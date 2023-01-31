@@ -162,6 +162,10 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="src\celeste.cpp" />
+    <ClCompile Include="src\colliders\circle.cpp" />
+    <ClCompile Include="src\colliders\collide.cpp" />
+    <ClCompile Include="src\colliders\collider.cpp" />
+    <ClCompile Include="src\colliders\hitbox.cpp" />
     <ClCompile Include="src\entities\player.cpp" />
     <ClCompile Include="src\entities\entity.cpp" />
     <ClCompile Include="src\entities\solid.cpp" />
@@ -204,6 +208,10 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\celeste.hpp" />
+    <ClInclude Include="include\colliders\circle.hpp" />
+    <ClInclude Include="include\colliders\collide.hpp" />
+    <ClInclude Include="include\colliders\collider.hpp" />
+    <ClInclude Include="include\colliders\hitbox.hpp" />
     <ClInclude Include="include\entities\player.hpp" />
     <ClInclude Include="include\entities\entity.hpp" />
     <ClInclude Include="include\entities\solid.hpp" />

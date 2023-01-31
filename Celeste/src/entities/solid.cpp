@@ -12,7 +12,7 @@ namespace celeste
 
     void Solid::Draw()
     {
-        calc::Vector2 pixelPosition = Globals::gWindowPosition + Globals::ToPixels(mPosition);
+        calc::Vector2 pixelPosition = Globals::ToPixels(mPosition);
         Globals::gDrawList->AddRectFilled(ToImVec2(pixelPosition), ToImVec2(pixelPosition + 60), IM_COL32_WHITE);
     }
 }

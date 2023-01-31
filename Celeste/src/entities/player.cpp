@@ -11,7 +11,7 @@ namespace celeste
     celeste::Player::Player()
     {
         mPosition = 30;
-        mApplyGravity = true;
+        //mApplyGravity = true;
     }
 
     void Player::Update(float deltaTime)
@@ -44,7 +44,7 @@ namespace celeste
     {
         ImGuiIO& io = ImGui::GetIO();
 
-        calc::Vector2 pixelPosition = Globals::gWindowPosition + Globals::ToPixels(mPosition);
+        calc::Vector2 pixelPosition = Globals::ToPixels(mPosition);
         calc::Vector2 pixelVelocity = Globals::ToPixels(mVelocity);
 
         ImGui::Begin("Player");
