@@ -16,6 +16,8 @@ namespace colliders
         bool Collide(const Hitbox& hitbox) const override;
         bool Collide(const Circle& circle) const override;
 
+        bool Intersect(const calc::Vector2& p1, const calc::Vector2& p2) const;
+
         inline float GetLeft() const override { return mPosition.x; }
         inline float GetRight() const override { return mPosition.x + mRadius; }
         inline float GetTop() const override { return mPosition.y; }

@@ -25,7 +25,7 @@ namespace colliders
 
     bool Hitbox::Collide(const Hitbox& hitbox) const
     {
-        calc::Vector2 position = hitbox.GetPosition(), size = hitbox.GetSize();
+        calc::Vector2 position = hitbox.mPosition, size = hitbox.mSize;
 
         // Check for a collision with any of the hitbox's corners
         return Collide(position) // Top left
@@ -36,40 +36,17 @@ namespace colliders
 
     bool Hitbox::Collide(const Circle& circle) const
     {
-        // TODO: Implement Hitbox-Circle collisions
-        /*calc::Vector2 oc = circle.GetPosition();
+        if (Collide(circle.GetPosition()))
+            return true;
 
-        calc::Vector2 os2[] = {
-            createVector2(box->rectangle.points[0].x, box->rectangle.points[0].y),
-            createVector2(box->rectangle.points[1].x, box->rectangle.points[1].y),
-            createVector2(box->rectangle.points[2].x, box->rectangle.points[2].y),
-            createVector2(box->rectangle.points[3].x, box->rectangle.points[3].y)
-        };
-
-        for (int i = 0; i < 4; i++) {
-            calc::Vector2 normal = getNormalVector2FromSegment(box->triangle.points[i], box->triangle.points[(i + 1) % 4]);
+        const calc::Vector2& topLeft = mPosition;
+        const calc::Vector2 topRight(mPosition.x + mSize.x, mPosition.y),
+            bottomLeft(mPosition.x, mPosition.y + mSize.y),
+            bottomRight(mPosition.x + mSize.x, mPosition.y + mSize.y);
             
-            calc::Vector2 temp = multiplyVector2(normal, circle.mRadius);
-            calc::Vector2 od1 = addVector2(oc, oppositeVector2(temp));
-            calc::Vector2 od2 = addVector2(oc, temp);
-            float sProjections[2];
-            sProjections[0] = dotProductVector2(normal, od1);
-            sProjections[1] = dotProductVector2(normal, od2);
-
-            float s2Projections[4];
-            for (int j = 0; j < 4; j++) {
-                s2Projections[j] = dotProductVector2(normal, os2[j]);
-            }
-
-            float max = getMax(sProjections, 2);
-            float min = getMin(sProjections, 2);
-            float max2 = getMax(s2Projections, 4);
-            float min2 = getMin(s2Projections, 4);
-
-            if (__max(min, min2) > __min(max, max2))
-                return false;
-        }*/
-
-        return true;
+        return circle.Intersect(topLeft, topRight)
+            || circle.Intersect(topRight, bottomRight)
+            || circle.Intersect(bottomRight, bottomLeft)
+            || circle.Intersect(bottomLeft, topLeft);
     }
 }
