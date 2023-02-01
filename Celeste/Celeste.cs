@@ -4,8 +4,6 @@
 // MVID: FAF6CA25-5C06-43EB-A08F-9CCF291FE6A3
 // Assembly location: C:\Program Files (x86)\Steam\steamapps\common\Celeste\orig\Celeste.exe
 
-#define STEAMWORKS_WIN
-
 using Celeste.Pico8;
 using Microsoft.Xna.Framework;
 using Monocle;
@@ -43,7 +41,7 @@ namespace Celeste
     public Celeste()
       : base(1920, 1080, 960, 540, nameof (Celeste), Settings.Instance.Fullscreen, Settings.Instance.VSync)
     {
-      this.Version = new Version(1, 4, 0, 0);
+      this.Version = new System.Version(1, 4, 0, 0);
       Celeste.Instance = this;
       Engine.ExitOnEscapeKeypress = false;
       this.IsFixedTimeStep = true;
