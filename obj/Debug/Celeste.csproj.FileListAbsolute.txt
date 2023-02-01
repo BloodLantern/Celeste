@@ -1,0 +1,2 @@
+C:\Users\maxim\source\repos\CelesteSource\Celeste\obj\Debug\Celeste.csproj.AssemblyReference.cache
+C:\Users\maxim\source\repos\CelesteSource\Celeste\obj\Debug\Celeste.csproj.CoreCompileInputs.cache
