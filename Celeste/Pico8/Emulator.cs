@@ -247,7 +247,7 @@ namespace Celeste.Pico8
       if ((HandleBase) this.snapshot != (HandleBase) null)
         Audio.ReleaseSnapshot(this.snapshot);
       this.snapshot = (EventInstance) null;
-      Stats.Store();
+      //Stats.Store();
       base.End();
     }
 

@@ -248,7 +248,7 @@ namespace Celeste
 
     private void GotBouncedOn(Entity entity)
     {
-      Celeste.Celeste.Freeze(0.15f);
+      Celeste.Freeze(0.15f);
       this.Speed = (this.Center - entity.Center).SafeNormalize(200f);
       this.State.State = 6;
       this.sprite.Scale = new Vector2(1.4f, 0.6f);
@@ -714,31 +714,16 @@ namespace Celeste
       return 3;
     }
 
+    // ISSUE: reference to a compiler-generated field
     private IEnumerator AttackCoroutine()
     {
-      // ISSUE: reference to a compiler-generated field
-      int num = this.\u003C\u003E1__state;
-      Seeker seeker = this;
-      if (num != 0)
-      {
-        if (num != 1)
-          return false;
-        // ISSUE: reference to a compiler-generated field
-        this.\u003C\u003E1__state = -1;
-        seeker.attackWindUp = false;
-        seeker.attackSpeed = 180f;
-        seeker.Speed = (seeker.lastSpottedAt - Vector2.UnitY * 2f - seeker.Center).SafeNormalize(180f);
-        seeker.SnapFacing(seeker.Speed.X);
-        return false;
-      }
-      // ISSUE: reference to a compiler-generated field
-      this.\u003C\u003E1__state = -1;
-      seeker.TurnFacing(seeker.lastSpottedAt.X - seeker.X, "windUp");
-      // ISSUE: reference to a compiler-generated field
-      this.\u003C\u003E2__current = (object) 0.3f;
-      // ISSUE: reference to a compiler-generated field
-      this.\u003C\u003E1__state = 1;
-      return true;
+        this.TurnFacing(this.lastSpottedAt.X - base.X, "windUp");
+        yield return 0.3f;
+        this.attackWindUp = false;
+        this.attackSpeed = 180f;
+        this.Speed = (this.lastSpottedAt - Vector2.UnitY * 2f - base.Center).SafeNormalize(180f);
+        this.SnapFacing(this.Speed.X);
+        yield break;
     }
 
     private int StunnedUpdate()

@@ -166,7 +166,7 @@ namespace Celeste
       flingBird.flingTargetSpeed = Vector2.Zero;
       flingBird.flingAccel = 1400f;
       yield return (object) 0.1f;
-      Celeste.Celeste.Freeze(0.05f);
+      Celeste.Freeze(0.05f);
       flingBird.flingTargetSpeed = FlingBird.FlingSpeed;
       flingBird.flingAccel = 6000f;
       yield return (object) 0.1f;
@@ -223,30 +223,15 @@ namespace Celeste
       }
     }
 
+    // ISSUE: reference to a compiler-generated field
     private IEnumerator LeaveRoutine()
     {
-      // ISSUE: reference to a compiler-generated field
-      int num = this.\u003C\u003E1__state;
-      FlingBird flingBird = this;
-      if (num != 0)
-      {
-        if (num != 1)
-          return false;
-        // ISSUE: reference to a compiler-generated field
-        this.\u003C\u003E1__state = -1;
-        flingBird.RemoveSelf();
-        return false;
-      }
-      // ISSUE: reference to a compiler-generated field
-      this.\u003C\u003E1__state = -1;
-      flingBird.sprite.Scale.X = 1f;
-      flingBird.sprite.Play("fly");
-      Vector2 to = new Vector2((float) ((flingBird.Scene as Level).Bounds.Right + 32), flingBird.Y);
-      // ISSUE: reference to a compiler-generated field
-      this.\u003C\u003E2__current = (object) flingBird.MoveOnCurve(flingBird.Position, (flingBird.Position + to) * 0.5f - Vector2.UnitY * 12f, to);
-      // ISSUE: reference to a compiler-generated field
-      this.\u003C\u003E1__state = 1;
-      return true;
+        this.sprite.Scale.X = 1f;
+        this.sprite.Play("fly", false, false);
+        Vector2 vector = new Vector2((float)((base.Scene as Level).Bounds.Right + 32), base.Y);
+        yield return this.MoveOnCurve(this.Position, (this.Position + vector) * 0.5f - Vector2.UnitY * 12f, vector);
+        base.RemoveSelf();
+        yield break;
     }
 
     private IEnumerator MoveOnCurve(Vector2 from, Vector2 anchor, Vector2 to)

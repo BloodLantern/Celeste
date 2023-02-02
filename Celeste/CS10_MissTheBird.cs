@@ -53,9 +53,13 @@ namespace Celeste
       bird.Position = bird.Position + Vector2.UnitX * 16f;
       cs10MissTheBird.bird.Add((Component) new Coroutine(cs10MissTheBird.bird.Startle((string) null, 0.5f, new Vector2?(new Vector2(3f, 0.25f)))));
       // ISSUE: reference to a compiler-generated method
-      cs10MissTheBird.Add((Component) Alarm.Create(Alarm.AlarmMode.Oneshot, new Action(cs10MissTheBird.\u003CCutscene\u003Eb__8_0), 0.1f, true));
+      cs10MissTheBird.Add(Alarm.Create(Alarm.AlarmMode.Oneshot, delegate
+      {
+          base.Add(new Coroutine(this.bird.FlyAway(0.2f), true));
+          this.bird.Position += new Vector2(0f, -4f);
+      }, 0.8f, true));
       while (!cs10MissTheBird.player.OnGround())
-        cs10MissTheBird.player.MoveVExact(1);
+      cs10MissTheBird.player.MoveVExact(1);
       Engine.TimeRate = 0.5f;
       cs10MissTheBird.player.Sprite.Play("roll");
       while ((double) cs10MissTheBird.player.Speed.X != 0.0)

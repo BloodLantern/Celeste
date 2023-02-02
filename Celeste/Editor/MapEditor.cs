@@ -130,7 +130,7 @@ namespace Celeste.Editor
       else
         MapEditor.Camera.Zoom += (float) num * 0.25f;
       MapEditor.Camera.Zoom = Math.Max(0.25f, Math.Min(24f, MapEditor.Camera.Zoom));
-      MapEditor.Camera.Position += new Vector2((float) Celeste.Input.MoveX.Value, (float) Celeste.Input.MoveY.Value) * 300f * Engine.DeltaTime;
+      MapEditor.Camera.Position += new Vector2((float) Input.MoveX.Value, (float) Input.MoveY.Value) * 300f * Engine.DeltaTime;
       this.UpdateMouse();
       this.hovered.Clear();
       if (this.mouseMode == MapEditor.MouseModes.Hover)

@@ -51,7 +51,7 @@ namespace Celeste
         if (!this.dashing)
         {
           this.dashing = true;
-          Celeste.Celeste.Freeze(0.05f);
+          Celeste.Freeze(0.05f);
           SlashFx.Burst(this.Playback.Center, (this.firstDash ? this.dashDirection0 : this.dashDirection1).Angle()).Tag = this.tag;
           this.dashTrailTimer = 0.1f;
           this.dashTrailCounter = 2;

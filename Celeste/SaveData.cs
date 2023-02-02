@@ -145,7 +145,7 @@ namespace Celeste
 
     public static void NoFileAssistChecks() => Input.MoveX.Inverted = Input.Aim.InvertedX = Input.Feather.InvertedX = false;
 
-    public void BeforeSave() => SaveData.Instance.Version = Celeste.Celeste.Instance.Version.ToString();
+    public void BeforeSave() => SaveData.Instance.Version = Celeste.Instance.Version.ToString();
 
     public void StartSession(Session session)
     {
@@ -166,7 +166,7 @@ namespace Celeste
     {
       ++this.TotalDeaths;
       ++this.Areas[area.ID].Modes[(int) area.Mode].Deaths;
-      Stats.Increment(Stat.DEATHS);
+      //Stats.Increment(Stat.DEATHS);
       StatsForStadia.Increment(StadiaStat.DEATHS);
     }
 
@@ -180,15 +180,15 @@ namespace Celeste
         ++this.TotalStrawberries;
         if (golden)
           ++this.TotalGoldenStrawberries;
-        if (this.TotalStrawberries >= 30)
+        /*if (this.TotalStrawberries >= 30)
           Achievements.Register(Achievement.STRB1);
         if (this.TotalStrawberries >= 80)
           Achievements.Register(Achievement.STRB2);
         if (this.TotalStrawberries >= 175)
-          Achievements.Register(Achievement.STRB3);
+          Achievements.Register(Achievement.STRB3);*/
         StatsForStadia.SetIfLarger(StadiaStat.BERRIES, this.TotalStrawberries);
       }
-      Stats.Increment(golden ? Stat.GOLDBERRIES : Stat.BERRIES);
+      //Stats.Increment(golden ? Stat.GOLDBERRIES : Stat.BERRIES);
     }
 
     public void AddStrawberry(EntityID strawberry, bool golden) => this.AddStrawberry(this.CurrentSession.Area, strawberry, golden);
@@ -206,7 +206,7 @@ namespace Celeste
     public void RegisterHeartGem(AreaKey area)
     {
       this.Areas[area.ID].Modes[(int) area.Mode].HeartGem = true;
-      if (area.Mode == AreaMode.Normal)
+      /*if (area.Mode == AreaMode.Normal)
       {
         if (area.ID == 1)
           Achievements.Register(Achievement.HEART1);
@@ -243,14 +243,14 @@ namespace Celeste
           Achievements.Register(Achievement.BSIDE7);
         else if (area.ID == 9)
           Achievements.Register(Achievement.BSIDE8);
-      }
+      }*/
       StatsForStadia.SetIfLarger(StadiaStat.HEARTS, this.TotalHeartGems);
     }
 
     public void RegisterCassette(AreaKey area)
     {
       this.Areas[area.ID].Cassette = true;
-      Achievements.Register(Achievement.CASS);
+      //Achievements.Register(Achievement.CASS);
     }
 
     public bool RegisterPoemEntry(string id)
@@ -314,7 +314,7 @@ namespace Celeste
 
     public bool FoundAnyCheckpoints(AreaKey area)
     {
-      if (Celeste.Celeste.PlayMode == Celeste.Celeste.PlayModes.Event)
+      if (Celeste.PlayMode == Celeste.PlayModes.Event)
         return false;
       if (!this.DebugMode && !this.CheatMode)
         return this.Areas[area.ID].Modes[(int) area.Mode].Checkpoints.Count > 0;
@@ -324,7 +324,7 @@ namespace Celeste
 
     public HashSet<string> GetCheckpoints(AreaKey area)
     {
-      if (Celeste.Celeste.PlayMode == Celeste.Celeste.PlayModes.Event)
+      if (Celeste.PlayMode == Celeste.PlayModes.Event)
         return new HashSet<string>();
       if (!this.DebugMode && !this.CheatMode)
         return this.Areas[area.ID].Modes[(int) area.Mode].Checkpoints;
@@ -362,7 +362,7 @@ namespace Celeste
       }
     }
 
-    public int MaxArea => Celeste.Celeste.PlayMode == Celeste.Celeste.PlayModes.Event ? 2 : AreaData.Areas.Count - 1;
+    public int MaxArea => Celeste.PlayMode == Celeste.PlayModes.Event ? 2 : AreaData.Areas.Count - 1;
 
     public int MaxAssistArea => AreaData.Areas.Count - 1;
 

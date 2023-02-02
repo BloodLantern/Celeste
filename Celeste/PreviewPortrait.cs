@@ -86,7 +86,7 @@ namespace Celeste
       this.topleft.Y += (float) MInput.Mouse.WheelDelta * Engine.DeltaTime * ActiveFont.LineHeight;
       if (!MInput.Keyboard.Pressed(Keys.F1))
         return;
-      Celeste.Celeste.ReloadPortraits();
+      Celeste.ReloadPortraits();
       Engine.Scene = (Scene) new PreviewPortrait(this.topleft.Y);
     }
 

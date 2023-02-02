@@ -280,7 +280,10 @@ namespace Celeste
       yield return (object) 1f;
       Input.Rumble(RumbleStrength.Light, RumbleLength.Long);
       // ISSUE: reference to a compiler-generated method
-      dreamBlock.Add((Component) (dreamBlock.shaker = new Shaker(onShake: new Action<Vector2>(dreamBlock.\u003CActivate\u003Eb__34_0))));
+      dreamBlock.Add(this.shaker = new Shaker(true, delegate (Vector2 t)
+      {
+          this.shake = t;
+      }));
       dreamBlock.shaker.Interval = 0.02f;
       dreamBlock.shaker.On = true;
       float p;

@@ -19,14 +19,12 @@ namespace Celeste
       if ((double) Glitch.Value <= 0.0 || Settings.Instance.DisableFlashes)
         return;
       Effect fxGlitch = GFX.FxGlitch;
-      Vector2 vector2;
-      ref Vector2 local = ref vector2;
       Viewport viewport = Engine.Graphics.GraphicsDevice.Viewport;
       double width = (double) viewport.Width;
       viewport = Engine.Graphics.GraphicsDevice.Viewport;
       double height = (double) viewport.Height;
-      local = new Vector2((float) width, (float) height);
-      fxGlitch.Parameters["dimensions"].SetValue(vector2);
+      Vector2 local = new Vector2((float) width, (float) height);
+      fxGlitch.Parameters["dimensions"].SetValue(local);
       fxGlitch.Parameters[nameof (amplitude)].SetValue(amplitude);
       fxGlitch.Parameters["minimum"].SetValue(-1f);
       fxGlitch.Parameters["glitch"].SetValue(Glitch.Value);

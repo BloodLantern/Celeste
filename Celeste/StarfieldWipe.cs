@@ -48,7 +48,7 @@ namespace Celeste
     public override void BeforeRender(Scene scene)
     {
       this.hasDrawn = true;
-      Engine.Graphics.GraphicsDevice.SetRenderTarget((RenderTarget2D) Celeste.Celeste.WipeTarget);
+      Engine.Graphics.GraphicsDevice.SetRenderTarget((RenderTarget2D) Celeste.WipeTarget);
       Engine.Graphics.GraphicsDevice.Clear(this.WipeIn ? Color.White : Color.Black);
       if ((double) this.Percent > 0.800000011920929)
       {
@@ -96,7 +96,7 @@ namespace Celeste
       if (this.WipeIn && (double) this.Percent <= 0.0099999997764825821 || !this.WipeIn && (double) this.Percent >= 0.99000000953674316)
         Draw.Rect(-1f, -1f, 1922f, 1082f, Color.White);
       else if (this.hasDrawn)
-        Draw.SpriteBatch.Draw((Texture2D) (RenderTarget2D) Celeste.Celeste.WipeTarget, new Vector2(-1f, -1f), Color.White);
+        Draw.SpriteBatch.Draw((Texture2D) (RenderTarget2D) Celeste.WipeTarget, new Vector2(-1f, -1f), Color.White);
       Draw.SpriteBatch.End();
     }
 

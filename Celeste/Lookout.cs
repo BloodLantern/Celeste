@@ -200,14 +200,13 @@ namespace Celeste
             }
             speed.X = 0.0f;
 label_47:
-            ref Vector2 local1 = ref cam;
             double x = (double) cam.X;
             bounds1 = level.Bounds;
             double left = (double) bounds1.Left;
             bounds1 = level.Bounds;
             double max1 = (double) (bounds1.Right - 320);
             double num1 = (double) Calc.Clamp((float) x, (float) left, (float) max1);
-            local1.X = (float) num1;
+            cam.X = (float) num1;
             foreach (Entity entity in entities)
             {
               if ((double) cam.X + 320.0 > (double) entity.Left && (double) cam.Y + 180.0 > (double) entity.Top && (double) cam.X < (double) entity.Right && (double) cam.Y < (double) entity.Bottom)
@@ -228,14 +227,13 @@ label_47:
             }
             speed.Y = 0.0f;
 label_56:
-            ref Vector2 local2 = ref cam;
             double y = (double) cam.Y;
             bounds2 = level.Bounds;
             double top = (double) bounds2.Top;
             bounds2 = level.Bounds;
             double max2 = (double) (bounds2.Bottom - 180);
             double num3 = (double) Calc.Clamp((float) y, (float) top, (float) max2);
-            local2.Y = (float) num3;
+            cam.Y = (float) num3;
             foreach (Entity entity in entities)
             {
               if ((double) cam.X + 320.0 > (double) entity.Left && (double) cam.Y + 180.0 > (double) entity.Top && (double) cam.X < (double) entity.Right && (double) cam.Y < (double) entity.Bottom)

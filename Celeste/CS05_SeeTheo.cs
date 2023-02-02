@@ -48,29 +48,14 @@ namespace Celeste
       cs05SeeTheo.EndCutscene(level);
     }
 
+    // ISSUE: reference to a compiler-generated field
     private IEnumerator ZoomIn()
-    {
-      // ISSUE: reference to a compiler-generated field
-      int num = this.\u003C\u003E1__state;
-      CS05_SeeTheo cs05SeeTheo = this;
-      if (num != 0)
-      {
-        if (num != 1)
-          return false;
-        // ISSUE: reference to a compiler-generated field
-        this.\u003C\u003E1__state = -1;
-        return false;
-      }
-      // ISSUE: reference to a compiler-generated field
-      this.\u003C\u003E1__state = -1;
-      // ISSUE: reference to a compiler-generated field
-      this.\u003C\u003E2__current = (object) cs05SeeTheo.Level.ZoomTo(Vector2.Lerp(cs05SeeTheo.player.Position, cs05SeeTheo.theo.Position, 0.5f) - cs05SeeTheo.Level.Camera.Position + new Vector2(0.0f, -20f), 2f, 0.5f);
-      // ISSUE: reference to a compiler-generated field
-      this.\u003C\u003E1__state = 1;
-      return true;
+        {
+        yield return this.Level.ZoomTo(Vector2.Lerp(this.player.Position, this.theo.Position, 0.5f) - this.Level.Camera.Position + new Vector2(0f, -20f), 2f, 0.5f);
+        yield break;
     }
 
-    private IEnumerator MadelineTurnsAround()
+        private IEnumerator MadelineTurnsAround()
     {
       yield return (object) 0.3f;
       this.player.Facing = Facings.Left;

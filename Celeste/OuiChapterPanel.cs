@@ -89,7 +89,7 @@ namespace Celeste
     {
       if (start == Overworld.StartMode.AreaComplete || start == Overworld.StartMode.AreaQuit)
       {
-        bool shouldAdvance = start == Overworld.StartMode.AreaComplete && (Celeste.Celeste.PlayMode == Celeste.Celeste.PlayModes.Event || SaveData.Instance.CurrentSession != null && SaveData.Instance.CurrentSession.ShouldAdvance);
+        bool shouldAdvance = start == Overworld.StartMode.AreaComplete && (Celeste.PlayMode == Celeste.PlayModes.Event || SaveData.Instance.CurrentSession != null && SaveData.Instance.CurrentSession.ShouldAdvance);
         this.Position = this.OpenPosition;
         this.Reset();
         this.Add((Component) new Coroutine(this.IncrementStats(shouldAdvance)));
@@ -136,7 +136,7 @@ namespace Celeste
       bool flag = false;
       if (!this.Data.Interlude && this.Data.HasMode(AreaMode.BSide) && (this.DisplayedStats.Cassette || (SaveData.Instance.DebugMode || SaveData.Instance.CheatMode) && this.DisplayedStats.Cassette == this.RealStats.Cassette))
         flag = true;
-      int num = this.Data.Interlude || !this.Data.HasMode(AreaMode.CSide) || SaveData.Instance.UnlockedModes < 3 ? 0 : (Celeste.Celeste.PlayMode != Celeste.Celeste.PlayModes.Event ? 1 : 0);
+      int num = this.Data.Interlude || !this.Data.HasMode(AreaMode.CSide) || SaveData.Instance.UnlockedModes < 3 ? 0 : (Celeste.PlayMode != Celeste.PlayModes.Event ? 1 : 0);
       this.modes.Add(new OuiChapterPanel.Option()
       {
         Label = Dialog.Clean(this.Data.Interlude ? "FILE_BEGIN" : "overworld_normal").ToUpper(),
@@ -183,18 +183,12 @@ namespace Celeste
       return option;
     }
 
+    // ISSUE: reference to a compiler-generated field
     public override IEnumerator Leave(Oui next)
     {
-      // ISSUE: reference to a compiler-generated field
-      int num1 = this.\u003C\u003E1__state;
-      OuiChapterPanel ouiChapterPanel = this;
-      if (num1 != 0)
-        return false;
-      // ISSUE: reference to a compiler-generated field
-      this.\u003C\u003E1__state = -1;
-      double num2 = (double) ouiChapterPanel.Overworld.Mountain.EaseCamera(ouiChapterPanel.Area.ID, ouiChapterPanel.Data.MountainIdle);
-      ouiChapterPanel.Add((Component) new Coroutine(ouiChapterPanel.EaseOut()));
-      return false;
+        base.Overworld.Mountain.EaseCamera(this.Area.ID, this.Data.MountainIdle, null, true, false);
+        base.Add(new Coroutine(this.EaseOut(true), true));
+        yield break;
     }
 
     public IEnumerator EaseOut(bool removeChildren = true)
@@ -329,7 +323,7 @@ namespace Celeste
         this.height = Calc.Approach(this.height, (float) this.GetModeHeight(), Engine.DeltaTime * 1600f);
       if (this.Selected && this.Focused)
       {
-        if (Celeste.Input.MenuLeft.Pressed && this.option > 0)
+        if (Input.MenuLeft.Pressed && this.option > 0)
         {
           Audio.Play("event:/ui/world_map/chapter/tab_roll_left");
           --this.option;
@@ -342,7 +336,7 @@ namespace Celeste
           else
             Audio.Play("event:/ui/world_map/chapter/checkpoint_photo_add");
         }
-        else if (Celeste.Input.MenuRight.Pressed && this.option + 1 < this.options.Count)
+        else if (Input.MenuRight.Pressed && this.option + 1 < this.options.Count)
         {
           Audio.Play("event:/ui/world_map/chapter/tab_roll_right");
           ++this.option;
@@ -355,7 +349,7 @@ namespace Celeste
           else
             Audio.Play("event:/ui/world_map/chapter/checkpoint_photo_remove");
         }
-        else if (Celeste.Input.MenuConfirm.Pressed)
+        else if (Input.MenuConfirm.Pressed)
         {
           if (this.selectingMode)
           {
@@ -372,7 +366,7 @@ namespace Celeste
           else
             this.Start(this.options[this.option].CheckpointLevelName);
         }
-        else if (Celeste.Input.MenuCancel.Pressed)
+        else if (Input.MenuCancel.Pressed)
         {
           if (this.selectingMode)
           {
@@ -599,7 +593,7 @@ namespace Celeste
           }
           ++modeStats.TotalStrawberries;
           ouiChapterPanel.strawberries.Amount = modeStats.TotalStrawberries;
-          Celeste.Input.Rumble(RumbleStrength.Light, RumbleLength.Short);
+          Input.Rumble(RumbleStrength.Light, RumbleLength.Short);
         }
         ouiChapterPanel.strawberries.CanWiggle = false;
         yield return (object) 0.5f;
@@ -611,7 +605,7 @@ namespace Celeste
           ouiChapterPanel.strawberries.ShowOutOf = true;
           ouiChapterPanel.strawberries.Wiggle();
           modeStats.Completed = true;
-          Celeste.Input.Rumble(RumbleStrength.Light, RumbleLength.Medium);
+          Input.Rumble(RumbleStrength.Light, RumbleLength.Medium);
           yield return (object) 0.6f;
         }
       }
@@ -630,7 +624,7 @@ namespace Celeste
             Audio.Play("event:/ui/postgame/death_final");
           else
             Audio.Play("event:/ui/postgame/death_count");
-          Celeste.Input.Rumble(RumbleStrength.Light, RumbleLength.Short);
+          Input.Rumble(RumbleStrength.Light, RumbleLength.Short);
         }
         yield return (object) 0.8f;
         ouiChapterPanel.deaths.CanWiggle = false;
@@ -656,7 +650,7 @@ namespace Celeste
           yield return (object) null;
         o.IconEase = 1f;
         ouiChapterPanel.modeAppearWiggler.Start();
-        Celeste.Input.Rumble(RumbleStrength.Medium, RumbleLength.Medium);
+        Input.Rumble(RumbleStrength.Medium, RumbleLength.Medium);
         ouiChapterPanel.remixUnlockText = new AreaCompleteTitle(ouiChapterPanel.spotlightPosition + new Vector2(0.0f, 80f), Dialog.Clean("OVERWORLD_REMIX_UNLOCKED"), 1f);
         ouiChapterPanel.remixUnlockText.Tag = (int) Tags.HUD;
         ouiChapterPanel.Overworld.Add((Entity) ouiChapterPanel.remixUnlockText);

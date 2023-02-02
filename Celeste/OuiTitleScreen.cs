@@ -20,7 +20,7 @@ namespace Celeste
     private const int ReflectionSliceSize = 4;
     private float alpha;
     private float fade;
-    private string version = "v." + (object) Celeste.Celeste.Instance.Version;
+    private string version = "v." + (object) Celeste.Instance.Version;
     private bool hideConfirmButton;
     private Monocle.Image logo;
     private MTexture title;
@@ -36,11 +36,11 @@ namespace Celeste
       this.reflections = new List<MTexture>();
       for (int y = this.title.Height - 4; y > 0; y -= 4)
         this.reflections.Add(this.title.GetSubtexture(0, y, this.title.Width, 4));
-      if (Celeste.Celeste.PlayMode != Celeste.Celeste.PlayModes.Normal)
+      if (Celeste.PlayMode != Celeste.PlayModes.Normal)
       {
         if ("".Length > 0)
           this.version += "\n";
-        this.version = this.version + "\n" + Celeste.Celeste.PlayMode.ToString() + " Build";
+        this.version = this.version + "\n" + Celeste.PlayMode.ToString() + " Build";
       }
       if (!Settings.Instance.LaunchWithFMODLiveUpdate)
         return;

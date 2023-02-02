@@ -192,7 +192,7 @@ namespace Celeste
         birdNpc.staticMover = (StaticMover) null;
       }
       birdNpc.Sprite.Play("fly");
-      birdNpc.Facing = (Facings) -(int) birdNpc.Facing;
+      birdNpc.Facing = (Facings) (-(int) birdNpc.Facing);
       Vector2 speed = new Vector2((float) ((int) birdNpc.Facing * 20), -40f * upwardsMultiplier);
       while ((double) birdNpc.Y > (double) birdNpc.level.Bounds.Top)
       {

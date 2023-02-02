@@ -1,5 +1,5 @@
 ﻿// Decompiled with JetBrains decompiler
-// Type: Celeste.InputMappingInfo
+// Type: InputMappingInfo
 // Assembly: Celeste, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null
 // MVID: FAF6CA25-5C06-43EB-A08F-9CCF291FE6A3
 // Assembly location: C:\Program Files (x86)\Steam\steamapps\common\Celeste\orig\Celeste.exe
@@ -24,9 +24,9 @@ namespace Celeste
       if (strArray.Length == 3)
       {
         this.info.Add((object) strArray[0]);
-        this.info.Add((object) Celeste.Input.MenuConfirm);
+        this.info.Add((object) Input.MenuConfirm);
         this.info.Add((object) strArray[1]);
-        this.info.Add((object) Celeste.Input.MenuJournal);
+        this.info.Add((object) Input.MenuJournal);
         this.info.Add((object) strArray[2]);
       }
       this.controllerMode = controllerMode;
@@ -67,17 +67,17 @@ namespace Celeste
           VirtualButton button = this.info[index] as VirtualButton;
           if (this.controllerMode)
           {
-            MTexture mtexture = Celeste.Input.GuiButton(button, Celeste.Input.PrefixMode.Attached);
+            MTexture mtexture = Input.GuiButton(button, Input.PrefixMode.Attached);
             num += (float) mtexture.Width * 0.6f;
           }
           else if (button.Binding.Keyboard.Count > 0)
           {
-            MTexture mtexture = Celeste.Input.GuiKey(button.Binding.Keyboard[0]);
+            MTexture mtexture = Input.GuiKey(button.Binding.Keyboard[0]);
             num += (float) mtexture.Width * 0.6f;
           }
           else
           {
-            MTexture mtexture = Celeste.Input.GuiKey(Keys.None);
+            MTexture mtexture = Input.GuiKey(Keys.None);
             num += (float) mtexture.Width * 0.6f;
           }
         }
@@ -102,19 +102,19 @@ namespace Celeste
           VirtualButton button = this.info[index] as VirtualButton;
           if (this.controllerMode)
           {
-            MTexture mtexture = Celeste.Input.GuiButton(button, Celeste.Input.PrefixMode.Attached);
+            MTexture mtexture = Input.GuiButton(button, Input.PrefixMode.Attached);
             mtexture.DrawJustified(position1, new Vector2(0.0f, 0.5f), color2, 0.6f);
             position1.X += (float) mtexture.Width * 0.6f;
           }
           else if (button.Binding.Keyboard.Count > 0)
           {
-            MTexture mtexture = Celeste.Input.GuiKey(button.Binding.Keyboard[0]);
+            MTexture mtexture = Input.GuiKey(button.Binding.Keyboard[0]);
             mtexture.DrawJustified(position1, new Vector2(0.0f, 0.5f), color2, 0.6f);
             position1.X += (float) mtexture.Width * 0.6f;
           }
           else
           {
-            MTexture mtexture = Celeste.Input.GuiKey(Keys.None);
+            MTexture mtexture = Input.GuiKey(Keys.None);
             mtexture.DrawJustified(position1, new Vector2(0.0f, 0.5f), color2, 0.6f);
             position1.X += (float) mtexture.Width * 0.6f;
           }

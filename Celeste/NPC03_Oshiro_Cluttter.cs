@@ -118,28 +118,13 @@ namespace Celeste
       entity.StateMachine.State = 0;
     }
 
+    // ISSUE: reference to a compiler-generated field
     private IEnumerator StandUp()
     {
-      // ISSUE: reference to a compiler-generated field
-      int num = this.\u003C\u003E1__state;
-      NPC03_Oshiro_Cluttter c03OshiroCluttter = this;
-      if (num != 0)
-      {
-        if (num != 1)
-          return false;
-        // ISSUE: reference to a compiler-generated field
-        this.\u003C\u003E1__state = -1;
-        return false;
-      }
-      // ISSUE: reference to a compiler-generated field
-      this.\u003C\u003E1__state = -1;
-      Audio.Play("event:/char/oshiro/chat_get_up", c03OshiroCluttter.Position);
-      (c03OshiroCluttter.Sprite as OshiroSprite).Pop("idle", false);
-      // ISSUE: reference to a compiler-generated field
-      this.\u003C\u003E2__current = (object) 0.25f;
-      // ISSUE: reference to a compiler-generated field
-      this.\u003C\u003E1__state = 1;
-      return true;
+        Audio.Play("event:/char/oshiro/chat_get_up", this.Position);
+        (this.Sprite as OshiroSprite).Pop("idle", false);
+        yield return 0.25f;
+        yield break;
     }
 
     private IEnumerator Pace()

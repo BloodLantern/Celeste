@@ -30,7 +30,7 @@ namespace Celeste
     public AreaComplete(Session session, XmlElement xml, Atlas atlas, HiresSnow snow)
     {
       this.Session = session;
-      this.version = Celeste.Celeste.Instance.Version.ToString();
+      this.version = Celeste.Instance.Version.ToString();
       if (session.Area.ID != 7)
       {
         string text = Dialog.Clean("areacomplete_" + (object) session.Area.Mode + (session.FullClear ? (object) "_fullclear" : (object) ""));
@@ -48,7 +48,7 @@ namespace Celeste
       this.Add((Monocle.Renderer) (this.snow = snow));
       this.RendererList.UpdateLists();
       AreaKey area = session.Area;
-      if (area.Mode != AreaMode.Normal)
+      /*if (area.Mode != AreaMode.Normal)
         return;
       if (area.ID == 1)
         Achievements.Register(Achievement.CH1);
@@ -69,7 +69,7 @@ namespace Celeste
         if (area.ID != 7)
           return;
         Achievements.Register(Achievement.CH7);
-      }
+      }*/
     }
 
     public override void End()
@@ -81,7 +81,7 @@ namespace Celeste
     public override void Update()
     {
       base.Update();
-      if (Celeste.Input.MenuConfirm.Pressed && this.finishedSlide && this.canConfirm)
+      if (Input.MenuConfirm.Pressed && this.finishedSlide && this.canConfirm)
       {
         this.canConfirm = false;
         if (this.Session.Area.ID == 7 && this.Session.Area.Mode == AreaMode.Normal)
@@ -119,18 +119,18 @@ namespace Celeste
         this.speedrunTimerEase = Calc.Approach(this.speedrunTimerEase, 1f, Engine.DeltaTime * 2f);
       if (this.title != null)
         this.title.Update();
-      if (Celeste.Celeste.PlayMode != Celeste.Celeste.PlayModes.Debug)
+      if (Celeste.PlayMode != Celeste.PlayModes.Debug)
         return;
       if (MInput.Keyboard.Pressed(Keys.F2))
       {
-        Celeste.Celeste.ReloadAssets(false, true, false);
+        Celeste.ReloadAssets(false, true, false);
         Engine.Scene = (Scene) new LevelExit(LevelExit.Mode.Completed, this.Session);
       }
       else
       {
         if (!MInput.Keyboard.Pressed(Keys.F3))
           return;
-        Celeste.Celeste.ReloadAssets(false, true, true);
+        Celeste.ReloadAssets(false, true, true);
         Engine.Scene = (Scene) new LevelExit(LevelExit.Mode.Completed, this.Session);
       }
     }

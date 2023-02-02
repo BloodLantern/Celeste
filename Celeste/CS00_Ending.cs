@@ -165,32 +165,22 @@ namespace Celeste
       level.Add((Entity) new CS00_Ending.EndingCutsceneDelay());
     }
 
-    private class EndingCutsceneDelay : Entity
-    {
-      public EndingCutsceneDelay() => this.Add((Component) new Coroutine(this.Routine()));
-
-      private IEnumerator Routine()
-      {
         // ISSUE: reference to a compiler-generated field
-        int num = this.\u003C\u003E1__state;
-        CS00_Ending.EndingCutsceneDelay endingCutsceneDelay = this;
-        if (num != 0)
+        private class EndingCutsceneDelay : Entity
         {
-          if (num != 1)
-            return false;
-          // ISSUE: reference to a compiler-generated field
-          this.\u003C\u003E1__state = -1;
-          (endingCutsceneDelay.Scene as Level).CompleteArea(false);
-          return false;
+            // Token: 0x0600286F RID: 10351 RVA: 0x00106847 File Offset: 0x00104A47
+            public EndingCutsceneDelay()
+            {
+                base.Add(new Coroutine(this.Routine(), true));
+            }
+
+            // Token: 0x06002870 RID: 10352 RVA: 0x00106861 File Offset: 0x00104A61
+            private IEnumerator Routine()
+            {
+                yield return 3f;
+                (base.Scene as Level).CompleteArea(false, false, false);
+                yield break;
+            }
         }
-        // ISSUE: reference to a compiler-generated field
-        this.\u003C\u003E1__state = -1;
-        // ISSUE: reference to a compiler-generated field
-        this.\u003C\u003E2__current = (object) 3f;
-        // ISSUE: reference to a compiler-generated field
-        this.\u003C\u003E1__state = 1;
-        return true;
-      }
     }
-  }
 }

@@ -307,60 +307,30 @@ namespace Celeste
       yield return (object) 0.25f;
     }
 
+    // ISSUE: reference to a compiler-generated field
     private IEnumerator DarknessConsumes()
     {
-      // ISSUE: reference to a compiler-generated field
-      int num = this.\u003C\u003E1__state;
-      CS04_Gondola cs04Gondola = this;
-      if (num != 0)
-      {
-        if (num != 1)
-          return false;
-        // ISSUE: reference to a compiler-generated field
-        this.\u003C\u003E1__state = -1;
-        cs04Gondola.theo.Sprite.Play("comfortStart");
-        return false;
-      }
-      // ISSUE: reference to a compiler-generated field
-      this.\u003C\u003E1__state = -1;
-      cs04Gondola.Level.Shake();
-      Input.Rumble(RumbleStrength.Medium, RumbleLength.Medium);
-      Audio.Play("event:/game/04_cliffside/gondola_scaryhair_02", cs04Gondola.gondola.Position);
-      cs04Gondola.BurstTentacles(2, 60f);
-      // ISSUE: reference to a compiler-generated field
-      this.\u003C\u003E2__current = (object) cs04Gondola.MoveTheoOnGondola(0.0f);
-      // ISSUE: reference to a compiler-generated field
-      this.\u003C\u003E1__state = 1;
-      return true;
-    }
+        this.Level.Shake(0.3f);
+        Input.Rumble(RumbleStrength.Medium, RumbleLength.Medium);
+        Audio.Play("event:/game/04_cliffside/gondola_scaryhair_02", this.gondola.Position);
+        this.BurstTentacles(2, 60f, 200f);
+        yield return this.MoveTheoOnGondola(0f, true);
+        this.theo.Sprite.Play("comfortStart", false, false);
+        yield break;
+        }
 
+    // ISSUE: reference to a compiler-generated field
     private IEnumerator CantBreath()
     {
-      // ISSUE: reference to a compiler-generated field
-      int num = this.\u003C\u003E1__state;
-      CS04_Gondola cs04Gondola = this;
-      if (num != 0)
-      {
-        if (num != 1)
-          return false;
-        // ISSUE: reference to a compiler-generated field
-        this.\u003C\u003E1__state = -1;
-        return false;
-      }
-      // ISSUE: reference to a compiler-generated field
-      this.\u003C\u003E1__state = -1;
-      cs04Gondola.Level.Shake();
-      Input.Rumble(RumbleStrength.Strong, RumbleLength.Medium);
-      Audio.Play("event:/game/04_cliffside/gondola_scaryhair_03", cs04Gondola.gondola.Position);
-      cs04Gondola.BurstTentacles(1, 30f);
-      cs04Gondola.BurstTentacles(0, 0.0f, 100f);
-      cs04Gondola.rumbler = new BreathingRumbler();
-      cs04Gondola.Scene.Add((Entity) cs04Gondola.rumbler);
-      // ISSUE: reference to a compiler-generated field
-      this.\u003C\u003E2__current = (object) null;
-      // ISSUE: reference to a compiler-generated field
-      this.\u003C\u003E1__state = 1;
-      return true;
+        this.Level.Shake(0.3f);
+        Input.Rumble(RumbleStrength.Strong, RumbleLength.Medium);
+        Audio.Play("event:/game/04_cliffside/gondola_scaryhair_03", this.gondola.Position);
+        this.BurstTentacles(1, 30f, 200f);
+        this.BurstTentacles(0, 0f, 100f);
+        this.rumbler = new BreathingRumbler();
+        base.Scene.Add(this.rumbler);
+        yield return null;
+        yield break;
     }
 
     private IEnumerator StartBreathing()

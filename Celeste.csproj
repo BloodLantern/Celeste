@@ -7,9 +7,25 @@
     <ProjectGuid>{AD4A712C-C235-41E5-B0A1-D1F0A1C24124}</ProjectGuid>
     <OutputType>WinExe</OutputType>
     <AssemblyName>Celeste</AssemblyName>
-    <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
-    <ApplicationVersion>1.0.0.0</ApplicationVersion>
+    <TargetFrameworkVersion>v4.8.1</TargetFrameworkVersion>
+    <LangVersion>preview</LangVersion>
     <FileAlignment>512</FileAlignment>
+    <PublishUrl>publish\</PublishUrl>
+    <Install>true</Install>
+    <InstallFrom>Disk</InstallFrom>
+    <UpdateEnabled>false</UpdateEnabled>
+    <UpdateMode>Foreground</UpdateMode>
+    <UpdateInterval>7</UpdateInterval>
+    <UpdateIntervalUnits>Days</UpdateIntervalUnits>
+    <UpdatePeriodically>false</UpdatePeriodically>
+    <UpdateRequired>false</UpdateRequired>
+    <MapFileExtensions>true</MapFileExtensions>
+    <ApplicationRevision>0</ApplicationRevision>
+    <ApplicationVersion>1.0.0.0</ApplicationVersion>
+    <IsWebBootstrapper>false</IsWebBootstrapper>
+    <UseApplicationTrust>false</UseApplicationTrust>
+    <BootstrapperEnabled>true</BootstrapperEnabled>
+    <TargetFrameworkProfile />
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <PlatformTarget>AnyCPU</PlatformTarget>
@@ -19,7 +35,7 @@
     <OutputPath>bin\Debug\</OutputPath>
     <DefineConstants>DEBUG;TRACE;STEAMWORKS_WIN</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
-    <WarningLevel>4</WarningLevel>
+    <WarningLevel>2</WarningLevel>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
@@ -32,12 +48,38 @@
     <WarningLevel>4</WarningLevel>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
   </PropertyGroup>
+  <PropertyGroup>
+    <StartupObject>Celeste.Celeste</StartupObject>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|x86'">
+    <DebugSymbols>true</DebugSymbols>
+    <OutputPath>bin\x86\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE;STEAMWORKS_WIN</DefineConstants>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <WarningLevel>2</WarningLevel>
+    <DebugType>full</DebugType>
+    <PlatformTarget>x86</PlatformTarget>
+    <LangVersion>preview</LangVersion>
+    <ErrorReport>prompt</ErrorReport>
+    <Prefer32Bit>true</Prefer32Bit>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release|x86'">
+    <OutputPath>bin\x86\Release\</OutputPath>
+    <DefineConstants>TRACE;STEAMWORKS_WIN</DefineConstants>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <Optimize>true</Optimize>
+    <DebugType>pdbonly</DebugType>
+    <PlatformTarget>x86</PlatformTarget>
+    <LangVersion>preview</LangVersion>
+    <ErrorReport>prompt</ErrorReport>
+    <Prefer32Bit>true</Prefer32Bit>
+  </PropertyGroup>
   <ItemGroup>
     <Reference Include="Microsoft.Xna.Framework" />
     <Reference Include="Microsoft.Xna.Framework.Game" />
     <Reference Include="Microsoft.Xna.Framework.Graphics" />
     <Reference Include="Steamworks.NET">
-      <HintPath>Steamworks.NET\Steamworks.NET.dll</HintPath>
+      <HintPath>..\..\..\OneDrive\Desktop\Utile\C# Libraries\bin\Steamworks.NET.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
@@ -644,323 +686,6 @@
     <Compile Include="Celeste\Editor\MapEditor.cs" />
     <Compile Include="Celeste\Pico8\Classic.cs" />
     <Compile Include="Celeste\Pico8\Emulator.cs" />
-    <Compile Include="FNA\Audio\AudioCategory.cs" />
-    <Compile Include="FNA\Audio\AudioChannels.cs" />
-    <Compile Include="FNA\Audio\AudioEmitter.cs" />
-    <Compile Include="FNA\Audio\AudioEngine.cs" />
-    <Compile Include="FNA\Audio\AudioListener.cs" />
-    <Compile Include="FNA\Audio\AudioStopOptions.cs" />
-    <Compile Include="FNA\Audio\Cue.cs" />
-    <Compile Include="FNA\Audio\DynamicSoundEffectInstance.cs" />
-    <Compile Include="FNA\Audio\InstancePlayLimitException.cs" />
-    <Compile Include="FNA\Audio\Microphone.cs" />
-    <Compile Include="FNA\Audio\MicrophoneState.cs" />
-    <Compile Include="FNA\Audio\NoAudioHardwareException.cs" />
-    <Compile Include="FNA\Audio\NoMicrophoneConnectedException.cs" />
-    <Compile Include="FNA\Audio\RendererDetail.cs" />
-    <Compile Include="FNA\Audio\SoundBank.cs" />
-    <Compile Include="FNA\Audio\SoundEffect.cs" />
-    <Compile Include="FNA\Audio\SoundEffectInstance.cs" />
-    <Compile Include="FNA\Audio\SoundState.cs" />
-    <Compile Include="FNA\Audio\WaveBank.cs" />
-    <Compile Include="FNA\BoundingBox.cs" />
-    <Compile Include="FNA\BoundingFrustum.cs" />
-    <Compile Include="FNA\BoundingSphere.cs" />
-    <Compile Include="FNA\Color.cs" />
-    <Compile Include="FNA\ContainmentType.cs" />
-    <Compile Include="FNA\Content\ContentExtensions.cs" />
-    <Compile Include="FNA\Content\ContentLoadException.cs" />
-    <Compile Include="FNA\Content\ContentManager.cs" />
-    <Compile Include="FNA\Content\ContentReader.cs" />
-    <Compile Include="FNA\Content\ContentReaders\AlphaTestEffectReader.cs" />
-    <Compile Include="FNA\Content\ContentReaders\ArrayReader.cs" />
-    <Compile Include="FNA\Content\ContentReaders\BasicEffectReader.cs" />
-    <Compile Include="FNA\Content\ContentReaders\BooleanReader.cs" />
-    <Compile Include="FNA\Content\ContentReaders\BoundingBoxReader.cs" />
-    <Compile Include="FNA\Content\ContentReaders\BoundingFrustumReader.cs" />
-    <Compile Include="FNA\Content\ContentReaders\BoundingSphereReader.cs" />
-    <Compile Include="FNA\Content\ContentReaders\ByteReader.cs" />
-    <Compile Include="FNA\Content\ContentReaders\CharReader.cs" />
-    <Compile Include="FNA\Content\ContentReaders\ColorReader.cs" />
-    <Compile Include="FNA\Content\ContentReaders\CurveReader.cs" />
-    <Compile Include="FNA\Content\ContentReaders\DateTimeReader.cs" />
-    <Compile Include="FNA\Content\ContentReaders\DecimalReader.cs" />
-    <Compile Include="FNA\Content\ContentReaders\DictionaryReader.cs" />
-    <Compile Include="FNA\Content\ContentReaders\DoubleReader.cs" />
-    <Compile Include="FNA\Content\ContentReaders\DualTextureEffectReader.cs" />
-    <Compile Include="FNA\Content\ContentReaders\EffectMaterialReader.cs" />
-    <Compile Include="FNA\Content\ContentReaders\EffectReader.cs" />
-    <Compile Include="FNA\Content\ContentReaders\EnumReader.cs" />
-    <Compile Include="FNA\Content\ContentReaders\EnvironmentMapEffectReader.cs" />
-    <Compile Include="FNA\Content\ContentReaders\ExternalReferenceReader.cs" />
-    <Compile Include="FNA\Content\ContentReaders\IndexBufferReader.cs" />
-    <Compile Include="FNA\Content\ContentReaders\Int16Reader.cs" />
-    <Compile Include="FNA\Content\ContentReaders\Int32Reader.cs" />
-    <Compile Include="FNA\Content\ContentReaders\Int64Reader.cs" />
-    <Compile Include="FNA\Content\ContentReaders\ListReader.cs" />
-    <Compile Include="FNA\Content\ContentReaders\MatrixReader.cs" />
-    <Compile Include="FNA\Content\ContentReaders\ModelReader.cs" />
-    <Compile Include="FNA\Content\ContentReaders\NullableReader.cs" />
-    <Compile Include="FNA\Content\ContentReaders\PlaneReader.cs" />
-    <Compile Include="FNA\Content\ContentReaders\PointReader.cs" />
-    <Compile Include="FNA\Content\ContentReaders\QuaternionReader.cs" />
-    <Compile Include="FNA\Content\ContentReaders\RayReader.cs" />
-    <Compile Include="FNA\Content\ContentReaders\RectangleReader.cs" />
-    <Compile Include="FNA\Content\ContentReaders\ReflectiveReader.cs" />
-    <Compile Include="FNA\Content\ContentReaders\SByteReader.cs" />
-    <Compile Include="FNA\Content\ContentReaders\SingleReader.cs" />
-    <Compile Include="FNA\Content\ContentReaders\SkinnedEffectReader.cs" />
-    <Compile Include="FNA\Content\ContentReaders\SongReader.cs" />
-    <Compile Include="FNA\Content\ContentReaders\SoundEffectReader.cs" />
-    <Compile Include="FNA\Content\ContentReaders\SpriteFontReader.cs" />
-    <Compile Include="FNA\Content\ContentReaders\StringReader.cs" />
-    <Compile Include="FNA\Content\ContentReaders\Texture2DReader.cs" />
-    <Compile Include="FNA\Content\ContentReaders\Texture3DReader.cs" />
-    <Compile Include="FNA\Content\ContentReaders\TextureCubeReader.cs" />
-    <Compile Include="FNA\Content\ContentReaders\TextureReader.cs" />
-    <Compile Include="FNA\Content\ContentReaders\TimeSpanReader.cs" />
-    <Compile Include="FNA\Content\ContentReaders\UInt16Reader.cs" />
-    <Compile Include="FNA\Content\ContentReaders\UInt32Reader.cs" />
-    <Compile Include="FNA\Content\ContentReaders\UInt64Reader.cs" />
-    <Compile Include="FNA\Content\ContentReaders\Vector2Reader.cs" />
-    <Compile Include="FNA\Content\ContentReaders\Vector3Reader.cs" />
-    <Compile Include="FNA\Content\ContentReaders\Vector4Reader.cs" />
-    <Compile Include="FNA\Content\ContentReaders\VertexBufferReader.cs" />
-    <Compile Include="FNA\Content\ContentReaders\VertexDeclarationReader.cs" />
-    <Compile Include="FNA\Content\ContentReaders\VideoReader.cs" />
-    <Compile Include="FNA\Content\ContentSerializerAttribute.cs" />
-    <Compile Include="FNA\Content\ContentSerializerCollectionItemNameAttribute.cs" />
-    <Compile Include="FNA\Content\ContentSerializerIgnoreAttribute.cs" />
-    <Compile Include="FNA\Content\ContentSerializerRuntimeTypeAttribute.cs" />
-    <Compile Include="FNA\Content\ContentSerializerTypeVersionAttribute.cs" />
-    <Compile Include="FNA\Content\ContentTypeReader.cs" />
-    <Compile Include="FNA\Content\ContentTypeReaderManager.cs" />
-    <Compile Include="FNA\Content\LzxDecoder.cs" />
-    <Compile Include="FNA\Content\ResourceContentManager.cs" />
-    <Compile Include="FNA\Curve.cs" />
-    <Compile Include="FNA\CurveContinuity.cs" />
-    <Compile Include="FNA\CurveKey.cs" />
-    <Compile Include="FNA\CurveKeyCollection.cs" />
-    <Compile Include="FNA\CurveLoopType.cs" />
-    <Compile Include="FNA\CurveTangent.cs" />
-    <Compile Include="FNA\Design\BoundingBoxConverter.cs" />
-    <Compile Include="FNA\Design\BoundingSphereConverter.cs" />
-    <Compile Include="FNA\Design\ColorConverter.cs" />
-    <Compile Include="FNA\Design\MathTypeConverter.cs" />
-    <Compile Include="FNA\Design\MatrixConverter.cs" />
-    <Compile Include="FNA\Design\PlaneConverter.cs" />
-    <Compile Include="FNA\Design\PointConverter.cs" />
-    <Compile Include="FNA\Design\QuaternionConverter.cs" />
-    <Compile Include="FNA\Design\RayConverter.cs" />
-    <Compile Include="FNA\Design\RectangleConverter.cs" />
-    <Compile Include="FNA\Design\Vector2Converter.cs" />
-    <Compile Include="FNA\Design\Vector3Converter.cs" />
-    <Compile Include="FNA\Design\Vector4Converter.cs" />
-    <Compile Include="FNA\DisplayOrientation.cs" />
-    <Compile Include="FNA\DrawableGameComponent.cs" />
-    <Compile Include="FNA\FNALoggerEXT.cs" />
-    <Compile Include="FNA\FNAPlatform\FNAPlatform.cs" />
-    <Compile Include="FNA\FNAPlatform\FNAWindow.cs" />
-    <Compile Include="FNA\FNAPlatform\SDL2_FNAPlatform.cs" />
-    <Compile Include="FNA\FrameworkDispatcher.cs" />
-    <Compile Include="FNA\Game.cs" />
-    <Compile Include="FNA\GameComponent.cs" />
-    <Compile Include="FNA\GameComponentCollection.cs" />
-    <Compile Include="FNA\GameComponentCollectionEventArgs.cs" />
-    <Compile Include="FNA\GameServiceContainer.cs" />
-    <Compile Include="FNA\GameTime.cs" />
-    <Compile Include="FNA\GameWindow.cs" />
-    <Compile Include="FNA\GraphicsDeviceInformation.cs" />
-    <Compile Include="FNA\GraphicsDeviceManager.cs" />
-    <Compile Include="FNA\Graphics\ClearOptions.cs" />
-    <Compile Include="FNA\Graphics\ColorWriteChannels.cs" />
-    <Compile Include="FNA\Graphics\CubeMapFace.cs" />
-    <Compile Include="FNA\Graphics\DepthFormat.cs" />
-    <Compile Include="FNA\Graphics\DeviceLostException.cs" />
-    <Compile Include="FNA\Graphics\DeviceNotResetException.cs" />
-    <Compile Include="FNA\Graphics\DirectionalLight.cs" />
-    <Compile Include="FNA\Graphics\DisplayMode.cs" />
-    <Compile Include="FNA\Graphics\DisplayModeCollection.cs" />
-    <Compile Include="FNA\Graphics\DxtUtil.cs" />
-    <Compile Include="FNA\Graphics\Effect\Effect.cs" />
-    <Compile Include="FNA\Graphics\Effect\EffectAnnotation.cs" />
-    <Compile Include="FNA\Graphics\Effect\EffectAnnotationCollection.cs" />
-    <Compile Include="FNA\Graphics\Effect\EffectMaterial.cs" />
-    <Compile Include="FNA\Graphics\Effect\EffectParameter.cs" />
-    <Compile Include="FNA\Graphics\Effect\EffectParameterClass.cs" />
-    <Compile Include="FNA\Graphics\Effect\EffectParameterCollection.cs" />
-    <Compile Include="FNA\Graphics\Effect\EffectParameterType.cs" />
-    <Compile Include="FNA\Graphics\Effect\EffectPass.cs" />
-    <Compile Include="FNA\Graphics\Effect\EffectPassCollection.cs" />
-    <Compile Include="FNA\Graphics\Effect\EffectTechnique.cs" />
-    <Compile Include="FNA\Graphics\Effect\EffectTechniqueCollection.cs" />
-    <Compile Include="FNA\Graphics\Effect\IEffectFog.cs" />
-    <Compile Include="FNA\Graphics\Effect\IEffectLights.cs" />
-    <Compile Include="FNA\Graphics\Effect\IEffectMatrices.cs" />
-    <Compile Include="FNA\Graphics\Effect\Resources.cs" />
-    <Compile Include="FNA\Graphics\Effect\StockEffects\AlphaTestEffect.cs" />
-    <Compile Include="FNA\Graphics\Effect\StockEffects\BasicEffect.cs" />
-    <Compile Include="FNA\Graphics\Effect\StockEffects\DualTextureEffect.cs" />
-    <Compile Include="FNA\Graphics\Effect\StockEffects\EffectHelpers.cs" />
-    <Compile Include="FNA\Graphics\Effect\StockEffects\EnvironmentMapEffect.cs" />
-    <Compile Include="FNA\Graphics\Effect\StockEffects\SkinnedEffect.cs" />
-    <Compile Include="FNA\Graphics\Effect\StockEffects\SpriteEffect.cs" />
-    <Compile Include="FNA\Graphics\FNA3D.cs" />
-    <Compile Include="FNA\Graphics\GraphicsAdapter.cs" />
-    <Compile Include="FNA\Graphics\GraphicsDevice.cs" />
-    <Compile Include="FNA\Graphics\GraphicsDeviceStatus.cs" />
-    <Compile Include="FNA\Graphics\GraphicsProfile.cs" />
-    <Compile Include="FNA\Graphics\GraphicsResource.cs" />
-    <Compile Include="FNA\Graphics\IGraphicsDeviceService.cs" />
-    <Compile Include="FNA\Graphics\IRenderTarget.cs" />
-    <Compile Include="FNA\Graphics\Model.cs" />
-    <Compile Include="FNA\Graphics\ModelBone.cs" />
-    <Compile Include="FNA\Graphics\ModelBoneCollection.cs" />
-    <Compile Include="FNA\Graphics\ModelEffectCollection.cs" />
-    <Compile Include="FNA\Graphics\ModelMesh.cs" />
-    <Compile Include="FNA\Graphics\ModelMeshCollection.cs" />
-    <Compile Include="FNA\Graphics\ModelMeshPart.cs" />
-    <Compile Include="FNA\Graphics\ModelMeshPartCollection.cs" />
-    <Compile Include="FNA\Graphics\NoSuitableGraphicsDeviceException.cs" />
-    <Compile Include="FNA\Graphics\OcclusionQuery.cs" />
-    <Compile Include="FNA\Graphics\PackedVector\Alpha8.cs" />
-    <Compile Include="FNA\Graphics\PackedVector\Bgr565.cs" />
-    <Compile Include="FNA\Graphics\PackedVector\Bgra4444.cs" />
-    <Compile Include="FNA\Graphics\PackedVector\Bgra5551.cs" />
-    <Compile Include="FNA\Graphics\PackedVector\Byte4.cs" />
-    <Compile Include="FNA\Graphics\PackedVector\HalfSingle.cs" />
-    <Compile Include="FNA\Graphics\PackedVector\HalfTypeHelper.cs" />
-    <Compile Include="FNA\Graphics\PackedVector\HalfVector2.cs" />
-    <Compile Include="FNA\Graphics\PackedVector\HalfVector4.cs" />
-    <Compile Include="FNA\Graphics\PackedVector\IPackedVector.cs" />
-    <Compile Include="FNA\Graphics\PackedVector\NormalizedByte2.cs" />
-    <Compile Include="FNA\Graphics\PackedVector\NormalizedByte4.cs" />
-    <Compile Include="FNA\Graphics\PackedVector\NormalizedShort2.cs" />
-    <Compile Include="FNA\Graphics\PackedVector\NormalizedShort4.cs" />
-    <Compile Include="FNA\Graphics\PackedVector\Rg32.cs" />
-    <Compile Include="FNA\Graphics\PackedVector\Rgba1010102.cs" />
-    <Compile Include="FNA\Graphics\PackedVector\Rgba64.cs" />
-    <Compile Include="FNA\Graphics\PackedVector\Short2.cs" />
-    <Compile Include="FNA\Graphics\PackedVector\Short4.cs" />
-    <Compile Include="FNA\Graphics\PipelineCache.cs" />
-    <Compile Include="FNA\Graphics\PresentationParameters.cs" />
-    <Compile Include="FNA\Graphics\PresentInterval.cs" />
-    <Compile Include="FNA\Graphics\PrimitiveType.cs" />
-    <Compile Include="FNA\Graphics\ProfileCapabilities.cs" />
-    <Compile Include="FNA\Graphics\RenderTarget2D.cs" />
-    <Compile Include="FNA\Graphics\RenderTargetBinding.cs" />
-    <Compile Include="FNA\Graphics\RenderTargetCube.cs" />
-    <Compile Include="FNA\Graphics\RenderTargetUsage.cs" />
-    <Compile Include="FNA\Graphics\ResourceCreatedEventArgs.cs" />
-    <Compile Include="FNA\Graphics\ResourceDestroyedEventArgs.cs" />
-    <Compile Include="FNA\Graphics\SamplerStateCollection.cs" />
-    <Compile Include="FNA\Graphics\SetDataOptions.cs" />
-    <Compile Include="FNA\Graphics\SpriteBatch.cs" />
-    <Compile Include="FNA\Graphics\SpriteEffects.cs" />
-    <Compile Include="FNA\Graphics\SpriteFont.cs" />
-    <Compile Include="FNA\Graphics\SpriteSortMode.cs" />
-    <Compile Include="FNA\Graphics\States\Blend.cs" />
-    <Compile Include="FNA\Graphics\States\BlendFunction.cs" />
-    <Compile Include="FNA\Graphics\States\BlendState.cs" />
-    <Compile Include="FNA\Graphics\States\CompareFunction.cs" />
-    <Compile Include="FNA\Graphics\States\CullMode.cs" />
-    <Compile Include="FNA\Graphics\States\DepthStencilState.cs" />
-    <Compile Include="FNA\Graphics\States\FillMode.cs" />
-    <Compile Include="FNA\Graphics\States\RasterizerState.cs" />
-    <Compile Include="FNA\Graphics\States\SamplerState.cs" />
-    <Compile Include="FNA\Graphics\States\StencilOperation.cs" />
-    <Compile Include="FNA\Graphics\States\TextureAddressMode.cs" />
-    <Compile Include="FNA\Graphics\States\TextureFilter.cs" />
-    <Compile Include="FNA\Graphics\SurfaceFormat.cs" />
-    <Compile Include="FNA\Graphics\Texture.cs" />
-    <Compile Include="FNA\Graphics\Texture2D.cs" />
-    <Compile Include="FNA\Graphics\Texture3D.cs" />
-    <Compile Include="FNA\Graphics\TextureCollection.cs" />
-    <Compile Include="FNA\Graphics\TextureCube.cs" />
-    <Compile Include="FNA\Graphics\Vertices\BufferUsage.cs" />
-    <Compile Include="FNA\Graphics\Vertices\DynamicIndexBuffer.cs" />
-    <Compile Include="FNA\Graphics\Vertices\DynamicVertexBuffer.cs" />
-    <Compile Include="FNA\Graphics\Vertices\IndexBuffer.cs" />
-    <Compile Include="FNA\Graphics\Vertices\IndexElementSize.cs" />
-    <Compile Include="FNA\Graphics\Vertices\IVertexType.cs" />
-    <Compile Include="FNA\Graphics\Vertices\VertexBuffer.cs" />
-    <Compile Include="FNA\Graphics\Vertices\VertexBufferBinding.cs" />
-    <Compile Include="FNA\Graphics\Vertices\VertexDeclaration.cs" />
-    <Compile Include="FNA\Graphics\Vertices\VertexDeclarationCache.cs" />
-    <Compile Include="FNA\Graphics\Vertices\VertexElement.cs" />
-    <Compile Include="FNA\Graphics\Vertices\VertexElementFormat.cs" />
-    <Compile Include="FNA\Graphics\Vertices\VertexElementUsage.cs" />
-    <Compile Include="FNA\Graphics\Vertices\VertexPositionColor.cs" />
-    <Compile Include="FNA\Graphics\Vertices\VertexPositionColorTexture.cs" />
-    <Compile Include="FNA\Graphics\Vertices\VertexPositionNormalTexture.cs" />
-    <Compile Include="FNA\Graphics\Vertices\VertexPositionTexture.cs" />
-    <Compile Include="FNA\Graphics\Viewport.cs" />
-    <Compile Include="FNA\Graphics\X360TexUtil.cs" />
-    <Compile Include="FNA\IDrawable.cs" />
-    <Compile Include="FNA\IGameComponent.cs" />
-    <Compile Include="FNA\IGraphicsDeviceManager.cs" />
-    <Compile Include="FNA\Input\Buttons.cs" />
-    <Compile Include="FNA\Input\ButtonState.cs" />
-    <Compile Include="FNA\Input\GamePad.cs" />
-    <Compile Include="FNA\Input\GamePadButtons.cs" />
-    <Compile Include="FNA\Input\GamePadCapabilities.cs" />
-    <Compile Include="FNA\Input\GamePadDeadZone.cs" />
-    <Compile Include="FNA\Input\GamePadDPad.cs" />
-    <Compile Include="FNA\Input\GamePadState.cs" />
-    <Compile Include="FNA\Input\GamePadThumbSticks.cs" />
-    <Compile Include="FNA\Input\GamePadTriggers.cs" />
-    <Compile Include="FNA\Input\GamePadType.cs" />
-    <Compile Include="FNA\Input\Keyboard.cs" />
-    <Compile Include="FNA\Input\KeyboardState.cs" />
-    <Compile Include="FNA\Input\Keys.cs" />
-    <Compile Include="FNA\Input\KeyState.cs" />
-    <Compile Include="FNA\Input\Mouse.cs" />
-    <Compile Include="FNA\Input\MouseState.cs" />
-    <Compile Include="FNA\Input\TextInputEXT.cs" />
-    <Compile Include="FNA\Input\Touch\GestureDetector.cs" />
-    <Compile Include="FNA\Input\Touch\GestureSample.cs" />
-    <Compile Include="FNA\Input\Touch\GestureType.cs" />
-    <Compile Include="FNA\Input\Touch\TouchCollection.cs" />
-    <Compile Include="FNA\Input\Touch\TouchLocation.cs" />
-    <Compile Include="FNA\Input\Touch\TouchLocationState.cs" />
-    <Compile Include="FNA\Input\Touch\TouchPanel.cs" />
-    <Compile Include="FNA\Input\Touch\TouchPanelCapabilities.cs" />
-    <Compile Include="FNA\IUpdateable.cs" />
-    <Compile Include="FNA\LaunchParameters.cs" />
-    <Compile Include="FNA\MathHelper.cs" />
-    <Compile Include="FNA\Matrix.cs" />
-    <Compile Include="FNA\Media\MediaPlayer.cs" />
-    <Compile Include="FNA\Media\MediaQueue.cs" />
-    <Compile Include="FNA\Media\MediaState.cs" />
-    <Compile Include="FNA\Media\Song.cs" />
-    <Compile Include="FNA\Media\SongCollection.cs" />
-    <Compile Include="FNA\Media\VideoSoundtrackType.cs" />
-    <Compile Include="FNA\Media\VisualizationData.cs" />
-    <Compile Include="FNA\Media\Xiph\Video.cs" />
-    <Compile Include="FNA\Media\Xiph\VideoPlayer.cs" />
-    <Compile Include="FNA\NamespaceDocs.cs" />
-    <Compile Include="FNA\Plane.cs" />
-    <Compile Include="FNA\PlaneIntersectionType.cs" />
-    <Compile Include="FNA\PlayerIndex.cs" />
-    <Compile Include="FNA\Point.cs" />
-    <Compile Include="FNA\PreparingDeviceSettingsEventArgs.cs" />
-    <Compile Include="FNA\Properties\AssemblyInfo.cs" />
-    <Compile Include="FNA\Quaternion.cs" />
-    <Compile Include="FNA\Ray.cs" />
-    <Compile Include="FNA\Rectangle.cs" />
-    <Compile Include="FNA\Storage\StorageContainer.cs" />
-    <Compile Include="FNA\Storage\StorageDevice.cs" />
-    <Compile Include="FNA\Storage\StorageDeviceNotConnectedException.cs" />
-    <Compile Include="FNA\TitleContainer.cs" />
-    <Compile Include="FNA\TitleLocation.cs" />
-    <Compile Include="FNA\Utilities\AssemblyHelper.cs" />
-    <Compile Include="FNA\Utilities\FileHelpers.cs" />
-    <Compile Include="FNA\Utilities\FNADllMap.cs" />
-    <Compile Include="FNA\Utilities\FNAInternalExtensions.cs" />
-    <Compile Include="FNA\Utilities\XamarinHelper.cs" />
-    <Compile Include="FNA\Vector2.cs" />
-    <Compile Include="FNA\Vector3.cs" />
-    <Compile Include="FNA\Vector4.cs" />
     <Compile Include="Monocle\Binding.cs" />
     <Compile Include="Monocle\ParticleEmitter.cs" />
     <Compile Include="Monocle\Circle.cs" />
@@ -1278,137 +1003,21 @@
     <Compile Include="FMOD\Studio\CommandReplay.cs" />
     <Compile Include="FMOD\Studio\MarshallingHelper.cs" />
     <Compile Include="SimplexNoise\Noise.cs" />
-    <Compile Include="AssemblyInfo.cs" />
-    <Compile Include="Steamworks.NET\isteamapplist.cs" />
-    <Compile Include="Steamworks.NET\isteamapps.cs" />
-    <Compile Include="Steamworks.NET\isteamclient.cs" />
-    <Compile Include="Steamworks.NET\isteamfriends.cs" />
-    <Compile Include="Steamworks.NET\isteamgameserver.cs" />
-    <Compile Include="Steamworks.NET\isteamgameserverclient.cs" />
-    <Compile Include="Steamworks.NET\isteamgameserverhttp.cs" />
-    <Compile Include="Steamworks.NET\isteamgameserverinventory.cs" />
-    <Compile Include="Steamworks.NET\isteamgameservernetworking.cs" />
-    <Compile Include="Steamworks.NET\isteamgameservernetworkingsockets.cs" />
-    <Compile Include="Steamworks.NET\isteamgameservernetworkingutils.cs" />
-    <Compile Include="Steamworks.NET\isteamgameserverstats.cs" />
-    <Compile Include="Steamworks.NET\isteamgameserverugc.cs" />
-    <Compile Include="Steamworks.NET\isteamgameserverutils.cs" />
-    <Compile Include="Steamworks.NET\isteamhtmlsurface.cs" />
-    <Compile Include="Steamworks.NET\isteamhttp.cs" />
-    <Compile Include="Steamworks.NET\isteaminput.cs" />
-    <Compile Include="Steamworks.NET\isteaminventory.cs" />
-    <Compile Include="Steamworks.NET\isteammatchmaking.cs" />
-    <Compile Include="Steamworks.NET\isteammusic.cs" />
-    <Compile Include="Steamworks.NET\isteammusicremote.cs" />
-    <Compile Include="Steamworks.NET\isteamnetworking.cs" />
-    <Compile Include="Steamworks.NET\isteamnetworkingmessages.cs" />
-    <Compile Include="Steamworks.NET\isteamnetworkingsockets.cs" />
-    <Compile Include="Steamworks.NET\isteamnetworkingutils.cs" />
-    <Compile Include="Steamworks.NET\isteamparentalsettings.cs" />
-    <Compile Include="Steamworks.NET\isteamremoteplay.cs" />
-    <Compile Include="Steamworks.NET\isteamremotestorage.cs" />
-    <Compile Include="Steamworks.NET\isteamscreenshots.cs" />
-    <Compile Include="Steamworks.NET\isteamugc.cs" />
-    <Compile Include="Steamworks.NET\isteamunifiedmessages.cs" />
-    <Compile Include="Steamworks.NET\isteamuser.cs" />
-    <Compile Include="Steamworks.NET\isteamuserstats.cs" />
-    <Compile Include="Steamworks.NET\isteamutils.cs" />
-    <Compile Include="Steamworks.NET\isteamvideo.cs" />
-    <Compile Include="Steamworks.NET\MatchmakingTypes\gameserveritem_t.cs" />
-    <Compile Include="Steamworks.NET\MatchmakingTypes\servernetadr_t.cs" />
-    <Compile Include="Steamworks.NET\NativeMethods.cs" />
-    <Compile Include="Steamworks.NET\SteamCallbacks.cs" />
-    <Compile Include="Steamworks.NET\SteamClientPublic\CGameID.cs" />
-    <Compile Include="Steamworks.NET\SteamClientPublic\CSteamID.cs" />
-    <Compile Include="Steamworks.NET\SteamClientPublic\HAuthTicket.cs" />
-    <Compile Include="Steamworks.NET\SteamClient\SteamAPIWarningMessageHook_t.cs" />
-    <Compile Include="Steamworks.NET\SteamClient\SteamAPI_CheckCallbackRegistered_t.cs" />
-    <Compile Include="Steamworks.NET\SteamClient\SteamAPI_PostAPIResultInProcess_t.cs" />
-    <Compile Include="Steamworks.NET\SteamConstants.cs" />
-    <Compile Include="Steamworks.NET\SteamDatagramTickets\SteamDatagramHostedAddress.cs" />
-    <Compile Include="Steamworks.NET\SteamDatagramTickets\SteamDatagramRelayAuthTicket.cs" />
-    <Compile Include="Steamworks.NET\SteamEnums.cs" />
-    <Compile Include="Steamworks.NET\SteamFriends\FriendsGroupID_t.cs" />
-    <Compile Include="Steamworks.NET\SteamHTMLSurface\HHTMLBrowser.cs" />
-    <Compile Include="Steamworks.NET\SteamHTTP\HTTPCookieContainerHandle.cs" />
-    <Compile Include="Steamworks.NET\SteamHTTP\HTTPRequestHandle.cs" />
-    <Compile Include="Steamworks.NET\SteamInput\InputActionSetHandle_t.cs" />
-    <Compile Include="Steamworks.NET\SteamInput\InputAnalogActionHandle_t.cs" />
-    <Compile Include="Steamworks.NET\SteamInput\InputDigitalActionHandle_t.cs" />
-    <Compile Include="Steamworks.NET\SteamInput\InputHandle_t.cs" />
-    <Compile Include="Steamworks.NET\SteamInventory\SteamInventoryResult_t.cs" />
-    <Compile Include="Steamworks.NET\SteamInventory\SteamInventoryUpdateHandle_t.cs" />
-    <Compile Include="Steamworks.NET\SteamInventory\SteamItemDef_t.cs" />
-    <Compile Include="Steamworks.NET\SteamInventory\SteamItemInstanceID_t.cs" />
-    <Compile Include="Steamworks.NET\SteamMatchmaking\HServerListRequest.cs" />
-    <Compile Include="Steamworks.NET\SteamMatchmaking\HServerQuery.cs" />
-    <Compile Include="Steamworks.NET\SteamNetworkingSockets\ISteamNetworkingConnectionSignaling.cs" />
-    <Compile Include="Steamworks.NET\SteamNetworkingSockets\ISteamNetworkingSignalingRecvContext.cs" />
-    <Compile Include="Steamworks.NET\SteamNetworkingTypes\FSteamNetworkingSocketsDebugOutput.cs" />
-    <Compile Include="Steamworks.NET\SteamNetworkingTypes\HSteamListenSocket.cs" />
-    <Compile Include="Steamworks.NET\SteamNetworkingTypes\HSteamNetConnection.cs" />
-    <Compile Include="Steamworks.NET\SteamNetworkingTypes\HSteamNetPollGroup.cs" />
-    <Compile Include="Steamworks.NET\SteamNetworkingTypes\SteamNetworkingConfigValue_t.cs" />
-    <Compile Include="Steamworks.NET\SteamNetworkingTypes\SteamNetworkingErrMsg.cs" />
-    <Compile Include="Steamworks.NET\SteamNetworkingTypes\SteamNetworkingIdentity.cs" />
-    <Compile Include="Steamworks.NET\SteamNetworkingTypes\SteamNetworkingIPAddr.cs" />
-    <Compile Include="Steamworks.NET\SteamNetworkingTypes\SteamNetworkingMessage_t.cs" />
-    <Compile Include="Steamworks.NET\SteamNetworkingTypes\SteamNetworkingMicroseconds.cs" />
-    <Compile Include="Steamworks.NET\SteamNetworkingTypes\SteamNetworkingPOPID.cs" />
-    <Compile Include="Steamworks.NET\SteamNetworking\SNetListenSocket_t.cs" />
-    <Compile Include="Steamworks.NET\SteamNetworking\SNetSocket_t.cs" />
-    <Compile Include="Steamworks.NET\SteamRemotePlay\RemotePlaySessionID_t.cs" />
-    <Compile Include="Steamworks.NET\SteamRemoteStorage\PublishedFileId_t.cs" />
-    <Compile Include="Steamworks.NET\SteamRemoteStorage\PublishedFileUpdateHandle_t.cs" />
-    <Compile Include="Steamworks.NET\SteamRemoteStorage\UGCFileWriteStreamHandle_t.cs" />
-    <Compile Include="Steamworks.NET\SteamRemoteStorage\UGCHandle_t.cs" />
-    <Compile Include="Steamworks.NET\SteamScreenshots\ScreenshotHandle.cs" />
-    <Compile Include="Steamworks.NET\SteamStructs.cs" />
-    <Compile Include="Steamworks.NET\SteamTypes\AccountID_t.cs" />
-    <Compile Include="Steamworks.NET\SteamTypes\AppId_t.cs" />
-    <Compile Include="Steamworks.NET\SteamTypes\DepotId_t.cs" />
-    <Compile Include="Steamworks.NET\SteamTypes\ManifestId_t.cs" />
-    <Compile Include="Steamworks.NET\SteamTypes\PartyBeaconID_t.cs" />
-    <Compile Include="Steamworks.NET\SteamTypes\RTime32.cs" />
-    <Compile Include="Steamworks.NET\SteamTypes\SiteId_t.cs" />
-    <Compile Include="Steamworks.NET\SteamTypes\SteamAPICall_t.cs" />
-    <Compile Include="Steamworks.NET\SteamTypes\SteamIPAddress_t.cs" />
-    <Compile Include="Steamworks.NET\SteamUGC\UGCQueryHandle_t.cs" />
-    <Compile Include="Steamworks.NET\SteamUGC\UGCUpdateHandle_t.cs" />
-    <Compile Include="Steamworks.NET\SteamUnifiedMessages\ClientUnifiedMessageHandle.cs" />
-    <Compile Include="Steamworks.NET\SteamUserStats\SteamLeaderboardEntries_t.cs" />
-    <Compile Include="Steamworks.NET\SteamUserStats\SteamLeaderboard_t.cs" />
-    <Compile Include="Steamworks.NET\Steam_api_common\HSteamPipe.cs" />
-    <Compile Include="Steamworks.NET\Steam_api_common\HSteamUser.cs" />
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="Microsoft\Xna\Framework.RuntimeProfile" />
+    <None Include="app.config" />
+    <None Include="global.json" />
+    <None Include="Microsoft\Xna\Framework.RuntimeProfile" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="FNA\FNAPlatform\README" />
-    <None Include="FNA\Graphics\Effect\StockEffects\FXB\AlphaTestEffect.fxb" />
-    <None Include="FNA\Graphics\Effect\StockEffects\FXB\BasicEffect.fxb" />
-    <None Include="FNA\Graphics\Effect\StockEffects\FXB\DualTextureEffect.fxb" />
-    <None Include="FNA\Graphics\Effect\StockEffects\FXB\EnvironmentMapEffect.fxb" />
-    <None Include="FNA\Graphics\Effect\StockEffects\FXB\SkinnedEffect.fxb" />
-    <None Include="FNA\Graphics\Effect\StockEffects\FXB\SpriteEffect.fxb" />
-    <None Include="FNA\Graphics\Effect\StockEffects\HLSL\Common.fxh" />
-    <None Include="FNA\Graphics\Effect\StockEffects\HLSL\Lighting.fxh" />
-    <None Include="FNA\Graphics\Effect\StockEffects\HLSL\Macros.fxh" />
-    <None Include="FNA\Graphics\Effect\StockEffects\HLSL\Structures.fxh" />
-    <None Include="FNA\Graphics\Effect\StockEffects\LICENSE" />
-    <None Include="FNA\Graphics\Effect\StockEffects\README" />
-    <None Include="FNA\Graphics\Effect\YUVToRGBA\README" />
-    <None Include="FNA\Graphics\Effect\YUVToRGBA\YUVToRGBAEffect.fxb" />
+    <BootstrapperPackage Include="Microsoft.Net.Framework.3.5.SP1">
+      <Visible>False</Visible>
+      <ProductName>.NET Framework 3.5 SP1</ProductName>
+      <Install>false</Install>
+    </BootstrapperPackage>
   </ItemGroup>
   <ItemGroup>
-    <Content Include="FNA\Graphics\Effect\StockEffects\HLSL\AlphaTestEffect.fx" />
-    <Content Include="FNA\Graphics\Effect\StockEffects\HLSL\BasicEffect.fx" />
-    <Content Include="FNA\Graphics\Effect\StockEffects\HLSL\DualTextureEffect.fx" />
-    <Content Include="FNA\Graphics\Effect\StockEffects\HLSL\EnvironmentMapEffect.fx" />
-    <Content Include="FNA\Graphics\Effect\StockEffects\HLSL\SkinnedEffect.fx" />
-    <Content Include="FNA\Graphics\Effect\StockEffects\HLSL\SpriteEffect.fx" />
-    <Content Include="FNA\Graphics\Effect\YUVToRGBA\YUVToRGBAEffect.fx" />
+    <Folder Include="Properties\" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

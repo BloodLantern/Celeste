@@ -429,29 +429,29 @@ namespace Celeste
       public override void Render(Vector2 position, float alignment = 0.5f, float scale = 1f)
       {
         position.Y += (float) this.TopPadding * scale;
-        Credits.Font.DrawOutline(Credits.FontSize, this.Title, position.Floor(), new Vector2(alignment, 0.0f), Vector2.One * 1.4f * scale, this.TitleColor, 2f, Credits.BorderColor);
-        position.Y += (float) ((double) Credits.LineHeight * 1.3999999761581421 + 8.0) * scale;
+        Font.DrawOutline(FontSize, this.Title, position.Floor(), new Vector2(alignment, 0.0f), Vector2.One * 1.4f * scale, this.TitleColor, 2f, BorderColor);
+        position.Y += (float) ((double) LineHeight * 1.3999999761581421 + 8.0) * scale;
         for (int index = 0; index < this.Credits.Length; ++index)
         {
           if (this.linkedImages[index] != null)
           {
             MTexture mtexture = GFX.Gui[this.linkedImages[index]];
-            mtexture.DrawJustified(position.Floor() + new Vector2(0.0f, -2f), new Vector2(alignment, 0.0f), Credits.BorderColor, 1.15f * scale, 0.0f);
-            mtexture.DrawJustified(position.Floor() + new Vector2(0.0f, 2f), new Vector2(alignment, 0.0f), Credits.BorderColor, 1.15f * scale, 0.0f);
-            mtexture.DrawJustified(position.Floor() + new Vector2(-2f, 0.0f), new Vector2(alignment, 0.0f), Credits.BorderColor, 1.15f * scale, 0.0f);
-            mtexture.DrawJustified(position.Floor() + new Vector2(2f, 0.0f), new Vector2(alignment, 0.0f), Credits.BorderColor, 1.15f * scale, 0.0f);
+            mtexture.DrawJustified(position.Floor() + new Vector2(0.0f, -2f), new Vector2(alignment, 0.0f), BorderColor, 1.15f * scale, 0.0f);
+            mtexture.DrawJustified(position.Floor() + new Vector2(0.0f, 2f), new Vector2(alignment, 0.0f), BorderColor, 1.15f * scale, 0.0f);
+            mtexture.DrawJustified(position.Floor() + new Vector2(-2f, 0.0f), new Vector2(alignment, 0.0f), BorderColor, 1.15f * scale, 0.0f);
+            mtexture.DrawJustified(position.Floor() + new Vector2(2f, 0.0f), new Vector2(alignment, 0.0f), BorderColor, 1.15f * scale, 0.0f);
             mtexture.DrawJustified(position.Floor(), new Vector2(alignment, 0.0f), this.CreditsColor, 1.15f * scale, 0.0f);
             position.Y += (float) mtexture.Height * 1.15f * scale;
           }
           else
           {
-            Credits.Font.DrawOutline(Credits.FontSize, this.Credits[index], position.Floor(), new Vector2(alignment, 0.0f), Vector2.One * 1.15f * scale, this.CreditsColor, 2f, Credits.BorderColor);
-            position.Y += Credits.LineHeight * 1.15f * scale;
+            Font.DrawOutline(FontSize, this.Credits[index], position.Floor(), new Vector2(alignment, 0.0f), Vector2.One * 1.15f * scale, this.CreditsColor, 2f, BorderColor);
+            position.Y += LineHeight * 1.15f * scale;
           }
         }
       }
 
-      public override float Height(float scale = 1f) => ((float) ((double) Credits.LineHeight * (1.3999999761581421 + (double) this.Credits.Length * 1.1499999761581421) + (this.Credits.Length != 0 ? 8.0 : 0.0)) + (float) this.TopPadding) * scale;
+      public override float Height(float scale = 1f) => ((float) ((double) LineHeight * (1.3999999761581421 + (double) this.Credits.Length * 1.1499999761581421) + (this.Credits.Length != 0 ? 8.0 : 0.0)) + (float) this.TopPadding) * scale;
     }
 
     private class MultiCredit : Credits.CreditNode

@@ -163,7 +163,10 @@ namespace Celeste
       Audio.SetMusic("event:/music/lvl6/madeline_and_theo");
       yield return (object) 1.5f;
       // ISSUE: reference to a compiler-generated method
-      cs06Campfire.Add((Component) Wiggler.Create(0.6f, 3f, new Action<float>(cs06Campfire.\u003CCutscene\u003Eb__21_0), true, true));
+      cs06Campfire.Add(Wiggler.Create(0.6f, 3f, delegate (float v)
+      {
+          this.theo.Sprite.Scale = Vector2.One * (1f + 0.1f * v);
+      }, true, true));
       cs06Campfire.Level.Particles.Emit(NPC01_Theo.P_YOLO, 4, cs06Campfire.theo.Position + new Vector2(-4f, -14f), Vector2.One * 3f);
       yield return (object) 0.5f;
       cs06Campfire.theo.Sprite.Play("wakeup");
@@ -236,7 +239,10 @@ namespace Celeste
       yield return (object) 0.1f;
       cs06Campfire.theo.Sprite.Play("idle");
       // ISSUE: reference to a compiler-generated method
-      cs06Campfire.Add((Component) Alarm.Create(Alarm.AlarmMode.Oneshot, new Action(cs06Campfire.\u003CSelfieSequence\u003Eb__23_0), 0.25f, true));
+      cs06Campfire.Add(Alarm.Create(Alarm.AlarmMode.Oneshot, delegate
+      {
+          this.theo.Sprite.Scale.X = -1f;
+      }, 0.25f, true));
       cs06Campfire.player.DummyAutoAnimate = true;
       yield return (object) cs06Campfire.player.DummyWalkToExact((int) ((double) cs06Campfire.theo.X + 5.0), speedMultiplier: 0.7f);
       yield return (object) 0.2f;
@@ -417,7 +423,7 @@ namespace Celeste
         GFX.Portraits[this.Question.Textbox].Draw(position, Vector2.Zero, color1);
         Facings facings = this.Question.PortraitSide;
         if (SaveData.Instance != null && SaveData.Instance.Assists.MirrorMode)
-          facings = (Facings) -(int) facings;
+          facings = (Facings) (-(int) facings);
         float num2 = 100f;
         this.Question.Portrait.Scale = Vector2.One * (num2 / this.Question.PortraitSize);
         if (facings == Facings.Right)

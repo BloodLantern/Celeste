@@ -83,7 +83,7 @@ namespace Celeste
       session.SummitGems[follow.GemID] = true;
       SaveData.Instance.RegisterSummitGem(follow.GemID);
       level.Shake();
-      Celeste.Celeste.Freeze(0.1f);
+      Celeste.Freeze(0.1f);
       SummitGem.P_Shatter.Color = SummitGem.GemColors[follow.GemID];
       float direction = player.Speed.Angle();
       level.ParticlesFG.Emit(SummitGem.P_Shatter, 5, follow.Position, Vector2.One * 4f, direction - 1.57079637f);

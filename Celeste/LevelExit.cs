@@ -73,7 +73,7 @@ namespace Celeste
           FadeWipe fadeWipe = new FadeWipe((Scene) this, true);
         }
       }
-      Stats.Store();
+      //Stats.Store();
       this.RendererList.UpdateLists();
     }
 

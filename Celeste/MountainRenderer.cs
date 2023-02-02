@@ -55,7 +55,7 @@ namespace Celeste
     {
       this.timer += Engine.DeltaTime;
       this.Model.Update();
-      this.userOffset += ((this.AllowUserRotation ? -Celeste.Input.MountainAim.Value * 0.8f : Vector2.Zero) - this.userOffset) * (1f - (float) Math.Pow(0.0099999997764825821, (double) Engine.DeltaTime));
+      this.userOffset += ((this.AllowUserRotation ? -Input.MountainAim.Value * 0.8f : Vector2.Zero) - this.userOffset) * (1f - (float) Math.Pow(0.0099999997764825821, (double) Engine.DeltaTime));
       if (!this.rotateAroundCenter)
       {
         if (this.Area == 8)
@@ -171,7 +171,7 @@ namespace Celeste
       this.door = Calc.Approach(this.door, this.Area != 9 || this.rotateAroundCenter ? 0.0f : 1f, Engine.DeltaTime * 1f);
       this.Model.CoreWallPosition = Vector3.Lerp(Vector3.Zero, -new Vector3(-1.5f, 1.5f, 1f), Ease.CubeInOut(this.door));
       this.Model.NearFogAlpha = Calc.Approach(this.Model.NearFogAlpha, this.ForceNearFog || this.rotateAroundCenter ? 1f : 0.0f, (this.rotateAroundCenter ? 1f : 4f) * Engine.DeltaTime);
-      if (Celeste.Celeste.PlayMode != Celeste.Celeste.PlayModes.Debug)
+      if (Celeste.PlayMode != Celeste.PlayModes.Debug)
         return;
       if (MInput.Keyboard.Pressed(Keys.P))
         Console.WriteLine(this.GetCameraString());

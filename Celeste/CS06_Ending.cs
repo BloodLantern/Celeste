@@ -116,29 +116,16 @@ namespace Celeste
       yield return (object) 0.1f;
     }
 
+    // ISSUE: reference to a compiler-generated field
     private IEnumerator TheoRaiseFist()
     {
-      // ISSUE: reference to a compiler-generated field
-      int num = this.\u003C\u003E1__state;
-      CS06_Ending cs06Ending = this;
-      if (num != 0)
-      {
-        if (num != 1)
-          return false;
-        // ISSUE: reference to a compiler-generated field
-        this.\u003C\u003E1__state = -1;
-        return false;
-      }
-      // ISSUE: reference to a compiler-generated field
-      this.\u003C\u003E1__state = -1;
-      cs06Ending.theo.Sprite.Play("yolo");
-      // ISSUE: reference to a compiler-generated method
-      cs06Ending.Add((Component) Alarm.Create(Alarm.AlarmMode.Oneshot, new Action(cs06Ending.\u003CTheoRaiseFist\u003Eb__14_0), 0.8f, true));
-      // ISSUE: reference to a compiler-generated field
-      this.\u003C\u003E2__current = (object) null;
-      // ISSUE: reference to a compiler-generated field
-      this.\u003C\u003E1__state = 1;
-      return true;
+        this.theo.Sprite.Play("yolo", false, false);
+        base.Add(Alarm.Create(Alarm.AlarmMode.Oneshot, delegate
+        {
+            this.theo.Sprite.Play("yoloEnd", false, false);
+        }, 0.8f, true));
+        yield return null;
+        yield break;
     }
 
     private IEnumerator TheoStopTired()

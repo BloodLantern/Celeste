@@ -26,7 +26,7 @@ namespace Celeste
     private float zoom = 1f;
     private float computerFade;
     private Coroutine talkingLoop;
-    private Vector2 center = Celeste.Celeste.TargetCenter;
+    private Vector2 center = Celeste.TargetCenter;
     private Coroutine cutscene;
     private Color fadeColor = Color.White;
     private Monocle.Image attachment;
@@ -38,7 +38,7 @@ namespace Celeste
     private string speedrunTimerChapterString;
     private string speedrunTimerFileString;
     private string chapterSpeedrunText = Dialog.Get("OPTIONS_SPEEDRUN_CHAPTER") + ":";
-    private string version = Celeste.Celeste.Instance.Version.ToString();
+    private string version = Celeste.Instance.Version.ToString();
     private bool showTimer;
     private EventInstance endAmbience;
     private EventInstance cinIntro;
@@ -151,13 +151,13 @@ namespace Celeste
       yield return (object) null;
       cs10Ending.frame = 21;
       cs10Ending.cursor.Visible = true;
-      cs10Ending.center = Celeste.Celeste.TargetCenter;
+      cs10Ending.center = Celeste.TargetCenter;
       cs10Ending.Add((Component) new Coroutine(cs10Ending.Fade(1f, 0.0f, 0.25f)));
       cs10Ending.Add((Component) new Coroutine(cs10Ending.Zoom(1.1f, 1f, 0.25f)));
       yield return (object) 0.25f;
       Audio.Play("event:/new_content/game/10_farewell/endscene_attachment_notify");
-      cs10Ending.attachment.Origin = Celeste.Celeste.TargetCenter;
-      cs10Ending.attachment.Position = Celeste.Celeste.TargetCenter;
+      cs10Ending.attachment.Origin = Celeste.TargetCenter;
+      cs10Ending.attachment.Position = Celeste.TargetCenter;
       cs10Ending.attachment.Visible = true;
       cs10Ending.attachment.Scale = Vector2.Zero;
       float p;
@@ -197,18 +197,18 @@ namespace Celeste
       }
       cs10Ending.ok.Visible = false;
       yield return (object) 0.1f;
-      cs10Ending.picture.Origin = Celeste.Celeste.TargetCenter;
-      cs10Ending.picture.Position = Celeste.Celeste.TargetCenter;
+      cs10Ending.picture.Origin = Celeste.TargetCenter;
+      cs10Ending.picture.Position = Celeste.TargetCenter;
       cs10Ending.picture.Visible = true;
       for (p = 0.0f; (double) p < 1.0; p += Engine.DeltaTime / 0.4f)
       {
         cs10Ending.picture.Scale.Y = (float) ((0.89999997615814209 + 0.10000000149011612 * (double) Ease.BigBackOut(p)) * 0.89999997615814209);
         cs10Ending.picture.Scale.X = (float) ((1.1000000238418579 - 0.10000000149011612 * (double) Ease.BigBackOut(p)) * 0.89999997615814209);
-        cs10Ending.picture.Position = Celeste.Celeste.TargetCenter + Vector2.UnitY * 120f * (1f - Ease.CubeOut(p));
+        cs10Ending.picture.Position = Celeste.TargetCenter + Vector2.UnitY * 120f * (1f - Ease.CubeOut(p));
         cs10Ending.picture.Color = Color.White * p;
         yield return (object) null;
       }
-      cs10Ending.picture.Position = Celeste.Celeste.TargetCenter;
+      cs10Ending.picture.Position = Celeste.TargetCenter;
       cs10Ending.attachment.Visible = false;
       to = cs10Ending.cursor.Position;
       from = new Vector2(120f, 30f);
@@ -233,11 +233,11 @@ namespace Celeste
       this.zoom = 1f;
       this.fade = 0.0f;
       this.fadeColor = Color.Black;
-      this.center = Celeste.Celeste.TargetCenter;
+      this.center = Celeste.TargetCenter;
       this.picture.Scale = Vector2.One;
       this.picture.Visible = true;
-      this.picture.Position = Celeste.Celeste.TargetCenter;
-      this.picture.Origin = Celeste.Celeste.TargetCenter;
+      this.picture.Position = Celeste.TargetCenter;
+      this.picture.Origin = Celeste.TargetCenter;
       this.computerFade = 1f;
       this.attachment.Visible = false;
       this.cursor.Visible = false;

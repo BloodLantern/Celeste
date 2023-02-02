@@ -7,7 +7,7 @@
 namespace Monocle
 {
   public class VirtualMap<T>
-  {
+    {
     public const int SegmentSize = 50;
     public readonly int Columns;
     public readonly int Rows;
@@ -16,7 +16,7 @@ namespace Monocle
     public readonly T EmptyValue;
     private T[,][,] segments;
 
-    public VirtualMap(int columns, int rows, T emptyValue = null)
+    public VirtualMap(int columns, int rows, T emptyValue = default)
     {
       this.Columns = columns;
       this.Rows = rows;
@@ -26,7 +26,7 @@ namespace Monocle
       this.EmptyValue = emptyValue;
     }
 
-    public VirtualMap(T[,] map, T emptyValue = null)
+    public VirtualMap(T[,] map, T emptyValue = default)
       : this(map.GetLength(0), map.GetLength(1), emptyValue)
     {
       for (int x = 0; x < this.Columns; ++x)

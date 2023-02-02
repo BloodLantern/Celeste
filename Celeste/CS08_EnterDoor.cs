@@ -25,32 +25,18 @@ namespace Celeste
 
     public override void OnBegin(Level level) => this.Add((Component) new Coroutine(this.Cutscene(level)));
 
+    // ISSUE: reference to a compiler-generated field
     private IEnumerator Cutscene(Level level)
     {
-      // ISSUE: reference to a compiler-generated field
-      int num = this.\u003C\u003E1__state;
-      CS08_EnterDoor cs08EnterDoor = this;
-      if (num != 0)
-      {
-        if (num != 1)
-          return false;
-        // ISSUE: reference to a compiler-generated field
-        this.\u003C\u003E1__state = -1;
-        cs08EnterDoor.EndCutscene(level);
-        return false;
-      }
-      // ISSUE: reference to a compiler-generated field
-      this.\u003C\u003E1__state = -1;
-      cs08EnterDoor.player.StateMachine.State = 11;
-      cs08EnterDoor.Add((Component) new Coroutine(cs08EnterDoor.player.DummyWalkToExact((int) cs08EnterDoor.targetX, speedMultiplier: 0.7f)));
-      cs08EnterDoor.Add((Component) new Coroutine(level.ZoomTo(new Vector2(cs08EnterDoor.targetX - level.Camera.X, 90f), 2f, 2f)));
-      FadeWipe fadeWipe = new FadeWipe((Scene) level, false);
-      fadeWipe.Duration = 2f;
-      // ISSUE: reference to a compiler-generated field
-      this.\u003C\u003E2__current = (object) fadeWipe.Wait();
-      // ISSUE: reference to a compiler-generated field
-      this.\u003C\u003E1__state = 1;
-      return true;
+        this.player.StateMachine.State = 11;
+        base.Add(new Coroutine(this.player.DummyWalkToExact((int)this.targetX, false, 0.7f, false), true));
+        base.Add(new Coroutine(level.ZoomTo(new Vector2(this.targetX - level.Camera.X, 90f), 2f, 2f), true));
+        yield return new FadeWipe(level, false, null)
+        {
+            Duration = 2f
+        }.Wait();
+        base.EndCutscene(level, true);
+        yield break;
     }
 
     public override void OnEnd(Level level) => level.OnEndOfFrame += (Action) (() =>

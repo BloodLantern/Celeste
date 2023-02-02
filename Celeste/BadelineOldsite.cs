@@ -108,37 +108,25 @@ namespace Celeste
     }
 
     private IEnumerator TweenToPlayer(Vector2 to)
-    {
-      // ISSUE: reference to a compiler-generated field
-      int num = this.\u003C\u003E1__state;
-      BadelineOldsite badelineOldsite = this;
-      if (num != 0)
-      {
-        if (num != 1)
-          return false;
-        // ISSUE: reference to a compiler-generated field
-        this.\u003C\u003E1__state = -1;
-        return false;
-      }
-      // ISSUE: reference to a compiler-generated field
-      this.\u003C\u003E1__state = -1;
-      Audio.Play("event:/char/badeline/level_entry", badelineOldsite.Position, "chaser_count", (float) badelineOldsite.index);
-      Vector2 from = badelineOldsite.Position;
-      Tween tween = Tween.Create(Tween.TweenMode.Oneshot, Ease.CubeIn, badelineOldsite.followBehindTime - 0.1f, true);
-      tween.OnUpdate = (Action<Tween>) (t =>
-      {
-        this.Position = Vector2.Lerp(from, to, t.Eased);
-        if ((double) to.X != (double) from.X)
-          this.Sprite.Scale.X = Math.Abs(this.Sprite.Scale.X) * (float) Math.Sign(to.X - from.X);
-        this.Trail();
-      });
-      badelineOldsite.Add((Component) tween);
-      // ISSUE: reference to a compiler-generated field
-      this.\u003C\u003E2__current = (object) tween.Duration;
-      // ISSUE: reference to a compiler-generated field
-      this.\u003C\u003E1__state = 1;
-      return true;
-    }
+        {
+            // ISSUE: reference to a compiler-generated field
+            BadelineOldsite badelineOldsite = this;
+            Audio.Play("event:/char/badeline/level_entry", badelineOldsite.Position, "chaser_count", (float)badelineOldsite.index);
+            Vector2 from = badelineOldsite.Position;
+            Tween tween = Tween.Create(Tween.TweenMode.Oneshot, Ease.CubeIn, badelineOldsite.followBehindTime - 0.1f, true);
+            tween.OnUpdate = delegate (Tween t)
+            {
+                badelineOldsite.Position = Vector2.Lerp(from, to, t.Eased);
+                if (to.X != from.X)
+                {
+                    badelineOldsite.Sprite.Scale.X = Math.Abs(badelineOldsite.Sprite.Scale.X) * (float)Math.Sign(to.X - from.X);
+                }
+                badelineOldsite.Trail();
+            };
+            base.Add(tween);
+            yield return tween.Duration;
+            yield break;
+        }
 
     private IEnumerator StopChasing()
     {

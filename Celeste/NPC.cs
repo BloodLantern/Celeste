@@ -171,33 +171,18 @@ namespace Celeste
         int x4 = (int) (nullable6.HasValue ? new float?(x3 + nullable6.GetValueOrDefault()) : new float?()).Value;
         yield return (object) player2.DummyWalkToExact(x4);
       }
-      player.Facing = (Facings) -side.Value;
+      player.Facing = (Facings) (-side.Value);
       if (turnToFace && npc.Sprite != null)
         npc.Sprite.Scale.X = (float) side.Value;
       yield return (object) null;
     }
 
+    // ISSUE: reference to a compiler-generated field
     public IEnumerator PlayerApproach48px()
     {
-      // ISSUE: reference to a compiler-generated field
-      int num = this.\u003C\u003E1__state;
-      NPC npc = this;
-      if (num != 0)
-      {
-        if (num != 1)
-          return false;
-        // ISSUE: reference to a compiler-generated field
-        this.\u003C\u003E1__state = -1;
-        return false;
-      }
-      // ISSUE: reference to a compiler-generated field
-      this.\u003C\u003E1__state = -1;
-      Player entity = npc.Scene.Tracker.GetEntity<Player>();
-      // ISSUE: reference to a compiler-generated field
-      this.\u003C\u003E2__current = (object) npc.PlayerApproach(entity, spacing: new float?(48f));
-      // ISSUE: reference to a compiler-generated field
-      this.\u003C\u003E1__state = 1;
-      return true;
+        Player entity = base.Scene.Tracker.GetEntity<Player>();
+        yield return this.PlayerApproach(entity, true, new float?((float)48), null);
+        yield break;
     }
 
     public IEnumerator PlayerLeave(Player player, float? to = null)

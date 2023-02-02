@@ -1,0 +1,111 @@
+Celeste Error Log
+==========================================
+
+Ver 1.4.0.0
+2/2/2023 9:48:04 PM
+System.DllNotFoundException: Unable to load DLL 'fmodstudio': The specified module could not be found. (Exception from HRESULT: 0x8007007E)
+   at FMOD.Studio.System.FMOD_Studio_System_Create(IntPtr& studiosystem, UInt32 headerversion)
+   at FMOD.Studio.System.create(System& studiosystem) in C:\Users\maxim\source\repos\CelesteDecompiled\FMOD\Studio\System.cs:line 19
+   at Celeste.Audio.Init() in C:\Users\maxim\source\repos\CelesteDecompiled\Celeste\Audio.cs:line 37
+   at Celeste.GameLoader.LoadThread() in C:\Users\maxim\source\repos\CelesteDecompiled\Celeste\GameLoader.cs:line 59
+   at Celeste.RunThread.RunThreadWithLogging(Action method) in C:\Users\maxim\source\repos\CelesteDecompiled\Celeste\RunThread.cs:line 34
+
+
+Ver 1.4.0.0
+2/2/2023 9:47:18 PM
+System.DllNotFoundException: Unable to load DLL 'fmodstudio': The specified module could not be found. (Exception from HRESULT: 0x8007007E)
+   at FMOD.Studio.System.FMOD_Studio_System_Create(IntPtr& studiosystem, UInt32 headerversion)
+   at FMOD.Studio.System.create(System& studiosystem) in C:\Users\maxim\source\repos\CelesteDecompiled\FMOD\Studio\System.cs:line 19
+   at Celeste.Audio.Init() in C:\Users\maxim\source\repos\CelesteDecompiled\Celeste\Audio.cs:line 37
+   at Celeste.GameLoader.LoadThread() in C:\Users\maxim\source\repos\CelesteDecompiled\Celeste\GameLoader.cs:line 59
+   at Celeste.RunThread.RunThreadWithLogging(Action method) in C:\Users\maxim\source\repos\CelesteDecompiled\Celeste\RunThread.cs:line 34
+
+
+Ver 1.4.0.0
+2/2/2023 9:36:41 PM
+System.InvalidOperationException: Callback dispatcher is not initialized.
+   at Steamworks.CallbackDispatcher.RunFrame(Boolean isGameServer) in C:\Users\maxim\OneDrive\Desktop\Utile\C# Libraries\Steamworks.NET-20.1.0\com.rlabrecque.steamworks.net\Runtime\CallbackDispatcher.cs:line 157
+   at Steamworks.SteamAPI.RunCallbacks() in C:\Users\maxim\OneDrive\Desktop\Utile\C# Libraries\Steamworks.NET-20.1.0\com.rlabrecque.steamworks.net\Runtime\Steam.cs:line 112
+   at Celeste.Celeste.Update(GameTime gameTime) in C:\Users\maxim\source\repos\CelesteDecompiled\Celeste\Celeste.cs:line 92
+   at Microsoft.Xna.Framework.Game.RunGame(Boolean useBlockingRun)
+   at Microsoft.Xna.Framework.Game.Run()
+   at Monocle.Engine.RunWithLogging() in C:\Users\maxim\source\repos\CelesteDecompiled\Monocle\Engine.cs:line 285
+
+
+Ver 1.4.0.0
+2/2/2023 9:35:54 PM
+Microsoft.Xna.Framework.Content.ContentLoadException: Error loading "Monocle\MonocleDefault". File not found. ---> System.IO.FileNotFoundException: Error loading "Content\Monocle\MonocleDefault.xnb". File not found.
+   at Microsoft.Xna.Framework.TitleContainer.OpenStream(String name)
+   at Microsoft.Xna.Framework.Content.ContentManager.OpenStream(String assetName)
+   --- End of inner exception stack trace ---
+   at Microsoft.Xna.Framework.Content.ContentManager.OpenStream(String assetName)
+   at Microsoft.Xna.Framework.Content.ContentManager.ReadAsset[T](String assetName, Action`1 recordDisposableObject)
+   at Microsoft.Xna.Framework.Content.ContentManager.Load[T](String assetName)
+   at Monocle.Draw.Initialize(GraphicsDevice graphicsDevice) in C:\Users\maxim\source\repos\CelesteDecompiled\Monocle\Draw.cs:line 28
+   at Monocle.Engine.LoadContent() in C:\Users\maxim\source\repos\CelesteDecompiled\Monocle\Engine.cs:line 177
+   at Celeste.Celeste.LoadContent() in C:\Users\maxim\source\repos\CelesteDecompiled\Celeste\Celeste.cs:line 69
+   at Microsoft.Xna.Framework.Game.Initialize()
+   at Monocle.Engine.Initialize() in C:\Users\maxim\source\repos\CelesteDecompiled\Monocle\Engine.cs:line 166
+   at Celeste.Celeste.Initialize() in C:\Users\maxim\source\repos\CelesteDecompiled\Celeste\Celeste.cs:line 55
+   at Microsoft.Xna.Framework.Game.RunGame(Boolean useBlockingRun)
+   at Microsoft.Xna.Framework.Game.Run()
+   at Monocle.Engine.RunWithLogging() in C:\Users\maxim\source\repos\CelesteDecompiled\Monocle\Engine.cs:line 285
+
+
+Ver 1.4.0.0
+2/2/2023 9:34:46 PM
+System.InvalidOperationException: Steamworks is not initialized.
+   at Steamworks.InteropHelp.TestIfAvailableClient() in C:\Users\maxim\OneDrive\Desktop\Utile\C# Libraries\Steamworks.NET-20.1.0\com.rlabrecque.steamworks.net\Runtime\InteropHelp.cs:line 31
+   at Steamworks.SteamUserStats.RequestCurrentStats() in C:\Users\maxim\OneDrive\Desktop\Utile\C# Libraries\Steamworks.NET-20.1.0\com.rlabrecque.steamworks.net\Runtime\autogen\isteamuserstats.cs:line 23
+   at Celeste.Stats.MakeRequest() in C:\Users\maxim\source\repos\CelesteDecompiled\Celeste\Stats.cs:line 19
+   at Celeste.Celeste..ctor() in C:\Users\maxim\source\repos\CelesteDecompiled\Celeste\Celeste.cs:line 48
+   at Celeste.Celeste.Main(String[] args) in C:\Users\maxim\source\repos\CelesteDecompiled\Celeste\Celeste.cs:line 163
+
+
+2/2/2023 9:34:13 PM
+System.InvalidOperationException: Steamworks is not initialized.
+   at Steamworks.InteropHelp.TestIfAvailableClient() in C:\Users\maxim\OneDrive\Desktop\Utile\C# Libraries\Steamworks.NET-20.1.0\com.rlabrecque.steamworks.net\Runtime\InteropHelp.cs:line 31
+   at Steamworks.SteamApps.GetCurrentGameLanguage() in C:\Users\maxim\OneDrive\Desktop\Utile\C# Libraries\Steamworks.NET-20.1.0\com.rlabrecque.steamworks.net\Runtime\autogen\isteamapps.cs:line 40
+   at Celeste.Celeste.Main(String[] args) in C:\Users\maxim\source\repos\CelesteDecompiled\Celeste\Celeste.cs:line 149
+
+
+2/2/2023 9:30:05 PM
+System.EntryPointNotFoundException: Unable to find an entry point named 'SteamInternal_CreateInterface' in DLL 'steam_api'.
+   at Steamworks.NativeMethods.SteamInternal_CreateInterface(UTF8StringHandle ver)
+   at Steamworks.CSteamAPIContext.Init() in C:\Users\maxim\OneDrive\Desktop\Utile\C# Libraries\Steamworks.NET-20.1.0\com.rlabrecque.steamworks.net\Runtime\Steam.cs:line 311
+   at Steamworks.SteamAPI.Init() in C:\Users\maxim\OneDrive\Desktop\Utile\C# Libraries\Steamworks.NET-20.1.0\com.rlabrecque.steamworks.net\Runtime\Steam.cs:line 38
+   at Celeste.Celeste.Main(String[] args) in C:\Users\maxim\source\repos\CelesteDecompiled\Celeste\Celeste.cs:line 142
+
+
+2/2/2023 9:21:24 PM
+System.EntryPointNotFoundException: Unable to find an entry point named 'SteamAPI_ISteamClient_GetISteamGameSearch' in DLL 'steam_api'.
+   at Steamworks.NativeMethods.ISteamClient_GetISteamGameSearch(IntPtr instancePtr, HSteamUser hSteamuser, HSteamPipe hSteamPipe, UTF8StringHandle pchVersion)
+   at Steamworks.SteamClient.GetISteamGameSearch(HSteamUser hSteamuser, HSteamPipe hSteamPipe, String pchVersion) in C:\Users\maxim\OneDrive\Desktop\Utile\C# Libraries\Steamworks.NET-20.1.0\com.rlabrecque.steamworks.net\Runtime\autogen\isteamclient.cs:line 209
+   at Steamworks.CSteamAPIContext.Init() in C:\Users\maxim\OneDrive\Desktop\Utile\C# Libraries\Steamworks.NET-20.1.0\com.rlabrecque.steamworks.net\Runtime\Steam.cs:line 346
+   at Steamworks.SteamAPI.Init() in C:\Users\maxim\OneDrive\Desktop\Utile\C# Libraries\Steamworks.NET-20.1.0\com.rlabrecque.steamworks.net\Runtime\Steam.cs:line 38
+   at Celeste.Celeste.Main(String[] args) in C:\Users\maxim\source\repos\CelesteDecompiled\Celeste\Celeste.cs:line 142
+
+
+2/2/2023 8:29:23 PM
+System.EntryPointNotFoundException: Unable to find an entry point named 'SteamAPI_ISteamClient_GetISteamGameSearch' in DLL 'steam_api'.
+   at Steamworks.NativeMethods.ISteamClient_GetISteamGameSearch(IntPtr instancePtr, HSteamUser hSteamuser, HSteamPipe hSteamPipe, UTF8StringHandle pchVersion)
+   at Steamworks.SteamClient.GetISteamGameSearch(HSteamUser hSteamuser, HSteamPipe hSteamPipe, String pchVersion) in C:\Users\maxim\OneDrive\Desktop\Utile\C# Libraries\Steamworks.NET-20.1.0\com.rlabrecque.steamworks.net\Runtime\autogen\isteamclient.cs:line 209
+   at Steamworks.CSteamAPIContext.Init() in C:\Users\maxim\OneDrive\Desktop\Utile\C# Libraries\Steamworks.NET-20.1.0\com.rlabrecque.steamworks.net\Runtime\Steam.cs:line 346
+   at Steamworks.SteamAPI.Init() in C:\Users\maxim\OneDrive\Desktop\Utile\C# Libraries\Steamworks.NET-20.1.0\com.rlabrecque.steamworks.net\Runtime\Steam.cs:line 38
+   at Celeste.Celeste.Main(String[] args) in C:\Users\maxim\source\repos\CelesteDecompiled\Celeste\Celeste.cs:line 142
+
+
+2/2/2023 8:23:43 PM
+System.DllNotFoundException: Unable to load DLL 'steam_api': The specified module could not be found. (Exception from HRESULT: 0x8007007E)
+   at Steamworks.NativeMethods.SteamAPI_RestartAppIfNecessary(AppId_t unOwnAppID)
+   at Steamworks.SteamAPI.RestartAppIfNecessary(AppId_t unOwnAppID) in C:\Users\maxim\OneDrive\Desktop\Utile\C# Libraries\Steamworks.NET-20.1.0\com.rlabrecque.steamworks.net\Runtime\Steam.cs:line 68
+   at Celeste.Celeste.Main(String[] args) in C:\Users\maxim\source\repos\CelesteDecompiled\Celeste\Celeste.cs:line 140
+
+
+
+
+
+
+
+
+

@@ -32,7 +32,7 @@ namespace Celeste
       {
         if (!(a == "flipMouth") && !(a == "flipEyes"))
           return;
-        this.facing = (Facings) -(int) this.facing;
+        this.facing = (Facings) (-(int) this.facing);
       });
       this.Collider = (Collider) new Hitbox(10f, 10f, -5f, -5f);
       this.Add((Component) new MirrorReflection());
@@ -297,7 +297,7 @@ namespace Celeste
         }
         if (!(data.Hit is TempleCrackedBlock))
           return;
-        Celeste.Celeste.Freeze(0.15f);
+        Celeste.Freeze(0.15f);
         Input.Rumble(RumbleStrength.Strong, RumbleLength.Long);
         (data.Hit as TempleCrackedBlock).Break(this.Position);
       }

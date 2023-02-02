@@ -89,32 +89,17 @@ namespace Celeste
       cs06BossEnd.EndCutscene(level);
     }
 
+    // ISSUE: reference to a compiler-generated field
     private IEnumerator StartMusic()
-    {
-      // ISSUE: reference to a compiler-generated field
-      int num = this.\u003C\u003E1__state;
-      CS06_BossEnd cs06BossEnd = this;
-      if (num != 0)
-      {
-        if (num != 1)
-          return false;
-        // ISSUE: reference to a compiler-generated field
-        this.\u003C\u003E1__state = -1;
-        return false;
-      }
-      // ISSUE: reference to a compiler-generated field
-      this.\u003C\u003E1__state = -1;
-      Level level = cs06BossEnd.SceneAs<Level>();
-      level.Session.Audio.Music.Event = "event:/music/lvl6/badeline_acoustic";
-      level.Session.Audio.Apply();
-      // ISSUE: reference to a compiler-generated field
-      this.\u003C\u003E2__current = (object) 0.5f;
-      // ISSUE: reference to a compiler-generated field
-      this.\u003C\u003E1__state = 1;
-      return true;
+        {
+        Level level = base.SceneAs<Level>();
+        level.Session.Audio.Music.Event = "event:/music/lvl6/badeline_acoustic";
+        level.Session.Audio.Apply(false);
+        yield return 0.5f;
+        yield break;
     }
 
-    private IEnumerator PlayerHug()
+        private IEnumerator PlayerHug()
     {
       CS06_BossEnd cs06BossEnd = this;
       cs06BossEnd.Add((Component) new Coroutine(cs06BossEnd.Level.ZoomTo(cs06BossEnd.badeline.Center + new Vector2(0.0f, -24f) - cs06BossEnd.Level.Camera.Position, 2f, 0.5f)));

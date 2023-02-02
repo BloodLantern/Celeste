@@ -120,50 +120,20 @@ namespace Celeste
       npC09GrannyInside.EndTalking(npC09GrannyInside.Level);
     }
 
+    // ISSUE: reference to a compiler-generated field
     private IEnumerator StartLaughing()
     {
-      // ISSUE: reference to a compiler-generated field
-      int num = this.\u003C\u003E1__state;
-      NPC09_Granny_Inside npC09GrannyInside = this;
-      if (num != 0)
-      {
-        if (num != 1)
-          return false;
-        // ISSUE: reference to a compiler-generated field
-        this.\u003C\u003E1__state = -1;
-        return false;
-      }
-      // ISSUE: reference to a compiler-generated field
-      this.\u003C\u003E1__state = -1;
-      npC09GrannyInside.Sprite.Play("laugh");
-      // ISSUE: reference to a compiler-generated field
-      this.\u003C\u003E2__current = (object) null;
-      // ISSUE: reference to a compiler-generated field
-      this.\u003C\u003E1__state = 1;
-      return true;
+        this.Sprite.Play("laugh", false, false);
+        yield return null;
+        yield break;
     }
 
+    // ISSUE: reference to a compiler-generated field
     private IEnumerator StopLaughing()
     {
-      // ISSUE: reference to a compiler-generated field
-      int num = this.\u003C\u003E1__state;
-      NPC09_Granny_Inside npC09GrannyInside = this;
-      if (num != 0)
-      {
-        if (num != 1)
-          return false;
-        // ISSUE: reference to a compiler-generated field
-        this.\u003C\u003E1__state = -1;
-        return false;
-      }
-      // ISSUE: reference to a compiler-generated field
-      this.\u003C\u003E1__state = -1;
-      npC09GrannyInside.Sprite.Play("idle");
-      // ISSUE: reference to a compiler-generated field
-      this.\u003C\u003E2__current = (object) null;
-      // ISSUE: reference to a compiler-generated field
-      this.\u003C\u003E1__state = 1;
-      return true;
+        this.Sprite.Play("idle", false, false);
+        yield return null;
+        yield break;
     }
 
     private void EndTalking(Level level)

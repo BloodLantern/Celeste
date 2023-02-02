@@ -39,7 +39,7 @@ namespace Celeste
       cs02Mirror.player.StateMachine.State = 11;
       cs02Mirror.playerEndX = (float) (8 * cs02Mirror.direction);
       yield return (object) 1f;
-      cs02Mirror.player.Facing = (Facings) -cs02Mirror.direction;
+      cs02Mirror.player.Facing = (Facings) (-cs02Mirror.direction);
       yield return (object) 0.4f;
       yield return (object) cs02Mirror.player.DummyRunTo(cs02Mirror.mirror.X + cs02Mirror.playerEndX);
       yield return (object) 0.5f;
@@ -92,7 +92,7 @@ namespace Celeste
         entity1.DummyAutoAnimate = true;
         entity1.Speed = Vector2.Zero;
         entity1.X = this.mirror.X + this.playerEndX;
-        entity1.Facing = this.direction == 0 ? Facings.Right : (Facings) -this.direction;
+        entity1.Facing = this.direction == 0 ? Facings.Right : (Facings) (-this.direction);
       }
       foreach (DreamBlock entity2 in this.Scene.Tracker.GetEntities<DreamBlock>())
         entity2.ActivateNoRoutine();

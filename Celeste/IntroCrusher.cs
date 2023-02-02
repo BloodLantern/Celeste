@@ -63,7 +63,10 @@ namespace Celeste
       introCrusher.shakingSfx.Play("event:/game/00_prologue/fallblock_first_shake");
       float time = 1.2f;
       // ISSUE: reference to a compiler-generated method
-      Shaker shaker = new Shaker(time, true, new Action<Vector2>(introCrusher.\u003CSequence\u003Eb__9_1));
+      Shaker shaker = new Shaker(time, true, delegate (Vector2 v)
+      {
+          this.shake = v;
+      });
       introCrusher.Add((Component) shaker);
       Input.Rumble(RumbleStrength.Medium, RumbleLength.Medium);
       for (; (double) time > 0.0; time -= Engine.DeltaTime)
@@ -102,7 +105,10 @@ namespace Celeste
       introCrusher.SceneAs<Level>().Shake();
       Input.Rumble(RumbleStrength.Strong, RumbleLength.Medium);
       // ISSUE: reference to a compiler-generated method
-      introCrusher.Add((Component) new Shaker(0.25f, true, new Action<Vector2>(introCrusher.\u003CSequence\u003Eb__9_0)));
+      introCrusher.Add(new Shaker(0.25f, true, delegate (Vector2 v)
+      {
+          this.shake = v;
+      }));
     }
   }
 }

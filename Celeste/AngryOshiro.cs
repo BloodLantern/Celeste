@@ -158,7 +158,7 @@ namespace Celeste
       if (this.state.State != 2 || (double) player.Bottom > (double) this.Top + 6.0)
         return;
       Audio.Play("event:/game/general/thing_booped", this.Position);
-      Celeste.Celeste.Freeze(0.2f);
+      Celeste.Freeze(0.2f);
       player.Bounce(this.Top + 2f);
       this.state.State = 5;
       this.prechargeSfx.Stop();
@@ -259,7 +259,10 @@ namespace Celeste
       if (angryOshiro.Scene.Tracker.GetEntity<Player>() != null)
       {
         // ISSUE: reference to a compiler-generated method
-        Alarm.Set((Entity) angryOshiro, 0.216f, new Action(angryOshiro.ChaseCoroutine));
+        Alarm.Set((Entity) angryOshiro, 0.216f, delegate
+        {
+          angryOshiro.chargeSfx.Play("event:/char/oshiro/boss_charge", null, 0f);
+        });
         angryOshiro.state.State = 1;
       }
       else
@@ -293,7 +296,7 @@ namespace Celeste
     private IEnumerator ChargeUpCoroutine()
     {
       AngryOshiro angryOshiro = this;
-      Celeste.Celeste.Freeze(0.05f);
+      Celeste.Freeze(0.05f);
       Distort.Anxiety = 0.3f;
       Input.Rumble(RumbleStrength.Strong, RumbleLength.Medium);
       angryOshiro.lightningVisible = true;

@@ -76,7 +76,7 @@ namespace Celeste
       sprite.Play("once");
       cs03Ending1.Add((Component) sprite);
       yield return (object) null;
-      Celeste.Celeste.Freeze(0.3f);
+      Celeste.Freeze(0.3f);
       yield return (object) null;
       level.Shake();
       Input.Rumble(RumbleStrength.Strong, RumbleLength.Long);
@@ -97,7 +97,10 @@ namespace Celeste
       Vector2 oshiroFallSpeed = new Vector2(-100f, -250f);
       Tween tween = Tween.Create(Tween.TweenMode.Oneshot, Ease.SineInOut, 1.5f, true);
       // ISSUE: reference to a compiler-generated method
-      tween.OnUpdate = new Action<Tween>(cs03Ending1.\u003CCutscene\u003Eb__11_0);
+      tween.OnUpdate = delegate (Tween t)
+      {
+          this.angryOshiro.Sprite.Rotation = t.Eased * -100f * 0.017453292f;
+      };
       cs03Ending1.Add((Component) tween);
       float t;
       for (t = 0.0f; (double) t < 2.0; t += Engine.DeltaTime)

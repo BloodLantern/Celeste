@@ -73,7 +73,10 @@ namespace Celeste
       while ((double) (unlockedRemixDisplay.drawLerp += Engine.DeltaTime * 1.2f) < 1.0)
         yield return (object) null;
       // ISSUE: reference to a compiler-generated method
-      unlockedRemixDisplay.Add((Component) (unlockedRemixDisplay.wiggler = Wiggler.Create(0.8f, 4f, new Action<float>(unlockedRemixDisplay.\u003CDisplayRoutine\u003Eb__17_0), true)));
+      unlockedRemixDisplay.Add(this.wiggler = Wiggler.Create(0.8f, 4f, delegate (float f)
+      {
+          this.rotation = f * 0.1f;
+      }, true, false));
       unlockedRemixDisplay.drawLerp = 1f;
       yield return (object) 4f;
       while ((double) (unlockedRemixDisplay.drawLerp -= Engine.DeltaTime * 2f) > 0.0)

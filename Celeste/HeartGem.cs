@@ -239,7 +239,10 @@ namespace Celeste
         sfx = "event:/game/general/crystalheart_gold_get";
       follow.sfx = SoundEmitter.Play(sfx, (Entity) follow);
       // ISSUE: reference to a compiler-generated method
-      follow.Add((Component) new LevelEndingHook(new Action(follow.\u003CCollectRoutine\u003Eb__35_0)));
+      follow.Add(new LevelEndingHook(delegate ()
+      {
+          this.sfx.Source.Stop(true);
+      }));
       follow.walls.Add(new InvisibleBarrier(new Vector2((float) level.Bounds.Right, (float) level.Bounds.Top), 8f, (float) level.Bounds.Height));
       List<InvisibleBarrier> walls1 = follow.walls;
       Rectangle bounds = level.Bounds;
@@ -260,7 +263,7 @@ namespace Celeste
       follow.Add((Component) (follow.white = GFX.SpriteBank.Create("heartGemWhite")));
       follow.Depth = -2000000;
       yield return (object) null;
-      Celeste.Celeste.Freeze(0.2f);
+      Celeste.Freeze(0.2f);
       yield return (object) null;
       Engine.TimeRate = 0.5f;
       player.Depth = -2000000;
@@ -361,7 +364,7 @@ namespace Celeste
         level.Session.UnlockedCSide = true;
       if (SaveData.Instance.TotalHeartGems < 24)
         return;
-      Achievements.Register(Achievement.CSIDES);
+      //Achievements.Register(Achievement.CSIDES);
     }
 
     private IEnumerator DoFakeRoutineWithBird(Player player)

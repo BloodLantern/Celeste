@@ -389,13 +389,19 @@ namespace Celeste
         cs07Credits1.snow = new HiresSnow();
         cs07Credits1.snow.Alpha = 0.0f;
         // ISSUE: reference to a compiler-generated method
-        cs07Credits1.snow.AttachAlphaTo = (ScreenWipe) new FadeWipe((Scene) cs07Credits1.Level, false, new Action(cs07Credits1.\u003CRoutine\u003Eb__24_0));
+        cs07Credits1.snow.AttachAlphaTo = (ScreenWipe) new FadeWipe(this.Level, false, delegate ()
+        {
+            base.EndCutscene(this.Level, true);
+        });
         cs07Credits1.Level.Add((Monocle.Renderer) (cs07Credits1.Level.HiresSnow = cs07Credits1.snow));
       }
       else
       {
         // ISSUE: reference to a compiler-generated method
-        FadeWipe fadeWipe = new FadeWipe((Scene) cs07Credits1.Level, false, new Action(cs07Credits1.\u003CRoutine\u003Eb__24_1));
+        FadeWipe fadeWipe = new FadeWipe(this.Level, false, delegate ()
+        {
+            base.EndCutscene(this.Level, true);
+        });
       }
     }
 

@@ -223,7 +223,7 @@ namespace Celeste
             return;
           Draw.SpriteBatch.Begin();
           Draw.SpriteBatch.Draw((Texture2D) (RenderTarget2D) this.prevPageBuffer, Vector2.Zero, Color.White);
-          Draw.SpriteBatch.Draw((Texture2D) (RenderTarget2D) this.currPageBuffer, Celeste.Celeste.TargetCenter, new Rectangle?(this.currPageBuffer.Bounds), Color.White, (float) ((1.0 - (double) this.pageEase) * 12.0), Celeste.Celeste.TargetCenter, Vector2.One * this.pageEase, SpriteEffects.None, 0.0f);
+          Draw.SpriteBatch.Draw((Texture2D) (RenderTarget2D) this.currPageBuffer, Celeste.TargetCenter, new Rectangle?(this.currPageBuffer.Bounds), Color.White, (float) ((1.0 - (double) this.pageEase) * 12.0), Celeste.TargetCenter, Vector2.One * this.pageEase, SpriteEffects.None, 0.0f);
           Draw.SpriteBatch.End();
         }
       }

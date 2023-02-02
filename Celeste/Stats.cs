@@ -30,7 +30,7 @@ namespace Celeste
       if (!Stats.statToString.TryGetValue(stat, out str))
         Stats.statToString.Add(stat, str = stat.ToString());
       int num;
-      if (!SteamUserStats.GetStat(str, ref num))
+      if (!SteamUserStats.GetStat(str, out num))
         return;
       SteamUserStats.SetStat(str, num + increment);
     }
@@ -43,7 +43,7 @@ namespace Celeste
         string str = (string) null;
         if (!Stats.statToString.TryGetValue(stat, out str))
           Stats.statToString.Add(stat, str = stat.ToString());
-        SteamUserStats.GetStat(str, ref num);
+        SteamUserStats.GetStat(str, out num);
       }
       return num;
     }
@@ -56,7 +56,7 @@ namespace Celeste
         string str = (string) null;
         if (!Stats.statToString.TryGetValue(stat, out str))
           Stats.statToString.Add(stat, str = stat.ToString());
-        SteamUserStats.GetGlobalStat(str, ref num);
+        SteamUserStats.GetGlobalStat(str, out num);
       }
       return num;
     }

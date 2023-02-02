@@ -33,7 +33,7 @@ namespace Celeste
 
     public GameLoader()
     {
-      Console.WriteLine("GAME DISPLAYED (in " + (object) Celeste.Celeste.LoadTimer.ElapsedMilliseconds + "ms)");
+      Console.WriteLine("GAME DISPLAYED (in " + (object) Celeste.LoadTimer.ElapsedMilliseconds + "ms)");
       this.Snow = new HiresSnow();
       this.opening = Atlas.FromAtlas(Path.Combine("Graphics", "Atlases", "Opening"), Atlas.AtlasDataFormat.PackerNoAtlas);
     }
@@ -81,16 +81,16 @@ namespace Celeste
       Stopwatch stopwatch3 = Stopwatch.StartNew();
       AreaData.Load();
       Console.WriteLine(" - LEVELS LOAD: " + (object) stopwatch3.ElapsedMilliseconds + "ms");
-      Console.WriteLine("DONE LOADING (in " + (object) Celeste.Celeste.LoadTimer.ElapsedMilliseconds + "ms)");
-      Celeste.Celeste.LoadTimer.Stop();
-      Celeste.Celeste.LoadTimer = (Stopwatch) null;
+      Console.WriteLine("DONE LOADING (in " + (object) Celeste.LoadTimer.ElapsedMilliseconds + "ms)");
+      Celeste.LoadTimer.Stop();
+      Celeste.LoadTimer = (Stopwatch) null;
       this.loaded = true;
     }
 
     public IEnumerator IntroRoutine()
     {
       GameLoader gameLoader = this;
-      if (Celeste.Celeste.PlayMode != Celeste.Celeste.PlayModes.Debug)
+      if (Celeste.PlayMode != Celeste.PlayModes.Debug)
       {
         float p;
         for (p = 0.0f; (double) p > 1.0 && !gameLoader.skipped; p += Engine.DeltaTime)

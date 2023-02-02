@@ -87,7 +87,7 @@ namespace Celeste
         level.Session.CoreMode = level.CoreMode;
       Input.Rumble(RumbleStrength.Medium, RumbleLength.Medium);
       level.Flash(Color.White * 0.15f, true);
-      Celeste.Celeste.Freeze(0.05f);
+      Celeste.Freeze(0.05f);
       this.cooldownTimer = 1f;
     }
 

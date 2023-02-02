@@ -133,7 +133,7 @@ namespace Celeste
       this.menu.RemoveSelf();
       this.menu = (TextMenu) null;
       this.exiting = true;
-      bool toAreaQuit = SaveData.Instance.Areas[0].Modes[0].Completed && Celeste.Celeste.PlayMode != Celeste.Celeste.PlayModes.Event;
+      bool toAreaQuit = SaveData.Instance.Areas[0].Modes[0].Completed && Celeste.PlayMode != Celeste.PlayModes.Event;
       new FadeWipe((Scene) this, false, (Action) (() =>
       {
         if (toAreaQuit)

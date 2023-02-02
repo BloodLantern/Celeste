@@ -16,7 +16,7 @@ namespace Celeste
     private const string DoneTalking = "theoDoneTalking";
     private const string HadntMetAtStart = "hadntMetTheoAtStart";
     private Coroutine talkRoutine;
-    private Celeste.Selfie selfie;
+    private Selfie selfie;
 
     private int CurrentConversation
     {
@@ -135,27 +135,12 @@ namespace Celeste
       yield return (object) 2f;
     }
 
+    // ISSUE: reference to a compiler-generated field
     private IEnumerator HidePhotos()
     {
-      // ISSUE: reference to a compiler-generated field
-      int num = this.\u003C\u003E1__state;
-      NPC02_Theo npC02Theo = this;
-      if (num != 0)
-      {
-        if (num != 1)
-          return false;
-        // ISSUE: reference to a compiler-generated field
-        this.\u003C\u003E1__state = -1;
-        return false;
-      }
-      // ISSUE: reference to a compiler-generated field
-      this.\u003C\u003E1__state = -1;
-      npC02Theo.Sprite.Play("idle");
-      // ISSUE: reference to a compiler-generated field
-      this.\u003C\u003E2__current = (object) 0.5f;
-      // ISSUE: reference to a compiler-generated field
-      this.\u003C\u003E1__state = 1;
-      return true;
+        this.Sprite.Play("idle", false, false);
+        yield return 0.5f;
+        yield break;
     }
 
     private IEnumerator Selfie()
@@ -166,34 +151,19 @@ namespace Celeste
       npC02Theo.Sprite.Scale.X = -npC02Theo.Sprite.Scale.X;
       npC02Theo.Sprite.Play("takeSelfie");
       yield return (object) 1f;
-      npC02Theo.Scene.Add((Entity) (npC02Theo.selfie = new Celeste.Selfie(npC02Theo.SceneAs<Level>())));
+      npC02Theo.Scene.Add((Entity) (npC02Theo.selfie = new Selfie(npC02Theo.SceneAs<Level>())));
       yield return (object) npC02Theo.selfie.PictureRoutine();
-      npC02Theo.selfie = (Celeste.Selfie) null;
+      npC02Theo.selfie = (Selfie) null;
       npC02Theo.Sprite.Scale.X = -npC02Theo.Sprite.Scale.X;
     }
 
+    // ISSUE: reference to a compiler-generated field
     private IEnumerator SelfieFiltered()
-    {
-      // ISSUE: reference to a compiler-generated field
-      int num = this.\u003C\u003E1__state;
-      NPC02_Theo npC02Theo = this;
-      if (num != 0)
-      {
-        if (num != 1)
-          return false;
-        // ISSUE: reference to a compiler-generated field
-        this.\u003C\u003E1__state = -1;
-        npC02Theo.selfie = (Celeste.Selfie) null;
-        return false;
-      }
-      // ISSUE: reference to a compiler-generated field
-      this.\u003C\u003E1__state = -1;
-      npC02Theo.Scene.Add((Entity) (npC02Theo.selfie = new Celeste.Selfie(npC02Theo.SceneAs<Level>())));
-      // ISSUE: reference to a compiler-generated field
-      this.\u003C\u003E2__current = (object) npC02Theo.selfie.FilterRoutine();
-      // ISSUE: reference to a compiler-generated field
-      this.\u003C\u003E1__state = 1;
-      return true;
+        {
+        base.Scene.Add(this.selfie = new Selfie(base.SceneAs<Level>()));
+        yield return this.selfie.FilterRoutine();
+        this.selfie = null;
+        yield break;
     }
   }
 }

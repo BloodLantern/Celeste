@@ -88,7 +88,15 @@ namespace Celeste
         FirstPlay = false
       });
       // ISSUE: reference to a compiler-generated method
-      cs10Farewell.granny.Sprite.OnFrameChange = new Action<string>(cs10Farewell.\u003CCutscene\u003Eb__9_0);
+      cs10Farewell.granny.Sprite.OnFrameChange = delegate (string anim)
+      {
+          int currentAnimationFrame = this.granny.Sprite.CurrentAnimationFrame;
+          if (anim == "walk" && currentAnimationFrame == 2)
+          {
+              float volume = Calc.ClampedMap((this.player.Position - this.granny.Position).Length(), 64f, 128f, 1f, 0f);
+              Audio.Play("event:/new_content/char/granny/cane_tap_ending", this.granny.Position).setVolume(volume);
+          }
+      };
       cs10Farewell.Scene.Add((Entity) cs10Farewell.granny);
       cs10Farewell.grannyWalk = new Coroutine(cs10Farewell.granny.MoveTo(cs10Farewell.player.Position + new Vector2(32f, 0.0f)));
       cs10Farewell.Add((Component) cs10Farewell.grannyWalk);
@@ -143,17 +151,11 @@ namespace Celeste
       yield return (object) 3.5f;
     }
 
+    // ISSUE: reference to a compiler-generated field
     private IEnumerator FadeToWhite()
     {
-      // ISSUE: reference to a compiler-generated field
-      int num = this.\u003C\u003E1__state;
-      CS10_Farewell cs10Farewell = this;
-      if (num != 0)
-        return false;
-      // ISSUE: reference to a compiler-generated field
-      this.\u003C\u003E1__state = -1;
-      cs10Farewell.Add((Component) new Coroutine(cs10Farewell.DoFadeToWhite()));
-      return false;
+        base.Add(new Coroutine(this.DoFadeToWhite(), true));
+        yield break;
     }
 
     private IEnumerator DoFadeToWhite()
@@ -174,7 +176,7 @@ namespace Celeste
         Audio.Stop(this.dissipate);
       this.Level.OnEndOfFrame += (Action) (() =>
       {
-        Achievements.Register(Achievement.FAREWELL);
+        //Achievements.Register(Achievement.FAREWELL);
         this.Level.TeleportTo(this.player, "end-cinematic", Player.IntroTypes.Transition);
       });
     }

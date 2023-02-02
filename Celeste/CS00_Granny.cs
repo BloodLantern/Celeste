@@ -85,30 +85,15 @@ namespace Celeste
       yield break;
     }
 
+    // ISSUE: reference to a compiler-generated field
     private IEnumerator OminousZoom()
     {
-      // ISSUE: reference to a compiler-generated field
-      int num = this.\u003C\u003E1__state;
-      CS00_Granny cs00Granny = this;
-      if (num != 0)
-      {
-        if (num != 1)
-          return false;
-        // ISSUE: reference to a compiler-generated field
-        this.\u003C\u003E1__state = -1;
-        return false;
-      }
-      // ISSUE: reference to a compiler-generated field
-      this.\u003C\u003E1__state = -1;
-      Vector2 screenSpaceFocusPoint = new Vector2(210f, 100f);
-      cs00Granny.zoomCoroutine = new Coroutine(cs00Granny.Level.ZoomAcross(screenSpaceFocusPoint, 4f, 3f));
-      cs00Granny.Add((Component) cs00Granny.zoomCoroutine);
-      cs00Granny.granny.Sprite.Play("idle");
-      // ISSUE: reference to a compiler-generated field
-      this.\u003C\u003E2__current = (object) 0.2f;
-      // ISSUE: reference to a compiler-generated field
-      this.\u003C\u003E1__state = 1;
-      return true;
+        Vector2 screenSpaceFocusPoint = new Vector2(210f, 100f);
+        this.zoomCoroutine = new Coroutine(this.Level.ZoomAcross(screenSpaceFocusPoint, 4f, 3f), true);
+        base.Add(this.zoomCoroutine);
+        this.granny.Sprite.Play("idle", false, false);
+        yield return 0.2f;
+        yield break;
     }
 
     private IEnumerator PanToMaddy()

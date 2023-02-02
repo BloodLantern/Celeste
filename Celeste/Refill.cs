@@ -144,7 +144,7 @@ namespace Celeste
     private IEnumerator RefillRoutine(Player player)
     {
       Refill refill = this;
-      Celeste.Celeste.Freeze(0.05f);
+      Celeste.Freeze(0.05f);
       yield return (object) null;
       refill.level.Shake();
       refill.sprite.Visible = refill.flash.Visible = false;

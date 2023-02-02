@@ -50,7 +50,7 @@ namespace Celeste
       if ((double) Math.Abs(this.bounce.X) > (double) Math.Abs(this.bounce.Y))
       {
         this.sprite.Play("deadside");
-        this.facing = (Facings) -Math.Sign(this.bounce.X);
+        this.facing = (Facings) (-Math.Sign(this.bounce.X));
       }
       else
       {
@@ -71,7 +71,7 @@ namespace Celeste
         PlayerDeadBody playerDeadBody = playerDeadBody1;
         Audio.Play("event:/char/madeline/predeath", playerDeadBody1.Position);
         playerDeadBody1.scale = 1.5f;
-        Celeste.Celeste.Freeze(0.05f);
+        Celeste.Freeze(0.05f);
         yield return (object) null;
         Vector2 from = playerDeadBody1.Position;
         Vector2 to = from + playerDeadBody1.bounce * 24f;
@@ -94,7 +94,10 @@ namespace Celeste
       Audio.Play(playerDeadBody1.HasGolden ? "event:/new_content/char/madeline/death_golden" : "event:/char/madeline/death", playerDeadBody1.Position);
       playerDeadBody1.deathEffect = new DeathEffect(playerDeadBody1.initialHairColor, new Vector2?(playerDeadBody1.Center - playerDeadBody1.Position));
       // ISSUE: reference to a compiler-generated method
-      playerDeadBody1.deathEffect.OnUpdate = new Action<float>(playerDeadBody1.\u003CDeathRoutine\u003Eb__15_0);
+      playerDeadBody1.deathEffect.OnUpdate = delegate (float f)
+      {
+          this.light.Alpha = 1f - f;
+      };
       playerDeadBody1.Add((Component) playerDeadBody1.deathEffect);
       yield return (object) (float) ((double) playerDeadBody1.deathEffect.Duration * 0.64999997615814209);
       if ((double) playerDeadBody1.ActionDelay > 0.0)

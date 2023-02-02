@@ -111,7 +111,7 @@ namespace Celeste
 
     private void Remap(Binding binding)
     {
-      if (!Celeste.Input.GuiInputController())
+      if (!Input.GuiInputController())
         return;
       this.remapping = true;
       this.remappingBinding = binding;
@@ -121,13 +121,13 @@ namespace Celeste
 
     private void AddRemap(Buttons btn)
     {
-      while (this.remappingBinding.Controller.Count >= Celeste.Input.MaxBindings)
+      while (this.remappingBinding.Controller.Count >= Input.MaxBindings)
         this.remappingBinding.Controller.RemoveAt(0);
       this.remapping = false;
       this.inputDelay = 0.25f;
       if (!this.remappingBinding.Add(btn))
         Audio.Play("event:/ui/main/button_invalid");
-      Celeste.Input.Initialize();
+      Input.Initialize();
     }
 
     private void Clear(Binding binding)
@@ -148,10 +148,10 @@ namespace Celeste
           this.resetDelay = 0.0f;
           this.resetHeld = false;
           Settings.Instance.SetDefaultButtonControls(true);
-          Celeste.Input.Initialize();
+          Input.Initialize();
           Audio.Play("event:/ui/main/button_select");
         }
-        if (!Celeste.Input.MenuConfirm.Check && (double) this.resetDelay > 0.30000001192092896)
+        if (!Input.MenuConfirm.Check && (double) this.resetDelay > 0.30000001192092896)
         {
           Audio.Play("event:/ui/main/button_invalid");
           this.resetHeld = false;
@@ -163,11 +163,11 @@ namespace Celeste
       this.Focused = !this.closing && (double) this.inputDelay <= 0.0 && !this.waitingForController && !this.remapping;
       if (!this.closing)
       {
-        if (!MInput.GamePads[Celeste.Input.Gamepad].Attached)
+        if (!MInput.GamePads[Input.Gamepad].Attached)
           this.waitingForController = true;
         else if (this.waitingForController)
           this.waitingForController = false;
-        if (Celeste.Input.MenuCancel.Pressed && !this.remapping)
+        if (Input.MenuCancel.Pressed && !this.remapping)
           this.OnCancel();
       }
       if ((double) this.inputDelay > 0.0 && !this.remapping)
@@ -175,14 +175,14 @@ namespace Celeste
       this.remappingEase = Calc.Approach(this.remappingEase, this.remapping ? 1f : 0.0f, Engine.RawDeltaTime * 4f);
       if ((double) this.remappingEase >= 0.25 && this.remapping)
       {
-        if (Celeste.Input.ESC.Pressed || (double) this.timeout <= 0.0 || !Celeste.Input.GuiInputController())
+        if (Input.ESC.Pressed || (double) this.timeout <= 0.0 || !Input.GuiInputController())
         {
           this.remapping = false;
           this.Focused = true;
         }
         else
         {
-          MInput.GamePadData gamePad = MInput.GamePads[Celeste.Input.Gamepad];
+          MInput.GamePadData gamePad = MInput.GamePads[Input.Gamepad];
           float num = 0.25f;
           if (gamePad.LeftStickLeftPressed(num))
             this.AddRemap(Buttons.LeftThumbstickLeft);
@@ -246,7 +246,7 @@ namespace Celeste
     {
       Draw.Rect(-10f, -10f, 1940f, 1100f, Color.Black * Ease.CubeOut(this.Alpha));
       Vector2 position = new Vector2(1920f, 1080f) * 0.5f;
-      if (MInput.GamePads[Celeste.Input.Gamepad].Attached)
+      if (MInput.GamePads[Input.Gamepad].Attached)
       {
         base.Render();
         if ((double) this.remappingEase > 0.0)

@@ -63,28 +63,14 @@ namespace Celeste
       yield return (object) null;
     }
 
+    // ISSUE: reference to a compiler-generated field
     private IEnumerator MadelineFacesAway()
     {
-      // ISSUE: reference to a compiler-generated field
-      int num = this.\u003C\u003E1__state;
-      CS10_BadelineHelps cs10BadelineHelps = this;
-      if (num != 0)
-      {
-        if (num != 1)
-          return false;
-        // ISSUE: reference to a compiler-generated field
-        this.\u003C\u003E1__state = -1;
-        return false;
-      }
-      // ISSUE: reference to a compiler-generated field
-      this.\u003C\u003E1__state = -1;
-      cs10BadelineHelps.Level.NextColorGrade("feelingdown", 0.1f);
-      // ISSUE: reference to a compiler-generated field
-      this.\u003C\u003E2__current = (object) cs10BadelineHelps.player.DummyWalkTo(cs10BadelineHelps.player.X - 16f);
-      // ISSUE: reference to a compiler-generated field
-      this.\u003C\u003E1__state = 1;
-      return true;
+        this.Level.NextColorGrade("feelingdown", 0.1f);
+        yield return this.player.DummyWalkTo(this.player.X - 16f, false, 1f, false);
+        yield break;
     }
+
 
     private IEnumerator MadelineFacesBadeline()
     {

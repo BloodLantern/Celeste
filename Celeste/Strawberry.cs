@@ -271,7 +271,10 @@ namespace Celeste
       strawberry.flapSpeed = -200f;
       Tween tween1 = Tween.Create(Tween.TweenMode.Oneshot, Ease.CubeOut, 0.25f, true);
       // ISSUE: reference to a compiler-generated method
-      tween1.OnUpdate = new Action<Tween>(strawberry.\u003CFlyAwayRoutine\u003Eb__46_0);
+      tween1.OnUpdate = delegate (Tween t)
+      {
+          this.flapSpeed = MathHelper.Lerp(-200f, 0f, t.Eased);
+      };
       strawberry.Add((Component) tween1);
       yield return (object) 0.1f;
       Audio.Play("event:/game/general/strawberry_laugh", strawberry.Position);
@@ -280,7 +283,10 @@ namespace Celeste
         Audio.Play("event:/game/general/strawberry_flyaway", strawberry.Position);
       Tween tween2 = Tween.Create(Tween.TweenMode.Oneshot, duration: 0.5f, start: true);
       // ISSUE: reference to a compiler-generated method
-      tween2.OnUpdate = new Action<Tween>(strawberry.\u003CFlyAwayRoutine\u003Eb__46_1);
+      tween2.OnUpdate = delegate (Tween t)
+      {
+          this.flapSpeed = MathHelper.Lerp(0f, -200f, t.Eased);
+      };
       strawberry.Add((Component) tween2);
     }
 

@@ -69,33 +69,18 @@ namespace Celeste
       yield return (object) this.player.DummyWalkTo(this.player.X + 8f);
     }
 
+    // ISSUE: reference to a compiler-generated field
     private IEnumerator BadelineAppears()
     {
-      // ISSUE: reference to a compiler-generated field
-      int num = this.\u003C\u003E1__state;
-      CS10_Gravestone cs10Gravestone = this;
-      if (num != 0)
-      {
-        if (num != 1)
-          return false;
-        // ISSUE: reference to a compiler-generated field
-        this.\u003C\u003E1__state = -1;
-        return false;
-      }
-      // ISSUE: reference to a compiler-generated field
-      this.\u003C\u003E1__state = -1;
-      cs10Gravestone.Level.Session.Inventory.Dashes = 1;
-      cs10Gravestone.player.Dashes = 1;
-      Vector2 position = cs10Gravestone.player.Position + new Vector2(-12f, -10f);
-      cs10Gravestone.Level.Displacement.AddBurst(position, 0.5f, 8f, 32f, 0.5f);
-      cs10Gravestone.Level.Add((Entity) (cs10Gravestone.badeline = new BadelineDummy(position)));
-      Audio.Play("event:/char/badeline/maddy_split", position);
-      cs10Gravestone.badeline.Sprite.Scale.X = 1f;
-      // ISSUE: reference to a compiler-generated field
-      this.\u003C\u003E2__current = (object) cs10Gravestone.badeline.FloatTo(position + new Vector2(0.0f, -6f), new int?(1), false);
-      // ISSUE: reference to a compiler-generated field
-      this.\u003C\u003E1__state = 1;
-      return true;
+        this.Level.Session.Inventory.Dashes = 1;
+        this.player.Dashes = 1;
+        Vector2 vector = this.player.Position + new Vector2(-12f, -10f);
+        this.Level.Displacement.AddBurst(vector, 0.5f, 8f, 32f, 0.5f, null, null);
+        this.Level.Add(this.badeline = new BadelineDummy(vector));
+        Audio.Play("event:/char/badeline/maddy_split", vector);
+        this.badeline.Sprite.Scale.X = 1f;
+        yield return this.badeline.FloatTo(vector + new Vector2(0f, -6f), new int?(1), false, false, false);
+        yield break;
     }
 
     private IEnumerator SitDown()

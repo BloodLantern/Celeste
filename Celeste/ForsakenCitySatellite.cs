@@ -201,7 +201,14 @@ namespace Celeste
           yield return (object) 0.2f;
         }
         // ISSUE: reference to a compiler-generated method
-        forsakenCitySatellite.Add((Component) Alarm.Create(Alarm.AlarmMode.Oneshot, new Action(forsakenCitySatellite.\u003CPulseRoutine\u003Eb__28_0), 1.1f, true));
+        forsakenCitySatellite.Add(Alarm.Create(Alarm.AlarmMode.Oneshot, delegate
+        {
+            if (this.enabled)
+            {
+                this.birdThrustSfx.Position = this.birdFlyPosition - this.Position;
+                this.birdThrustSfx.Play("event:/game/01_forsaken_city/birdbros_thrust", null, 0f);
+            }
+        }, 1.1f, true));
         forsakenCitySatellite.birds.Shuffle<ForsakenCitySatellite.CodeBird>();
         foreach (ForsakenCitySatellite.CodeBird bird in forsakenCitySatellite.birds)
         {

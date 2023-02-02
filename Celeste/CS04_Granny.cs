@@ -58,24 +58,9 @@ namespace Celeste
 
     private IEnumerator ZoomIn()
     {
-      // ISSUE: reference to a compiler-generated field
-      int num = this.\u003C\u003E1__state;
-      CS04_Granny cs04Granny = this;
-      if (num != 0)
-      {
-        if (num != 1)
-          return false;
         // ISSUE: reference to a compiler-generated field
-        this.\u003C\u003E1__state = -1;
-        return false;
-      }
-      // ISSUE: reference to a compiler-generated field
-      this.\u003C\u003E1__state = -1;
-      // ISSUE: reference to a compiler-generated field
-      this.\u003C\u003E2__current = (object) cs04Granny.Level.ZoomTo(new Vector2(123f, 116f), 2f, 0.5f);
-      // ISSUE: reference to a compiler-generated field
-      this.\u003C\u003E1__state = 1;
-      return true;
+        yield return this.Level.ZoomTo(new Vector2(123f, 116f), 2f, 0.5f);
+        yield break;
     }
 
     private IEnumerator MaddyTurnsAround()

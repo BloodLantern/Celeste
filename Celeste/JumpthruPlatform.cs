@@ -52,8 +52,7 @@ namespace Celeste
             if (!(lower == "core"))
             {
               if (lower == "wood" || lower == "cliffside")
-                ;
-              this.SurfaceSoundIndex = 5;
+                this.SurfaceSoundIndex = 5;
             }
             else
               this.SurfaceSoundIndex = 3;

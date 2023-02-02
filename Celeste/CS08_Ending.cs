@@ -25,7 +25,7 @@ namespace Celeste
     private bool showVersion;
     private float versionAlpha;
     private Coroutine cutscene;
-    private string version = Celeste.Celeste.Instance.Version.ToString();
+    private string version = Celeste.Instance.Version.ToString();
 
     public CS08_Ending()
       : base(false, true)
@@ -69,7 +69,7 @@ namespace Celeste
       this.Add((Component) (this.vignette = new Monocle.Image(GFX.Portraits[id])));
       this.vignette.Visible = false;
       this.vignette.CenterOrigin();
-      this.vignette.Position = Celeste.Celeste.TargetCenter;
+      this.vignette.Position = Celeste.TargetCenter;
       this.Add((Component) (this.cutscene = new Coroutine(this.Cutscene(level))));
     }
 
@@ -118,7 +118,7 @@ namespace Celeste
       for (p2 = 0.0f; (double) p2 < 1.0; p2 += Engine.DeltaTime / p1)
       {
         float amount = Ease.CubeOut(p2);
-        cs08Ending.vignette.Position = Vector2.Lerp(Celeste.Celeste.TargetCenter, Celeste.Celeste.TargetCenter + new Vector2(0.0f, 140f), amount);
+        cs08Ending.vignette.Position = Vector2.Lerp(Celeste.TargetCenter, Celeste.TargetCenter + new Vector2(0.0f, 140f), amount);
         cs08Ending.vignette.Scale = Vector2.One * (float) (0.64999997615814209 + 0.34999999403953552 * (1.0 - (double) amount));
         cs08Ending.vignette.Rotation = -0.025f * amount;
         yield return (object) null;
@@ -132,7 +132,7 @@ namespace Celeste
       for (float p3 = 0.0f; (double) p3 < 1.0; p3 += Engine.DeltaTime / p1)
       {
         float amount = Ease.CubeOut(p3);
-        cs08Ending.vignette.Position = Vector2.Lerp(posFrom, Celeste.Celeste.TargetCenter, amount);
+        cs08Ending.vignette.Position = Vector2.Lerp(posFrom, Celeste.TargetCenter, amount);
         cs08Ending.vignette.Scale = Vector2.One * MathHelper.Lerp(scaleFrom, 1f, amount);
         cs08Ending.vignette.Rotation = MathHelper.Lerp(p2, 0.0f, amount);
         yield return (object) null;
@@ -145,7 +145,7 @@ namespace Celeste
     {
       this.vignette.Visible = true;
       this.vignette.Color = Color.White;
-      this.vignette.Position = Celeste.Celeste.TargetCenter;
+      this.vignette.Position = Celeste.TargetCenter;
       this.vignette.Scale = Vector2.One;
       this.vignette.Rotation = 0.0f;
       if (this.player != null)
@@ -197,36 +197,21 @@ namespace Celeste
     private IEnumerator MaddyTurns()
     {
       yield return (object) 0.1f;
-      this.player.Facing = (Facings) -(int) this.player.Facing;
+      this.player.Facing = (Facings) (-(int) this.player.Facing);
       yield return (object) 0.1f;
     }
 
+    // ISSUE: reference to a compiler-generated field
     private IEnumerator BadelineEmerges()
     {
-      // ISSUE: reference to a compiler-generated field
-      int num = this.\u003C\u003E1__state;
-      CS08_Ending cs08Ending = this;
-      if (num != 0)
-      {
-        if (num != 1)
-          return false;
-        // ISSUE: reference to a compiler-generated field
-        this.\u003C\u003E1__state = -1;
-        return false;
-      }
-      // ISSUE: reference to a compiler-generated field
-      this.\u003C\u003E1__state = -1;
-      cs08Ending.Level.Displacement.AddBurst(cs08Ending.player.Center, 0.5f, 8f, 32f, 0.5f);
-      cs08Ending.Level.Session.Inventory.Dashes = 1;
-      cs08Ending.player.Dashes = 1;
-      cs08Ending.Level.Add((Entity) (cs08Ending.badeline = new BadelineDummy(cs08Ending.player.Position)));
-      Audio.Play("event:/char/badeline/maddy_split", cs08Ending.player.Position);
-      cs08Ending.badeline.Sprite.Scale.X = 1f;
-      // ISSUE: reference to a compiler-generated field
-      this.\u003C\u003E2__current = (object) cs08Ending.badeline.FloatTo(cs08Ending.player.Position + new Vector2(-12f, -16f), new int?(1), false);
-      // ISSUE: reference to a compiler-generated field
-      this.\u003C\u003E1__state = 1;
-      return true;
+        this.Level.Displacement.AddBurst(this.player.Center, 0.5f, 8f, 32f, 0.5f, null, null);
+        this.Level.Session.Inventory.Dashes = 1;
+        this.player.Dashes = 1;
+        this.Level.Add(this.badeline = new BadelineDummy(this.player.Position));
+        Audio.Play("event:/char/badeline/maddy_split", this.player.Position);
+        this.badeline.Sprite.Scale.X = 1f;
+        yield return this.badeline.FloatTo(this.player.Position + new Vector2(-12f, -16f), new int?(1), false, false, false);
+        yield break;
     }
 
     private IEnumerator OshiroEnters()

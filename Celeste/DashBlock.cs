@@ -80,7 +80,7 @@ namespace Celeste
     public override void Removed(Scene scene)
     {
       base.Removed(scene);
-      Celeste.Celeste.Freeze(0.05f);
+      Celeste.Freeze(0.05f);
     }
 
     public void Break(Vector2 from, Vector2 direction, bool playSound = true, bool playDebrisSound = true)

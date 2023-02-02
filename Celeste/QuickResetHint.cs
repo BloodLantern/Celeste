@@ -36,13 +36,13 @@ namespace Celeste
           (object) buttons2,
           (object) this.textHold,
           (object) "、",
-          (object) Celeste.Input.FirstButton(Celeste.Input.Pause),
+          (object) Input.FirstButton(Input.Pause),
           (object) this.textPress
         };
         this.keyboardList = new List<object>()
         {
           (object) this.textStart,
-          (object) Celeste.Input.FirstKey(Celeste.Input.QuickRestart),
+          (object) Input.FirstKey(Input.QuickRestart),
           (object) this.textPress
         };
       }
@@ -56,20 +56,20 @@ namespace Celeste
           (object) buttons2,
           (object) ",  ",
           (object) this.textPress,
-          (object) Celeste.Input.FirstButton(Celeste.Input.Pause)
+          (object) Input.FirstButton(Input.Pause)
         };
         this.keyboardList = new List<object>()
         {
           (object) this.textStart,
           (object) this.textPress,
-          (object) Celeste.Input.FirstKey(Celeste.Input.QuickRestart)
+          (object) Input.FirstKey(Input.QuickRestart)
         };
       }
     }
 
     public override void Render()
     {
-      List<object> objectList = Celeste.Input.GuiInputController() ? this.controllerList : this.keyboardList;
+      List<object> objectList = Input.GuiInputController() ? this.controllerList : this.keyboardList;
       float num = 0.0f;
       foreach (object text in objectList)
       {
@@ -79,10 +79,10 @@ namespace Celeste
             num += ActiveFont.Measure(text as string).X;
             continue;
           case Buttons button:
-            num += (float) Celeste.Input.GuiSingleButton(button).Width + 16f;
+            num += (float) Input.GuiSingleButton(button).Width + 16f;
             continue;
           case Keys key:
-            num += (float) Celeste.Input.GuiKey(key).Width + 16f;
+            num += (float) Input.GuiKey(key).Width + 16f;
             continue;
           default:
             continue;
@@ -98,12 +98,12 @@ namespace Celeste
             position.X += ActiveFont.Measure(text as string).X * 0.75f;
             continue;
           case Buttons button:
-            MTexture mtexture1 = Celeste.Input.GuiSingleButton(button);
+            MTexture mtexture1 = Input.GuiSingleButton(button);
             mtexture1.DrawJustified(position + new Vector2((float) (((double) mtexture1.Width + 16.0) * 0.75 * 0.5), 0.0f), new Vector2(0.5f, 0.5f), Color.White, 0.75f);
             position.X += (float) (((double) mtexture1.Width + 16.0) * 0.75);
             continue;
           case Keys key:
-            MTexture mtexture2 = Celeste.Input.GuiKey(key);
+            MTexture mtexture2 = Input.GuiKey(key);
             mtexture2.DrawJustified(position + new Vector2((float) (((double) mtexture2.Width + 16.0) * 0.75 * 0.5), 0.0f), new Vector2(0.5f, 0.5f), Color.White, 0.75f);
             position.X += (float) (((double) mtexture2.Width + 16.0) * 0.75);
             continue;

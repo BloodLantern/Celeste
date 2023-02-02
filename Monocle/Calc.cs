@@ -1346,7 +1346,7 @@ namespace Monocle
       if (Calc.stopwatch == null)
         return;
       Calc.stopwatch.Stop();
-      "Timer: " + (object) Calc.stopwatch.ElapsedTicks + " ticks, or " + TimeSpan.FromTicks(Calc.stopwatch.ElapsedTicks).TotalSeconds.ToString("00.0000000") + " seconds";
+      Console.Write("Timer: " + (object) Calc.stopwatch.ElapsedTicks + " ticks, or " + TimeSpan.FromTicks(Calc.stopwatch.ElapsedTicks).TotalSeconds.ToString("00.0000000") + " seconds");
       Calc.stopwatch = (Stopwatch) null;
     }
 

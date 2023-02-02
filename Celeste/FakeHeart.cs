@@ -135,7 +135,7 @@ namespace Celeste
         return;
       this.Collidable = this.Visible = false;
       this.respawnTimer = 3f;
-      Celeste.Celeste.Freeze(0.05f);
+      Celeste.Freeze(0.05f);
       this.SceneAs<Level>().Shake();
       SlashFx.Burst(this.Position, angle);
       player?.RefillDash();

@@ -62,27 +62,12 @@ namespace Celeste
       cs06Granny.EndCutscene(level);
     }
 
+    // ISSUE: reference to a compiler-generated field
     private IEnumerator ZoomIn()
     {
-      // ISSUE: reference to a compiler-generated field
-      int num = this.\u003C\u003E1__state;
-      CS06_Granny cs06Granny = this;
-      if (num != 0)
-      {
-        if (num != 1)
-          return false;
-        // ISSUE: reference to a compiler-generated field
-        this.\u003C\u003E1__state = -1;
-        return false;
-      }
-      // ISSUE: reference to a compiler-generated field
-      this.\u003C\u003E1__state = -1;
-      Vector2 screenSpaceFocusPoint = Vector2.Lerp(cs06Granny.granny.Position, cs06Granny.player.Position, 0.5f) - cs06Granny.Level.Camera.Position + new Vector2(0.0f, -20f);
-      // ISSUE: reference to a compiler-generated field
-      this.\u003C\u003E2__current = (object) cs06Granny.Level.ZoomTo(screenSpaceFocusPoint, 2f, 0.5f);
-      // ISSUE: reference to a compiler-generated field
-      this.\u003C\u003E1__state = 1;
-      return true;
+        Vector2 screenSpaceFocusPoint = Vector2.Lerp(this.granny.Position, this.player.Position, 0.5f) - this.Level.Camera.Position + new Vector2(0f, -20f);
+        yield return this.Level.ZoomTo(screenSpaceFocusPoint, 2f, 0.5f);
+        yield break;
     }
 
     private IEnumerator Laughs()

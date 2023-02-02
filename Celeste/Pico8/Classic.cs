@@ -184,7 +184,7 @@ namespace Celeste.Pico8
       ++this.deaths;
       this.shake = 10;
       this.destroy_object((Classic.ClassicObject) obj);
-      Stats.Increment(Stat.PICO_DEATHS);
+      //Stats.Increment(Stat.PICO_DEATHS);
       this.dead_particles.Clear();
       for (int index = 0; index <= 7; ++index)
       {
@@ -1100,7 +1100,7 @@ namespace Celeste.Pico8
           this.G.got_fruit.Add(1 + this.G.level_index());
           this.G.init_object<Classic.lifeup>(new Classic.lifeup(), this.x, this.y);
           this.G.destroy_object((Classic.ClassicObject) this);
-          Stats.Increment(Stat.PICO_BERRIES);
+          //Stats.Increment(Stat.PICO_BERRIES);
         }
         ++this.off;
         this.y = this.start + this.E.sin(this.off / 40f) * 2.5f;
@@ -1154,7 +1154,7 @@ namespace Celeste.Pico8
         this.G.got_fruit.Add(1 + this.G.level_index());
         this.G.init_object<Classic.lifeup>(new Classic.lifeup(), this.x, this.y);
         this.G.destroy_object((Classic.ClassicObject) this);
-        Stats.Increment(Stat.PICO_BERRIES);
+        //Stats.Increment(Stat.PICO_BERRIES);
       }
 
       public override void draw()
@@ -1472,8 +1472,8 @@ namespace Celeste.Pico8
         base.init(g, e);
         this.x += 5f;
         this.score = (float) this.G.got_fruit.Count;
-        Stats.Increment(Stat.PICO_COMPLETES);
-        Achievements.Register(Achievement.PICO8);
+        //Stats.Increment(Stat.PICO_COMPLETES);
+        //Achievements.Register(Achievement.PICO8);
       }
 
       public override void draw()

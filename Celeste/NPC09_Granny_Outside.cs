@@ -78,50 +78,20 @@ namespace Celeste
       c09GrannyOutside.EndTalking(c09GrannyOutside.Level);
     }
 
+    // ISSUE: reference to a compiler-generated field
     private IEnumerator MoveRight()
     {
-      // ISSUE: reference to a compiler-generated field
-      int num = this.\u003C\u003E1__state;
-      NPC09_Granny_Outside c09GrannyOutside = this;
-      if (num != 0)
-      {
-        if (num != 1)
-          return false;
-        // ISSUE: reference to a compiler-generated field
-        this.\u003C\u003E1__state = -1;
-        return false;
-      }
-      // ISSUE: reference to a compiler-generated field
-      this.\u003C\u003E1__state = -1;
-      // ISSUE: reference to a compiler-generated field
-      this.\u003C\u003E2__current = (object) c09GrannyOutside.MoveTo(new Vector2(c09GrannyOutside.X + 8f, c09GrannyOutside.Y));
-      // ISSUE: reference to a compiler-generated field
-      this.\u003C\u003E1__state = 1;
-      return true;
+        yield return base.MoveTo(new Vector2(base.X + 8f, base.Y), false, null, false);
+        yield break;
     }
 
+    // ISSUE: reference to a compiler-generated field
     private IEnumerator ExitRight()
     {
-      // ISSUE: reference to a compiler-generated field
-      int num = this.\u003C\u003E1__state;
-      NPC09_Granny_Outside c09GrannyOutside = this;
-      if (num != 0)
-      {
-        if (num != 1)
-          return false;
-        // ISSUE: reference to a compiler-generated field
-        this.\u003C\u003E1__state = -1;
-        return false;
-      }
-      // ISSUE: reference to a compiler-generated field
-      this.\u003C\u003E1__state = -1;
-      c09GrannyOutside.leaving = true;
-      c09GrannyOutside.Add((Component) new Coroutine(c09GrannyOutside.MoveTo(new Vector2((float) (c09GrannyOutside.Level.Bounds.Right + 16), c09GrannyOutside.Y))));
-      // ISSUE: reference to a compiler-generated field
-      this.\u003C\u003E2__current = (object) null;
-      // ISSUE: reference to a compiler-generated field
-      this.\u003C\u003E1__state = 1;
-      return true;
+        this.leaving = true;
+        base.Add(new Coroutine(base.MoveTo(new Vector2((float)(this.Level.Bounds.Right + 16), base.Y), false, null, false), true));
+        yield return null;
+        yield break;
     }
 
     private void EndTalking(Level level)

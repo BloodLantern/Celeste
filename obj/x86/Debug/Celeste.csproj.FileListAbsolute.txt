@@ -1,0 +1,11 @@
+C:\Users\maxim\source\repos\CelesteDecompiled\bin\x86\Debug\Celeste.exe.config
+C:\Users\maxim\source\repos\CelesteDecompiled\bin\x86\Debug\Celeste.exe
+C:\Users\maxim\source\repos\CelesteDecompiled\bin\x86\Debug\Celeste.pdb
+C:\Users\maxim\source\repos\CelesteDecompiled\bin\x86\Debug\Steamworks.NET.dll
+C:\Users\maxim\source\repos\CelesteDecompiled\bin\x86\Debug\Steamworks.NET.pdb
+C:\Users\maxim\source\repos\CelesteDecompiled\obj\x86\Debug\Celeste.csproj.AssemblyReference.cache
+C:\Users\maxim\source\repos\CelesteDecompiled\obj\x86\Debug\Celeste.csproj.SuggestedBindingRedirects.cache
+C:\Users\maxim\source\repos\CelesteDecompiled\obj\x86\Debug\Celeste.csproj.CoreCompileInputs.cache
+C:\Users\maxim\source\repos\CelesteDecompiled\obj\x86\Debug\Celeste.csproj.CopyComplete
+C:\Users\maxim\source\repos\CelesteDecompiled\obj\x86\Debug\Celeste.exe
+C:\Users\maxim\source\repos\CelesteDecompiled\obj\x86\Debug\Celeste.pdb

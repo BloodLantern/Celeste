@@ -50,13 +50,13 @@ namespace Celeste
       this.buttons.Add((MenuButton) this.climbButton);
       targetPosition += Vector2.UnitY * this.climbButton.ButtonHeight;
       targetPosition.X -= 140f;
-      if (Celeste.Celeste.PlayMode == Celeste.Celeste.PlayModes.Debug)
+      if (Celeste.PlayMode == Celeste.PlayModes.Debug)
       {
         MainMenuSmallButton mainMenuSmallButton = new MainMenuSmallButton("menu_debug", "menu/options", (Oui) this, targetPosition, targetPosition + vector2, new Action(this.OnDebug));
         this.buttons.Add((MenuButton) mainMenuSmallButton);
         targetPosition += Vector2.UnitY * mainMenuSmallButton.ButtonHeight;
       }
-      if (Settings.Instance.Pico8OnMainMenu || Celeste.Celeste.PlayMode == Celeste.Celeste.PlayModes.Debug || Celeste.Celeste.PlayMode == Celeste.Celeste.PlayModes.Event)
+      if (Settings.Instance.Pico8OnMainMenu || Celeste.PlayMode == Celeste.PlayModes.Debug || Celeste.PlayMode == Celeste.PlayModes.Event)
       {
         MainMenuSmallButton mainMenuSmallButton = new MainMenuSmallButton("menu_pico8", "menu/pico8", (Oui) this, targetPosition, targetPosition + vector2, new Action(this.OnPico8));
         this.buttons.Add((MenuButton) mainMenuSmallButton);
@@ -143,7 +143,11 @@ namespace Celeste
       ouiMainMenu.Focused = false;
       Tween tween = Tween.Create(Tween.TweenMode.Oneshot, Ease.CubeInOut, 0.2f, true);
       // ISSUE: reference to a compiler-generated method
-      tween.OnUpdate = new Action<Tween>(ouiMainMenu.\u003CLeave\u003Eb__18_0);
+      tween.OnUpdate = delegate (Tween t)
+      {
+          this.ease = 1f - t.Eased;
+          this.Position = Vector2.Lerp(OuiMainMenu.TargetPosition, OuiMainMenu.TweenFrom, t.Eased);
+      };
       ouiMainMenu.Add((Component) tween);
       bool keepClimb = ouiMainMenu.climbButton.Selected && !(next is OuiTitleScreen);
       foreach (MenuButton button in ouiMainMenu.buttons)
@@ -202,7 +206,7 @@ namespace Celeste
     {
       Audio.Play("event:/ui/main/whoosh_list_out");
       Audio.Play("event:/ui/main/button_climb");
-      if (Celeste.Celeste.PlayMode == Celeste.Celeste.PlayModes.Event)
+      if (Celeste.PlayMode == Celeste.PlayModes.Event)
       {
         SaveData.InitializeDebugMode(false);
         this.Overworld.Goto<OuiChapterSelect>();

@@ -96,7 +96,7 @@ namespace Celeste
       if (this.health > 0)
       {
         this.Add((Component) (this.firstHitSfx = new SoundSource("event:/new_content/game/10_farewell/fusebox_hit_1")));
-        Celeste.Celeste.Freeze(0.1f);
+        Celeste.Freeze(0.1f);
         this.shakeCounter = 0.2f;
         this.shaker.On = true;
         this.bounceDir = dir;
@@ -110,7 +110,7 @@ namespace Celeste
         if (this.firstHitSfx != null)
           this.firstHitSfx.Stop();
         Audio.Play("event:/new_content/game/10_farewell/fusebox_hit_2", this.Position);
-        Celeste.Celeste.Freeze(0.2f);
+        Celeste.Freeze(0.2f);
         player.RefillDash();
         this.Break();
         Input.Rumble(RumbleStrength.Strong, RumbleLength.Long);

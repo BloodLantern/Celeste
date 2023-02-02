@@ -17,7 +17,7 @@ namespace Celeste
     public Billboard Image;
     public Wiggler Wiggler;
     public Vector2 Scale = Vector2.One;
-    public Vector3 Position;
+    public new Vector3 Position;
     public bool Show = true;
     public bool Disabled;
     private List<MTexture> frames;

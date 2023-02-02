@@ -166,7 +166,7 @@ namespace Celeste
       player.Sprite.Play("jumpSlow_carry");
       player.Speed = Vector2.Zero;
       player.Facing = Facings.Right;
-      Celeste.Celeste.Freeze(0.1f);
+      Celeste.Freeze(0.1f);
       level.Shake();
       Input.Rumble(RumbleStrength.Strong, RumbleLength.Short);
       follow.emitParticles = true;
@@ -234,7 +234,7 @@ namespace Celeste
         curve = new SimpleCurve();
       }
       follow.Sprite.Rate = 1f;
-      Celeste.Celeste.Freeze(0.05f);
+      Celeste.Freeze(0.05f);
       yield return (object) null;
       level.Shake();
       Input.Rumble(RumbleStrength.Strong, RumbleLength.Long);

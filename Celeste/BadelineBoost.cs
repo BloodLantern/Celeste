@@ -130,7 +130,7 @@ namespace Celeste
         num = -1;
       BadelineDummy badeline = new BadelineDummy(boost.Position);
       boost.Scene.Add((Entity) badeline);
-      player.Facing = (Facings) -num;
+      player.Facing = (Facings) (-num);
       badeline.Sprite.Scale.X = (float) num;
       Vector2 playerFrom = player.Position;
       Vector2 playerTo = boost.Position + new Vector2((float) (num * 4), -3f);

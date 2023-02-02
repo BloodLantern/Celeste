@@ -558,24 +558,24 @@ label_104:
         if (parameterInfo.ParameterType == typeof (string))
         {
           // ISSUE: explicit reference operation
-          ^ref strArray[index] += "string";
+          strArray[index] += "string";
         }
         else if (parameterInfo.ParameterType == typeof (int))
         {
           // ISSUE: explicit reference operation
-          ^ref strArray[index] += "int";
+          strArray[index] += "int";
         }
         else if (parameterInfo.ParameterType == typeof (float))
         {
           // ISSUE: explicit reference operation
-          ^ref strArray[index] += "float";
+          strArray[index] += "float";
         }
         else
         {
           if (!(parameterInfo.ParameterType == typeof (bool)))
             throw new Exception(method.DeclaringType.Name + "." + method.Name + " is marked as a command, but has an invalid parameter type. Allowed types are: string, int, float, and bool");
           // ISSUE: explicit reference operation
-          ^ref strArray[index] += "bool";
+          strArray[index] += "bool";
         }
         if (parameterInfo.DefaultValue == DBNull.Value)
           defaults[index] = (object) null;
@@ -642,18 +642,19 @@ label_104:
       char[] chArray = new char[1]{ '\n' };
       foreach (string str2 in str1.Split(chArray))
       {
-        int length1 = str2.LastIndexOf(" in ") + 4;
-        int startIndex1 = str2.LastIndexOf('\\') + 1;
+        string strOut = str2;
+        int length1 = strOut.LastIndexOf(" in ") + 4;
+        int startIndex1 = strOut.LastIndexOf('\\') + 1;
         if (length1 != -1 && startIndex1 != -1)
-          str2 = str2.Substring(0, length1) + str2.Substring(startIndex1);
-        int length2 = str2.IndexOf('(') + 1;
-        int startIndex2 = str2.IndexOf(')');
+          strOut = strOut.Substring(0, length1) + strOut.Substring(startIndex1);
+        int length2 = strOut.IndexOf('(') + 1;
+        int startIndex2 = strOut.IndexOf(')');
         if (length2 != -1 && startIndex2 != -1)
-          str2 = str2.Substring(0, length2) + str2.Substring(startIndex2);
-        int startIndex3 = str2.LastIndexOf(':');
+          strOut = strOut.Substring(0, length2) + strOut.Substring(startIndex2);
+        int startIndex3 = strOut.LastIndexOf(':');
         if (startIndex3 != -1)
-          str2 = str2.Insert(startIndex3 + 1, " ").Insert(startIndex3, " ");
-        Engine.Commands.Log((object) ("-> " + str2.TrimStart()), Color.White);
+          strOut = strOut.Insert(startIndex3 + 1, " ").Insert(startIndex3, " ");
+        Engine.Commands.Log((object) ("-> " + strOut.TrimStart()), Color.White);
       }
     }
 

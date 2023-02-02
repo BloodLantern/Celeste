@@ -314,7 +314,7 @@ namespace Celeste
         entity.Retreat();
       if (player != null)
       {
-        Celeste.Celeste.Freeze(0.1f);
+        Celeste.Freeze(0.1f);
         Engine.TimeRate = !lastHit ? 0.75f : 0.5f;
         Input.Rumble(RumbleStrength.Strong, RumbleLength.Medium);
       }

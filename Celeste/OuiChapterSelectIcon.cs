@@ -274,7 +274,7 @@ namespace Celeste
         if (SaveData.Instance != null && SaveData.Instance.Assists.MirrorMode)
           scale2.X = -scale2.X;
         mtexture.DrawCentered(this.Position + this.shake, Color.White, scale2, this.Rotation);
-        if (this.New && SaveData.Instance != null && !SaveData.Instance.CheatMode && this.Area == SaveData.Instance.UnlockedAreas && !this.selected && this.tween == null && !this.AssistModeUnlockable && Celeste.Celeste.PlayMode != Celeste.Celeste.PlayModes.Event)
+        if (this.New && SaveData.Instance != null && !SaveData.Instance.CheatMode && this.Area == SaveData.Instance.UnlockedAreas && !this.selected && this.tween == null && !this.AssistModeUnlockable && Celeste.PlayMode != Celeste.PlayModes.Event)
         {
           Vector2 position = this.Position + new Vector2((float) width * 0.25f, (float) -mtexture.Height * 0.25f) + Vector2.UnitY * -Math.Abs(this.newWiggle.Value * 30f);
           GFX.Gui["areas/new"].DrawCentered(position);

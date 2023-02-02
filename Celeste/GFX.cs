@@ -188,14 +188,12 @@ namespace Celeste
     {
       Effect effect1 = effect != null ? effect : GFX.FxPrimitive;
       BlendState blendState1 = blendState != null ? blendState : BlendState.AlphaBlend;
-      Vector2 vector2;
-      ref Vector2 local = ref vector2;
       Viewport viewport = Engine.Graphics.GraphicsDevice.Viewport;
       double width = (double) viewport.Width;
       viewport = Engine.Graphics.GraphicsDevice.Viewport;
       double height = (double) viewport.Height;
-      local = new Vector2((float) width, (float) height);
-      matrix *= Matrix.CreateScale((float) (1.0 / (double) vector2.X * 2.0), (float) (-(1.0 / (double) vector2.Y) * 2.0), 1f);
+      Vector2 local = new Vector2((float) width, (float) height);
+      matrix *= Matrix.CreateScale((float) (1.0 / (double) local.X * 2.0), (float) (-(1.0 / (double) local.Y) * 2.0), 1f);
       matrix *= Matrix.CreateTranslation(-1f, 1f, 0.0f);
       Engine.Instance.GraphicsDevice.RasterizerState = RasterizerState.CullNone;
       Engine.Instance.GraphicsDevice.BlendState = blendState1;
@@ -219,14 +217,12 @@ namespace Celeste
     {
       Effect effect1 = effect != null ? effect : GFX.FxPrimitive;
       BlendState blendState1 = blendState != null ? blendState : BlendState.AlphaBlend;
-      Vector2 vector2;
-      ref Vector2 local = ref vector2;
       Viewport viewport = Engine.Graphics.GraphicsDevice.Viewport;
       double width = (double) viewport.Width;
       viewport = Engine.Graphics.GraphicsDevice.Viewport;
       double height = (double) viewport.Height;
-      local = new Vector2((float) width, (float) height);
-      matrix *= Matrix.CreateScale((float) (1.0 / (double) vector2.X * 2.0), (float) (-(1.0 / (double) vector2.Y) * 2.0), 1f);
+      Vector2 local = new Vector2((float) width, (float) height);
+      matrix *= Matrix.CreateScale((float) (1.0 / (double) local.X * 2.0), (float) (-(1.0 / (double) local.Y) * 2.0), 1f);
       matrix *= Matrix.CreateTranslation(-1f, 1f, 0.0f);
       Engine.Instance.GraphicsDevice.RasterizerState = RasterizerState.CullNone;
       Engine.Instance.GraphicsDevice.BlendState = blendState1;

@@ -3103,7 +3103,7 @@ namespace Celeste
       {
         ++SaveData.Instance.TotalDashes;
         ++this.level.Session.Dashes;
-        Stats.Increment(Stat.DASHES);
+        //Stats.Increment(Stat.DASHES);
         bool flag = (double) this.DashDir.Y < 0.0 || (double) this.DashDir.Y == 0.0 && (double) this.DashDir.X > 0.0;
         if (this.DashDir == Vector2.Zero)
           flag = this.Facing == Facings.Right;

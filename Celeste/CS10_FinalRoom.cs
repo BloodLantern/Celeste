@@ -51,30 +51,15 @@ namespace Celeste
       cs10FinalRoom.EndCutscene(level);
     }
 
+    // ISSUE: reference to a compiler-generated field
     private IEnumerator BadelineAppears()
     {
-      // ISSUE: reference to a compiler-generated field
-      int num = this.\u003C\u003E1__state;
-      CS10_FinalRoom cs10FinalRoom = this;
-      if (num != 0)
-      {
-        if (num != 1)
-          return false;
-        // ISSUE: reference to a compiler-generated field
-        this.\u003C\u003E1__state = -1;
-        return false;
-      }
-      // ISSUE: reference to a compiler-generated field
-      this.\u003C\u003E1__state = -1;
-      cs10FinalRoom.Level.Add((Entity) (cs10FinalRoom.badeline = new BadelineDummy(cs10FinalRoom.player.Position + new Vector2(18f, -8f))));
-      cs10FinalRoom.Level.Displacement.AddBurst(cs10FinalRoom.badeline.Center, 0.5f, 8f, 32f, 0.5f);
-      Audio.Play("event:/char/badeline/maddy_split", cs10FinalRoom.badeline.Position);
-      cs10FinalRoom.badeline.Sprite.Scale.X = -1f;
-      // ISSUE: reference to a compiler-generated field
-      this.\u003C\u003E2__current = (object) null;
-      // ISSUE: reference to a compiler-generated field
-      this.\u003C\u003E1__state = 1;
-      return true;
+        this.Level.Add(this.badeline = new BadelineDummy(this.player.Position + new Vector2(18f, -8f)));
+        this.Level.Displacement.AddBurst(this.badeline.Center, 0.5f, 8f, 32f, 0.5f, null, null);
+        Audio.Play("event:/char/badeline/maddy_split", this.badeline.Position);
+        this.badeline.Sprite.Scale.X = -1f;
+        yield return null;
+        yield break;
     }
 
     private IEnumerator BadelineVanishes()

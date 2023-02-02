@@ -83,7 +83,7 @@ namespace Celeste
       player?.RefillStamina();
       Audio.Play("event:/game/general/cassette_get", this.Position);
       this.collected = true;
-      Celeste.Celeste.Freeze(0.1f);
+      Celeste.Freeze(0.1f);
       this.Add((Component) new Coroutine(this.CollectRoutine(player)));
     }
 
@@ -210,7 +210,7 @@ namespace Celeste
       public override void Render()
       {
         float num = Ease.CubeOut(this.alpha);
-        Vector2 vector2_1 = Celeste.Celeste.TargetCenter + new Vector2(0.0f, 64f);
+        Vector2 vector2_1 = Celeste.TargetCenter + new Vector2(0.0f, 64f);
         Vector2 vector2_2 = Vector2.UnitY * 64f * (1f - num);
         Draw.Rect(-10f, -10f, 1940f, 1100f, Color.Black * num * 0.8f);
         GFX.Gui["collectables/cassette"].DrawJustified(vector2_1 - vector2_2 + new Vector2(0.0f, 32f), new Vector2(0.5f, 1f), Color.White * num);

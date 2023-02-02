@@ -73,16 +73,17 @@ namespace Celeste
       int num2 = 0;
       foreach (Vector2 position in this.positions)
       {
-        position.Y -= (scene as Level).Camera.Y + this.CameraOffset.Y;
-        position.Y %= this.loopHeight;
-        if ((double) position.Y < 0.0)
-          position.Y += this.loopHeight;
-        position.X -= (scene as Level).Camera.X + this.CameraOffset.X;
-        position.X %= this.loopWidth;
-        if ((double) position.X < 0.0)
-          position.X += this.loopWidth;
+        Vector2 positionOut = position;
+        positionOut.Y -= (scene as Level).Camera.Y + this.CameraOffset.Y;
+        positionOut.Y %= this.loopHeight;
+        if ((double) positionOut.Y < 0.0)
+          positionOut.Y += this.loopHeight;
+        positionOut.X -= (scene as Level).Camera.X + this.CameraOffset.X;
+        positionOut.X %= this.loopWidth;
+        if ((double) positionOut.X < 0.0)
+          positionOut.X += this.loopWidth;
         if (num2 < num1)
-          GFX.Game["particles/snow"].DrawCentered(position, color, this.scale, this.rotation);
+          GFX.Game["particles/snow"].DrawCentered(positionOut, color, this.scale, this.rotation);
         ++num2;
       }
     }

@@ -45,7 +45,7 @@ namespace Celeste
     public override IEnumerator Enter(Oui from)
     {
       OuiJournal journal = this;
-      Stats.MakeRequest();
+      //Stats.MakeRequest();
       journal.Overworld.ShowConfirmUI = false;
       journal.fromAreaInspect = from is OuiChapterPanel;
       journal.PageIndex = 0;

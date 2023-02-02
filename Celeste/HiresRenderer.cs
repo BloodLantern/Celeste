@@ -12,7 +12,7 @@ namespace Celeste
 {
   public class HiresRenderer : Monocle.Renderer
   {
-    public static VirtualRenderTarget Buffer => Celeste.Celeste.HudTarget;
+    public static VirtualRenderTarget Buffer => Celeste.HudTarget;
 
     public static bool DrawToBuffer
     {

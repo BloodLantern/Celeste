@@ -227,40 +227,40 @@ namespace Celeste
         this.OnUpdate();
       if (this.Focused)
       {
-        if (Celeste.Input.MenuDown.Pressed)
+        if (Input.MenuDown.Pressed)
         {
-          if (!Celeste.Input.MenuDown.Repeating || this.Selection != this.LastPossibleSelection)
+          if (!Input.MenuDown.Repeating || this.Selection != this.LastPossibleSelection)
             this.MoveSelection(1, true);
         }
-        else if (Celeste.Input.MenuUp.Pressed && (!Celeste.Input.MenuUp.Repeating || this.Selection != this.FirstPossibleSelection))
+        else if (Input.MenuUp.Pressed && (!Input.MenuUp.Repeating || this.Selection != this.FirstPossibleSelection))
           this.MoveSelection(-1, true);
         if (this.Current != null)
         {
-          if (Celeste.Input.MenuLeft.Pressed)
+          if (Input.MenuLeft.Pressed)
             this.Current.LeftPressed();
-          if (Celeste.Input.MenuRight.Pressed)
+          if (Input.MenuRight.Pressed)
             this.Current.RightPressed();
-          if (Celeste.Input.MenuConfirm.Pressed)
+          if (Input.MenuConfirm.Pressed)
           {
             this.Current.ConfirmPressed();
             if (this.Current.OnPressed != null)
               this.Current.OnPressed();
           }
-          if (Celeste.Input.MenuJournal.Pressed && this.Current.OnAltPressed != null)
+          if (Input.MenuJournal.Pressed && this.Current.OnAltPressed != null)
             this.Current.OnAltPressed();
         }
-        if (!Celeste.Input.MenuConfirm.Pressed)
+        if (!Input.MenuConfirm.Pressed)
         {
-          if (Celeste.Input.MenuCancel.Pressed && this.OnCancel != null)
+          if (Input.MenuCancel.Pressed && this.OnCancel != null)
             this.OnCancel();
-          else if (Celeste.Input.ESC.Pressed && this.OnESC != null)
+          else if (Input.ESC.Pressed && this.OnESC != null)
           {
-            Celeste.Input.ESC.ConsumeBuffer();
+            Input.ESC.ConsumeBuffer();
             this.OnESC();
           }
-          else if (Celeste.Input.Pause.Pressed && this.OnPause != null)
+          else if (Input.Pause.Pressed && this.OnPause != null)
           {
-            Celeste.Input.Pause.ConsumeBuffer();
+            Input.Pause.ConsumeBuffer();
             this.OnPause();
           }
         }
@@ -618,11 +618,11 @@ namespace Celeste
       {
         this.Values.Clear();
         int index1 = 0;
-        for (int index2 = Math.Min(Celeste.Input.MaxBindings, keys.Count); index1 < index2; ++index1)
+        for (int index2 = Math.Min(Input.MaxBindings, keys.Count); index1 < index2; ++index1)
         {
           if (keys[index1] != Keys.None)
           {
-            MTexture mtexture = Celeste.Input.GuiKey(keys[index1], (string) null);
+            MTexture mtexture = Input.GuiKey(keys[index1], (string) null);
             if (mtexture != null)
             {
               this.Values.Add((object) mtexture);
@@ -647,9 +647,9 @@ namespace Celeste
       {
         this.Values.Clear();
         int index1 = 0;
-        for (int index2 = Math.Min(Celeste.Input.MaxBindings, buttons.Count); index1 < index2; ++index1)
+        for (int index2 = Math.Min(Input.MaxBindings, buttons.Count); index1 < index2; ++index1)
         {
-          MTexture mtexture = Celeste.Input.GuiSingleButton(buttons[index1], fallback: ((string) null));
+          MTexture mtexture = Input.GuiSingleButton(buttons[index1], fallback: ((string) null));
           if (mtexture != null)
           {
             this.Values.Add((object) mtexture);

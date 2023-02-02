@@ -10,7 +10,7 @@ using System;
 
 namespace Celeste
 {
-  public class MiniTextboxTrigger : Celeste.Trigger
+  public class MiniTextboxTrigger : Trigger
   {
     private EntityID id;
     private string[] dialogOptions;

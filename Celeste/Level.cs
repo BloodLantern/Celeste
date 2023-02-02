@@ -1589,15 +1589,15 @@ namespace Celeste
         }
         if (this.wasPaused && !this.Paused)
           this.EndPauseEffects();
-        if (this.CanPause && Celeste.Input.QuickRestart.Pressed)
+        if (this.CanPause && Input.QuickRestart.Pressed)
         {
-          Celeste.Input.QuickRestart.ConsumeBuffer();
+          Input.QuickRestart.ConsumeBuffer();
           this.Pause(quickReset: true);
         }
-        else if (this.CanPause && (Celeste.Input.Pause.Pressed || Celeste.Input.ESC.Pressed))
+        else if (this.CanPause && (Input.Pause.Pressed || Input.ESC.Pressed))
         {
-          Celeste.Input.Pause.ConsumeBuffer();
-          Celeste.Input.ESC.ConsumeBuffer();
+          Input.Pause.ConsumeBuffer();
+          Input.ESC.ConsumeBuffer();
           this.Pause();
         }
         if (this.wasPaused && !this.Paused)
@@ -1733,25 +1733,25 @@ namespace Celeste
           else
             this.colorGradeEase = Calc.Approach(this.colorGradeEase, 1f, Engine.DeltaTime * this.colorGradeEaseSpeed);
         }
-        if (Celeste.Celeste.PlayMode != Celeste.Celeste.PlayModes.Debug)
+        if (Celeste.PlayMode != Celeste.PlayModes.Debug)
           return;
         if (MInput.Keyboard.Pressed(Keys.Tab) && Engine.Scene.Tracker.GetEntity<KeyboardConfigUI>() == null && Engine.Scene.Tracker.GetEntity<ButtonConfigUI>() == null)
           Engine.Scene = (Scene) new MapEditor(this.Session.Area);
         if (MInput.Keyboard.Pressed(Keys.F1))
         {
-          Celeste.Celeste.ReloadAssets(true, false, false, new AreaKey?(this.Session.Area));
+          Celeste.ReloadAssets(true, false, false, new AreaKey?(this.Session.Area));
           Engine.Scene = (Scene) new LevelLoader(this.Session);
         }
         else if (MInput.Keyboard.Pressed(Keys.F2))
         {
-          Celeste.Celeste.ReloadAssets(true, true, false, new AreaKey?(this.Session.Area));
+          Celeste.ReloadAssets(true, true, false, new AreaKey?(this.Session.Area));
           Engine.Scene = (Scene) new LevelLoader(this.Session);
         }
         else
         {
           if (!MInput.Keyboard.Pressed(Keys.F3))
             return;
-          Celeste.Celeste.ReloadAssets(true, true, true, new AreaKey?(this.Session.Area));
+          Celeste.ReloadAssets(true, true, true, new AreaKey?(this.Session.Area));
           Engine.Scene = (Scene) new LevelLoader(this.Session);
         }
       }
@@ -1837,7 +1837,7 @@ namespace Celeste
         this.Pathfinder.Render();
         Draw.SpriteBatch.End();
       }
-      if ((!this.Paused || !this.PauseMainMenuOpen) && (double) this.wasPausedTimer >= 1.0 || !Celeste.Input.MenuJournal.Check || !this.AllowHudHide)
+      if ((!this.Paused || !this.PauseMainMenuOpen) && (double) this.wasPausedTimer >= 1.0 || !Input.MenuJournal.Check || !this.AllowHudHide)
         this.HudRenderer.Render((Scene) this);
       if (this.Wipe != null)
         this.Wipe.Render((Scene) this);
@@ -1951,7 +1951,7 @@ namespace Celeste
           this.PauseMainMenuOpen = false;
           this.Options(menu.IndexOf(item1), minimal);
         })));
-        if (!minimal && Celeste.Celeste.PlayMode != Celeste.Celeste.PlayModes.Event)
+        if (!minimal && Celeste.PlayMode != Celeste.PlayModes.Event)
         {
           TextMenu.Item obj;
           menu.Add(obj = new TextMenu.Button(Dialog.Clean("menu_pause_savequit")).Pressed((Action) (() =>
@@ -1996,7 +1996,7 @@ namespace Celeste
             })));
             (item3 as TextMenu.Button).ConfirmSfx = "event:/ui/main/message_confirm";
           }
-          if (Celeste.Celeste.PlayMode == Celeste.Celeste.PlayModes.Event)
+          if (Celeste.PlayMode == Celeste.PlayModes.Event)
             menu.Add(new TextMenu.Button(Dialog.Clean("menu_pause_restartdemo")).Pressed((Action) (() =>
             {
               this.EndPauseEffects();
@@ -2177,7 +2177,7 @@ namespace Celeste
       menu.Add((TextMenu.Item) new TextMenu.OnOff(Dialog.Clean("MENU_VARIANT_MIRROR"), SaveData.Instance.Assists.MirrorMode).Change((Action<bool>) (on =>
       {
         SaveData.Instance.Assists.MirrorMode = on;
-        Celeste.Input.MoveX.Inverted = Celeste.Input.Aim.InvertedX = Celeste.Input.Feather.InvertedX = on;
+        Input.MoveX.Inverted = Input.Aim.InvertedX = Input.Feather.InvertedX = on;
       })));
       menu.Add((TextMenu.Item) new TextMenu.OnOff(Dialog.Clean("MENU_VARIANT_360DASHING"), SaveData.Instance.Assists.ThreeSixtyDashing).Change((Action<bool>) (on => SaveData.Instance.Assists.ThreeSixtyDashing = on)));
       menu.Add((TextMenu.Item) new TextMenu.OnOff(Dialog.Clean("MENU_VARIANT_INVISMOTION"), SaveData.Instance.Assists.InvisibleMotion).Change((Action<bool>) (on => SaveData.Instance.Assists.InvisibleMotion = on)));

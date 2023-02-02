@@ -114,7 +114,7 @@ namespace Celeste
     {
       if (!this.pressed && direction == Vector2.UnitY)
       {
-        Celeste.Celeste.Freeze(0.2f);
+        Celeste.Freeze(0.2f);
         Input.Rumble(RumbleStrength.Strong, RumbleLength.Medium);
         Level scene = this.Scene as Level;
         scene.Session.SetFlag("oshiro_clutter_cleared_" + (object) (int) this.color);
@@ -136,27 +136,14 @@ namespace Celeste
     private IEnumerator LightningRoutine(Player player)
     {
       // ISSUE: reference to a compiler-generated field
-      int num = this.\u003C\u003E1__state;
-      ClutterSwitch clutterSwitch = this;
-      if (num != 0)
-      {
-        if (num != 1)
-          return false;
-        // ISSUE: reference to a compiler-generated field
-        this.\u003C\u003E1__state = -1;
-        return false;
-      }
-      // ISSUE: reference to a compiler-generated field
-      this.\u003C\u003E1__state = -1;
-      Level level = clutterSwitch.SceneAs<Level>();
-      level.Session.SetFlag("disable_lightning");
-      ++level.Session.Audio.Music.Progress;
-      level.Session.Audio.Apply();
-      // ISSUE: reference to a compiler-generated field
-      this.\u003C\u003E2__current = (object) Lightning.RemoveRoutine(level);
-      // ISSUE: reference to a compiler-generated field
-      this.\u003C\u003E1__state = 1;
-      return true;
+      Level level = base.SceneAs<Level>();
+      level.Session.SetFlag("disable_lightning", true);
+      AudioTrackState music = level.Session.Audio.Music;
+      int progress = music.Progress;
+      music.Progress = progress + 1;
+      level.Session.Audio.Apply(false);
+      yield return Lightning.RemoveRoutine(level, null);
+      yield break;
     }
 
     private IEnumerator AbsorbRoutine(Player player)

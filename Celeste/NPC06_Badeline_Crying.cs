@@ -175,7 +175,7 @@ namespace Celeste
         {
           Vector2 vector2 = player.Center + Calc.AngleToVector(orb.Scene.TimeActive * 2f + offset, 24f);
           ease = Calc.Approach(ease, 1f, Engine.DeltaTime * 2f);
-          orb.Position = from + (vector2 - from) * Ease.CubeInOut(ease);
+          orb.Position = from + (vector2 - from) * Monocle.Ease.CubeInOut(ease);
           yield return (object) null;
         }
       }
@@ -190,7 +190,7 @@ namespace Celeste
           Vector2 to = entity.Center;
           for (float p = 0.0f; (double) p < 1.0; p += Engine.DeltaTime)
           {
-            float num = Ease.BigBackIn(p);
+            float num = Monocle.Ease.BigBackIn(p);
             orb.Position = from + (to - from) * num;
             orb.Ease = (float) (0.20000000298023224 + (1.0 - (double) num) * 0.800000011920929);
             yield return (object) null;

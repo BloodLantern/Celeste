@@ -67,9 +67,9 @@ namespace Celeste
               num += (float) (this.language.FontSize.LineHeight + 50);
           }
           this.textboxScroll.Y += (float) MInput.Mouse.WheelDelta * Engine.DeltaTime * ActiveFont.LineHeight;
-          this.textboxScroll.Y -= (float) ((double) Celeste.Input.Aim.Value.Y * (double) Engine.DeltaTime * (double) ActiveFont.LineHeight * 20.0);
+          this.textboxScroll.Y -= (float) ((double) Input.Aim.Value.Y * (double) Engine.DeltaTime * (double) ActiveFont.LineHeight * 20.0);
           this.textboxScroll.Y = Calc.Clamp(this.textboxScroll.Y, 716f - num, 64f);
-          if (MInput.Keyboard.Pressed(Keys.Escape) || Celeste.Input.MenuConfirm.Pressed)
+          if (MInput.Keyboard.Pressed(Keys.Escape) || Input.MenuConfirm.Pressed)
             this.ClearTextboxes();
           else if (MInput.Keyboard.Pressed(Keys.Space))
           {
@@ -83,7 +83,7 @@ namespace Celeste
         else
         {
           this.listScroll.Y += (float) MInput.Mouse.WheelDelta * Engine.DeltaTime * ActiveFont.LineHeight;
-          this.listScroll.Y -= (float) ((double) Celeste.Input.Aim.Value.Y * (double) Engine.DeltaTime * (double) ActiveFont.LineHeight * 20.0);
+          this.listScroll.Y -= (float) ((double) Input.Aim.Value.Y * (double) Engine.DeltaTime * (double) ActiveFont.LineHeight * 20.0);
           this.listScroll.Y = Calc.Clamp(this.listScroll.Y, (float) (1016.0 - (double) this.list.Count * (double) ActiveFont.LineHeight * 0.60000002384185791), 64f);
           if (this.language != null)
           {
@@ -98,7 +98,7 @@ namespace Celeste
                 }
               }
             }
-            if (MInput.Keyboard.Pressed(Keys.Escape) || Celeste.Input.MenuConfirm.Pressed)
+            if (MInput.Keyboard.Pressed(Keys.Escape) || Input.MenuConfirm.Pressed)
             {
               this.listScroll = new Vector2(64f, 64f);
               this.UnsetLanguage();
@@ -121,12 +121,12 @@ namespace Celeste
         }
         if (MInput.Keyboard.Pressed(Keys.F2))
         {
-          Celeste.Celeste.ReloadPortraits();
+          Celeste.ReloadPortraits();
           Engine.Scene = (Scene) new PreviewDialog(this.language, this.listScroll.Y, this.textboxScroll.Y, this.current);
         }
         if (!MInput.Keyboard.Pressed(Keys.F1) || this.language == null)
           return;
-        Celeste.Celeste.ReloadDialog();
+        Celeste.ReloadDialog();
         Engine.Scene = (Scene) new PreviewDialog(Dialog.Languages[this.language.Id], this.listScroll.Y, this.textboxScroll.Y, this.current);
       }
     }

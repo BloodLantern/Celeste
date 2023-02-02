@@ -157,7 +157,7 @@ namespace Celeste
           if (dashBlock != null)
           {
             level.Shake(0.5f);
-            Celeste.Celeste.Freeze(0.1f);
+            Celeste.Freeze(0.1f);
             Input.Rumble(RumbleStrength.Strong, RumbleLength.Medium);
             dashBlock.Break(heartGemDoor.BotSolid.BottomCenter, new Vector2(0.0f, 1f), playDebrisSound: false);
             Player entity2 = heartGemDoor.Scene.Tracker.GetEntity<Player>();
@@ -167,7 +167,7 @@ namespace Celeste
           yield return (object) null;
         }
         level.Shake(0.5f);
-        Celeste.Celeste.Freeze(0.1f);
+        Celeste.Freeze(0.1f);
         heartGemDoor.TopSolid.Y = topTo;
         heartGemDoor.BotSolid.Y = botTo;
         while ((double) heartGemDoor.heartAlpha < 1.0)

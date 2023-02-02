@@ -105,13 +105,13 @@ namespace Celeste
 
     private void AddRemap(Keys key)
     {
-      while (this.remappingBinding.Keyboard.Count >= Celeste.Input.MaxBindings)
+      while (this.remappingBinding.Keyboard.Count >= Input.MaxBindings)
         this.remappingBinding.Keyboard.RemoveAt(0);
       this.remapping = false;
       this.inputDelay = 0.25f;
       if (!this.remappingBinding.Add(key))
         Audio.Play("event:/ui/main/button_invalid");
-      Celeste.Input.Initialize();
+      Input.Initialize();
     }
 
     private void Clear(Binding binding)
@@ -132,10 +132,10 @@ namespace Celeste
           this.resetDelay = 0.0f;
           this.resetHeld = false;
           Settings.Instance.SetDefaultKeyboardControls(true);
-          Celeste.Input.Initialize();
+          Input.Initialize();
           Audio.Play("event:/ui/main/button_select");
         }
-        if (!Celeste.Input.MenuConfirm.Check && (double) this.resetDelay > 0.30000001192092896)
+        if (!Input.MenuConfirm.Check && (double) this.resetDelay > 0.30000001192092896)
         {
           Audio.Play("event:/ui/main/button_invalid");
           this.resetHeld = false;
@@ -145,14 +145,14 @@ namespace Celeste
       }
       base.Update();
       this.Focused = !this.closing && (double) this.inputDelay <= 0.0 && !this.remapping;
-      if (!this.closing && Celeste.Input.MenuCancel.Pressed && !this.remapping)
+      if (!this.closing && Input.MenuCancel.Pressed && !this.remapping)
         this.OnCancel();
       if ((double) this.inputDelay > 0.0 && !this.remapping)
         this.inputDelay -= Engine.RawDeltaTime;
       this.remappingEase = Calc.Approach(this.remappingEase, this.remapping ? 1f : 0.0f, Engine.RawDeltaTime * 4f);
       if ((double) this.remappingEase >= 0.25 && this.remapping)
       {
-        if (Celeste.Input.ESC.Pressed || (double) this.timeout <= 0.0)
+        if (Input.ESC.Pressed || (double) this.timeout <= 0.0)
         {
           this.remapping = false;
           this.Focused = true;

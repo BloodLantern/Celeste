@@ -45,7 +45,7 @@ namespace Celeste
       Celeste.Instance = this;
       Engine.ExitOnEscapeKeypress = false;
       this.IsFixedTimeStep = true;
-      Stats.MakeRequest();
+      //Stats.MakeRequest();
       StatsForStadia.MakeRequest();
       Console.WriteLine("CELESTE : " + (object) this.Version);
     }
@@ -81,15 +81,15 @@ namespace Celeste
       }
       if (GFX.Game != null)
       {
-        Draw.Particle = GFX.Game["util/particle"];
-        Draw.Pixel = new MTexture(GFX.Game["util/pixel"], 1, 1, 1, 1);
+        Monocle.Draw.Particle = GFX.Game["util/particle"];
+        Monocle.Draw.Pixel = new MTexture(GFX.Game["util/pixel"], 1, 1, 1, 1);
       }
       GFX.LoadEffects();
     }
 
     protected override void Update(GameTime gameTime)
     {
-      SteamAPI.RunCallbacks();
+      //SteamAPI.RunCallbacks();
       if (Celeste.SaveRoutine != null)
         Celeste.SaveRoutine.Update();
       this.AutoSplitterInfo.Update();
@@ -137,7 +137,7 @@ namespace Celeste
       {
         Celeste._mainThreadId = Thread.CurrentThread.ManagedThreadId;
         Settings.Initialize();
-        if (SteamAPI.RestartAppIfNecessary(Celeste.SteamID))
+        /*if (SteamAPI.RestartAppIfNecessary(Celeste.SteamID))
           return;
         if (!SteamAPI.Init())
         {
@@ -146,7 +146,7 @@ namespace Celeste
           return;
         }
         if (!Settings.Existed)
-          Settings.Instance.Language = SteamApps.GetCurrentGameLanguage();
+          Settings.Instance.Language = SteamApps.GetCurrentGameLanguage();*/
         int num = Settings.Existed ? 1 : 0;
         for (int index = 0; index < args.Length - 1; ++index)
         {

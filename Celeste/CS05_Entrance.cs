@@ -56,29 +56,14 @@ namespace Celeste
       yield break;
     }
 
+    // ISSUE: reference to a compiler-generated field
     private IEnumerator TheoLeaves()
     {
-      // ISSUE: reference to a compiler-generated field
-      int num = this.\u003C\u003E1__state;
-      CS05_Entrance cs05Entrance = this;
-      if (num != 0)
-      {
-        if (num != 1)
-          return false;
-        // ISSUE: reference to a compiler-generated field
-        this.\u003C\u003E1__state = -1;
-        return false;
-      }
-      // ISSUE: reference to a compiler-generated field
-      this.\u003C\u003E1__state = -1;
-      // ISSUE: reference to a compiler-generated field
-      this.\u003C\u003E2__current = (object) cs05Entrance.theo.MoveTo(new Vector2((float) (cs05Entrance.Level.Bounds.Right + 32), cs05Entrance.theo.Y));
-      // ISSUE: reference to a compiler-generated field
-      this.\u003C\u003E1__state = 1;
-      return true;
+        yield return this.theo.MoveTo(new Vector2((float)(this.Level.Bounds.Right + 32), this.theo.Y), false, null, false);
+        yield break;
     }
 
-    public override void OnEnd(Level level)
+        public override void OnEnd(Level level)
     {
       if (this.player != null)
       {

@@ -289,59 +289,32 @@ namespace Celeste
       yield return (object) null;
     }
 
+    // ISSUE: reference to a compiler-generated field
     private IEnumerator TentaclesGrab()
     {
-      // ISSUE: reference to a compiler-generated field
-      int num = this.\u003C\u003E1__state;
-      CS06_StarJumpEnd cs06StarJumpEnd = this;
-      if (num != 0)
-      {
-        if (num != 1)
-          return false;
-        // ISSUE: reference to a compiler-generated field
-        this.\u003C\u003E1__state = -1;
+        this.maddySineTarget = 0f;
+        Audio.Play("event:/game/06_reflection/badeline_freakout_5");
+        this.player.Sprite.Play("tentacle_grab", false, false);
+        yield return 0.1f;
         Input.Rumble(RumbleStrength.Strong, RumbleLength.Long);
-        cs06StarJumpEnd.Level.Shake();
-        cs06StarJumpEnd.rumbler = new BreathingRumbler();
-        cs06StarJumpEnd.Level.Add((Entity) cs06StarJumpEnd.rumbler);
-        return false;
-      }
-      // ISSUE: reference to a compiler-generated field
-      this.\u003C\u003E1__state = -1;
-      cs06StarJumpEnd.maddySineTarget = 0.0f;
-      Audio.Play("event:/game/06_reflection/badeline_freakout_5");
-      cs06StarJumpEnd.player.Sprite.Play("tentacle_grab");
-      // ISSUE: reference to a compiler-generated field
-      this.\u003C\u003E2__current = (object) 0.1f;
-      // ISSUE: reference to a compiler-generated field
-      this.\u003C\u003E1__state = 1;
-      return true;
+        this.Level.Shake(0.3f);
+        this.rumbler = new BreathingRumbler();
+        this.Level.Add(this.rumbler);
+        yield break;
     }
 
+    // ISSUE: reference to a compiler-generated field
     private IEnumerator StartCirclingPlayer()
     {
-      // ISSUE: reference to a compiler-generated field
-      int num = this.\u003C\u003E1__state;
-      CS06_StarJumpEnd cs06StarJumpEnd = this;
-      if (num != 0)
-      {
-        if (num != 1)
-          return false;
-        // ISSUE: reference to a compiler-generated field
-        this.\u003C\u003E1__state = -1;
-        return false;
-      }
-      // ISSUE: reference to a compiler-generated field
-      this.\u003C\u003E1__state = -1;
-      cs06StarJumpEnd.Add((Component) new Coroutine(cs06StarJumpEnd.BadelineCirclePlayer()));
-      Vector2 from = cs06StarJumpEnd.player.Position;
-      Vector2 to = new Vector2((float) cs06StarJumpEnd.Level.Bounds.Center.X, cs06StarJumpEnd.player.Y);
-      Tween.Set((Entity) cs06StarJumpEnd, Tween.TweenMode.Oneshot, 0.5f, Ease.CubeOut, (Action<Tween>) (t => this.player.Position = Vector2.Lerp(from, to, t.Eased)));
-      // ISSUE: reference to a compiler-generated field
-      this.\u003C\u003E2__current = (object) null;
-      // ISSUE: reference to a compiler-generated field
-      this.\u003C\u003E1__state = 1;
-      return true;
+        base.Add(new Coroutine(this.BadelineCirclePlayer(), true));
+        Vector2 from = this.player.Position;
+        Vector2 to = new Vector2((float)this.Level.Bounds.Center.X, this.player.Y);
+        Tween.Set(this, Tween.TweenMode.Oneshot, 0.5f, Ease.CubeOut, delegate (Tween t)
+        {
+            this.player.Position = Vector2.Lerp(from, to, t.Eased);
+        }, null);
+        yield return null;
+        yield break;
     }
 
     private IEnumerator EndCirclingPlayer()
@@ -390,30 +363,15 @@ namespace Celeste
       this.breathing = (BreathingMinigame) null;
     }
 
+    // ISSUE: reference to a compiler-generated field
     private IEnumerator BadelineFlyDown()
     {
-      // ISSUE: reference to a compiler-generated field
-      int num = this.\u003C\u003E1__state;
-      CS06_StarJumpEnd cs06StarJumpEnd = this;
-      if (num != 0)
-      {
-        if (num != 1)
-          return false;
-        // ISSUE: reference to a compiler-generated field
-        this.\u003C\u003E1__state = -1;
-        cs06StarJumpEnd.badeline.RemoveSelf();
-        return false;
-      }
-      // ISSUE: reference to a compiler-generated field
-      this.\u003C\u003E1__state = -1;
-      cs06StarJumpEnd.badeline.Sprite.Play("fallFast");
-      cs06StarJumpEnd.badeline.FloatSpeed = 600f;
-      cs06StarJumpEnd.badeline.FloatAccel = 1200f;
-      // ISSUE: reference to a compiler-generated field
-      this.\u003C\u003E2__current = (object) cs06StarJumpEnd.badeline.FloatTo(new Vector2(cs06StarJumpEnd.badeline.X, cs06StarJumpEnd.Level.Camera.Y + 200f), fadeLight: true);
-      // ISSUE: reference to a compiler-generated field
-      this.\u003C\u003E1__state = 1;
-      return true;
+        this.badeline.Sprite.Play("fallFast", false, false);
+        this.badeline.FloatSpeed = 600f;
+        this.badeline.FloatAccel = 1200f;
+        yield return this.badeline.FloatTo(new Vector2(this.badeline.X, this.Level.Camera.Y + 200f), null, true, true, false);
+        this.badeline.RemoveSelf();
+        yield break;
     }
 
     private IEnumerator NothernLightsDown()

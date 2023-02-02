@@ -68,7 +68,7 @@ namespace Celeste
       ouiChapterSelect.Visible = true;
       ouiChapterSelect.EaseCamera();
       ouiChapterSelect.display = true;
-      ouiChapterSelect.journalEnabled = Celeste.Celeste.PlayMode == Celeste.Celeste.PlayModes.Debug || SaveData.Instance.CheatMode;
+      ouiChapterSelect.journalEnabled = Celeste.PlayMode == Celeste.PlayModes.Debug || SaveData.Instance.CheatMode;
       for (int index = 0; index <= SaveData.Instance.UnlockedAreas && !ouiChapterSelect.journalEnabled; ++index)
       {
         if (SaveData.Instance.Areas[index].Modes[0].TimePlayed > 0L && !AreaData.Get(index).Interlude)
