@@ -79,7 +79,7 @@
     <Reference Include="Microsoft.Xna.Framework.Game" />
     <Reference Include="Microsoft.Xna.Framework.Graphics" />
     <Reference Include="Steamworks.NET">
-      <HintPath>..\..\..\OneDrive\Desktop\Utile\C# Libraries\bin\Steamworks.NET.dll</HintPath>
+      <HintPath>references\Steamworks.NET.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
@@ -1020,4 +1020,7 @@
     <Folder Include="Properties\" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <PropertyGroup>
+    <PostBuildEvent>copy /d /y "$(ProjectDir)references\*" "$(TargetDir)"</PostBuildEvent>
+  </PropertyGroup>
 </Project>
