@@ -121,7 +121,7 @@ namespace Celeste
         this.Sprite.Add("normal", "ha", 0.15f, 0, 1, 0, 1, 0, 1, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9);
         this.Sprite.Play("normal");
         this.Sprite.JustifyOrigin(0.5f, 0.5f);
-        this.Duration = (float) this.Sprite.CurrentAnimationTotalFrames * 0.15f;
+        this.Duration = Sprite.CurrentAnimationTotalFrames * 0.15f;
       }
     }
   }

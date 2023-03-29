@@ -30,7 +30,7 @@ namespace Celeste
     public override void Render(Scene scene)
     {
       Draw.SpriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, SamplerState.LinearClamp, DepthStencilState.None, RasterizerState.CullNone, (Effect) null, Engine.ScreenMatrix);
-      foreach (Entity system in this.Systems)
+      foreach (Entity system in Systems)
         system.Render();
       Draw.SpriteBatch.End();
     }

@@ -54,24 +54,24 @@ namespace Celeste
     public Vector3 MountainCursor;
     public float MountainCursorScale;
 
-    public static ModeProperties GetMode(AreaKey area) => AreaData.GetMode(area.ID, area.Mode);
+    public static ModeProperties GetMode(AreaKey area) => GetMode(area.ID, area.Mode);
 
-    public static ModeProperties GetMode(int id, AreaMode mode = AreaMode.Normal) => AreaData.Areas[id].Mode[(int) mode];
+    public static ModeProperties GetMode(int id, AreaMode mode = AreaMode.Normal) => Areas[id].Mode[(int) mode];
 
     public static void Load()
     {
-      AreaData.Areas = new List<AreaData>();
-      List<AreaData> areas1 = AreaData.Areas;
-      AreaData areaData1 = new AreaData();
+      Areas = new List<AreaData>();
+      List<AreaData> areas1 = Areas;
+      AreaData areaData1 = new();
       areaData1.Name = "area_0";
       areaData1.Icon = "areas/intro";
       areaData1.Interlude = true;
-      areaData1.CompleteScreenName = (string) null;
+      areaData1.CompleteScreenName = null;
       areaData1.Mode = new ModeProperties[3]
       {
         new ModeProperties()
         {
-          PoemID = (string) null,
+          PoemID = null,
           Path = "0-Intro",
           Checkpoints = (CheckpointData[]) null,
           Inventory = PlayerInventory.Prologue,
@@ -85,17 +85,17 @@ namespace Celeste
       areaData1.TitleTextColor = Color.White;
       areaData1.IntroType = Player.IntroTypes.WalkInRight;
       areaData1.Dreaming = false;
-      areaData1.ColorGrade = (string) null;
+      areaData1.ColorGrade = null;
       CurtainWipe curtainWipe1;
-      areaData1.Wipe = (Action<Scene, bool, Action>) ((scene, wipeIn, onComplete) => curtainWipe1 = new CurtainWipe(scene, wipeIn, onComplete));
+      areaData1.Wipe = ((scene, wipeIn, onComplete) => curtainWipe1 = new CurtainWipe(scene, wipeIn, onComplete));
       areaData1.DarknessAlpha = 0.05f;
       areaData1.BloomBase = 0.0f;
       areaData1.BloomStrength = 1f;
-      areaData1.OnLevelBegin = (Action<Level>) null;
+      areaData1.OnLevelBegin = null;
       areaData1.Jumpthru = "wood";
       AreaData areaData2 = areaData1;
       areas1.Add(areaData2);
-      List<AreaData> areas2 = AreaData.Areas;
+      List<AreaData> areas2 = Areas;
       AreaData areaData3 = new AreaData();
       areaData3.Name = "area_1";
       areaData3.Icon = "areas/city";
@@ -142,9 +142,9 @@ namespace Celeste
       areaData3.TitleTextColor = Color.White;
       areaData3.IntroType = Player.IntroTypes.Jump;
       areaData3.Dreaming = false;
-      areaData3.ColorGrade = (string) null;
+      areaData3.ColorGrade = null;
       AngledWipe angledWipe;
-      areaData3.Wipe = (Action<Scene, bool, Action>) ((scene, wipeIn, onComplete) => angledWipe = new AngledWipe(scene, wipeIn, onComplete));
+      areaData3.Wipe = ((scene, wipeIn, onComplete) => angledWipe = new AngledWipe(scene, wipeIn, onComplete));
       areaData3.DarknessAlpha = 0.05f;
       areaData3.BloomBase = 0.0f;
       areaData3.BloomStrength = 1f;
@@ -154,8 +154,8 @@ namespace Celeste
       areaData3.CassetteSong = "event:/music/cassette/01_forsaken_city";
       AreaData areaData4 = areaData3;
       areas2.Add(areaData4);
-      List<AreaData> areas3 = AreaData.Areas;
-      AreaData areaData5 = new AreaData();
+      List<AreaData> areas3 = Areas;
+      AreaData areaData5 = new();
       areaData5.Name = "area_2";
       areaData5.Icon = "areas/oldsite";
       areaData5.Interlude = false;
@@ -203,7 +203,7 @@ namespace Celeste
       areaData5.Dreaming = true;
       areaData5.ColorGrade = "oldsite";
       DreamWipe dreamWipe;
-      areaData5.Wipe = (Action<Scene, bool, Action>) ((scene, wipeIn, onComplete) => dreamWipe = new DreamWipe(scene, wipeIn, onComplete));
+      areaData5.Wipe = ((scene, wipeIn, onComplete) => dreamWipe = new DreamWipe(scene, wipeIn, onComplete));
       areaData5.DarknessAlpha = 0.15f;
       areaData5.BloomBase = 0.5f;
       areaData5.BloomStrength = 1f;
@@ -218,8 +218,8 @@ namespace Celeste
       areaData5.CassetteSong = "event:/music/cassette/02_old_site";
       AreaData areaData6 = areaData5;
       areas3.Add(areaData6);
-      List<AreaData> areas4 = AreaData.Areas;
-      AreaData areaData7 = new AreaData();
+      List<AreaData> areas4 = Areas;
+      AreaData areaData7 = new();
       areaData7.Name = "area_3";
       areaData7.Icon = "areas/resort";
       areaData7.Interlude = false;
@@ -228,7 +228,7 @@ namespace Celeste
       areaData7.CassetteCheckpointIndex = 2;
       AreaData areaData8 = areaData7;
       ModeProperties[] modePropertiesArray1 = new ModeProperties[3];
-      ModeProperties modeProperties1 = new ModeProperties();
+      ModeProperties modeProperties1 = new();
       modeProperties1.PoemID = "cr";
       modeProperties1.Path = "3-CelestialResort";
       modeProperties1.Checkpoints = new CheckpointData[3]
@@ -272,9 +272,9 @@ namespace Celeste
       areaData7.TitleTextColor = Color.White;
       areaData7.IntroType = Player.IntroTypes.WalkInRight;
       areaData7.Dreaming = false;
-      areaData7.ColorGrade = (string) null;
+      areaData7.ColorGrade = null;
       KeyDoorWipe keyDoorWipe;
-      areaData7.Wipe = (Action<Scene, bool, Action>) ((scene, wipeIn, onComplete) => keyDoorWipe = new KeyDoorWipe(scene, wipeIn, onComplete));
+      areaData7.Wipe = ((scene, wipeIn, onComplete) => keyDoorWipe = new KeyDoorWipe(scene, wipeIn, onComplete));
       areaData7.DarknessAlpha = 0.15f;
       areaData7.BloomBase = 0.0f;
       areaData7.BloomStrength = 1f;
@@ -284,7 +284,7 @@ namespace Celeste
       areaData7.CassetteSong = "event:/music/cassette/03_resort";
       AreaData areaData9 = areaData7;
       areas4.Add(areaData9);
-      List<AreaData> areas5 = AreaData.Areas;
+      List<AreaData> areas5 = Areas;
       AreaData areaData10 = new AreaData();
       areaData10.Name = "area_4";
       areaData10.Icon = "areas/cliffside";
@@ -333,9 +333,9 @@ namespace Celeste
       };
       areaData10.IntroType = Player.IntroTypes.WalkInRight;
       areaData10.Dreaming = false;
-      areaData10.ColorGrade = (string) null;
+      areaData10.ColorGrade = null;
       WindWipe windWipe;
-      areaData10.Wipe = (Action<Scene, bool, Action>) ((scene, wipeIn, onComplete) => windWipe = new WindWipe(scene, wipeIn, onComplete));
+      areaData10.Wipe = ((scene, wipeIn, onComplete) => windWipe = new WindWipe(scene, wipeIn, onComplete));
       areaData10.DarknessAlpha = 0.1f;
       areaData10.BloomBase = 0.25f;
       areaData10.BloomStrength = 1f;
@@ -348,7 +348,7 @@ namespace Celeste
       areaData10.CassetteSong = "event:/music/cassette/04_cliffside";
       AreaData areaData11 = areaData10;
       areas5.Add(areaData11);
-      List<AreaData> areas6 = AreaData.Areas;
+      List<AreaData> areas6 = Areas;
       AreaData areaData12 = new AreaData();
       areaData12.Name = "area_5";
       areaData12.Icon = "areas/temple";
@@ -388,7 +388,7 @@ namespace Celeste
         new ModeProperties()
         {
           Path = "5X-MirrorTemple",
-          Checkpoints = (CheckpointData[]) null,
+          Checkpoints = null,
           Inventory = PlayerInventory.Default,
           AudioState = new AudioState("event:/music/remix/05_mirror_temple", "event:/env/amb/05_interior_main")
         }
@@ -398,18 +398,18 @@ namespace Celeste
       areaData12.TitleTextColor = Color.White;
       areaData12.IntroType = Player.IntroTypes.WakeUp;
       areaData12.Dreaming = false;
-      areaData12.ColorGrade = (string) null;
+      areaData12.ColorGrade = null;
       DropWipe dropWipe;
-      areaData12.Wipe = (Action<Scene, bool, Action>) ((scene, wipeIn, onComplete) => dropWipe = new DropWipe(scene, wipeIn, onComplete));
+      areaData12.Wipe = ((scene, wipeIn, onComplete) => dropWipe = new DropWipe(scene, wipeIn, onComplete));
       areaData12.DarknessAlpha = 0.15f;
       areaData12.BloomBase = 0.0f;
       areaData12.BloomStrength = 1f;
-      areaData12.OnLevelBegin = (Action<Level>) (level =>
+      areaData12.OnLevelBegin = (level =>
       {
-        level.Add((Entity) new SeekerEffectsController());
+        level.Add(new SeekerEffectsController());
         if (level.Session.Area.Mode != AreaMode.Normal)
           return;
-        level.Add((Entity) new TempleEndingMusicHandler());
+        level.Add(new TempleEndingMusicHandler());
       });
       areaData12.Jumpthru = "temple";
       areaData12.CassseteNoteColor = Calc.HexToColor("5a56e6");
@@ -420,7 +420,7 @@ namespace Celeste
       areaData12.CassetteSong = "event:/music/cassette/05_mirror_temple";
       AreaData areaData13 = areaData12;
       areas6.Add(areaData13);
-      List<AreaData> areas7 = AreaData.Areas;
+      List<AreaData> areas7 = Areas;
       AreaData areaData14 = new AreaData();
       areaData14.Name = "area_6";
       areaData14.Icon = "areas/reflection";
@@ -490,7 +490,7 @@ namespace Celeste
       areaData14.CassetteSong = "event:/music/cassette/06_reflection";
       AreaData areaData16 = areaData14;
       areas7.Add(areaData16);
-      List<AreaData> areas8 = AreaData.Areas;
+      List<AreaData> areas8 = Areas;
       AreaData areaData17 = new AreaData();
       areaData17.Name = "area_7";
       areaData17.Icon = "areas/summit";
@@ -558,7 +558,7 @@ namespace Celeste
       areaData17.CassetteSong = "event:/music/cassette/07_summit";
       AreaData areaData18 = areaData17;
       areas8.Add(areaData18);
-      List<AreaData> areas9 = AreaData.Areas;
+      List<AreaData> areas9 = Areas;
       AreaData areaData19 = new AreaData();
       areaData19.Name = "area_8";
       areaData19.Icon = "areas/intro";
@@ -593,7 +593,7 @@ namespace Celeste
       areaData19.Jumpthru = "wood";
       AreaData areaData20 = areaData19;
       areas9.Add(areaData20);
-      List<AreaData> areas10 = AreaData.Areas;
+      List<AreaData> areas10 = Areas;
       AreaData areaData21 = new AreaData();
       areaData21.Name = "area_9";
       areaData21.Icon = "areas/core";
@@ -658,7 +658,7 @@ namespace Celeste
       areaData21.CoreMode = Session.CoreModes.Hot;
       AreaData areaData23 = areaData21;
       areas10.Add(areaData23);
-      List<AreaData> areas11 = AreaData.Areas;
+      List<AreaData> areas11 = Areas;
       AreaData areaData24 = new AreaData();
       areaData24.Name = "area_10";
       areaData24.Icon = "areas/farewell";
@@ -717,20 +717,20 @@ namespace Celeste
       AreaData areaData26 = areaData24;
       areas11.Add(areaData26);
       int length = Enum.GetNames(typeof (AreaMode)).Length;
-      for (int index = 0; index < AreaData.Areas.Count; ++index)
+      for (int index = 0; index < Areas.Count; ++index)
       {
-        AreaData.Areas[index].ID = index;
-        AreaData.Areas[index].Mode[0].MapData = new MapData(new AreaKey(index));
-        if (!AreaData.Areas[index].Interlude)
+        Areas[index].ID = index;
+        Areas[index].Mode[0].MapData = new MapData(new AreaKey(index));
+        if (!Areas[index].Interlude)
         {
           for (int mode = 1; mode < length; ++mode)
           {
-            if (AreaData.Areas[index].HasMode((AreaMode) mode))
-              AreaData.Areas[index].Mode[mode].MapData = new MapData(new AreaKey(index, (AreaMode) mode));
+            if (Areas[index].HasMode((AreaMode) mode))
+              Areas[index].Mode[mode].MapData = new MapData(new AreaKey(index, (AreaMode) mode));
           }
         }
       }
-      AreaData.ReloadMountainViews();
+      ReloadMountainViews();
     }
 
     public static void ReloadMountainViews()
@@ -738,27 +738,27 @@ namespace Celeste
       foreach (XmlElement xml in (XmlNode) Calc.LoadXML(Path.Combine(Engine.ContentDirectory, "Overworld", "AreaViews.xml"))["Views"])
       {
         int index = xml.AttrInt("id");
-        if (index >= 0 && index < AreaData.Areas.Count)
+        if (index >= 0 && index < Areas.Count)
         {
           Vector3 pos1 = xml["Idle"].AttrVector3("position");
           Vector3 target1 = xml["Idle"].AttrVector3("target");
-          AreaData.Areas[index].MountainIdle = new MountainCamera(pos1, target1);
+          Areas[index].MountainIdle = new MountainCamera(pos1, target1);
           Vector3 pos2 = xml["Select"].AttrVector3("position");
           Vector3 target2 = xml["Select"].AttrVector3("target");
-          AreaData.Areas[index].MountainSelect = new MountainCamera(pos2, target2);
+          Areas[index].MountainSelect = new MountainCamera(pos2, target2);
           Vector3 pos3 = xml["Zoom"].AttrVector3("position");
           Vector3 target3 = xml["Zoom"].AttrVector3("target");
-          AreaData.Areas[index].MountainZoom = new MountainCamera(pos3, target3);
+          Areas[index].MountainZoom = new MountainCamera(pos3, target3);
           if (xml["Cursor"] != null)
-            AreaData.Areas[index].MountainCursor = xml["Cursor"].AttrVector3("position");
-          AreaData.Areas[index].MountainState = xml.AttrInt("state", 0);
+            Areas[index].MountainCursor = xml["Cursor"].AttrVector3("position");
+          Areas[index].MountainState = xml.AttrInt("state", 0);
         }
       }
     }
 
     public static bool IsPoemRemix(string id)
     {
-      foreach (AreaData area in AreaData.Areas)
+      foreach (AreaData area in Areas)
       {
         if (area.Mode.Length > 1 && area.Mode[1] != null && !string.IsNullOrEmpty(area.Mode[1].PoemID) && area.Mode[1].PoemID.Equals(id, StringComparison.OrdinalIgnoreCase))
           return true;
@@ -768,7 +768,7 @@ namespace Celeste
 
     public static int GetCheckpointID(AreaKey area, string level)
     {
-      CheckpointData[] checkpoints = AreaData.Areas[area.ID].Mode[(int) area.Mode].Checkpoints;
+      CheckpointData[] checkpoints = Areas[area.ID].Mode[(int) area.Mode].Checkpoints;
       if (checkpoints != null)
       {
         for (int checkpointId = 0; checkpointId < checkpoints.Length; ++checkpointId)
@@ -782,7 +782,7 @@ namespace Celeste
 
     public static CheckpointData GetCheckpoint(AreaKey area, string level)
     {
-      CheckpointData[] checkpoints = AreaData.Areas[area.ID].Mode[(int) area.Mode].Checkpoints;
+      CheckpointData[] checkpoints = Areas[area.ID].Mode[(int) area.Mode].Checkpoints;
       if (level != null && checkpoints != null)
       {
         foreach (CheckpointData checkpoint in checkpoints)
@@ -798,41 +798,41 @@ namespace Celeste
     {
       if (string.IsNullOrEmpty(level))
         return "START";
-      CheckpointData checkpoint = AreaData.GetCheckpoint(area, level);
+      CheckpointData checkpoint = GetCheckpoint(area, level);
       return checkpoint != null ? Dialog.Clean(checkpoint.Name) : (string) null;
     }
 
     public static PlayerInventory GetCheckpointInventory(AreaKey area, string level)
     {
-      CheckpointData checkpoint = AreaData.GetCheckpoint(area, level);
-      return checkpoint != null && checkpoint.Inventory.HasValue ? checkpoint.Inventory.Value : AreaData.Areas[area.ID].Mode[(int) area.Mode].Inventory;
+      CheckpointData checkpoint = GetCheckpoint(area, level);
+      return checkpoint != null && checkpoint.Inventory.HasValue ? checkpoint.Inventory.Value : Areas[area.ID].Mode[(int) area.Mode].Inventory;
     }
 
     public static bool GetCheckpointDreaming(AreaKey area, string level)
     {
-      CheckpointData checkpoint = AreaData.GetCheckpoint(area, level);
-      return checkpoint != null ? checkpoint.Dreaming : AreaData.Areas[area.ID].Dreaming;
+      CheckpointData checkpoint = GetCheckpoint(area, level);
+      return checkpoint != null ? checkpoint.Dreaming : Areas[area.ID].Dreaming;
     }
 
     public static Session.CoreModes GetCheckpointCoreMode(AreaKey area, string level)
     {
-      CheckpointData checkpoint = AreaData.GetCheckpoint(area, level);
-      return checkpoint != null && checkpoint.CoreMode.HasValue ? checkpoint.CoreMode.Value : AreaData.Areas[area.ID].CoreMode;
+      CheckpointData checkpoint = GetCheckpoint(area, level);
+      return checkpoint != null && checkpoint.CoreMode.HasValue ? checkpoint.CoreMode.Value : Areas[area.ID].CoreMode;
     }
 
-    public static AudioState GetCheckpointAudioState(AreaKey area, string level) => AreaData.GetCheckpoint(area, level)?.AudioState;
+    public static AudioState GetCheckpointAudioState(AreaKey area, string level) => GetCheckpoint(area, level)?.AudioState;
 
-    public static string GetCheckpointColorGrading(AreaKey area, string level) => AreaData.GetCheckpoint(area, level)?.ColorGrade;
+    public static string GetCheckpointColorGrading(AreaKey area, string level) => GetCheckpoint(area, level)?.ColorGrade;
 
-    public static void Unload() => AreaData.Areas = (List<AreaData>) null;
+    public static void Unload() => Areas = (List<AreaData>) null;
 
-    public static AreaData Get(Scene scene) => scene != null && scene is Level ? AreaData.Areas[(scene as Level).Session.Area.ID] : (AreaData) null;
+    public static AreaData Get(Scene scene) => scene != null && scene is Level ? Areas[(scene as Level).Session.Area.ID] : (AreaData) null;
 
-    public static AreaData Get(Session session) => session != null ? AreaData.Areas[session.Area.ID] : (AreaData) null;
+    public static AreaData Get(Session session) => session != null ? Areas[session.Area.ID] : (AreaData) null;
 
-    public static AreaData Get(AreaKey area) => AreaData.Areas[area.ID];
+    public static AreaData Get(AreaKey area) => Areas[area.ID];
 
-    public static AreaData Get(int id) => AreaData.Areas[id];
+    public static AreaData Get(int id) => Areas[id];
 
     public XmlElement CompleteScreenXml => GFX.CompleteScreensXml["Screens"][this.CompleteScreenName];
 
