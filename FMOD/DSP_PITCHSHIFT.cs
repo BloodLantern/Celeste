@@ -6,11 +6,11 @@
 
 namespace FMOD
 {
-  public enum DSP_PITCHSHIFT
-  {
-    PITCH,
-    FFTSIZE,
-    OVERLAP,
-    MAXCHANNELS,
-  }
+    public enum DSP_PITCHSHIFT
+    {
+        PITCH,
+        FFTSIZE,
+        OVERLAP,
+        MAXCHANNELS,
+    }
 }

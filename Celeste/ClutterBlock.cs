@@ -11,70 +11,70 @@ using System.Collections.Generic;
 
 namespace Celeste
 {
-  public class ClutterBlock : Entity
-  {
-    public ClutterBlock.Colors BlockColor;
-    public Monocle.Image Image;
-    public HashSet<ClutterBlock> HasBelow = new HashSet<ClutterBlock>();
-    public List<ClutterBlock> Below = new List<ClutterBlock>();
-    public List<ClutterBlock> Above = new List<ClutterBlock>();
-    public bool OnTheGround;
-    public bool TopSideOpen;
-    public bool LeftSideOpen;
-    public bool RightSideOpen;
-    private float floatTarget;
-    private float floatDelay;
-    private float floatTimer;
-
-    public ClutterBlock(Vector2 position, MTexture texture, ClutterBlock.Colors color)
-      : base(position)
+    public class ClutterBlock : Entity
     {
-      this.BlockColor = color;
-      this.Add((Component) (this.Image = new Monocle.Image(texture)));
-      this.Collider = (Collider) new Hitbox((float) texture.Width, (float) texture.Height);
-      this.Depth = -9998;
-    }
+        public ClutterBlock.Colors BlockColor;
+        public Monocle.Image Image;
+        public HashSet<ClutterBlock> HasBelow = new HashSet<ClutterBlock>();
+        public List<ClutterBlock> Below = new List<ClutterBlock>();
+        public List<ClutterBlock> Above = new List<ClutterBlock>();
+        public bool OnTheGround;
+        public bool TopSideOpen;
+        public bool LeftSideOpen;
+        public bool RightSideOpen;
+        private float floatTarget;
+        private float floatDelay;
+        private float floatTimer;
 
-    public void WeightDown()
-    {
-      foreach (ClutterBlock clutterBlock in this.Below)
-        clutterBlock.WeightDown();
-      this.floatTarget = 0.0f;
-      this.floatDelay = 0.1f;
-    }
+        public ClutterBlock(Vector2 position, MTexture texture, ClutterBlock.Colors color)
+            : base(position)
+        {
+            this.BlockColor = color;
+            this.Add((Component) (this.Image = new Monocle.Image(texture)));
+            this.Collider = (Collider) new Hitbox((float) texture.Width, (float) texture.Height);
+            this.Depth = -9998;
+        }
 
-    public override void Update()
-    {
-      base.Update();
-      if (this.OnTheGround)
-        return;
-      if ((double) this.floatDelay <= 0.0)
-      {
-        Player entity = this.Scene.Tracker.GetEntity<Player>();
-        if (entity != null && ((!this.TopSideOpen ? 0 : ((double) entity.Right <= (double) this.Left || (double) entity.Left >= (double) this.Right || (double) entity.Bottom < (double) this.Top - 1.0 ? 0 : ((double) entity.Bottom <= (double) this.Top + 4.0 ? 1 : 0))) | (entity.StateMachine.State != 1 || !this.LeftSideOpen || (double) entity.Right < (double) this.Left - 1.0 || (double) entity.Right >= (double) this.Left + 4.0 || (double) entity.Bottom <= (double) this.Top ? 0 : ((double) entity.Top < (double) this.Bottom ? 1 : 0)) | (entity.StateMachine.State != 1 || !this.RightSideOpen || (double) entity.Left > (double) this.Right + 1.0 || (double) entity.Left <= (double) this.Right - 4.0 || (double) entity.Bottom <= (double) this.Top ? 0 : ((double) entity.Top < (double) this.Bottom ? 1 : 0))) != 0)
-          this.WeightDown();
-      }
-      this.floatTimer += Engine.DeltaTime;
-      this.floatDelay -= Engine.DeltaTime;
-      if ((double) this.floatDelay <= 0.0)
-        this.floatTarget = Calc.Approach(this.floatTarget, this.WaveTarget, Engine.DeltaTime * 4f);
-      this.Image.Y = this.floatTarget;
-    }
+        public void WeightDown()
+        {
+            foreach (ClutterBlock clutterBlock in this.Below)
+                clutterBlock.WeightDown();
+            this.floatTarget = 0.0f;
+            this.floatDelay = 0.1f;
+        }
 
-    private float WaveTarget => (float) (-((Math.Sin((double) ((int) this.Position.X / 16) * 0.25 + (double) this.floatTimer * 2.0) + 1.0) / 2.0) - 1.0);
+        public override void Update()
+        {
+            base.Update();
+            if (this.OnTheGround)
+                return;
+            if ((double) this.floatDelay <= 0.0)
+            {
+                Player entity = this.Scene.Tracker.GetEntity<Player>();
+                if (entity != null && ((!this.TopSideOpen ? 0 : ((double) entity.Right <= (double) this.Left || (double) entity.Left >= (double) this.Right || (double) entity.Bottom < (double) this.Top - 1.0 ? 0 : ((double) entity.Bottom <= (double) this.Top + 4.0 ? 1 : 0))) | (entity.StateMachine.State != 1 || !this.LeftSideOpen || (double) entity.Right < (double) this.Left - 1.0 || (double) entity.Right >= (double) this.Left + 4.0 || (double) entity.Bottom <= (double) this.Top ? 0 : ((double) entity.Top < (double) this.Bottom ? 1 : 0)) | (entity.StateMachine.State != 1 || !this.RightSideOpen || (double) entity.Left > (double) this.Right + 1.0 || (double) entity.Left <= (double) this.Right - 4.0 || (double) entity.Bottom <= (double) this.Top ? 0 : ((double) entity.Top < (double) this.Bottom ? 1 : 0))) != 0)
+                    this.WeightDown();
+            }
+            this.floatTimer += Engine.DeltaTime;
+            this.floatDelay -= Engine.DeltaTime;
+            if ((double) this.floatDelay <= 0.0)
+                this.floatTarget = Calc.Approach(this.floatTarget, this.WaveTarget, Engine.DeltaTime * 4f);
+            this.Image.Y = this.floatTarget;
+        }
 
-    public void Absorb(ClutterAbsorbEffect effect)
-    {
-      effect.FlyClutter(this.Position + new Vector2(this.Image.Width * 0.5f, this.Image.Height * 0.5f + this.floatTarget), this.Image.Texture, true, Calc.Random.NextFloat(0.5f));
-      this.Scene.Remove((Entity) this);
-    }
+        private float WaveTarget => (float) (-((Math.Sin((double) ((int) this.Position.X / 16) * 0.25 + (double) this.floatTimer * 2.0) + 1.0) / 2.0) - 1.0);
 
-    public enum Colors
-    {
-      Red,
-      Green,
-      Yellow,
-      Lightning,
+        public void Absorb(ClutterAbsorbEffect effect)
+        {
+            effect.FlyClutter(this.Position + new Vector2(this.Image.Width * 0.5f, this.Image.Height * 0.5f + this.floatTarget), this.Image.Texture, true, Calc.Random.NextFloat(0.5f));
+            this.Scene.Remove((Entity) this);
+        }
+
+        public enum Colors
+        {
+            Red,
+            Green,
+            Yellow,
+            Lightning,
+        }
     }
-  }
 }

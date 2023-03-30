@@ -6,10 +6,10 @@
 
 namespace Monocle
 {
-  public abstract class VirtualInputNode
-  {
-    public virtual void Update()
+    public abstract class VirtualInputNode
     {
+        public virtual void Update()
+        {
+        }
     }
-  }
 }

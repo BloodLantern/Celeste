@@ -11,228 +11,228 @@ using System.Linq;
 
 namespace Monocle
 {
-  public class ColliderList : Collider
-  {
-    public Collider[] colliders { get; private set; }
-
-    public ColliderList(params Collider[] colliders) => this.colliders = colliders;
-
-    public void Add(params Collider[] toAdd)
+    public class ColliderList : Collider
     {
-      Collider[] colliderArray = new Collider[this.colliders.Length + toAdd.Length];
-      for (int index = 0; index < this.colliders.Length; ++index)
-        colliderArray[index] = this.colliders[index];
-      for (int index = 0; index < toAdd.Length; ++index)
-      {
-        colliderArray[index + this.colliders.Length] = toAdd[index];
-        toAdd[index].Added(this.Entity);
-      }
-      this.colliders = colliderArray;
-    }
+        public Collider[] colliders { get; private set; }
 
-    public void Remove(params Collider[] toRemove)
-    {
-      Collider[] colliderArray = new Collider[this.colliders.Length - toRemove.Length];
-      int index = 0;
-      foreach (Collider collider in this.colliders)
-      {
-        if (!((IEnumerable<Collider>) toRemove).Contains<Collider>(collider))
+        public ColliderList(params Collider[] colliders) => this.colliders = colliders;
+
+        public void Add(params Collider[] toAdd)
         {
-          colliderArray[index] = collider;
-          ++index;
+            Collider[] colliderArray = new Collider[this.colliders.Length + toAdd.Length];
+            for (int index = 0; index < this.colliders.Length; ++index)
+                colliderArray[index] = this.colliders[index];
+            for (int index = 0; index < toAdd.Length; ++index)
+            {
+                colliderArray[index + this.colliders.Length] = toAdd[index];
+                toAdd[index].Added(this.Entity);
+            }
+            this.colliders = colliderArray;
         }
-      }
-      this.colliders = colliderArray;
-    }
 
-    internal override void Added(Entity entity)
-    {
-      base.Added(entity);
-      foreach (Collider collider in this.colliders)
-        collider.Added(entity);
-    }
-
-    internal override void Removed()
-    {
-      base.Removed();
-      foreach (Collider collider in this.colliders)
-        collider.Removed();
-    }
-
-    public override float Width
-    {
-      get => this.Right - this.Left;
-      set => throw new NotImplementedException();
-    }
-
-    public override float Height
-    {
-      get => this.Bottom - this.Top;
-      set => throw new NotImplementedException();
-    }
-
-    public override float Left
-    {
-      get
-      {
-        float left = this.colliders[0].Left;
-        for (int index = 1; index < this.colliders.Length; ++index)
+        public void Remove(params Collider[] toRemove)
         {
-          if ((double) this.colliders[index].Left < (double) left)
-            left = this.colliders[index].Left;
+            Collider[] colliderArray = new Collider[this.colliders.Length - toRemove.Length];
+            int index = 0;
+            foreach (Collider collider in this.colliders)
+            {
+                if (!((IEnumerable<Collider>) toRemove).Contains<Collider>(collider))
+                {
+                    colliderArray[index] = collider;
+                    ++index;
+                }
+            }
+            this.colliders = colliderArray;
         }
-        return left;
-      }
-      set
-      {
-        float num = value - this.Left;
-        foreach (Collider collider in this.colliders)
-          this.Position.X += num;
-      }
-    }
 
-    public override float Right
-    {
-      get
-      {
-        float right = this.colliders[0].Right;
-        for (int index = 1; index < this.colliders.Length; ++index)
+        internal override void Added(Entity entity)
         {
-          if ((double) this.colliders[index].Right > (double) right)
-            right = this.colliders[index].Right;
+            base.Added(entity);
+            foreach (Collider collider in this.colliders)
+                collider.Added(entity);
         }
-        return right;
-      }
-      set
-      {
-        float num = value - this.Right;
-        foreach (Collider collider in this.colliders)
-          this.Position.X += num;
-      }
-    }
 
-    public override float Top
-    {
-      get
-      {
-        float top = this.colliders[0].Top;
-        for (int index = 1; index < this.colliders.Length; ++index)
+        internal override void Removed()
         {
-          if ((double) this.colliders[index].Top < (double) top)
-            top = this.colliders[index].Top;
+            base.Removed();
+            foreach (Collider collider in this.colliders)
+                collider.Removed();
         }
-        return top;
-      }
-      set
-      {
-        float num = value - this.Top;
-        foreach (Collider collider in this.colliders)
-          this.Position.Y += num;
-      }
-    }
 
-    public override float Bottom
-    {
-      get
-      {
-        float bottom = this.colliders[0].Bottom;
-        for (int index = 1; index < this.colliders.Length; ++index)
+        public override float Width
         {
-          if ((double) this.colliders[index].Bottom > (double) bottom)
-            bottom = this.colliders[index].Bottom;
+            get => this.Right - this.Left;
+            set => throw new NotImplementedException();
         }
-        return bottom;
-      }
-      set
-      {
-        float num = value - this.Bottom;
-        foreach (Collider collider in this.colliders)
-          this.Position.Y += num;
-      }
-    }
 
-    public override Collider Clone()
-    {
-      Collider[] colliderArray = new Collider[this.colliders.Length];
-      for (int index = 0; index < this.colliders.Length; ++index)
-        colliderArray[index] = this.colliders[index].Clone();
-      return (Collider) new ColliderList(colliderArray);
-    }
+        public override float Height
+        {
+            get => this.Bottom - this.Top;
+            set => throw new NotImplementedException();
+        }
 
-    public override void Render(Camera camera, Color color)
-    {
-      foreach (Collider collider in this.colliders)
-        collider.Render(camera, color);
-    }
+        public override float Left
+        {
+            get
+            {
+                float left = this.colliders[0].Left;
+                for (int index = 1; index < this.colliders.Length; ++index)
+                {
+                    if ((double) this.colliders[index].Left < (double) left)
+                        left = this.colliders[index].Left;
+                }
+                return left;
+            }
+            set
+            {
+                float num = value - this.Left;
+                foreach (Collider collider in this.colliders)
+                    this.Position.X += num;
+            }
+        }
 
-    public override bool Collide(Vector2 point)
-    {
-      foreach (Collider collider in this.colliders)
-      {
-        if (collider.Collide(point))
-          return true;
-      }
-      return false;
-    }
+        public override float Right
+        {
+            get
+            {
+                float right = this.colliders[0].Right;
+                for (int index = 1; index < this.colliders.Length; ++index)
+                {
+                    if ((double) this.colliders[index].Right > (double) right)
+                        right = this.colliders[index].Right;
+                }
+                return right;
+            }
+            set
+            {
+                float num = value - this.Right;
+                foreach (Collider collider in this.colliders)
+                    this.Position.X += num;
+            }
+        }
 
-    public override bool Collide(Rectangle rect)
-    {
-      foreach (Collider collider in this.colliders)
-      {
-        if (collider.Collide(rect))
-          return true;
-      }
-      return false;
-    }
+        public override float Top
+        {
+            get
+            {
+                float top = this.colliders[0].Top;
+                for (int index = 1; index < this.colliders.Length; ++index)
+                {
+                    if ((double) this.colliders[index].Top < (double) top)
+                        top = this.colliders[index].Top;
+                }
+                return top;
+            }
+            set
+            {
+                float num = value - this.Top;
+                foreach (Collider collider in this.colliders)
+                    this.Position.Y += num;
+            }
+        }
 
-    public override bool Collide(Vector2 from, Vector2 to)
-    {
-      foreach (Collider collider in this.colliders)
-      {
-        if (collider.Collide(from, to))
-          return true;
-      }
-      return false;
-    }
+        public override float Bottom
+        {
+            get
+            {
+                float bottom = this.colliders[0].Bottom;
+                for (int index = 1; index < this.colliders.Length; ++index)
+                {
+                    if ((double) this.colliders[index].Bottom > (double) bottom)
+                        bottom = this.colliders[index].Bottom;
+                }
+                return bottom;
+            }
+            set
+            {
+                float num = value - this.Bottom;
+                foreach (Collider collider in this.colliders)
+                    this.Position.Y += num;
+            }
+        }
 
-    public override bool Collide(Hitbox hitbox)
-    {
-      foreach (Collider collider in this.colliders)
-      {
-        if (collider.Collide(hitbox))
-          return true;
-      }
-      return false;
-    }
+        public override Collider Clone()
+        {
+            Collider[] colliderArray = new Collider[this.colliders.Length];
+            for (int index = 0; index < this.colliders.Length; ++index)
+                colliderArray[index] = this.colliders[index].Clone();
+            return (Collider) new ColliderList(colliderArray);
+        }
 
-    public override bool Collide(Grid grid)
-    {
-      foreach (Collider collider in this.colliders)
-      {
-        if (collider.Collide(grid))
-          return true;
-      }
-      return false;
-    }
+        public override void Render(Camera camera, Color color)
+        {
+            foreach (Collider collider in this.colliders)
+                collider.Render(camera, color);
+        }
 
-    public override bool Collide(Circle circle)
-    {
-      foreach (Collider collider in this.colliders)
-      {
-        if (collider.Collide(circle))
-          return true;
-      }
-      return false;
-    }
+        public override bool Collide(Vector2 point)
+        {
+            foreach (Collider collider in this.colliders)
+            {
+                if (collider.Collide(point))
+                    return true;
+            }
+            return false;
+        }
 
-    public override bool Collide(ColliderList list)
-    {
-      foreach (Collider collider in this.colliders)
-      {
-        if (collider.Collide(list))
-          return true;
-      }
-      return false;
+        public override bool Collide(Rectangle rect)
+        {
+            foreach (Collider collider in this.colliders)
+            {
+                if (collider.Collide(rect))
+                    return true;
+            }
+            return false;
+        }
+
+        public override bool Collide(Vector2 from, Vector2 to)
+        {
+            foreach (Collider collider in this.colliders)
+            {
+                if (collider.Collide(from, to))
+                    return true;
+            }
+            return false;
+        }
+
+        public override bool Collide(Hitbox hitbox)
+        {
+            foreach (Collider collider in this.colliders)
+            {
+                if (collider.Collide(hitbox))
+                    return true;
+            }
+            return false;
+        }
+
+        public override bool Collide(Grid grid)
+        {
+            foreach (Collider collider in this.colliders)
+            {
+                if (collider.Collide(grid))
+                    return true;
+            }
+            return false;
+        }
+
+        public override bool Collide(Circle circle)
+        {
+            foreach (Collider collider in this.colliders)
+            {
+                if (collider.Collide(circle))
+                    return true;
+            }
+            return false;
+        }
+
+        public override bool Collide(ColliderList list)
+        {
+            foreach (Collider collider in this.colliders)
+            {
+                if (collider.Collide(list))
+                    return true;
+            }
+            return false;
+        }
     }
-  }
 }

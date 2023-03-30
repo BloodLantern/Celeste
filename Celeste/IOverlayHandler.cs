@@ -6,8 +6,8 @@
 
 namespace Celeste
 {
-  public interface IOverlayHandler
-  {
-    Overlay Overlay { get; set; }
-  }
+    public interface IOverlayHandler
+    {
+        Overlay Overlay { get; set; }
+    }
 }

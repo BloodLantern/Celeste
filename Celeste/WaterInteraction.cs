@@ -10,30 +10,30 @@ using System;
 
 namespace Celeste
 {
-  [Tracked(false)]
-  public class WaterInteraction : Component
-  {
-    public static ParticleType P_Drip;
-    public Func<bool> IsDashing;
-    public float DrippingTimer;
-    public float DrippingOffset;
-
-    public WaterInteraction(Func<bool> isDashing)
-      : base(false, false)
+    [Tracked(false)]
+    public class WaterInteraction : Component
     {
-      this.IsDashing = isDashing;
-    }
+        public static ParticleType P_Drip;
+        public Func<bool> IsDashing;
+        public float DrippingTimer;
+        public float DrippingOffset;
 
-    public override void Update()
-    {
-      if ((double) this.DrippingTimer <= 0.0)
-        return;
-      this.DrippingTimer -= Engine.DeltaTime;
-      if (!this.Scene.OnInterval(0.1f))
-        return;
-      float x = this.Entity.Left - 2f + Calc.Random.NextFloat(this.Entity.Width + 4f);
-      float y = this.Entity.Top + this.DrippingOffset + Calc.Random.NextFloat(this.Entity.Height - this.DrippingOffset);
-      (this.Scene as Level).ParticlesFG.Emit(WaterInteraction.P_Drip, new Vector2(x, y));
+        public WaterInteraction(Func<bool> isDashing)
+            : base(false, false)
+        {
+            this.IsDashing = isDashing;
+        }
+
+        public override void Update()
+        {
+            if ((double) this.DrippingTimer <= 0.0)
+                return;
+            this.DrippingTimer -= Engine.DeltaTime;
+            if (!this.Scene.OnInterval(0.1f))
+                return;
+            float x = this.Entity.Left - 2f + Calc.Random.NextFloat(this.Entity.Width + 4f);
+            float y = this.Entity.Top + this.DrippingOffset + Calc.Random.NextFloat(this.Entity.Height - this.DrippingOffset);
+            (this.Scene as Level).ParticlesFG.Emit(WaterInteraction.P_Drip, new Vector2(x, y));
+        }
     }
-  }
 }

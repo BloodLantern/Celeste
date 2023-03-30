@@ -9,63 +9,63 @@ using System;
 
 namespace Celeste
 {
-  public class Follower : Component
-  {
-    public EntityID ParentEntityID;
-    public Leader Leader;
-    public Action OnGainLeader;
-    public Action OnLoseLeader;
-    public bool PersistentFollow = true;
-    public float FollowDelay = 0.5f;
-    public float DelayTimer;
-    public bool MoveTowardsLeader = true;
-
-    public bool HasLeader => this.Leader != null;
-
-    public Follower(Action onGainLeader = null, Action onLoseLeader = null)
-      : base(true, false)
+    public class Follower : Component
     {
-      this.OnGainLeader = onGainLeader;
-      this.OnLoseLeader = onLoseLeader;
-    }
+        public EntityID ParentEntityID;
+        public Leader Leader;
+        public Action OnGainLeader;
+        public Action OnLoseLeader;
+        public bool PersistentFollow = true;
+        public float FollowDelay = 0.5f;
+        public float DelayTimer;
+        public bool MoveTowardsLeader = true;
 
-    public Follower(EntityID entityID, Action onGainLeader = null, Action onLoseLeader = null)
-      : base(true, false)
-    {
-      this.ParentEntityID = entityID;
-      this.OnGainLeader = onGainLeader;
-      this.OnLoseLeader = onLoseLeader;
-    }
+        public bool HasLeader => this.Leader != null;
 
-    public override void Update()
-    {
-      base.Update();
-      if ((double) this.DelayTimer <= 0.0)
-        return;
-      this.DelayTimer -= Engine.DeltaTime;
-    }
+        public Follower(Action onGainLeader = null, Action onLoseLeader = null)
+            : base(true, false)
+        {
+            this.OnGainLeader = onGainLeader;
+            this.OnLoseLeader = onLoseLeader;
+        }
 
-    public void OnLoseLeaderUtil()
-    {
-      if (this.PersistentFollow)
-        this.Entity.RemoveTag((int) Tags.Persistent);
-      this.Leader = (Leader) null;
-      if (this.OnLoseLeader == null)
-        return;
-      this.OnLoseLeader();
-    }
+        public Follower(EntityID entityID, Action onGainLeader = null, Action onLoseLeader = null)
+            : base(true, false)
+        {
+            this.ParentEntityID = entityID;
+            this.OnGainLeader = onGainLeader;
+            this.OnLoseLeader = onLoseLeader;
+        }
 
-    public void OnGainLeaderUtil(Leader leader)
-    {
-      if (this.PersistentFollow)
-        this.Entity.AddTag((int) Tags.Persistent);
-      this.Leader = leader;
-      this.DelayTimer = this.FollowDelay;
-      if (this.OnGainLeader == null)
-        return;
-      this.OnGainLeader();
-    }
+        public override void Update()
+        {
+            base.Update();
+            if ((double) this.DelayTimer <= 0.0)
+                return;
+            this.DelayTimer -= Engine.DeltaTime;
+        }
 
-    public int FollowIndex => this.Leader == null ? -1 : this.Leader.Followers.IndexOf(this);
-  }
+        public void OnLoseLeaderUtil()
+        {
+            if (this.PersistentFollow)
+                this.Entity.RemoveTag((int) Tags.Persistent);
+            this.Leader = (Leader) null;
+            if (this.OnLoseLeader == null)
+                return;
+            this.OnLoseLeader();
+        }
+
+        public void OnGainLeaderUtil(Leader leader)
+        {
+            if (this.PersistentFollow)
+                this.Entity.AddTag((int) Tags.Persistent);
+            this.Leader = leader;
+            this.DelayTimer = this.FollowDelay;
+            if (this.OnGainLeader == null)
+                return;
+            this.OnGainLeader();
+        }
+
+        public int FollowIndex => this.Leader == null ? -1 : this.Leader.Followers.IndexOf(this);
+    }
 }

@@ -11,246 +11,246 @@ using System.Collections;
 
 namespace Celeste
 {
-  public class WindController : Entity
-  {
-    private const float Weak = 400f;
-    private const float Strong = 800f;
-    private const float Crazy = 1200f;
-    private const float Accel = 1000f;
-    private const float Down = 300f;
-    private const float Up = -400f;
-    private const float Space = -600f;
-    private Level level;
-    private WindController.Patterns pattern;
-    private Vector2 targetSpeed;
-    private Coroutine coroutine;
-    private WindController.Patterns startPattern;
-    private bool everSetPattern;
-
-    public WindController(WindController.Patterns pattern)
+    public class WindController : Entity
     {
-      this.Tag = (int) Tags.TransitionUpdate;
-      this.startPattern = pattern;
-    }
+        private const float Weak = 400f;
+        private const float Strong = 800f;
+        private const float Crazy = 1200f;
+        private const float Accel = 1000f;
+        private const float Down = 300f;
+        private const float Up = -400f;
+        private const float Space = -600f;
+        private Level level;
+        private WindController.Patterns pattern;
+        private Vector2 targetSpeed;
+        private Coroutine coroutine;
+        private WindController.Patterns startPattern;
+        private bool everSetPattern;
 
-    public override void Added(Scene scene)
-    {
-      base.Added(scene);
-      this.level = this.SceneAs<Level>();
-    }
-
-    public void SetStartPattern()
-    {
-      if (this.everSetPattern)
-        return;
-      this.SetPattern(this.startPattern);
-    }
-
-    public void SetPattern(WindController.Patterns pattern)
-    {
-      if (this.pattern == pattern && this.everSetPattern)
-        return;
-      this.everSetPattern = true;
-      this.pattern = pattern;
-      if (this.coroutine != null)
-      {
-        this.Remove((Component) this.coroutine);
-        this.coroutine = (Coroutine) null;
-      }
-      switch (pattern)
-      {
-        case WindController.Patterns.None:
-          this.targetSpeed = Vector2.Zero;
-          this.SetAmbienceStrength(false);
-          break;
-        case WindController.Patterns.Left:
-          this.targetSpeed.X = -400f;
-          this.SetAmbienceStrength(false);
-          break;
-        case WindController.Patterns.Right:
-          this.targetSpeed.X = 400f;
-          this.SetAmbienceStrength(false);
-          break;
-        case WindController.Patterns.LeftStrong:
-          this.targetSpeed.X = -800f;
-          this.SetAmbienceStrength(true);
-          break;
-        case WindController.Patterns.RightStrong:
-          this.targetSpeed.X = 800f;
-          this.SetAmbienceStrength(true);
-          break;
-        case WindController.Patterns.LeftOnOff:
-          this.Add((Component) (this.coroutine = new Coroutine(this.LeftOnOffSequence())));
-          break;
-        case WindController.Patterns.RightOnOff:
-          this.Add((Component) (this.coroutine = new Coroutine(this.RightOnOffSequence())));
-          break;
-        case WindController.Patterns.LeftOnOffFast:
-          this.Add((Component) (this.coroutine = new Coroutine(this.LeftOnOffFastSequence())));
-          break;
-        case WindController.Patterns.RightOnOffFast:
-          this.Add((Component) (this.coroutine = new Coroutine(this.RightOnOffFastSequence())));
-          break;
-        case WindController.Patterns.Alternating:
-          this.Add((Component) (this.coroutine = new Coroutine(this.AlternatingSequence())));
-          break;
-        case WindController.Patterns.RightCrazy:
-          this.targetSpeed.X = 1200f;
-          this.SetAmbienceStrength(true);
-          break;
-        case WindController.Patterns.Down:
-          this.targetSpeed.Y = 300f;
-          this.SetAmbienceStrength(false);
-          break;
-        case WindController.Patterns.Up:
-          this.targetSpeed.Y = -400f;
-          this.SetAmbienceStrength(false);
-          break;
-        case WindController.Patterns.Space:
-          this.targetSpeed.Y = -600f;
-          this.SetAmbienceStrength(false);
-          break;
-      }
-    }
-
-    private void SetAmbienceStrength(bool strong)
-    {
-      int num = 0;
-      if ((double) this.targetSpeed.X != 0.0)
-        num = Math.Sign(this.targetSpeed.X);
-      else if ((double) this.targetSpeed.Y != 0.0)
-        num = Math.Sign(this.targetSpeed.Y);
-      Audio.SetParameter(Audio.CurrentAmbienceEventInstance, "wind_direction", (float) num);
-      Audio.SetParameter(Audio.CurrentAmbienceEventInstance, "strong_wind", strong ? 1f : 0.0f);
-    }
-
-    public void SnapWind()
-    {
-      if (this.coroutine != null && this.coroutine.Active)
-        this.coroutine.Update();
-      this.level.Wind = this.targetSpeed;
-    }
-
-    public override void Update()
-    {
-      base.Update();
-      if (this.pattern == WindController.Patterns.LeftGemsOnly)
-      {
-        bool flag = false;
-        foreach (StrawberrySeed entity in this.Scene.Tracker.GetEntities<StrawberrySeed>())
+        public WindController(WindController.Patterns pattern)
         {
-          if (entity.Collected)
-          {
-            flag = true;
-            break;
-          }
+            this.Tag = (int) Tags.TransitionUpdate;
+            this.startPattern = pattern;
         }
-        if (flag)
+
+        public override void Added(Scene scene)
         {
-          this.targetSpeed.X = -400f;
-          this.SetAmbienceStrength(false);
+            base.Added(scene);
+            this.level = this.SceneAs<Level>();
         }
-        else
+
+        public void SetStartPattern()
         {
-          this.targetSpeed.X = 0.0f;
-          this.SetAmbienceStrength(false);
+            if (this.everSetPattern)
+                return;
+            this.SetPattern(this.startPattern);
         }
-      }
-      this.level.Wind = Calc.Approach(this.level.Wind, this.targetSpeed, 1000f * Engine.DeltaTime);
-      if (!(this.level.Wind != Vector2.Zero) || this.level.Transitioning)
-        return;
-      foreach (WindMover component in this.Scene.Tracker.GetComponents<WindMover>())
-        component.Move(this.level.Wind * 0.1f * Engine.DeltaTime);
-    }
 
-    private IEnumerator AlternatingSequence()
-    {
-      while (true)
-      {
-        this.targetSpeed.X = -400f;
-        this.SetAmbienceStrength(false);
-        yield return (object) 3f;
-        this.targetSpeed.X = 0.0f;
-        this.SetAmbienceStrength(false);
-        yield return (object) 2f;
-        this.targetSpeed.X = 400f;
-        this.SetAmbienceStrength(false);
-        yield return (object) 3f;
-        this.targetSpeed.X = 0.0f;
-        this.SetAmbienceStrength(false);
-        yield return (object) 2f;
-      }
-    }
+        public void SetPattern(WindController.Patterns pattern)
+        {
+            if (this.pattern == pattern && this.everSetPattern)
+                return;
+            this.everSetPattern = true;
+            this.pattern = pattern;
+            if (this.coroutine != null)
+            {
+                this.Remove((Component) this.coroutine);
+                this.coroutine = (Coroutine) null;
+            }
+            switch (pattern)
+            {
+                case WindController.Patterns.None:
+                    this.targetSpeed = Vector2.Zero;
+                    this.SetAmbienceStrength(false);
+                    break;
+                case WindController.Patterns.Left:
+                    this.targetSpeed.X = -400f;
+                    this.SetAmbienceStrength(false);
+                    break;
+                case WindController.Patterns.Right:
+                    this.targetSpeed.X = 400f;
+                    this.SetAmbienceStrength(false);
+                    break;
+                case WindController.Patterns.LeftStrong:
+                    this.targetSpeed.X = -800f;
+                    this.SetAmbienceStrength(true);
+                    break;
+                case WindController.Patterns.RightStrong:
+                    this.targetSpeed.X = 800f;
+                    this.SetAmbienceStrength(true);
+                    break;
+                case WindController.Patterns.LeftOnOff:
+                    this.Add((Component) (this.coroutine = new Coroutine(this.LeftOnOffSequence())));
+                    break;
+                case WindController.Patterns.RightOnOff:
+                    this.Add((Component) (this.coroutine = new Coroutine(this.RightOnOffSequence())));
+                    break;
+                case WindController.Patterns.LeftOnOffFast:
+                    this.Add((Component) (this.coroutine = new Coroutine(this.LeftOnOffFastSequence())));
+                    break;
+                case WindController.Patterns.RightOnOffFast:
+                    this.Add((Component) (this.coroutine = new Coroutine(this.RightOnOffFastSequence())));
+                    break;
+                case WindController.Patterns.Alternating:
+                    this.Add((Component) (this.coroutine = new Coroutine(this.AlternatingSequence())));
+                    break;
+                case WindController.Patterns.RightCrazy:
+                    this.targetSpeed.X = 1200f;
+                    this.SetAmbienceStrength(true);
+                    break;
+                case WindController.Patterns.Down:
+                    this.targetSpeed.Y = 300f;
+                    this.SetAmbienceStrength(false);
+                    break;
+                case WindController.Patterns.Up:
+                    this.targetSpeed.Y = -400f;
+                    this.SetAmbienceStrength(false);
+                    break;
+                case WindController.Patterns.Space:
+                    this.targetSpeed.Y = -600f;
+                    this.SetAmbienceStrength(false);
+                    break;
+            }
+        }
 
-    private IEnumerator RightOnOffSequence()
-    {
-      while (true)
-      {
-        this.targetSpeed.X = 800f;
-        this.SetAmbienceStrength(true);
-        yield return (object) 3f;
-        this.targetSpeed.X = 0.0f;
-        this.SetAmbienceStrength(false);
-        yield return (object) 3f;
-      }
-    }
+        private void SetAmbienceStrength(bool strong)
+        {
+            int num = 0;
+            if ((double) this.targetSpeed.X != 0.0)
+                num = Math.Sign(this.targetSpeed.X);
+            else if ((double) this.targetSpeed.Y != 0.0)
+                num = Math.Sign(this.targetSpeed.Y);
+            Audio.SetParameter(Audio.CurrentAmbienceEventInstance, "wind_direction", (float) num);
+            Audio.SetParameter(Audio.CurrentAmbienceEventInstance, "strong_wind", strong ? 1f : 0.0f);
+        }
 
-    private IEnumerator LeftOnOffSequence()
-    {
-      while (true)
-      {
-        this.targetSpeed.X = -800f;
-        this.SetAmbienceStrength(true);
-        yield return (object) 3f;
-        this.targetSpeed.X = 0.0f;
-        this.SetAmbienceStrength(false);
-        yield return (object) 3f;
-      }
-    }
+        public void SnapWind()
+        {
+            if (this.coroutine != null && this.coroutine.Active)
+                this.coroutine.Update();
+            this.level.Wind = this.targetSpeed;
+        }
 
-    private IEnumerator RightOnOffFastSequence()
-    {
-      while (true)
-      {
-        this.targetSpeed.X = 800f;
-        this.SetAmbienceStrength(true);
-        yield return (object) 2f;
-        this.targetSpeed.X = 0.0f;
-        this.SetAmbienceStrength(false);
-        yield return (object) 2f;
-      }
-    }
+        public override void Update()
+        {
+            base.Update();
+            if (this.pattern == WindController.Patterns.LeftGemsOnly)
+            {
+                bool flag = false;
+                foreach (StrawberrySeed entity in this.Scene.Tracker.GetEntities<StrawberrySeed>())
+                {
+                    if (entity.Collected)
+                    {
+                        flag = true;
+                        break;
+                    }
+                }
+                if (flag)
+                {
+                    this.targetSpeed.X = -400f;
+                    this.SetAmbienceStrength(false);
+                }
+                else
+                {
+                    this.targetSpeed.X = 0.0f;
+                    this.SetAmbienceStrength(false);
+                }
+            }
+            this.level.Wind = Calc.Approach(this.level.Wind, this.targetSpeed, 1000f * Engine.DeltaTime);
+            if (!(this.level.Wind != Vector2.Zero) || this.level.Transitioning)
+                return;
+            foreach (WindMover component in this.Scene.Tracker.GetComponents<WindMover>())
+                component.Move(this.level.Wind * 0.1f * Engine.DeltaTime);
+        }
 
-    private IEnumerator LeftOnOffFastSequence()
-    {
-      while (true)
-      {
-        this.targetSpeed.X = -800f;
-        this.SetAmbienceStrength(true);
-        yield return (object) 2f;
-        this.targetSpeed.X = 0.0f;
-        this.SetAmbienceStrength(false);
-        yield return (object) 2f;
-      }
-    }
+        private IEnumerator AlternatingSequence()
+        {
+            while (true)
+            {
+                this.targetSpeed.X = -400f;
+                this.SetAmbienceStrength(false);
+                yield return (object) 3f;
+                this.targetSpeed.X = 0.0f;
+                this.SetAmbienceStrength(false);
+                yield return (object) 2f;
+                this.targetSpeed.X = 400f;
+                this.SetAmbienceStrength(false);
+                yield return (object) 3f;
+                this.targetSpeed.X = 0.0f;
+                this.SetAmbienceStrength(false);
+                yield return (object) 2f;
+            }
+        }
 
-    public enum Patterns
-    {
-      None,
-      Left,
-      Right,
-      LeftStrong,
-      RightStrong,
-      LeftOnOff,
-      RightOnOff,
-      LeftOnOffFast,
-      RightOnOffFast,
-      Alternating,
-      LeftGemsOnly,
-      RightCrazy,
-      Down,
-      Up,
-      Space,
+        private IEnumerator RightOnOffSequence()
+        {
+            while (true)
+            {
+                this.targetSpeed.X = 800f;
+                this.SetAmbienceStrength(true);
+                yield return (object) 3f;
+                this.targetSpeed.X = 0.0f;
+                this.SetAmbienceStrength(false);
+                yield return (object) 3f;
+            }
+        }
+
+        private IEnumerator LeftOnOffSequence()
+        {
+            while (true)
+            {
+                this.targetSpeed.X = -800f;
+                this.SetAmbienceStrength(true);
+                yield return (object) 3f;
+                this.targetSpeed.X = 0.0f;
+                this.SetAmbienceStrength(false);
+                yield return (object) 3f;
+            }
+        }
+
+        private IEnumerator RightOnOffFastSequence()
+        {
+            while (true)
+            {
+                this.targetSpeed.X = 800f;
+                this.SetAmbienceStrength(true);
+                yield return (object) 2f;
+                this.targetSpeed.X = 0.0f;
+                this.SetAmbienceStrength(false);
+                yield return (object) 2f;
+            }
+        }
+
+        private IEnumerator LeftOnOffFastSequence()
+        {
+            while (true)
+            {
+                this.targetSpeed.X = -800f;
+                this.SetAmbienceStrength(true);
+                yield return (object) 2f;
+                this.targetSpeed.X = 0.0f;
+                this.SetAmbienceStrength(false);
+                yield return (object) 2f;
+            }
+        }
+
+        public enum Patterns
+        {
+            None,
+            Left,
+            Right,
+            LeftStrong,
+            RightStrong,
+            LeftOnOff,
+            RightOnOff,
+            LeftOnOffFast,
+            RightOnOffFast,
+            Alternating,
+            LeftGemsOnly,
+            RightCrazy,
+            Down,
+            Up,
+            Space,
+        }
     }
-  }
 }

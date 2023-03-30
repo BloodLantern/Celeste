@@ -6,10 +6,10 @@
 
 namespace Celeste
 {
-  public enum AreaMode
-  {
-    Normal,
-    BSide,
-    CSide,
-  }
+    public enum AreaMode
+    {
+        Normal,
+        BSide,
+        CSide,
+    }
 }

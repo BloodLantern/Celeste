@@ -6,10 +6,10 @@
 
 namespace FMOD
 {
-  public enum DSP_FLANGE
-  {
-    MIX,
-    DEPTH,
-    RATE,
-  }
+    public enum DSP_FLANGE
+    {
+        MIX,
+        DEPTH,
+        RATE,
+    }
 }

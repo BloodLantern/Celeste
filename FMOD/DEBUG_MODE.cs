@@ -6,10 +6,10 @@
 
 namespace FMOD
 {
-  public enum DEBUG_MODE
-  {
-    TTY,
-    FILE,
-    CALLBACK,
-  }
+    public enum DEBUG_MODE
+    {
+        TTY,
+        FILE,
+        CALLBACK,
+    }
 }

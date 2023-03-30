@@ -6,8 +6,8 @@
 
 namespace FMOD
 {
-  public enum DSP_DISTORTION
-  {
-    LEVEL,
-  }
+    public enum DSP_DISTORTION
+    {
+        LEVEL,
+    }
 }

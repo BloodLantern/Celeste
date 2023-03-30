@@ -6,11 +6,11 @@
 
 namespace Celeste
 {
-  public enum RumbleStrength
-  {
-    Light,
-    Medium,
-    Strong,
-    Climb,
-  }
+    public enum RumbleStrength
+    {
+        Light,
+        Medium,
+        Strong,
+        Climb,
+    }
 }

@@ -9,17 +9,17 @@ using Monocle;
 
 namespace Celeste
 {
-  public class PropLight : Entity
-  {
-    public PropLight(Vector2 position, Color color, float alpha)
-      : base(position)
+    public class PropLight : Entity
     {
-      this.Add((Component) new VertexLight(color, alpha, 128, 256));
-    }
+        public PropLight(Vector2 position, Color color, float alpha)
+            : base(position)
+        {
+            this.Add((Component) new VertexLight(color, alpha, 128, 256));
+        }
 
-    public PropLight(EntityData data, Vector2 offset)
-      : this(data.Position + offset, data.HexColor("color"), data.Float("alpha"))
-    {
+        public PropLight(EntityData data, Vector2 offset)
+            : this(data.Position + offset, data.HexColor("color"), data.Float("alpha"))
+        {
+        }
     }
-  }
 }

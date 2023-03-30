@@ -8,5 +8,5 @@ using System;
 
 namespace FMOD
 {
-  public delegate RESULT FILE_CLOSECALLBACK(IntPtr handle, IntPtr userdata);
+    public delegate RESULT FILE_CLOSECALLBACK(IntPtr handle, IntPtr userdata);
 }

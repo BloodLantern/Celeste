@@ -6,12 +6,12 @@
 
 namespace Celeste
 {
-  public enum PlayerSpriteMode
-  {
-    Madeline,
-    MadelineNoBackpack,
-    Badeline,
-    MadelineAsBadeline,
-    Playback,
-  }
+    public enum PlayerSpriteMode
+    {
+        Madeline,
+        MadelineNoBackpack,
+        Badeline,
+        MadelineAsBadeline,
+        Playback,
+    }
 }

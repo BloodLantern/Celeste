@@ -8,7 +8,7 @@ using System;
 
 namespace Celeste
 {
-  public class SpawnableAttribute : Attribute
-  {
-  }
+    public class SpawnableAttribute : Attribute
+    {
+    }
 }

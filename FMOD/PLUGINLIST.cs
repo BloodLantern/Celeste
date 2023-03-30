@@ -8,9 +8,9 @@ using System;
 
 namespace FMOD
 {
-  public struct PLUGINLIST
-  {
-    private PLUGINTYPE type;
-    private IntPtr description;
-  }
+    public struct PLUGINLIST
+    {
+        private PLUGINTYPE type;
+        private IntPtr description;
+    }
 }

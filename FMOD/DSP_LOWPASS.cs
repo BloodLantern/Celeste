@@ -6,9 +6,9 @@
 
 namespace FMOD
 {
-  public enum DSP_LOWPASS
-  {
-    CUTOFF,
-    RESONANCE,
-  }
+    public enum DSP_LOWPASS
+    {
+        CUTOFF,
+        RESONANCE,
+    }
 }

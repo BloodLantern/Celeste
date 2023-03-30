@@ -6,9 +6,9 @@
 
 namespace FMOD
 {
-  public enum CHANNELCONTROL_TYPE
-  {
-    CHANNEL,
-    CHANNELGROUP,
-  }
+    public enum CHANNELCONTROL_TYPE
+    {
+        CHANNEL,
+        CHANNELGROUP,
+    }
 }

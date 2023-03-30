@@ -8,7 +8,7 @@ using System;
 
 namespace Monocle
 {
-  public class Pooled : Attribute
-  {
-  }
+    public class Pooled : Attribute
+    {
+    }
 }

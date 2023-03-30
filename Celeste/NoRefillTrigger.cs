@@ -8,20 +8,20 @@ using Microsoft.Xna.Framework;
 
 namespace Celeste
 {
-  public class NoRefillTrigger : Trigger
-  {
-    public bool State;
-
-    public NoRefillTrigger(EntityData data, Vector2 offset)
-      : base(data, offset)
+    public class NoRefillTrigger : Trigger
     {
-      this.State = data.Bool("state");
-    }
+        public bool State;
 
-    public override void OnEnter(Player player)
-    {
-      base.OnEnter(player);
-      this.SceneAs<Level>().Session.Inventory.NoRefills = this.State;
+        public NoRefillTrigger(EntityData data, Vector2 offset)
+            : base(data, offset)
+        {
+            this.State = data.Bool("state");
+        }
+
+        public override void OnEnter(Player player)
+        {
+            base.OnEnter(player);
+            this.SceneAs<Level>().Session.Inventory.NoRefills = this.State;
+        }
     }
-  }
 }

@@ -6,11 +6,11 @@
 
 namespace FMOD
 {
-  public enum DSP_TRANSCEIVER
-  {
-    TRANSMIT,
-    GAIN,
-    CHANNEL,
-    TRANSMITSPEAKERMODE,
-  }
+    public enum DSP_TRANSCEIVER
+    {
+        TRANSMIT,
+        GAIN,
+        CHANNEL,
+        TRANSMITSPEAKERMODE,
+    }
 }

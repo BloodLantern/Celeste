@@ -9,12 +9,12 @@ using Monocle;
 
 namespace Celeste
 {
-  [Tracked(false)]
-  public class CheckpointBlockerTrigger : Trigger
-  {
-    public CheckpointBlockerTrigger(EntityData data, Vector2 offset)
-      : base(data, offset)
+    [Tracked(false)]
+    public class CheckpointBlockerTrigger : Trigger
     {
+        public CheckpointBlockerTrigger(EntityData data, Vector2 offset)
+            : base(data, offset)
+        {
+        }
     }
-  }
 }

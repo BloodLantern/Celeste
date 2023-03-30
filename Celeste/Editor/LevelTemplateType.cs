@@ -6,9 +6,9 @@
 
 namespace Celeste.Editor
 {
-  public enum LevelTemplateType
-  {
-    Level,
-    Filler,
-  }
+    public enum LevelTemplateType
+    {
+        Level,
+        Filler,
+    }
 }

@@ -9,25 +9,25 @@ using Monocle;
 
 namespace Celeste
 {
-  [Tracked(false)]
-  public class WindTrigger : Trigger
-  {
-    public WindController.Patterns Pattern;
-
-    public WindTrigger(EntityData data, Vector2 offset)
-      : base(data, offset)
+    [Tracked(false)]
+    public class WindTrigger : Trigger
     {
-      this.Pattern = data.Enum<WindController.Patterns>("pattern");
-    }
+        public WindController.Patterns Pattern;
 
-    public override void OnEnter(Player player)
-    {
-      base.OnEnter(player);
-      WindController first = this.Scene.Entities.FindFirst<WindController>();
-      if (first == null)
-        this.Scene.Add((Entity) new WindController(this.Pattern));
-      else
-        first.SetPattern(this.Pattern);
+        public WindTrigger(EntityData data, Vector2 offset)
+            : base(data, offset)
+        {
+            this.Pattern = data.Enum<WindController.Patterns>("pattern");
+        }
+
+        public override void OnEnter(Player player)
+        {
+            base.OnEnter(player);
+            WindController first = this.Scene.Entities.FindFirst<WindController>();
+            if (first == null)
+                this.Scene.Add((Entity) new WindController(this.Pattern));
+            else
+                first.SetPattern(this.Pattern);
+        }
     }
-  }
 }

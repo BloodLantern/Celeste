@@ -6,12 +6,12 @@
 
 namespace Celeste
 {
-  public enum DashCollisionResults
-  {
-    Rebound,
-    NormalCollision,
-    NormalOverride,
-    Bounce,
-    Ignore,
-  }
+    public enum DashCollisionResults
+    {
+        Rebound,
+        NormalCollision,
+        NormalOverride,
+        Bounce,
+        Ignore,
+    }
 }

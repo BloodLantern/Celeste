@@ -9,22 +9,22 @@ using System.Xml.Serialization;
 
 namespace Celeste
 {
-  [Serializable]
-  public class MEP
-  {
-    [XmlAttribute]
-    public string Key;
-    [XmlAttribute]
-    public float Value;
-
-    public MEP()
+    [Serializable]
+    public class MEP
     {
-    }
+        [XmlAttribute]
+        public string Key;
+        [XmlAttribute]
+        public float Value;
 
-    public MEP(string key, float value)
-    {
-      this.Key = key;
-      this.Value = value;
+        public MEP()
+        {
+        }
+
+        public MEP(string key, float value)
+        {
+            this.Key = key;
+            this.Value = value;
+        }
     }
-  }
 }

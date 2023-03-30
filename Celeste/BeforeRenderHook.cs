@@ -9,15 +9,15 @@ using System;
 
 namespace Celeste
 {
-  [Tracked(false)]
-  public class BeforeRenderHook : Component
-  {
-    public Action Callback;
-
-    public BeforeRenderHook(Action callback)
-      : base(false, true)
+    [Tracked(false)]
+    public class BeforeRenderHook : Component
     {
-      this.Callback = callback;
+        public Action Callback;
+
+        public BeforeRenderHook(Action callback)
+            : base(false, true)
+        {
+            this.Callback = callback;
+        }
     }
-  }
 }

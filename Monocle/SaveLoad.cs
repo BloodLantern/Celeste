@@ -10,98 +10,98 @@ using System.Xml.Serialization;
 
 namespace Monocle
 {
-  public static class SaveLoad
-  {
-    public static void SerializeToFile<T>(T obj, string filepath, SaveLoad.SerializeModes mode)
+    public static class SaveLoad
     {
-      using (FileStream serializationStream = new FileStream(filepath, FileMode.Create))
-      {
-        if (mode == SaveLoad.SerializeModes.Binary)
+        public static void SerializeToFile<T>(T obj, string filepath, SaveLoad.SerializeModes mode)
         {
-          new BinaryFormatter().Serialize((Stream) serializationStream, (object) obj);
+            using (FileStream serializationStream = new FileStream(filepath, FileMode.Create))
+            {
+                if (mode == SaveLoad.SerializeModes.Binary)
+                {
+                    new BinaryFormatter().Serialize((Stream) serializationStream, (object) obj);
+                }
+                else
+                {
+                    if (mode != SaveLoad.SerializeModes.XML)
+                        return;
+                    new XmlSerializer(typeof (T)).Serialize((Stream) serializationStream, (object) obj);
+                }
+            }
         }
-        else
+
+        public static bool SafeSerializeToFile<T>(T obj, string filepath, SaveLoad.SerializeModes mode)
         {
-          if (mode != SaveLoad.SerializeModes.XML)
-            return;
-          new XmlSerializer(typeof (T)).Serialize((Stream) serializationStream, (object) obj);
+            try
+            {
+                SaveLoad.SerializeToFile<T>(obj, filepath, mode);
+                return true;
+            }
+            catch
+            {
+                return false;
+            }
         }
-      }
-    }
 
-    public static bool SafeSerializeToFile<T>(T obj, string filepath, SaveLoad.SerializeModes mode)
-    {
-      try
-      {
-        SaveLoad.SerializeToFile<T>(obj, filepath, mode);
-        return true;
-      }
-      catch
-      {
-        return false;
-      }
-    }
-
-    public static T DeserializeFromFile<T>(string filepath, SaveLoad.SerializeModes mode)
-    {
-      using (FileStream serializationStream = File.OpenRead(filepath))
-        return mode == SaveLoad.SerializeModes.Binary ? (T) new BinaryFormatter().Deserialize((Stream) serializationStream) : (T) new XmlSerializer(typeof (T)).Deserialize((Stream) serializationStream);
-    }
-
-    public static T SafeDeserializeFromFile<T>(
-      string filepath,
-      SaveLoad.SerializeModes mode,
-      bool debugUnsafe = false)
-    {
-      if (!File.Exists(filepath))
-        return default (T);
-      if (debugUnsafe)
-        return SaveLoad.DeserializeFromFile<T>(filepath, mode);
-      try
-      {
-        return SaveLoad.DeserializeFromFile<T>(filepath, mode);
-      }
-      catch
-      {
-        return default (T);
-      }
-    }
-
-    public static T SafeDeserializeFromFile<T>(
-      string filepath,
-      SaveLoad.SerializeModes mode,
-      out bool loadError,
-      bool debugUnsafe = false)
-    {
-      if (File.Exists(filepath))
-      {
-        if (debugUnsafe)
+        public static T DeserializeFromFile<T>(string filepath, SaveLoad.SerializeModes mode)
         {
-          loadError = false;
-          return SaveLoad.DeserializeFromFile<T>(filepath, mode);
+            using (FileStream serializationStream = File.OpenRead(filepath))
+                return mode == SaveLoad.SerializeModes.Binary ? (T) new BinaryFormatter().Deserialize((Stream) serializationStream) : (T) new XmlSerializer(typeof (T)).Deserialize((Stream) serializationStream);
         }
-        try
-        {
-          loadError = false;
-          return SaveLoad.DeserializeFromFile<T>(filepath, mode);
-        }
-        catch
-        {
-          loadError = true;
-          return default (T);
-        }
-      }
-      else
-      {
-        loadError = false;
-        return default (T);
-      }
-    }
 
-    public enum SerializeModes
-    {
-      Binary,
-      XML,
+        public static T SafeDeserializeFromFile<T>(
+            string filepath,
+            SaveLoad.SerializeModes mode,
+            bool debugUnsafe = false)
+        {
+            if (!File.Exists(filepath))
+                return default (T);
+            if (debugUnsafe)
+                return SaveLoad.DeserializeFromFile<T>(filepath, mode);
+            try
+            {
+                return SaveLoad.DeserializeFromFile<T>(filepath, mode);
+            }
+            catch
+            {
+                return default (T);
+            }
+        }
+
+        public static T SafeDeserializeFromFile<T>(
+            string filepath,
+            SaveLoad.SerializeModes mode,
+            out bool loadError,
+            bool debugUnsafe = false)
+        {
+            if (File.Exists(filepath))
+            {
+                if (debugUnsafe)
+                {
+                    loadError = false;
+                    return SaveLoad.DeserializeFromFile<T>(filepath, mode);
+                }
+                try
+                {
+                    loadError = false;
+                    return SaveLoad.DeserializeFromFile<T>(filepath, mode);
+                }
+                catch
+                {
+                    loadError = true;
+                    return default (T);
+                }
+            }
+            else
+            {
+                loadError = false;
+                return default (T);
+            }
+        }
+
+        public enum SerializeModes
+        {
+            Binary,
+            XML,
+        }
     }
-  }
 }

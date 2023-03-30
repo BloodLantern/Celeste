@@ -6,5 +6,5 @@
 
 namespace Celeste
 {
-  public delegate void Collision(CollisionData data);
+    public delegate void Collision(CollisionData data);
 }

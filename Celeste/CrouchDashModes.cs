@@ -6,9 +6,9 @@
 
 namespace Celeste
 {
-  public enum CrouchDashModes
-  {
-    Press,
-    Hold,
-  }
+    public enum CrouchDashModes
+    {
+        Press,
+        Hold,
+    }
 }

@@ -6,11 +6,11 @@
 
 namespace FMOD
 {
-  public enum DSP_ENVELOPEFOLLOWER
-  {
-    ATTACK,
-    RELEASE,
-    ENVELOPE,
-    USESIDECHAIN,
-  }
+    public enum DSP_ENVELOPEFOLLOWER
+    {
+        ATTACK,
+        RELEASE,
+        ENVELOPE,
+        USESIDECHAIN,
+    }
 }

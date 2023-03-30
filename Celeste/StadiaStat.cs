@@ -6,10 +6,10 @@
 
 namespace Celeste
 {
-  public enum StadiaStat
-  {
-    BERRIES,
-    HEARTS,
-    DEATHS,
-  }
+    public enum StadiaStat
+    {
+        BERRIES,
+        HEARTS,
+        DEATHS,
+    }
 }

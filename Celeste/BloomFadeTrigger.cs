@@ -9,28 +9,28 @@ using Monocle;
 
 namespace Celeste
 {
-  public class BloomFadeTrigger : Trigger
-  {
-    public float BloomAddFrom;
-    public float BloomAddTo;
-    public Trigger.PositionModes PositionMode;
-
-    public BloomFadeTrigger(EntityData data, Vector2 offset)
-      : base(data, offset)
+    public class BloomFadeTrigger : Trigger
     {
-      this.BloomAddFrom = data.Float("bloomAddFrom");
-      this.BloomAddTo = data.Float("bloomAddTo");
-      this.PositionMode = data.Enum<Trigger.PositionModes>("positionMode");
-    }
+        public float BloomAddFrom;
+        public float BloomAddTo;
+        public Trigger.PositionModes PositionMode;
 
-    public override void OnStay(Player player)
-    {
-      Level scene = this.Scene as Level;
-      Session session = scene.Session;
-      float num1 = this.BloomAddFrom + (this.BloomAddTo - this.BloomAddFrom) * MathHelper.Clamp(this.GetPositionLerp(player, this.PositionMode), 0.0f, 1f);
-      double num2 = (double) num1;
-      session.BloomBaseAdd = (float) num2;
-      scene.Bloom.Base = AreaData.Get((Scene) scene).BloomBase + num1;
+        public BloomFadeTrigger(EntityData data, Vector2 offset)
+            : base(data, offset)
+        {
+            this.BloomAddFrom = data.Float("bloomAddFrom");
+            this.BloomAddTo = data.Float("bloomAddTo");
+            this.PositionMode = data.Enum<Trigger.PositionModes>("positionMode");
+        }
+
+        public override void OnStay(Player player)
+        {
+            Level scene = this.Scene as Level;
+            Session session = scene.Session;
+            float num1 = this.BloomAddFrom + (this.BloomAddTo - this.BloomAddFrom) * MathHelper.Clamp(this.GetPositionLerp(player, this.PositionMode), 0.0f, 1f);
+            double num2 = (double) num1;
+            session.BloomBaseAdd = (float) num2;
+            scene.Bloom.Base = AreaData.Get((Scene) scene).BloomBase + num1;
+        }
     }
-  }
 }

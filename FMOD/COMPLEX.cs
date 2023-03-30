@@ -6,9 +6,9 @@
 
 namespace FMOD
 {
-  public struct COMPLEX
-  {
-    public float real;
-    public float imag;
-  }
+    public struct COMPLEX
+    {
+        public float real;
+        public float imag;
+    }
 }

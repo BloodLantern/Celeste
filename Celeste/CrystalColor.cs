@@ -6,11 +6,11 @@
 
 namespace Celeste
 {
-  public enum CrystalColor
-  {
-    Blue,
-    Red,
-    Purple,
-    Rainbow,
-  }
+    public enum CrystalColor
+    {
+        Blue,
+        Red,
+        Purple,
+        Rainbow,
+    }
 }
