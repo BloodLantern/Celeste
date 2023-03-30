@@ -16,21 +16,21 @@ namespace Celeste.Editor
 {
     public class MapEditor : Scene
     {
-        private static readonly Color gridColor = new Color(0.1f, 0.1f, 0.1f);
+        private static readonly Color gridColor = new(0.1f, 0.1f, 0.1f);
         private static Camera Camera;
         private static AreaKey area = AreaKey.None;
         private static float saveFlash = 0.0f;
-        private MapData mapData;
-        private List<LevelTemplate> levels = new List<LevelTemplate>();
+        private readonly MapData mapData;
+        private readonly List<LevelTemplate> levels = new();
         private Vector2 mousePosition;
         private MouseModes mouseMode;
         private Vector2 lastMouseScreenPosition;
         private Vector2 mouseDragStart;
-        private HashSet<LevelTemplate> selection = new HashSet<LevelTemplate>();
-        private HashSet<LevelTemplate> hovered = new HashSet<LevelTemplate>();
-        private float fade;
-        private List<Vector2[]> undoStack = new List<Vector2[]>();
-        private List<Vector2[]> redoStack = new List<Vector2[]>();
+        private readonly HashSet<LevelTemplate> selection = new();
+        private readonly HashSet<LevelTemplate> hovered = new();
+        private readonly float fade;
+        private readonly List<Vector2[]> undoStack = new();
+        private readonly List<Vector2[]> redoStack = new();
 
         public MapEditor(AreaKey area, bool reloadMapData = true)
         {
@@ -44,8 +44,10 @@ namespace Celeste.Editor
                 levels.Add(new LevelTemplate(rectangle.X, rectangle.Y, rectangle.Width, rectangle.Height));
             if (area != area)
             {
-                Camera = new Camera();
-                Camera.Zoom = 6f;
+                Camera = new Camera
+                {
+                    Zoom = 6f
+                };
                 Camera.CenterOrigin();
             }
             if (SaveData.Instance != null)
@@ -68,8 +70,8 @@ namespace Celeste.Editor
 
         public void Rename(string oldName, string newName)
         {
-            LevelTemplate levelTemplate1 = (LevelTemplate)null;
-            LevelTemplate levelTemplate2 = (LevelTemplate)null;
+            LevelTemplate levelTemplate1 = null;
+            LevelTemplate levelTemplate2 = null;
             foreach (LevelTemplate level in levels)
             {
                 if (levelTemplate1 == null && level.Name == oldName)
@@ -121,11 +123,11 @@ namespace Celeste.Editor
             }
             int num = Math.Sign(MInput.Mouse.WheelDelta);
             if (num > 0 && (double)Camera.Zoom >= 1.0 || (double)Camera.Zoom > 1.0)
-                Camera.Zoom += (float)num;
+                Camera.Zoom += num;
             else
-                Camera.Zoom += (float)num * 0.25f;
+                Camera.Zoom += num * 0.25f;
             Camera.Zoom = Math.Max(0.25f, Math.Min(24f, Camera.Zoom));
-            Camera.Position += new Vector2((float)Input.MoveX.Value, (float)Input.MoveY.Value) * 300f* Engine.DeltaTime;
+            Camera.Position += new Vector2(Input.MoveX.Value, Input.MoveY.Value) * 300f* Engine.DeltaTime;
             UpdateMouse();
             hovered.Clear();
             if (mouseMode == MouseModes.Hover)
@@ -271,7 +273,7 @@ namespace Celeste.Editor
             }
             else
             {
-                if ((double)saveFlash > 0.0)
+                if (saveFlash > 0.0)
                     saveFlash -= Engine.DeltaTime * 4f;
                 lastMouseScreenPosition = MInput.Mouse.Position;
                 base.Update();
@@ -287,17 +289,17 @@ namespace Celeste.Editor
         public override void Render()
         {
             UpdateMouse();
-            Draw.SpriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, SamplerState.PointClamp, DepthStencilState.None, RasterizerState.CullNone, (Effect)null, Camera.Matrix * Engine.ScreenMatrix);
+            Draw.SpriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, SamplerState.PointClamp, DepthStencilState.None, RasterizerState.CullNone, null, Camera.Matrix * Engine.ScreenMatrix);
             float width = 1920f / Camera.Zoom;
             float height = 1080f / Camera.Zoom;
             int num1 = 5;
-            float num2 = (float)Math.Floor((double)Camera.Left / (double)num1 - 1.0) * (float)num1;
-            float num3 = (float)Math.Floor((double)Camera.Top / (double)num1 - 1.0) * (float)num1;
+            float num2 = (float)Math.Floor((double)Camera.Left / num1 - 1.0) * num1;
+            float num3 = (float)Math.Floor((double)Camera.Top / num1 - 1.0) * num1;
             for (float num4 = num2;
-                (double)num4 <= (double)num2 + (double)width + 10.0; num4 += 5f)
+                num4 <= num2 + width + 10.0; num4 += 5f)
                 Draw.Line(num4, Camera.Top, num4, Camera.Top + height, gridColor);
             for (float num5 = num3;
-                (double)num5 <= (double)num3 + (double)height + 10.0; num5 += 5f)
+                num5 <= num3 + height + 10.0; num5 += 5f)
                 Draw.Line(Camera.Left, num5, Camera.Left + width, num5, gridColor);
             Draw.Line(0.0f, Camera.Top, 0.0f, Camera.Top + height, Color.DarkSlateBlue, 1f / Camera.Zoom);
             Draw.Line(Camera.Left, 0.0f, Camera.Left + width, 0.0f, Color.DarkSlateBlue, 1f / Camera.Zoom);
@@ -314,15 +316,15 @@ namespace Celeste.Editor
             }
             else if (mouseMode == MouseModes.Select)
                 Draw.Rect(GetMouseRect(mouseDragStart, mousePosition), Color.Lime * 0.25f);
-            if ((double)saveFlash > 0.0)
+            if (saveFlash > 0.0)
                 Draw.Rect(Camera.Left, Camera.Top, width, height, Color.White * Ease.CubeInOut(saveFlash));
-            if ((double)fade > 0.0)
+            if (fade > 0.0)
                 Draw.Rect(0.0f, 0.0f, 320f, 180f, Color.Black * fade);
             Draw.SpriteBatch.End();
-            Draw.SpriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, SamplerState.LinearClamp, DepthStencilState.None, RasterizerState.CullNone, (Effect)null, Engine.ScreenMatrix);
+            Draw.SpriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, SamplerState.LinearClamp, DepthStencilState.None, RasterizerState.CullNone, null, Engine.ScreenMatrix);
             Draw.Rect(0.0f, 0.0f, 1920f, 72f, Color.Black);
-            Vector2 position1 = new Vector2(16f, 4f);
-            Vector2 position2 = new Vector2(1904f, 4f);
+            Vector2 position1 = new(16f, 4f);
+            Vector2 position2 = new(1904f, 4f);
             if (MInput.Keyboard.Check(Keys.Q))
             {
                 Draw.Rect(-10f, -10f, 1940f, 1100f, Color.Black * 0.25f);
@@ -337,7 +339,7 @@ namespace Celeste.Editor
                             if (current.Strawberries != null && index < current.Strawberries.Count)
                             {
                                 Vector2 strawberry = current.Strawberries[index];
-                                ActiveFont.DrawOutline(current.StrawberryMetadata[index], (new Vector2((float)current.X + strawberry.X, (float)current.Y + strawberry.Y) - Camera.Position) * Camera.Zoom + new Vector2(960f, 532f), new Vector2(0.5f, 1f), Vector2.One * 1f, Color.Red, 2f, Color.Black);
+                                ActiveFont.DrawOutline(current.StrawberryMetadata[index], (new Vector2(current.X + strawberry.X, current.Y + strawberry.Y) - Camera.Position) * Camera.Zoom + new Vector2(960f, 532f), new Vector2(0.5f, 1f), Vector2.One * 1f, Color.Red, 2f, Color.Black);
                                 ++index;
                             }
                             else
@@ -360,13 +362,13 @@ namespace Celeste.Editor
             }
             else if (hovered.Count == 1)
             {
-                LevelTemplate levelTemplate = (LevelTemplate)null;
+                LevelTemplate levelTemplate = null;
                 using (HashSet<LevelTemplate>.Enumerator enumerator = hovered.GetEnumerator())
                 {
                     if (enumerator.MoveNext())
                         levelTemplate = enumerator.Current;
                 }
-                string text = levelTemplate.ActualWidth.ToString() + "x" + levelTemplate.ActualHeight.ToString() + "   " + (object)levelTemplate.X + "," + (object)levelTemplate.Y + "   " + (object)(levelTemplate.X * 8) + "," + (object)(levelTemplate.Y * 8);
+                string text = levelTemplate.ActualWidth.ToString() + "x" + levelTemplate.ActualHeight.ToString() + "   " + levelTemplate.X + "," + levelTemplate.Y + "   " + (levelTemplate.X * 8) + "," + (levelTemplate.Y * 8);
                 ActiveFont.Draw(levelTemplate.Name, position1, Color.Yellow);
                 Vector2 position3 = position2;
                 Vector2 unitX = Vector2.UnitX;
@@ -382,7 +384,7 @@ namespace Celeste.Editor
         private void LoadLevel(LevelTemplate level, Vector2 at)
         {
             Save();
-            Engine.Scene = (Scene)new LevelLoader(new Session(area)
+            Engine.Scene = new LevelLoader(new Session(area)
             {
                 FirstLevel = false,
                 Level = level.Name,
@@ -394,7 +396,7 @@ namespace Celeste.Editor
         {
             Vector2[] vector2Array = new Vector2[levels.Count];
             for (int index = 0; index < levels.Count; ++index)
-                vector2Array[index] = new Vector2((float)levels[index].X, (float)levels[index].Y);
+                vector2Array[index] = new Vector2(levels[index].X, levels[index].Y);
             undoStack.Add(vector2Array);
             while (undoStack.Count > 30)
                 undoStack.RemoveAt(0);
@@ -407,7 +409,7 @@ namespace Celeste.Editor
                 return;
             Vector2[] vector2Array = new Vector2[levels.Count];
             for (int index = 0; index < levels.Count; ++index)
-                vector2Array[index] = new Vector2((float)levels[index].X, (float)levels[index].Y);
+                vector2Array[index] = new Vector2(levels[index].X, levels[index].Y);
             redoStack.Add(vector2Array);
             Vector2[] undo = undoStack[undoStack.Count - 1];
             undoStack.RemoveAt(undoStack.Count - 1);
@@ -424,7 +426,7 @@ namespace Celeste.Editor
                 return;
             Vector2[] vector2Array = new Vector2[levels.Count];
             for (int index = 0; index < levels.Count; ++index)
-                vector2Array[index] = new Vector2((float)levels[index].X, (float)levels[index].Y);
+                vector2Array[index] = new Vector2(levels[index].X, levels[index].Y);
             undoStack.Add(vector2Array);
             Vector2[] redo = redoStack[undoStack.Count - 1];
             redoStack.RemoveAt(undoStack.Count - 1);
@@ -437,9 +439,9 @@ namespace Celeste.Editor
 
         private Rectangle GetMouseRect(Vector2 a, Vector2 b)
         {
-            Vector2 vector2_1 = new Vector2(Math.Min(a.X, b.X), Math.Min(a.Y, b.Y));
-            Vector2 vector2_2 = new Vector2(Math.Max(a.X, b.X), Math.Max(a.Y, b.Y));
-            return new Rectangle((int)vector2_1.X, (int)vector2_1.Y, (int)((double)vector2_2.X - (double)vector2_1.X), (int)((double)vector2_2.Y - (double)vector2_1.Y));
+            Vector2 vector2_1 = new(Math.Min(a.X, b.X), Math.Min(a.Y, b.Y));
+            Vector2 vector2_2 = new(Math.Max(a.X, b.X), Math.Max(a.Y, b.Y));
+            return new Rectangle((int)vector2_1.X, (int)vector2_1.Y, (int)(vector2_2.X - vector2_1.X), (int)(vector2_2.Y - vector2_1.Y));
         }
 
         private LevelTemplate TestCheck(Vector2 point)
@@ -449,7 +451,7 @@ namespace Celeste.Editor
                 if (!level.Dummy && level.Check(point))
                     return level;
             }
-            return (LevelTemplate)null;
+            return null;
         }
 
         private bool LevelCheck(Vector2 point)

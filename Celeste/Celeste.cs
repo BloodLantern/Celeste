@@ -26,7 +26,7 @@ namespace Celeste
         const int TargetWidth = 1920;
         public
         const int TargetHeight = 1080;
-        public static Celeste.PlayModes PlayMode = Celeste.PlayModes.Normal;
+        public static PlayModes PlayMode = PlayModes.Normal;
         public
         const string EventName = "";
         public
@@ -38,19 +38,19 @@ namespace Celeste
         public static VirtualRenderTarget WipeTarget;
         public static DisconnectedControllerUI DisconnectUI;
         private bool firstLoad = true;
-        public AutoSplitterInfo AutoSplitterInfo = new AutoSplitterInfo();
+        public AutoSplitterInfo AutoSplitterInfo = new();
         public static Coroutine SaveRoutine;
         public static Stopwatch LoadTimer;
-        public static readonly AppId_t SteamID = new AppId_t(504230U);
+        public static readonly AppId_t SteamID = new(504230U);
         private static int _mainThreadId;
-        private static MapEditor editor;
+        private static readonly MapEditor editor;
 
         public static Vector2 TargetCenter => new Vector2(1920f, 1080f) / 2f;
 
         public Celeste() : base(1920, 1080, 960, 540, nameof(Celeste), Settings.Instance.Fullscreen, Settings.Instance.VSync)
         {
             this.Version = new System.Version(1, 4, 0, 0);
-            Celeste.Instance = this;
+            Instance = this;
             Engine.ExitOnEscapeKeypress = false;
             this.IsFixedTimeStep = true;
             //Stats.MakeRequest();
@@ -68,7 +68,7 @@ namespace Celeste
             SFX.Initialize();
             Tags.Initialize();
             Input.Initialize();
-            Engine.Commands.Enabled = Celeste.PlayMode == Celeste.PlayModes.Debug;
+            Engine.Commands.Enabled = PlayMode == PlayModes.Debug;
             Engine.Scene = (Scene)new GameLoader();
         }
 
@@ -76,13 +76,13 @@ namespace Celeste
         {
             base.LoadContent();
             Console.WriteLine("BEGIN LOAD");
-            Celeste.LoadTimer = Stopwatch.StartNew();
+            LoadTimer = Stopwatch.StartNew();
             PlaybackData.Load();
             if (this.firstLoad)
             {
                 this.firstLoad = false;
-                Celeste.HudTarget = VirtualContent.CreateRenderTarget("hud-target", 1922, 1082);
-                Celeste.WipeTarget = VirtualContent.CreateRenderTarget("wipe-target", 1922, 1082);
+                HudTarget = VirtualContent.CreateRenderTarget("hud-target", 1922, 1082);
+                WipeTarget = VirtualContent.CreateRenderTarget("wipe-target", 1922, 1082);
                 OVR.Load();
                 GFX.Load();
                 MTN.Load();
@@ -98,8 +98,7 @@ namespace Celeste
         protected override void Update(GameTime gameTime)
         {
             //SteamAPI.RunCallbacks();
-            if (Celeste.SaveRoutine != null)
-                Celeste.SaveRoutine.Update();
+            SaveRoutine?.Update();
             this.AutoSplitterInfo.Update();
             Audio.Update();
             //editor.Update();
@@ -110,7 +109,7 @@ namespace Celeste
 
         protected override void OnSceneTransition(Scene last, Scene next)
         {
-            if (!(last is OverworldLoader) || !(next is Overworld))
+            if (last is not OverworldLoader || next is not Overworld)
                 base.OnSceneTransition(last, next);
             Engine.TimeRate = 1f;
             Audio.PauseGameplaySfx = false;
@@ -123,9 +122,9 @@ namespace Celeste
         protected override void RenderCore()
         {
             base.RenderCore();
-            if (Celeste.DisconnectUI == null)
+            if (DisconnectUI == null)
                 return;
-            Celeste.DisconnectUI.Render();
+            DisconnectUI.Render();
         }
 
         public static void Freeze(float time)
@@ -138,16 +137,16 @@ namespace Celeste
             Engine.Scene.Tracker.GetEntity<CassetteBlockManager>()?.AdvanceMusic(time);
         }
 
-        public static bool IsMainThread => Thread.CurrentThread.ManagedThreadId == Celeste._mainThreadId;
+        public static bool IsMainThread => Thread.CurrentThread.ManagedThreadId == _mainThreadId;
 
         private static void Main(string[] args)
         {
             Celeste celeste;
             try
             {
-                Celeste._mainThreadId = Thread.CurrentThread.ManagedThreadId;
+                _mainThreadId = Thread.CurrentThread.ManagedThreadId;
                 Settings.Initialize();
-                /*if (SteamAPI.RestartAppIfNecessary(Celeste.SteamID))
+                /*if (SteamAPI.RestartAppIfNecessary(SteamID))
                   return;
                 if (!SteamAPI.Init())
                 {
@@ -203,9 +202,13 @@ namespace Celeste
             ReloadGraphics(hires);
         }
 
-        public static void ReloadLevels(AreaKey? area = null) { }
-
-        public static void ReloadGraphics(bool hires) { }
+        public static void ReloadLevels(AreaKey? area = null)
+        {
+            if (area is null)
+            {
+                throw new ArgumentNullException(nameof(area));
+            }
+        }
 
         public static void ReloadPortraits() { }
 
@@ -213,15 +216,17 @@ namespace Celeste
 
         private static void CallProcess(string path, string args = "", bool createWindow = false)
         {
-            Process process = new Process();
-            process.StartInfo = new ProcessStartInfo()
+            Process process = new()
             {
-                FileName = path,
-                WorkingDirectory = Path.GetDirectoryName(path),
-                RedirectStandardOutput = false,
-                CreateNoWindow = !createWindow,
-                UseShellExecute = false,
-                Arguments = args
+                StartInfo = new ProcessStartInfo()
+                {
+                    FileName = path,
+                    WorkingDirectory = Path.GetDirectoryName(path),
+                    RedirectStandardOutput = false,
+                    CreateNoWindow = !createWindow,
+                    UseShellExecute = false,
+                    Arguments = args
+                }
             };
             process.Start();
             process.WaitForExit();

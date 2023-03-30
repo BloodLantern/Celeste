@@ -8,6 +8,7 @@ using Celeste;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
+using Steamworks;
 using System;
 using System.IO;
 using System.Reflection;
@@ -360,5 +361,7 @@ namespace Monocle
                 MaxDepth = 1f
             };
         }
+
+        public static void ReloadGraphics(bool hires) { }
     }
 }

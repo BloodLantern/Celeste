@@ -32,8 +32,8 @@ namespace Celeste.Editor
         public int EditorColorIndex;
         private Vector2 moveAnchor;
         private Vector2 resizeAnchor;
-        private List<Rectangle> solids = new();
-        private List<Rectangle> backs = new();
+        private readonly List<Rectangle> solids = new();
+        private readonly List<Rectangle> backs = new();
         private static readonly Color bgTilesColor = Color.DarkSlateGray * 0.5f;
         private static readonly Color[] fgTilesColor = new Color[7] {
             Color.White,
@@ -52,7 +52,7 @@ namespace Celeste.Editor
         private static readonly Color dummyInactiveBorderColor = Color.DarkOrange;
         private static readonly Color firstBorderColor = Color.Aqua;
 
-        private Vector2 resizeHoldSize => new Vector2(Math.Min(Width, 4), Math.Min(Height, 4));
+        private Vector2 ResizeHoldSize => new(Math.Min(Width, 4), Math.Min(Height, 4));
 
         public LevelTemplate(LevelData data)
         {
@@ -128,6 +128,11 @@ namespace Celeste.Editor
 
         public void RenderContents(Camera camera, List<LevelTemplate> allLevels)
         {
+            if (camera is null)
+            {
+                throw new ArgumentNullException(nameof(camera));
+            }
+
             if (Type == LevelTemplateType.Level)
             {
                 bool flag = false;
@@ -159,7 +164,7 @@ namespace Celeste.Editor
             else
             {
                 Draw.Rect(X, Y, Width, Height, dummyFgTilesColor);
-                Draw.Rect((X + Width) - resizeHoldSize.X, (Y + Height) - resizeHoldSize.Y, resizeHoldSize.X, resizeHoldSize.Y, Color.Orange);
+                Draw.Rect((X + Width) - ResizeHoldSize.X, (Y + Height) - ResizeHoldSize.Y, ResizeHoldSize.X, ResizeHoldSize.Y, Color.Orange);
             }
         }
 
@@ -248,9 +253,9 @@ namespace Celeste.Editor
             ActualHeight = Height * 8;
         }
 
-        public bool ResizePosition(Vector2 mouse) => mouse.X > (X + Width) - resizeHoldSize.X && mouse.Y > (Y + Height) - resizeHoldSize.Y && mouse.X < (X + Width) && mouse.Y < (Y + Height);
+        public bool ResizePosition(Vector2 mouse) => mouse.X > (X + Width) - ResizeHoldSize.X && mouse.Y > (Y + Height) - ResizeHoldSize.Y && mouse.X < (X + Width) && mouse.Y < (Y + Height);
 
-        public Rectangle Rect => new Rectangle(X, Y, Width, Height);
+        public Rectangle Rect => new(X, Y, Width, Height);
 
         public int Left
         {
