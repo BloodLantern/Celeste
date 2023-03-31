@@ -84,7 +84,7 @@ namespace Celeste
             float edgeDepth,
             Color edgeColor,
             float stroke = 0.0f,
-            Color strokeColor = default (Color))
+            Color strokeColor = default)
         {
             ActiveFont.Draw(text, position, justify, scale, color, edgeDepth, edgeColor, stroke, strokeColor);
         }

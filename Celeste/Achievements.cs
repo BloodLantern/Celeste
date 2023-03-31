@@ -14,8 +14,7 @@ namespace Celeste
 
         public static bool Has(Achievement achievement)
         {
-            bool flag;
-            return SteamUserStats.GetAchievement(Achievements.ID(achievement), out flag) & flag;
+            return SteamUserStats.GetAchievement(Achievements.ID(achievement), out bool flag) & flag;
         }
 
         public static void Register(Achievement achievement)

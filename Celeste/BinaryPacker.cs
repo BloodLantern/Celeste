@@ -14,12 +14,12 @@ namespace Celeste
 {
     public static class BinaryPacker
     {
-        public static readonly HashSet<string> IgnoreAttributes = new HashSet<string>() {
+        public static readonly HashSet<string> IgnoreAttributes = new() {
             "_eid"
         };
         public static string InnerTextAttributeName = "innerText";
         public static string OutputFileExtension = ".bin";
-        private static Dictionary<string, short> stringValue = new Dictionary<string, short>();
+        private static readonly Dictionary<string, short> stringValue = new();
         private static string[] stringLookup;
         private static short stringCounter;
 
@@ -31,7 +31,7 @@ namespace Celeste
             filename.Replace(extension, OutputFileExtension);
             XmlDocument xmlDocument = new();
             xmlDocument.Load(filename);
-            XmlElement rootElement = (XmlElement)null;
+            XmlElement rootElement = null;
             foreach (object childNode in xmlDocument.ChildNodes)
             {
                 if (childNode is XmlElement)
@@ -49,17 +49,15 @@ namespace Celeste
             stringCounter = 0;
             CreateLookupTable(rootElement);
             AddLookupValue(InnerTextAttributeName);
-            using (FileStream output = new FileStream(outfilename, FileMode.Create))
-            {
-                BinaryWriter writer = new BinaryWriter(output);
-                writer.Write("CELESTE MAP");
-                writer.Write(Path.GetFileNameWithoutExtension(outfilename));
-                writer.Write(stringValue.Count);
-                foreach (KeyValuePair<string, short> keyValuePair in stringValue)
-                    writer.Write(keyValuePair.Key);
-                WriteElement(writer, rootElement);
-                writer.Flush();
-            }
+            using FileStream output = new(outfilename, FileMode.Create);
+            BinaryWriter writer = new(output);
+            writer.Write("CELESTE MAP");
+            writer.Write(Path.GetFileNameWithoutExtension(outfilename));
+            writer.Write(stringValue.Count);
+            foreach (KeyValuePair<string, short> keyValuePair in stringValue)
+                writer.Write(keyValuePair.Key);
+            WriteElement(writer, rootElement);
+            writer.Flush();
         }
 
         private static void CreateLookupTable(XmlElement element)

@@ -17,14 +17,14 @@ namespace Celeste
     {
         public AreaKey Area;
         public Vector2? RespawnPoint;
-        public AudioState Audio = new AudioState();
+        public AudioState Audio = new();
         public PlayerInventory Inventory;
-        public HashSet<string> Flags = new HashSet<string>();
-        public HashSet<string> LevelFlags = new HashSet<string>();
-        public HashSet<EntityID> Strawberries = new HashSet<EntityID>();
-        public HashSet<EntityID> DoNotLoad = new HashSet<EntityID>();
-        public HashSet<EntityID> Keys = new HashSet<EntityID>();
-        public List<Session.Counter> Counters = new List<Session.Counter>();
+        public HashSet<string> Flags = new();
+        public HashSet<string> LevelFlags = new();
+        public HashSet<EntityID> Strawberries = new();
+        public HashSet<EntityID> DoNotLoad = new();
+        public HashSet<EntityID> Keys = new();
+        public List<Counter> Counters = new();
         public bool[] SummitGems = new bool[6];
         public AreaStats OldStats;
         public bool UnlockedCSide;
@@ -65,7 +65,7 @@ namespace Celeste
         [XmlAttribute]
         public float DarkRoomAlpha = 0.75f;
         [XmlAttribute]
-        public Session.CoreModes CoreMode;
+        public CoreModes CoreMode;
         [XmlAttribute]
         public bool GrabbedGolden;
         [XmlAttribute]
@@ -74,137 +74,137 @@ namespace Celeste
         [NonSerialized]
         public bool JustStarted;
 
-        public MapData MapData => AreaData.Areas[this.Area.ID].Mode[(int) this.Area.Mode].MapData;
+        public MapData MapData => AreaData.Areas[Area.ID].Mode[(int) Area.Mode].MapData;
 
         private Session()
         {
-            this.JustStarted = true;
-            this.InArea = true;
+            JustStarted = true;
+            InArea = true;
         }
 
         public Session(AreaKey area, string checkpoint = null, AreaStats oldStats = null)
             : this()
         {
-            this.Area = area;
-            this.StartCheckpoint = checkpoint;
-            this.ColorGrade = this.MapData.Data.ColorGrade;
-            this.Dreaming = AreaData.Areas[area.ID].Dreaming;
-            this.Inventory = AreaData.GetCheckpointInventory(area, checkpoint);
-            this.CoreMode = AreaData.Areas[area.ID].CoreMode;
-            this.FirstLevel = true;
-            this.Audio = this.MapData.ModeData.AudioState.Clone();
-            if (this.StartCheckpoint == null)
+            Area = area;
+            StartCheckpoint = checkpoint;
+            ColorGrade = MapData.Data.ColorGrade;
+            Dreaming = AreaData.Areas[area.ID].Dreaming;
+            Inventory = AreaData.GetCheckpointInventory(area, checkpoint);
+            CoreMode = AreaData.Areas[area.ID].CoreMode;
+            FirstLevel = true;
+            Audio = MapData.ModeData.AudioState.Clone();
+            if (StartCheckpoint == null)
             {
-                this.Level = this.MapData.StartLevel().Name;
-                this.StartedFromBeginning = true;
+                Level = MapData.StartLevel().Name;
+                StartedFromBeginning = true;
             }
             else
             {
-                this.Level = this.StartCheckpoint;
-                this.StartedFromBeginning = false;
-                this.Dreaming = AreaData.GetCheckpointDreaming(area, checkpoint);
-                this.CoreMode = AreaData.GetCheckpointCoreMode(area, checkpoint);
+                Level = StartCheckpoint;
+                StartedFromBeginning = false;
+                Dreaming = AreaData.GetCheckpointDreaming(area, checkpoint);
+                CoreMode = AreaData.GetCheckpointCoreMode(area, checkpoint);
                 AudioState checkpointAudioState = AreaData.GetCheckpointAudioState(area, checkpoint);
                 if (checkpointAudioState != null)
                 {
                     if (checkpointAudioState.Music != null)
-                        this.Audio.Music = checkpointAudioState.Music.Clone();
+                        Audio.Music = checkpointAudioState.Music.Clone();
                     if (checkpointAudioState.Ambience != null)
-                        this.Audio.Ambience = checkpointAudioState.Ambience.Clone();
+                        Audio.Ambience = checkpointAudioState.Ambience.Clone();
                 }
                 string checkpointColorGrading = AreaData.GetCheckpointColorGrading(area, checkpoint);
                 if (checkpointColorGrading != null)
-                    this.ColorGrade = checkpointColorGrading;
+                    ColorGrade = checkpointColorGrading;
                 CheckpointData checkpoint1 = AreaData.GetCheckpoint(area, checkpoint);
                 if (checkpoint1 != null && checkpoint1.Flags != null)
                 {
                     foreach (string flag in checkpoint1.Flags)
-                        this.SetFlag(flag);
+                        SetFlag(flag);
                 }
             }
             if (oldStats != null)
-                this.OldStats = oldStats;
+                OldStats = oldStats;
             else
-                this.OldStats = SaveData.Instance.Areas[this.Area.ID].Clone();
+                OldStats = SaveData.Instance.Areas[Area.ID].Clone();
         }
 
-        public LevelData LevelData => this.MapData.Get(this.Level);
+        public LevelData LevelData => MapData.Get(Level);
 
         public bool FullClear
         {
             get
             {
-                if (this.Area.Mode != AreaMode.Normal || !this.Cassette || !this.HeartGem || this.Strawberries.Count < this.MapData.DetectedStrawberries)
+                if (Area.Mode != AreaMode.Normal || !Cassette || !HeartGem || Strawberries.Count < MapData.DetectedStrawberries)
                     return false;
-                return this.Area.ID != 7 || this.HasAllSummitGems;
+                return Area.ID != 7 || HasAllSummitGems;
             }
         }
 
-        public bool ShouldAdvance => this.Area.Mode == AreaMode.Normal && !this.OldStats.Modes[0].Completed && this.Area.ID < SaveData.Instance.MaxArea;
+        public bool ShouldAdvance => Area.Mode == AreaMode.Normal && !OldStats.Modes[0].Completed && Area.ID < SaveData.Instance.MaxArea;
 
         public Session Restart(string intoLevel = null)
         {
-            Session session = new Session(this.Area, this.StartCheckpoint, this.OldStats)
+            Session session = new(Area, StartCheckpoint, OldStats)
             {
-                UnlockedCSide = this.UnlockedCSide
+                UnlockedCSide = UnlockedCSide
             };
             if (intoLevel != null)
             {
                 session.Level = intoLevel;
-                if (intoLevel != this.MapData.StartLevel().Name)
+                if (intoLevel != MapData.StartLevel().Name)
                     session.StartedFromBeginning = false;
             }
             return session;
         }
 
-        public void UpdateLevelStartDashes() => this.DashesAtLevelStart = this.Dashes;
+        public void UpdateLevelStartDashes() => DashesAtLevelStart = Dashes;
 
         public bool HasAllSummitGems
         {
             get
             {
-                for (int index = 0; index < this.SummitGems.Length; ++index)
+                for (int index = 0; index < SummitGems.Length; ++index)
                 {
-                    if (!this.SummitGems[index])
+                    if (!SummitGems[index])
                         return false;
                 }
                 return true;
             }
         }
 
-        public Vector2 GetSpawnPoint(Vector2 from) => this.LevelData.Spawns.ClosestTo(from);
+        public Vector2 GetSpawnPoint(Vector2 from) => LevelData.Spawns.ClosestTo(from);
 
-        public bool GetFlag(string flag) => this.Flags.Contains(flag);
+        public bool GetFlag(string flag) => Flags.Contains(flag);
 
         public void SetFlag(string flag, bool setTo = true)
         {
             if (setTo)
-                this.Flags.Add(flag);
+                Flags.Add(flag);
             else
-                this.Flags.Remove(flag);
+                Flags.Remove(flag);
         }
 
         public int GetCounter(string counter)
         {
-            for (int index = 0; index < this.Counters.Count; ++index)
+            for (int index = 0; index < Counters.Count; ++index)
             {
-                if (this.Counters[index].Key.Equals(counter))
-                    return this.Counters[index].Value;
+                if (Counters[index].Key.Equals(counter))
+                    return Counters[index].Value;
             }
             return 0;
         }
 
         public void SetCounter(string counter, int value)
         {
-            for (int index = 0; index < this.Counters.Count; ++index)
+            for (int index = 0; index < Counters.Count; ++index)
             {
-                if (this.Counters[index].Key.Equals(counter))
+                if (Counters[index].Key.Equals(counter))
                 {
-                    this.Counters[index].Value = value;
+                    Counters[index].Value = value;
                     return;
                 }
             }
-            this.Counters.Add(new Session.Counter()
+            Counters.Add(new Counter()
             {
                 Key = counter,
                 Value = value
@@ -213,22 +213,22 @@ namespace Celeste
 
         public void IncrementCounter(string counter)
         {
-            for (int index = 0; index < this.Counters.Count; ++index)
+            for (int index = 0; index < Counters.Count; ++index)
             {
-                if (this.Counters[index].Key.Equals(counter))
+                if (Counters[index].Key.Equals(counter))
                 {
-                    ++this.Counters[index].Value;
+                    ++Counters[index].Value;
                     return;
                 }
             }
-            this.Counters.Add(new Session.Counter()
+            Counters.Add(new Counter()
             {
                 Key = counter,
                 Value = 1
             });
         }
 
-        public bool GetLevelFlag(string level) => this.LevelFlags.Contains(level);
+        public bool GetLevelFlag(string level) => LevelFlags.Contains(level);
 
         [Serializable]
         public class Counter
