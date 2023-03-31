@@ -14,14 +14,14 @@ namespace Celeste
 
         public static bool Has(Achievement achievement)
         {
-            return SteamUserStats.GetAchievement(Achievements.ID(achievement), out bool flag) & flag;
+            return SteamUserStats.GetAchievement(ID(achievement), out bool flag) & flag;
         }
 
         public static void Register(Achievement achievement)
         {
-            if (Achievements.Has(achievement))
+            if (Has(achievement))
                 return;
-            SteamUserStats.SetAchievement(Achievements.ID(achievement));
+            SteamUserStats.SetAchievement(ID(achievement));
             Stats.Store();
         }
     }

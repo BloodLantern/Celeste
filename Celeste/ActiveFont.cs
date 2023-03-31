@@ -13,19 +13,31 @@ namespace Celeste
     {
         public static PixelFont Font => Fonts.Get(Dialog.Language.FontFace);
 
-        public static PixelFontSize FontSize => ActiveFont.Font.Get(ActiveFont.BaseSize);
+        public static PixelFontSize FontSize => Font.Get(BaseSize);
 
         public static float BaseSize => Dialog.Language.FontFaceSize;
 
-        public static float LineHeight => (float) ActiveFont.Font.Get(ActiveFont.BaseSize).LineHeight;
+        public static float LineHeight => Font.Get(BaseSize).LineHeight;
 
-        public static Vector2 Measure(char text) => ActiveFont.Font.Get(ActiveFont.BaseSize).Measure(text);
+        public static Vector2 Measure(char text)
+        {
+            return Font.Get(BaseSize).Measure(text);
+        }
 
-        public static Vector2 Measure(string text) => ActiveFont.Font.Get(ActiveFont.BaseSize).Measure(text);
+        public static Vector2 Measure(string text)
+        {
+            return Font.Get(BaseSize).Measure(text);
+        }
 
-        public static float WidthToNextLine(string text, int start) => ActiveFont.Font.Get(ActiveFont.BaseSize).WidthToNextLine(text, start);
+        public static float WidthToNextLine(string text, int start)
+        {
+            return Font.Get(BaseSize).WidthToNextLine(text, start);
+        }
 
-        public static float HeightOf(string text) => ActiveFont.Font.Get(ActiveFont.BaseSize).HeightOf(text);
+        public static float HeightOf(string text)
+        {
+            return Font.Get(BaseSize).HeightOf(text);
+        }
 
         public static void Draw(
             char character,
@@ -34,7 +46,7 @@ namespace Celeste
             Vector2 scale,
             Color color)
         {
-            ActiveFont.Font.Draw(ActiveFont.BaseSize, character, position, justify, scale, color);
+            Font.Draw(BaseSize, character, position, justify, scale, color);
         }
 
         private static void Draw(
@@ -48,10 +60,13 @@ namespace Celeste
             float stroke,
             Color strokeColor)
         {
-            ActiveFont.Font.Draw(ActiveFont.BaseSize, text, position, justify, scale, color, edgeDepth, edgeColor, stroke, strokeColor);
+            Font.Draw(BaseSize, text, position, justify, scale, color, edgeDepth, edgeColor, stroke, strokeColor);
         }
 
-        public static void Draw(string text, Vector2 position, Color color) => ActiveFont.Draw(text, position, Vector2.Zero, Vector2.One, color, 0.0f, Color.Transparent, 0.0f, Color.Transparent);
+        public static void Draw(string text, Vector2 position, Color color)
+        {
+            Draw(text, position, Vector2.Zero, Vector2.One, color, 0.0f, Color.Transparent, 0.0f, Color.Transparent);
+        }
 
         public static void Draw(
             string text,
@@ -60,7 +75,7 @@ namespace Celeste
             Vector2 scale,
             Color color)
         {
-            ActiveFont.Draw(text, position, justify, scale, color, 0.0f, Color.Transparent, 0.0f, Color.Transparent);
+            Draw(text, position, justify, scale, color, 0.0f, Color.Transparent, 0.0f, Color.Transparent);
         }
 
         public static void DrawOutline(
@@ -72,7 +87,7 @@ namespace Celeste
             float stroke,
             Color strokeColor)
         {
-            ActiveFont.Draw(text, position, justify, scale, color, 0.0f, Color.Transparent, stroke, strokeColor);
+            Draw(text, position, justify, scale, color, 0.0f, Color.Transparent, stroke, strokeColor);
         }
 
         public static void DrawEdgeOutline(
@@ -86,7 +101,7 @@ namespace Celeste
             float stroke = 0.0f,
             Color strokeColor = default)
         {
-            ActiveFont.Draw(text, position, justify, scale, color, edgeDepth, edgeColor, stroke, strokeColor);
+            Draw(text, position, justify, scale, color, edgeDepth, edgeColor, stroke, strokeColor);
         }
     }
 }

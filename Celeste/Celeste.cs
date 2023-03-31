@@ -4,7 +4,15 @@
 // MVID: FAF6CA25-5C06-43EB-A08F-9CCF291FE6A3
 // Assembly location: C:\Program Files (x86)\Steam\steamapps\common\Celeste\orig\Celeste.exe
 
+// Enables all the steam-related code, which prevents us from debugging in VS
+//#define STEAM
+
+// Instantiates and updates the developers' map editor
+//#define EDITOR
+
+#if EDITOR
 using Celeste.Editor;
+#endif
 using Celeste.Pico8;
 using Microsoft.Xna.Framework;
 using Monocle;
@@ -18,21 +26,14 @@ namespace Celeste
 {
     public class Celeste : Engine
     {
-        public
-        const int GameWidth = 320;
-        public
-        const int GameHeight = 180;
-        public
-        const int TargetWidth = 1920;
-        public
-        const int TargetHeight = 1080;
+        public const int GameWidth = 320;
+        public const int GameHeight = 180;
+        public const int TargetWidth = 1920;
+        public const int TargetHeight = 1080;
         public static PlayModes PlayMode = PlayModes.Normal;
-        public
-        const string EventName = "";
-        public
-        const bool Beta = false;
-        public
-        const string PLATFORM = "PC";
+        public const string EventName = "";
+        public const bool Beta = false;
+        public const string PLATFORM = "PC";
         public static new Celeste Instance;
         public static VirtualRenderTarget HudTarget;
         public static VirtualRenderTarget WipeTarget;
@@ -43,19 +44,23 @@ namespace Celeste
         public static Stopwatch LoadTimer;
         public static readonly AppId_t SteamID = new(504230U);
         private static int _mainThreadId;
+#if EDITOR
         private static readonly MapEditor editor;
+#endif
 
-        public static Vector2 TargetCenter => new Vector2(1920f, 1080f) / 2f;
+        public static Vector2 TargetCenter => new Vector2(TargetWidth, TargetHeight) / 2f;
 
-        public Celeste() : base(1920, 1080, 960, 540, nameof(Celeste), Settings.Instance.Fullscreen, Settings.Instance.VSync)
+        public Celeste() : base(TargetWidth, TargetHeight, 960, 540, nameof(Celeste), Settings.Instance.Fullscreen, Settings.Instance.VSync)
         {
-            this.Version = new System.Version(1, 4, 0, 0);
+            Version = new System.Version(1, 4, 0, 0);
             Instance = this;
-            Engine.ExitOnEscapeKeypress = false;
-            this.IsFixedTimeStep = true;
-            //Stats.MakeRequest();
+            ExitOnEscapeKeypress = false;
+            IsFixedTimeStep = true;
+#if STEAM
+            Stats.MakeRequest();
+#endif
             StatsForStadia.MakeRequest();
-            Console.WriteLine("CELESTE : " + (object)this.Version);
+            Console.WriteLine("CELESTE : " + (object)Version);
         }
 
         protected override void Initialize()
@@ -63,13 +68,13 @@ namespace Celeste
             base.Initialize();
             Settings.Instance.AfterLoad();
             if (Settings.Instance.Fullscreen)
-                Engine.ViewPadding = Settings.Instance.ViewportPadding;
+                ViewPadding = Settings.Instance.ViewportPadding;
             Settings.Instance.ApplyScreen();
             SFX.Initialize();
             Tags.Initialize();
             Input.Initialize();
-            Engine.Commands.Enabled = PlayMode == PlayModes.Debug;
-            Engine.Scene = (Scene)new GameLoader();
+            Commands.Enabled = PlayMode == PlayModes.Debug;
+            Scene = new GameLoader();
         }
 
         protected override void LoadContent()
@@ -78,9 +83,9 @@ namespace Celeste
             Console.WriteLine("BEGIN LOAD");
             LoadTimer = Stopwatch.StartNew();
             PlaybackData.Load();
-            if (this.firstLoad)
+            if (firstLoad)
             {
-                this.firstLoad = false;
+                firstLoad = false;
                 HudTarget = VirtualContent.CreateRenderTarget("hud-target", 1922, 1082);
                 WipeTarget = VirtualContent.CreateRenderTarget("wipe-target", 1922, 1082);
                 OVR.Load();
@@ -97,12 +102,16 @@ namespace Celeste
 
         protected override void Update(GameTime gameTime)
         {
-            //SteamAPI.RunCallbacks();
+#if STEAM
+            SteamAPI.RunCallbacks();
+#endif
             SaveRoutine?.Update();
-            this.AutoSplitterInfo.Update();
+            AutoSplitterInfo.Update();
             Audio.Update();
-            //editor.Update();
-            //editor.Render();
+#if EDITOR
+            editor.Update();
+            editor.Render();
+#endif
             base.Update(gameTime);
             Input.UpdateGrab();
         }
@@ -111,7 +120,7 @@ namespace Celeste
         {
             if (last is not OverworldLoader || next is not Overworld)
                 base.OnSceneTransition(last, next);
-            Engine.TimeRate = 1f;
+            TimeRate = 1f;
             Audio.PauseGameplaySfx = false;
             Audio.SetMusicParam("fade", 1f);
             Distort.Anxiety = 0.0f;
@@ -129,12 +138,12 @@ namespace Celeste
 
         public static void Freeze(float time)
         {
-            if ((double)Engine.FreezeTimer >= (double)time)
+            if (FreezeTimer >= time)
                 return;
-            Engine.FreezeTimer = time;
-            if (Engine.Scene == null)
+            FreezeTimer = time;
+            if (Scene == null)
                 return;
-            Engine.Scene.Tracker.GetEntity<CassetteBlockManager>()?.AdvanceMusic(time);
+            Scene.Tracker.GetEntity<CassetteBlockManager>()?.AdvanceMusic(time);
         }
 
         public static bool IsMainThread => Thread.CurrentThread.ManagedThreadId == _mainThreadId;
@@ -146,7 +155,8 @@ namespace Celeste
             {
                 _mainThreadId = Thread.CurrentThread.ManagedThreadId;
                 Settings.Initialize();
-                /*if (SteamAPI.RestartAppIfNecessary(SteamID))
+#if STEAM
+                if (SteamAPI.RestartAppIfNecessary(SteamID))
                   return;
                 if (!SteamAPI.Init())
                 {
@@ -155,7 +165,8 @@ namespace Celeste
                   return;
                 }
                 if (!Settings.Existed)
-                  Settings.Instance.Language = SteamApps.GetCurrentGameLanguage();*/
+                  Settings.Instance.Language = SteamApps.GetCurrentGameLanguage();
+#endif
                 int num = Settings.Existed ? 1 : 0;
                 for (int index = 0; index < args.Length - 1; ++index)
                 {
@@ -186,7 +197,9 @@ namespace Celeste
                     return;
                 }
             }
-            //editor = new MapEditor(new AreaKey(9));
+#if EDITOR
+            editor = new MapEditor(new AreaKey(9));
+#endif
             celeste.RunWithLogging();
             RunThread.WaitAll();
             celeste.Dispose();
@@ -234,10 +247,10 @@ namespace Celeste
 
         public static bool PauseAnywhere()
         {
-            switch (Engine.Scene)
+            switch (Scene)
             {
                 case Level _:
-                    Level scene1 = Engine.Scene as Level;
+                    Level scene1 = Scene as Level;
                     if (scene1.CanPause)
                     {
                         scene1.Pause();
@@ -245,7 +258,7 @@ namespace Celeste
                     }
                     break;
                 case Emulator _:
-                    Emulator scene2 = Engine.Scene as Emulator;
+                    Emulator scene2 = Scene as Emulator;
                     if (scene2.CanPause)
                     {
                         scene2.CreatePauseMenu();
@@ -253,7 +266,7 @@ namespace Celeste
                     }
                     break;
                 case IntroVignette _:
-                    IntroVignette scene3 = Engine.Scene as IntroVignette;
+                    IntroVignette scene3 = Scene as IntroVignette;
                     if (scene3.CanPause)
                     {
                         scene3.OpenMenu();
@@ -261,7 +274,7 @@ namespace Celeste
                     }
                     break;
                 case CoreVignette _:
-                    CoreVignette scene4 = Engine.Scene as CoreVignette;
+                    CoreVignette scene4 = Scene as CoreVignette;
                     if (scene4.CanPause)
                     {
                         scene4.OpenMenu();

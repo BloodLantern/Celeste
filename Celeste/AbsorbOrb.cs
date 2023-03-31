@@ -22,7 +22,7 @@ namespace Celeste
         private Vector2 burstDirection;
         //private Vector2 burstScale;
         private float alpha = 1f;
-        private readonly Monocle.Image sprite;
+        private readonly Image sprite;
         //private readonly BloomPoint bloom;
 
         public AbsorbOrb(Vector2 position, Entity into = null, Vector2? absorbTarget = null)
@@ -32,10 +32,10 @@ namespace Celeste
             Position = position;
             Tag = (int) Tags.FrozenUpdate;
             Depth = -2000000;
-            consumeDelay = (float) (0.699999988079071 + Calc.Random.NextFloat() * 0.30000001192092896);
-            burstSpeed = (float) (80.0 + Calc.Random.NextFloat() * 40.0);
-            burstDirection = Calc.AngleToVector(Calc.Random.NextFloat() * 6.28318548f, 1f);
-            Add(sprite = new Monocle.Image(GFX.Game["collectables/heartGem/orb"]));
+            consumeDelay = 0.6f + Calc.Random.NextFloat() * 0.3f;
+            burstSpeed = 80f + Calc.Random.NextFloat() * 40f;
+            burstDirection = Calc.AngleToVector(Calc.Random.NextFloat() * 2f * (float) Math.PI, 1f);
+            Add(sprite = new Image(GFX.Game["collectables/heartGem/orb"]));
             sprite.CenterOrigin();
             Add(/*bloom = */new BloomPoint(1f, 16f));
         }
@@ -66,7 +66,7 @@ namespace Celeste
                 Position += burstDirection * burstSpeed * Engine.RawDeltaTime;
                 burstSpeed = Calc.Approach(burstSpeed, 800f, Engine.RawDeltaTime * 200f);
                 sprite.Rotation = burstDirection.Angle();
-                sprite.Scale = new Vector2(Math.Min(2f, (float) (0.5 + burstSpeed * 0.019999999552965164)), Math.Max(0.05f, (float) (0.5 - burstSpeed * 0.0040000001899898052)));
+                sprite.Scale = new Vector2(Math.Min(2f, (float) (0.5 + burstSpeed * 0.02f)), Math.Max(0.05f, (float) (0.5 - burstSpeed * 0.004f)));
                 sprite.Color = Color.White * (alpha = Calc.Approach(alpha, 0.0f, Engine.DeltaTime));
             }
             else if (consumeDelay > 0.0)
@@ -74,14 +74,14 @@ namespace Celeste
                 Position += burstDirection * burstSpeed * Engine.RawDeltaTime;
                 burstSpeed = Calc.Approach(burstSpeed, 0.0f, Engine.RawDeltaTime * 120f);
                 sprite.Rotation = burstDirection.Angle();
-                sprite.Scale = new Vector2(Math.Min(2f, (float) (0.5 + burstSpeed * 0.019999999552965164)), Math.Max(0.05f, (float) (0.5 - burstSpeed * 0.0040000001899898052)));
+                sprite.Scale = new Vector2(Math.Min(2f, (float) (0.5 + burstSpeed * 0.02f)), Math.Max(0.05f, (float) (0.5 - burstSpeed * 0.004f)));
                 consumeDelay -= Engine.RawDeltaTime;
                 if (consumeDelay > 0.0)
                     return;
                 Vector2 position = Position;
                 Vector2 end = vector2_1;
                 Vector2 vector2_2 = (position + end) / 2f;
-                Vector2 vector2_3 = (end - position).SafeNormalize().Perpendicular() * (position - end).Length() * (float) (0.05000000074505806 + Calc.Random.NextFloat() * 0.44999998807907104);
+                Vector2 vector2_3 = (end - position).SafeNormalize().Perpendicular() * (position - end).Length() * (float) (0.5f + Calc.Random.NextFloat() * 0.5f);
                 float num1 = end.X - position.X;
                 float num2 = end.Y - position.Y;
                 if (Math.Abs(num1) > Math.Abs(num2) && Math.Sign(vector2_3.X) != Math.Sign(num1) || Math.Abs(num2) > Math.Abs(num2) && Math.Sign(vector2_3.Y) != Math.Sign(num2))
@@ -99,7 +99,7 @@ namespace Celeste
                 float percent = Ease.CubeIn(this.percent);
                 Position = curve.GetPoint(this.percent);
                 float num = Calc.YoYo(this.percent) * curve.GetLengthParametric(10);
-                sprite.Scale = new Vector2(Math.Min(2f, (float) (0.5 + num * 0.019999999552965164)), Math.Max(0.05f, (float) (0.5 - num * 0.0040000001899898052)));
+                sprite.Scale = new Vector2(Math.Min(2f, 0.5f + num * 0.02f), Math.Max(0.05f, 0.5f - num * 0.004f));
                 sprite.Color = Color.White * (1f - percent);
                 sprite.Rotation = Calc.Angle(Position, curve.GetPoint(Ease.CubeIn(percent + 0.01f)));
             }

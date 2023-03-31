@@ -166,7 +166,9 @@ namespace Celeste
         {
             ++this.TotalDeaths;
             ++this.Areas[area.ID].Modes[(int) area.Mode].Deaths;
-            //Stats.Increment(Stat.DEATHS);
+#if STEAM
+            Stats.Increment(Stat.DEATHS);
+#endif
             StatsForStadia.Increment(StadiaStat.DEATHS);
         }
 
@@ -180,15 +182,19 @@ namespace Celeste
                 ++this.TotalStrawberries;
                 if (golden)
                     ++this.TotalGoldenStrawberries;
-                /*if (this.TotalStrawberries >= 30)
+#if STEAM
+                if (this.TotalStrawberries >= 30)
                     Achievements.Register(Achievement.STRB1);
                 if (this.TotalStrawberries >= 80)
                     Achievements.Register(Achievement.STRB2);
                 if (this.TotalStrawberries >= 175)
-                    Achievements.Register(Achievement.STRB3);*/
+                    Achievements.Register(Achievement.STRB3);
+#endif
                 StatsForStadia.SetIfLarger(StadiaStat.BERRIES, this.TotalStrawberries);
             }
-            //Stats.Increment(golden ? Stat.GOLDBERRIES : Stat.BERRIES);
+#if STEAM
+            Stats.Increment(golden ? Stat.GOLDBERRIES : Stat.BERRIES);
+#endif
         }
 
         public void AddStrawberry(EntityID strawberry, bool golden) => this.AddStrawberry(this.CurrentSession.Area, strawberry, golden);
@@ -206,7 +212,8 @@ namespace Celeste
         public void RegisterHeartGem(AreaKey area)
         {
             this.Areas[area.ID].Modes[(int) area.Mode].HeartGem = true;
-            /*if (area.Mode == AreaMode.Normal)
+#if STEAM
+            if (area.Mode == AreaMode.Normal)
             {
                 if (area.ID == 1)
                     Achievements.Register(Achievement.HEART1);
@@ -243,14 +250,17 @@ namespace Celeste
                     Achievements.Register(Achievement.BSIDE7);
                 else if (area.ID == 9)
                     Achievements.Register(Achievement.BSIDE8);
-            }*/
+            }
+#endif
             StatsForStadia.SetIfLarger(StadiaStat.HEARTS, this.TotalHeartGems);
         }
 
         public void RegisterCassette(AreaKey area)
         {
             this.Areas[area.ID].Cassette = true;
-            //Achievements.Register(Achievement.CASS);
+#if STEAM
+            Achievements.Register(Achievement.CASS);
+#endif
         }
 
         public bool RegisterPoemEntry(string id)
