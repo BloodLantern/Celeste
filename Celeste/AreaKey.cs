@@ -30,32 +30,54 @@ namespace Celeste
             get
             {
                 if (AreaData.Areas[ID].Interlude)
-                    return -1;
-                int chapterIndex = 0;
-                for (int index = 0; index <= ID; ++index)
                 {
-                    if (!AreaData.Areas[index].Interlude)
+                    return -1;
+                }
+
+                int chapterIndex = 0;
+                for (int i = 0; i <= ID; ++i)
+                {
+                    if (!AreaData.Areas[i].Interlude)
+                    {
                         ++chapterIndex;
+                    }
                 }
                 return chapterIndex;
             }
         }
 
-        public static bool operator ==(AreaKey a, AreaKey b) => a.ID == b.ID && a.Mode == b.Mode;
+        public static bool operator ==(AreaKey a, AreaKey b)
+        {
+            return a.ID == b.ID && a.Mode == b.Mode;
+        }
 
-        public static bool operator !=(AreaKey a, AreaKey b) => a.ID != b.ID || a.Mode != b.Mode;
+        public static bool operator !=(AreaKey a, AreaKey b)
+        {
+            return a.ID != b.ID || a.Mode != b.Mode;
+        }
 
-        public override bool Equals(object obj) => false;
+        public override bool Equals(object obj)
+        {
+            return false;
+        }
 
-        public override int GetHashCode() => (int)(ID * 3 + Mode);
+        public override int GetHashCode()
+        {
+            return ID * 3 + (int) Mode;
+        }
 
         public override string ToString()
         {
             string str = ID.ToString();
             if (Mode == AreaMode.BSide)
+            {
                 str += "H";
+            }
             else if (Mode == AreaMode.CSide)
+            {
                 str += "HH";
+            }
+
             return str;
         }
     }

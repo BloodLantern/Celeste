@@ -15,47 +15,59 @@ namespace Celeste
     {
         [XmlIgnore]
         private string ev;
-        public List<MEP> Parameters = new List<MEP>();
+        public List<MEP> Parameters = new();
 
         [XmlAttribute]
         public string Event
         {
-            get => this.ev;
+            get => ev;
             set
             {
-                if (!(this.ev != value))
+                if (!(ev != value))
+                {
                     return;
-                this.ev = value;
-                this.Parameters.Clear();
+                }
+
+                ev = value;
+                Parameters.Clear();
             }
         }
 
         [XmlIgnore]
         public int Progress
         {
-            get => (int) this.GetParam("progress");
-            set => this.Param("progress", (float) value);
+            get => (int)GetParam("progress");
+            set => Param("progress", value);
         }
 
         public AudioTrackState()
         {
         }
 
-        public AudioTrackState(string ev) => this.Event = ev;
+        public AudioTrackState(string ev)
+        {
+            Event = ev;
+        }
 
-        public AudioTrackState Layer(int index, float value) => this.Param(AudioState.LayerParameters[index], value);
+        public AudioTrackState Layer(int index, float value)
+        {
+            return Param(AudioState.LayerParameters[index], value);
+        }
 
-        public AudioTrackState Layer(int index, bool value) => this.Param(AudioState.LayerParameters[index], value);
+        public AudioTrackState Layer(int index, bool value)
+        {
+            return Param(AudioState.LayerParameters[index], value);
+        }
 
         public AudioTrackState SetProgress(int value)
         {
-            this.Progress = value;
+            Progress = value;
             return this;
         }
 
         public AudioTrackState Param(string key, float value)
         {
-            foreach (MEP parameter in this.Parameters)
+            foreach (MEP parameter in Parameters)
             {
                 if (parameter.Key != null && parameter.Key.Equals(key, StringComparison.InvariantCultureIgnoreCase))
                 {
@@ -63,28 +75,38 @@ namespace Celeste
                     return this;
                 }
             }
-            this.Parameters.Add(new MEP(key, value));
+            Parameters.Add(new MEP(key, value));
             return this;
         }
 
-        public AudioTrackState Param(string key, bool value) => this.Param(key, value ? 1f : 0.0f);
+        public AudioTrackState Param(string key, bool value)
+        {
+            return Param(key, value ? 1 : 0);
+        }
 
         public float GetParam(string key)
         {
-            foreach (MEP parameter in this.Parameters)
+            foreach (MEP parameter in Parameters)
             {
                 if (parameter.Key != null && parameter.Key.Equals(key, StringComparison.InvariantCultureIgnoreCase))
+                {
                     return parameter.Value;
+                }
             }
-            return 0.0f;
+            return 0;
         }
 
         public AudioTrackState Clone()
         {
-            AudioTrackState audioTrackState = new AudioTrackState();
-            audioTrackState.Event = this.Event;
-            foreach (MEP parameter in this.Parameters)
+            AudioTrackState audioTrackState = new()
+            {
+                Event = Event
+            };
+            foreach (MEP parameter in Parameters)
+            {
                 audioTrackState.Parameters.Add(new MEP(parameter.Key, parameter.Value));
+            }
+
             return audioTrackState;
         }
     }
