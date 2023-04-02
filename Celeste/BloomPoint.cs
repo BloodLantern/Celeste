@@ -18,29 +18,29 @@ namespace Celeste
 
         public float X
         {
-            get => this.Position.X;
-            set => this.Position.X = value;
+            get => Position.X;
+            set => Position.X = value;
         }
 
         public float Y
         {
-            get => this.Position.Y;
-            set => this.Position.Y = value;
+            get => Position.Y;
+            set => Position.Y = value;
         }
 
         public BloomPoint(float alpha, float radius)
             : base(false, true)
         {
-            this.Alpha = alpha;
-            this.Radius = radius;
+            Alpha = alpha;
+            Radius = radius;
         }
 
         public BloomPoint(Vector2 position, float alpha, float radius)
             : base(false, true)
         {
-            this.Position = position;
-            this.Alpha = alpha;
-            this.Radius = radius;
+            Position = position;
+            Alpha = alpha;
+            Radius = radius;
         }
     }
 }

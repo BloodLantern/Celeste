@@ -16,20 +16,22 @@ namespace Celeste
         public BladeRotateSpinner(EntityData data, Vector2 offset)
             : base(data, offset)
         {
-            this.Add((Component) (this.Sprite = GFX.SpriteBank.Create("templeBlade")));
-            this.Sprite.Play("idle");
-            this.Depth = -50;
-            this.Add((Component) new MirrorReflection());
+            Add(Sprite = GFX.SpriteBank.Create("templeBlade"));
+            Sprite.Play("idle");
+            Depth = -50;
+            Add(new MirrorReflection());
         }
 
         public override void Update()
         {
             base.Update();
-            if (this.Scene.OnInterval(0.04f))
-                this.SceneAs<Level>().ParticlesBG.Emit(BladeTrackSpinner.P_Trail, 2, this.Position, Vector2.One * 3f);
-            if (!this.Scene.OnInterval(1f))
+            if (Scene.OnInterval(0.04f))
+                SceneAs<Level>().ParticlesBG.Emit(BladeTrackSpinner.P_Trail, 2, Position, Vector2.One * 3f);
+
+            if (!Scene.OnInterval(1f))
                 return;
-            this.Sprite.Play("spin");
+
+            Sprite.Play("spin");
         }
     }
 }

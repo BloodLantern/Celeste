@@ -11,12 +11,15 @@ using System.Collections.Generic;
 
 namespace Celeste
 {
+    /// <summary>
+    /// Core block
+    /// </summary>
     public class BounceBlock : Solid
     {
         public static ParticleType P_Reform;
         public static ParticleType P_FireBreak;
         public static ParticleType P_IceBreak;
-        private const float WindUpDelay = 0.0f;
+        private const float WindUpDelay = 0f;
         private const float WindUpDist = 10f;
         private const float IceWindUpDist = 16f;
         private const float BounceDist = 24f;
@@ -25,7 +28,7 @@ namespace Celeste
         private const float WallPushTime = 0.1f;
         private const float BounceEndTime = 0.05f;
         private Vector2 bounceDir;
-        private BounceBlock.States state;
+        private States state;
         private Vector2 startPos;
         private float moveSpeed;
         private float windUpStartTimer;
@@ -38,256 +41,267 @@ namespace Celeste
         private float reappearFlash;
         private bool reformed = true;
         private Vector2 debrisDirection;
-        private List<Monocle.Image> hotImages;
-        private List<Monocle.Image> coldImages;
-        private Sprite hotCenterSprite;
-        private Sprite coldCenterSprite;
+        private readonly List<Image> hotImages;
+        private readonly List<Image> coldImages;
+        private readonly Sprite hotCenterSprite;
+        private readonly Sprite coldCenterSprite;
 
         public BounceBlock(Vector2 position, float width, float height)
             : base(position, width, height, false)
         {
-            this.state = BounceBlock.States.Waiting;
-            this.startPos = this.Position;
-            this.hotImages = this.BuildSprite(GFX.Game["objects/bumpblocknew/fire00"]);
-            this.hotCenterSprite = GFX.SpriteBank.Create("bumpBlockCenterFire");
-            this.hotCenterSprite.Position = new Vector2(this.Width, this.Height) / 2f;
-            this.hotCenterSprite.Visible = false;
-            this.Add((Component) this.hotCenterSprite);
-            this.coldImages = this.BuildSprite(GFX.Game["objects/bumpblocknew/ice00"]);
-            this.coldCenterSprite = GFX.SpriteBank.Create("bumpBlockCenterIce");
-            this.coldCenterSprite.Position = new Vector2(this.Width, this.Height) / 2f;
-            this.coldCenterSprite.Visible = false;
-            this.Add((Component) this.coldCenterSprite);
-            this.Add((Component) new CoreModeListener(new Action<Session.CoreModes>(this.OnChangeMode)));
+            state = States.Waiting;
+            startPos = Position;
+            hotImages = BuildSprite(GFX.Game["objects/bumpblocknew/fire00"]);
+            hotCenterSprite = GFX.SpriteBank.Create("bumpBlockCenterFire");
+            hotCenterSprite.Position = new Vector2(Width, Height) / 2f;
+            hotCenterSprite.Visible = false;
+            Add(hotCenterSprite);
+            coldImages = BuildSprite(GFX.Game["objects/bumpblocknew/ice00"]);
+            coldCenterSprite = GFX.SpriteBank.Create("bumpBlockCenterIce");
+            coldCenterSprite.Position = new Vector2(Width, Height) / 2f;
+            coldCenterSprite.Visible = false;
+            Add(coldCenterSprite);
+            Add(new CoreModeListener(new Action<Session.CoreModes>(OnChangeMode)));
         }
 
         public BounceBlock(EntityData data, Vector2 offset)
-            : this(data.Position + offset, (float) data.Width, (float) data.Height)
+            : this(data.Position + offset, data.Width, data.Height)
         {
         }
 
-        private List<Monocle.Image> BuildSprite(MTexture source)
+        private List<Image> BuildSprite(MTexture source)
         {
-            List<Monocle.Image> imageList = new List<Monocle.Image>();
+            List<Image> imageList = new();
             int num1 = source.Width / 8;
             int num2 = source.Height / 8;
-            for (int x = 0; (double) x < (double) this.Width; x += 8)
-            {
-                for (int y = 0; (double) y < (double) this.Height; y += 8)
+            for (int x = 0; x < Width; x += 8)
+                for (int y = 0; y < Height; y += 8)
                 {
-                    int num3 = x != 0 ? ((double) x < (double) this.Width - 8.0 ? Calc.Random.Next(1, num1 - 1) : num1 - 1) : 0;
-                    int num4 = y != 0 ? ((double) y < (double) this.Height - 8.0 ? Calc.Random.Next(1, num2 - 1) : num2 - 1) : 0;
-                    Monocle.Image image = new Monocle.Image(source.GetSubtexture(num3 * 8, num4 * 8, 8, 8));
-                    image.Position = new Vector2((float) x, (float) y);
+                    int num3 = x != 0 ? (x < Width - 8 ? Calc.Random.Next(1, num1 - 1) : num1 - 1) : 0;
+                    int num4 = y != 0 ? (y < Height - 8 ? Calc.Random.Next(1, num2 - 1) : num2 - 1) : 0;
+                    Image image = new(source.GetSubtexture(num3 * 8, num4 * 8, 8, 8))
+                    {
+                        Position = new Vector2(x, y)
+                    };
                     imageList.Add(image);
-                    this.Add((Component) image);
+                    Add(image);
                 }
-            }
             return imageList;
         }
 
         private void ToggleSprite()
         {
-            this.hotCenterSprite.Visible = !this.iceMode;
-            this.coldCenterSprite.Visible = this.iceMode;
-            foreach (Component hotImage in this.hotImages)
-                hotImage.Visible = !this.iceMode;
-            foreach (Component coldImage in this.coldImages)
-                coldImage.Visible = this.iceMode;
+            hotCenterSprite.Visible = !iceMode;
+            coldCenterSprite.Visible = iceMode;
+            foreach (Component hotImage in hotImages)
+                hotImage.Visible = !iceMode;
+
+            foreach (Component coldImage in coldImages)
+                coldImage.Visible = iceMode;
         }
 
         public override void Added(Scene scene)
         {
             base.Added(scene);
-            this.iceModeNext = this.iceMode = this.SceneAs<Level>().CoreMode == Session.CoreModes.Cold;
-            this.ToggleSprite();
+            iceModeNext = iceMode = SceneAs<Level>().CoreMode == Session.CoreModes.Cold;
+            ToggleSprite();
         }
 
-        private void OnChangeMode(Session.CoreModes coreMode) => this.iceModeNext = coreMode == Session.CoreModes.Cold;
+        private void OnChangeMode(Session.CoreModes coreMode)
+        {
+            iceModeNext = coreMode == Session.CoreModes.Cold;
+        }
 
         private void CheckModeChange()
         {
-            if (this.iceModeNext == this.iceMode)
+            if (iceModeNext == iceMode)
                 return;
-            this.iceMode = this.iceModeNext;
-            this.ToggleSprite();
+
+            iceMode = iceModeNext;
+            ToggleSprite();
         }
 
         public override void Render()
         {
-            Vector2 position = this.Position;
-            this.Position = this.Position + this.Shake;
-            if (this.state != BounceBlock.States.Broken && this.reformed)
+            Vector2 position = Position;
+            Position += Shake;
+            if (state != States.Broken && reformed)
                 base.Render();
-            if ((double) this.reappearFlash > 0.0)
+
+            if (reappearFlash > 0)
             {
-                float num1 = Ease.CubeOut(this.reappearFlash);
+                float num1 = Ease.CubeOut(reappearFlash);
                 float num2 = num1 * 2f;
-                Draw.Rect(this.X - num2, this.Y - num2, this.Width + num2 * 2f, this.Height + num2 * 2f, Color.White * num1);
+                Draw.Rect(X - num2, Y - num2, Width + (num2 * 2f), Height + (num2 * 2f), Color.White * num1);
             }
-            this.Position = position;
+            Position = position;
         }
 
         public override void Update()
         {
             base.Update();
-            this.reappearFlash = Calc.Approach(this.reappearFlash, 0.0f, Engine.DeltaTime * 8f);
-            if (this.state == BounceBlock.States.Waiting)
+            reappearFlash = Calc.Approach(reappearFlash, 0f, Engine.DeltaTime * 8f);
+            if (state == States.Waiting)
             {
-                this.CheckModeChange();
-                this.moveSpeed = Calc.Approach(this.moveSpeed, 100f, 400f * Engine.DeltaTime);
-                Vector2 position = Calc.Approach(this.ExactPosition, this.startPos, this.moveSpeed * Engine.DeltaTime);
-                Vector2 liftSpeed = (position - this.ExactPosition).SafeNormalize(this.moveSpeed);
-                liftSpeed.X *= 0.75f;
-                this.MoveTo(position, liftSpeed);
-                this.windUpProgress = Calc.Approach(this.windUpProgress, 0.0f, 1f * Engine.DeltaTime);
-                Player player = this.WindUpPlayerCheck();
+                CheckModeChange();
+                moveSpeed = Calc.Approach(moveSpeed, 100f, 400f * Engine.DeltaTime);
+                Vector2 position = Calc.Approach(ExactPosition, startPos, moveSpeed * Engine.DeltaTime);
+                Vector2 liftSpeed = (position - ExactPosition).SafeNormalize(moveSpeed);
+                liftSpeed.X *= LiftSpeedXMult;
+                MoveTo(position, liftSpeed);
+                windUpProgress = Calc.Approach(windUpProgress, 0f, 1f * Engine.DeltaTime);
+                Player player = WindUpPlayerCheck();
                 if (player == null)
                     return;
-                this.moveSpeed = 80f;
-                this.windUpStartTimer = 0.0f;
-                this.bounceDir = !this.iceMode ? (player.Center - this.Center).SafeNormalize() : -Vector2.UnitY;
-                this.state = BounceBlock.States.WindingUp;
+
+                moveSpeed = 80f;
+                windUpStartTimer = 0f;
+                bounceDir = !iceMode ? (player.Center - Center).SafeNormalize() : -Vector2.UnitY;
+                state = States.WindingUp;
                 Input.Rumble(RumbleStrength.Medium, RumbleLength.Medium);
-                if (this.iceMode)
+                if (iceMode)
                 {
-                    this.StartShaking(0.2f);
-                    Audio.Play("event:/game/09_core/iceblock_touch", this.Center);
+                    StartShaking(0.2f);
+                    _ = Audio.Play("event:/game/09_core/iceblock_touch", Center);
                 }
                 else
-                    Audio.Play("event:/game/09_core/bounceblock_touch", this.Center);
+                    _ = Audio.Play("event:/game/09_core/bounceblock_touch", Center);
             }
-            else if (this.state == BounceBlock.States.WindingUp)
+            else if (state == States.WindingUp)
             {
-                Player player = this.WindUpPlayerCheck();
+                Player player = WindUpPlayerCheck();
                 if (player != null)
-                    this.bounceDir = !this.iceMode ? (player.Center - this.Center).SafeNormalize() : -Vector2.UnitY;
-                if ((double) this.windUpStartTimer > 0.0)
+                    bounceDir = !iceMode ? (player.Center - Center).SafeNormalize() : -Vector2.UnitY;
+
+                if (windUpStartTimer > WindUpDelay)
                 {
-                    this.windUpStartTimer -= Engine.DeltaTime;
-                    this.windUpProgress = Calc.Approach(this.windUpProgress, 0.0f, 1f * Engine.DeltaTime);
+                    windUpStartTimer -= Engine.DeltaTime;
+                    windUpProgress = Calc.Approach(windUpProgress, 0f, 1f * Engine.DeltaTime);
                 }
                 else
                 {
-                    this.moveSpeed = Calc.Approach(this.moveSpeed, this.iceMode ? 35f : 40f, 600f * Engine.DeltaTime);
-                    float num = this.iceMode ? 0.333f : 1f;
-                    Vector2 target = this.startPos - this.bounceDir * (this.iceMode ? 16f : 10f);
-                    Vector2 position = Calc.Approach(this.ExactPosition, target, this.moveSpeed * num * Engine.DeltaTime);
-                    Vector2 liftSpeed = (position - this.ExactPosition).SafeNormalize(this.moveSpeed * num);
-                    liftSpeed.X *= 0.75f;
-                    this.MoveTo(position, liftSpeed);
-                    this.windUpProgress = Calc.ClampedMap(Vector2.Distance(this.ExactPosition, target), 16f, 2f);
-                    if (this.iceMode && (double) Vector2.DistanceSquared(this.ExactPosition, target) <= 12.0)
-                        this.StartShaking(0.1f);
-                    else if (!this.iceMode && (double) this.windUpProgress >= 0.5)
-                        this.StartShaking(0.1f);
-                    if ((double) Vector2.DistanceSquared(this.ExactPosition, target) > 2.0)
+                    moveSpeed = Calc.Approach(moveSpeed, iceMode ? 35f : 40f, 600f * Engine.DeltaTime);
+                    float num = iceMode ? 1 / 3f : 1f;
+                    Vector2 target = startPos - (bounceDir * (iceMode ? IceWindUpDist : WindUpDist));
+                    Vector2 position = Calc.Approach(ExactPosition, target, moveSpeed * num * Engine.DeltaTime);
+                    Vector2 liftSpeed = (position - ExactPosition).SafeNormalize(moveSpeed * num);
+                    liftSpeed.X *= LiftSpeedXMult;
+                    MoveTo(position, liftSpeed);
+                    windUpProgress = Calc.ClampedMap(Vector2.Distance(ExactPosition, target), IceWindUpDist, 2f);
+                    if (iceMode && Vector2.DistanceSquared(ExactPosition, target) <= 12)
+                        StartShaking(WallPushTime);
+                    else if (!iceMode && windUpProgress >= 0.5f)
+                        StartShaking(WallPushTime);
+
+                    if ((double)Vector2.DistanceSquared(ExactPosition, target) > 2)
                         return;
-                    if (this.iceMode)
-                        this.Break();
+
+                    if (iceMode)
+                        Break();
                     else
-                        this.state = BounceBlock.States.Bouncing;
-                    this.moveSpeed = 0.0f;
+                        state = States.Bouncing;
+
+                    moveSpeed = 0f;
                 }
             }
-            else if (this.state == BounceBlock.States.Bouncing)
+            else if (state == States.Bouncing)
             {
-                this.moveSpeed = Calc.Approach(this.moveSpeed, 140f, 800f * Engine.DeltaTime);
-                Vector2 target = this.startPos + this.bounceDir * 24f;
-                Vector2 position = Calc.Approach(this.ExactPosition, target, this.moveSpeed * Engine.DeltaTime);
-                this.bounceLift = (position - this.ExactPosition).SafeNormalize(Math.Min(this.moveSpeed * 3f, 200f));
-                this.bounceLift.X *= 0.75f;
-                this.MoveTo(position, this.bounceLift);
-                this.windUpProgress = 1f;
-                if ((this.ExactPosition == target ? 1 : (this.iceMode ? 0 : (this.WindUpPlayerCheck() == null ? 1 : 0))) == 0)
+                moveSpeed = Calc.Approach(moveSpeed, 140f, 800f * Engine.DeltaTime);
+                Vector2 target = startPos + (bounceDir * BounceDist);
+                Vector2 position = Calc.Approach(ExactPosition, target, moveSpeed * Engine.DeltaTime);
+                bounceLift = (position - ExactPosition).SafeNormalize(Math.Min(moveSpeed * 3f, 200f));
+                bounceLift.X *= LiftSpeedXMult;
+                MoveTo(position, bounceLift);
+                windUpProgress = 1f;
+                if ((ExactPosition == target ? 1 : (iceMode ? 0 : (WindUpPlayerCheck() == null ? 1 : 0))) == 0)
                     return;
-                this.debrisDirection = (target - this.startPos).SafeNormalize();
-                this.state = BounceBlock.States.BounceEnd;
+
+                debrisDirection = (target - startPos).SafeNormalize();
+                state = States.BounceEnd;
                 Input.Rumble(RumbleStrength.Medium, RumbleLength.Medium);
-                this.moveSpeed = 0.0f;
-                this.bounceEndTimer = 0.05f;
-                this.ShakeOffPlayer(this.bounceLift);
+                moveSpeed = 0.0f;
+                bounceEndTimer = BounceEndTime;
+                ShakeOffPlayer(bounceLift);
             }
-            else if (this.state == BounceBlock.States.BounceEnd)
+            else if (state == States.BounceEnd)
             {
-                this.bounceEndTimer -= Engine.DeltaTime;
-                if ((double) this.bounceEndTimer > 0.0)
+                bounceEndTimer -= Engine.DeltaTime;
+                if (bounceEndTimer > 0)
                     return;
-                this.Break();
+
+                Break();
             }
             else
             {
-                if (this.state != BounceBlock.States.Broken)
+                if (state != States.Broken)
                     return;
-                this.Depth = 8990;
-                this.reformed = false;
-                if ((double) this.respawnTimer > 0.0)
-                {
-                    this.respawnTimer -= Engine.DeltaTime;
-                }
+
+                Depth = 8990;
+                reformed = false;
+                if (respawnTimer > 0)
+                    respawnTimer -= Engine.DeltaTime;
                 else
                 {
-                    Vector2 position = this.Position;
-                    this.Position = this.startPos;
-                    if (!this.CollideCheck<Actor>() && !this.CollideCheck<Solid>())
+                    Vector2 position = Position;
+                    Position = startPos;
+                    if (!CollideCheck<Actor>() && !CollideCheck<Solid>())
                     {
-                        this.CheckModeChange();
-                        Audio.Play(this.iceMode ? "event:/game/09_core/iceblock_reappear" : "event:/game/09_core/bounceblock_reappear", this.Center);
+                        CheckModeChange();
+                        _ = Audio.Play(iceMode ? "event:/game/09_core/iceblock_reappear" : "event:/game/09_core/bounceblock_reappear", Center);
                         float duration = 0.35f;
-                        for (int index1 = 0; (double) index1 < (double) this.Width; index1 += 8)
-                        {
-                            for (int index2 = 0; (double) index2 < (double) this.Height; index2 += 8)
+                        for (int index1 = 0; index1 < Width; index1 += 8)
+                            for (int index2 = 0; index2 < Height; index2 += 8)
                             {
-                                Vector2 to = new Vector2((float) ((double) this.X + (double) index1 + 4.0), (float) ((double) this.Y + (double) index2 + 4.0));
-                                this.Scene.Add((Entity) Engine.Pooler.Create<BounceBlock.RespawnDebris>().Init(to + (to - this.Center).SafeNormalize() * 12f, to, this.iceMode, duration));
+                                Vector2 to = new(X + index1 + 4, Y + index2 + 4);
+                                Scene.Add(Engine.Pooler.Create<RespawnDebris>().Init(to + ((to - Center).SafeNormalize() * 12f), to, iceMode, duration));
                             }
-                        }
-                        Alarm.Set((Entity) this, duration, (Action) (() =>
+                        _ = Alarm.Set(this, duration, () =>
                         {
-                            this.reformed = true;
-                            this.reappearFlash = 0.6f;
-                            this.EnableStaticMovers();
-                            this.ReformParticles();
-                        }));
-                        this.Depth = -9000;
-                        this.MoveStaticMovers(this.Position - position);
-                        this.Collidable = true;
-                        this.state = BounceBlock.States.Waiting;
+                            reformed = true;
+                            reappearFlash = 0.6f;
+                            EnableStaticMovers();
+                            ReformParticles();
+                        });
+                        Depth = -9000;
+                        MoveStaticMovers(Position - position);
+                        Collidable = true;
+                        state = States.Waiting;
                     }
                     else
-                        this.Position = position;
+                        Position = position;
                 }
             }
         }
 
         private void ReformParticles()
         {
-            Level level = this.SceneAs<Level>();
-            for (int index = 0; (double) index < (double) this.Width; index += 4)
+            Level level = SceneAs<Level>();
+            for (int index = 0; index < Width; index += 4)
             {
-                level.Particles.Emit(BounceBlock.P_Reform, new Vector2(this.X + 2f + (float) index + (float) Calc.Random.Range(-1, 1), this.Y), -1.57079637f);
-                level.Particles.Emit(BounceBlock.P_Reform, new Vector2(this.X + 2f + (float) index + (float) Calc.Random.Range(-1, 1), this.Bottom - 1f), 1.57079637f);
+                level.Particles.Emit(P_Reform, new Vector2(X + 2f + index + Calc.Random.Range(-1, 1), Y), (float) -Math.PI / 2);
+                level.Particles.Emit(P_Reform, new Vector2(X + 2f + index + Calc.Random.Range(-1, 1), Bottom - 1f), (float) -Math.PI / 2);
             }
-            for (int index = 0; (double) index < (double) this.Height; index += 4)
+            for (int index = 0; index < Height; index += 4)
             {
-                level.Particles.Emit(BounceBlock.P_Reform, new Vector2(this.X, this.Y + 2f + (float) index + (float) Calc.Random.Range(-1, 1)), 3.14159274f);
-                level.Particles.Emit(BounceBlock.P_Reform, new Vector2(this.Right - 1f, this.Y + 2f + (float) index + (float) Calc.Random.Range(-1, 1)), 0.0f);
+                level.Particles.Emit(P_Reform, new Vector2(X, Y + 2f + index + Calc.Random.Range(-1, 1)), (float) Math.PI);
+                level.Particles.Emit(P_Reform, new Vector2(Right - 1f, Y + 2f + index + Calc.Random.Range(-1, 1)), 0.0f);
             }
         }
 
         private Player WindUpPlayerCheck()
         {
-            Player player = this.CollideFirst<Player>(this.Position - Vector2.UnitY);
-            if (player != null && (double) player.Speed.Y < 0.0)
-                player = (Player) null;
+            Player player = CollideFirst<Player>(Position - Vector2.UnitY);
+            if (player != null && player.Speed.Y < 0)
+                player = null;
+
             if (player == null)
             {
-                player = this.CollideFirst<Player>(this.Position + Vector2.UnitX);
+                player = CollideFirst<Player>(Position + Vector2.UnitX);
                 if (player == null || player.StateMachine.State != 1 || player.Facing != Facings.Left)
                 {
-                    player = this.CollideFirst<Player>(this.Position - Vector2.UnitX);
+                    player = CollideFirst<Player>(Position - Vector2.UnitX);
                     if (player == null || player.StateMachine.State != 1 || player.Facing != Facings.Right)
-                        player = (Player) null;
+                        player = null;
                 }
             }
             return player;
@@ -295,9 +309,10 @@ namespace Celeste
 
         private void ShakeOffPlayer(Vector2 liftSpeed)
         {
-            Player player = this.WindUpPlayerCheck();
+            Player player = WindUpPlayerCheck();
             if (player == null)
                 return;
+
             player.StateMachine.State = 0;
             player.Speed = liftSpeed;
             player.StartJumpGraceTime();
@@ -305,37 +320,36 @@ namespace Celeste
 
         private void Break()
         {
-            if (!this.iceMode)
-                Audio.Play("event:/game/09_core/bounceblock_break", this.Center);
+            if (!iceMode)
+                _ = Audio.Play("event:/game/09_core/bounceblock_break", Center);
+
             Input.Rumble(RumbleStrength.Light, RumbleLength.Medium);
-            this.state = BounceBlock.States.Broken;
-            this.Collidable = false;
-            this.DisableStaticMovers();
-            this.respawnTimer = 1.6f;
-            Vector2 direction1 = new Vector2(0.0f, 1f);
-            if (!this.iceMode)
-                direction1 = this.debrisDirection;
-            Vector2 center = this.Center;
-            for (int index1 = 0; (double) index1 < (double) this.Width; index1 += 8)
-            {
-                for (int index2 = 0; (double) index2 < (double) this.Height; index2 += 8)
+            state = States.Broken;
+            Collidable = false;
+            DisableStaticMovers();
+            respawnTimer = RespawnTime;
+            Vector2 direction1 = new(0.0f, 1f);
+            if (!iceMode)
+                direction1 = debrisDirection;
+
+            Vector2 center = Center;
+            for (int tileX = 0; tileX < Width; tileX += 8)
+                for (int tileY = 0; tileY < Height; tileY += 8)
                 {
-                    if (this.iceMode)
-                        direction1 = (new Vector2((float) ((double) this.X + (double) index1 + 4.0), (float) ((double) this.Y + (double) index2 + 4.0)) - center).SafeNormalize();
-                    this.Scene.Add((Entity) Engine.Pooler.Create<BounceBlock.BreakDebris>().Init(new Vector2((float) ((double) this.X + (double) index1 + 4.0), (float) ((double) this.Y + (double) index2 + 4.0)), direction1, this.iceMode));
+                    if (iceMode)
+                        direction1 = (new Vector2(X + tileX + 4, Y + tileY + 4) - center).SafeNormalize();
+
+                    Scene.Add(Engine.Pooler.Create<BreakDebris>().Init(new Vector2(X + tileX + 4, Y + tileY + 4), direction1, iceMode));
                 }
-            }
-            float num = this.debrisDirection.Angle();
-            Level level = this.SceneAs<Level>();
-            for (int index3 = 0; (double) index3 < (double) this.Width; index3 += 4)
-            {
-                for (int index4 = 0; (double) index4 < (double) this.Height; index4 += 4)
+            float num = debrisDirection.Angle();
+            Level level = SceneAs<Level>();
+            for (int halfTileX = 0; halfTileX < Width; halfTileX += 4)
+                for (int halfTileY = 0; halfTileY < Height; halfTileY += 4)
                 {
-                    Vector2 position = this.Position + new Vector2((float) (2 + index3), (float) (2 + index4)) + Calc.Random.Range(-Vector2.One, Vector2.One);
-                    float direction2 = this.iceMode ? (position - center).Angle() : num;
-                    level.Particles.Emit(this.iceMode ? BounceBlock.P_IceBreak : BounceBlock.P_FireBreak, position, direction2);
+                    Vector2 position = Position + new Vector2(2 + halfTileX, 2 + halfTileY) + Calc.Random.Range(-Vector2.One, Vector2.One);
+                    float direction2 = iceMode ? (position - center).Angle() : num;
+                    level.Particles.Emit(iceMode ? P_IceBreak : P_FireBreak, position, direction2);
                 }
-            }
         }
 
         private enum States
@@ -350,29 +364,30 @@ namespace Celeste
         [Pooled]
         private class RespawnDebris : Entity
         {
-            private Monocle.Image sprite;
+            private Image sprite;
             private Vector2 from;
             private Vector2 to;
             private float percent;
             private float duration;
 
-            public BounceBlock.RespawnDebris Init(
+            public RespawnDebris Init(
                 Vector2 from,
                 Vector2 to,
                 bool ice,
                 float duration)
             {
                 List<MTexture> atlasSubtextures = GFX.Game.GetAtlasSubtextures(ice ? "objects/bumpblocknew/ice_rubble" : "objects/bumpblocknew/fire_rubble");
-                MTexture texture = Calc.Random.Choose<MTexture>(atlasSubtextures);
-                if (this.sprite == null)
+                MTexture texture = Calc.Random.Choose(atlasSubtextures);
+                if (sprite == null)
                 {
-                    this.Add((Component) (this.sprite = new Monocle.Image(texture)));
-                    this.sprite.CenterOrigin();
+                    Add(sprite = new Image(texture));
+                    _ = sprite.CenterOrigin();
                 }
                 else
-                    this.sprite.Texture = texture;
-                this.Position = this.from = from;
-                this.percent = 0.0f;
+                    sprite.Texture = texture;
+
+                Position = this.from = from;
+                percent = 0.0f;
                 this.to = to;
                 this.duration = duration;
                 return this;
@@ -380,21 +395,19 @@ namespace Celeste
 
             public override void Update()
             {
-                if ((double) this.percent > 1.0)
-                {
-                    this.RemoveSelf();
-                }
+                if (percent > 1)
+                    RemoveSelf();
                 else
                 {
-                    this.percent += Engine.DeltaTime / this.duration;
-                    this.Position = Vector2.Lerp(this.from, this.to, Ease.CubeIn(this.percent));
-                    this.sprite.Color = Color.White * this.percent;
+                    percent += Engine.DeltaTime / duration;
+                    Position = Vector2.Lerp(from, to, Ease.CubeIn(percent));
+                    sprite.Color = Color.White * percent;
                 }
             }
 
             public override void Render()
             {
-                this.sprite.DrawOutline(Color.Black);
+                sprite.DrawOutline(Color.Black);
                 base.Render();
             }
         }
@@ -402,50 +415,49 @@ namespace Celeste
         [Pooled]
         private class BreakDebris : Entity
         {
-            private Monocle.Image sprite;
+            private Image sprite;
             private Vector2 speed;
             private float percent;
             private float duration;
 
-            public BounceBlock.BreakDebris Init(Vector2 position, Vector2 direction, bool ice)
+            public BreakDebris Init(Vector2 position, Vector2 direction, bool ice)
             {
                 List<MTexture> atlasSubtextures = GFX.Game.GetAtlasSubtextures(ice ? "objects/bumpblocknew/ice_rubble" : "objects/bumpblocknew/fire_rubble");
-                MTexture texture = Calc.Random.Choose<MTexture>(atlasSubtextures);
-                if (this.sprite == null)
+                MTexture texture = Calc.Random.Choose(atlasSubtextures);
+                if (sprite == null)
                 {
-                    this.Add((Component) (this.sprite = new Monocle.Image(texture)));
-                    this.sprite.CenterOrigin();
+                    Add(sprite = new Image(texture));
+                    _ = sprite.CenterOrigin();
                 }
                 else
-                    this.sprite.Texture = texture;
-                this.Position = position;
+                    sprite.Texture = texture;
+
+                Position = position;
                 direction = Calc.AngleToVector(direction.Angle() + Calc.Random.Range(-0.1f, 0.1f), 1f);
-                this.speed = direction * (ice ? (float) Calc.Random.Range(20, 40) : (float) Calc.Random.Range(120, 200));
-                this.percent = 0.0f;
-                this.duration = (float) Calc.Random.Range(2, 3);
+                speed = direction * (ice ? Calc.Random.Range(20, 40) : Calc.Random.Range(120, 200));
+                percent = 0.0f;
+                duration = Calc.Random.Range(2, 3);
                 return this;
             }
 
             public override void Update()
             {
                 base.Update();
-                if ((double) this.percent >= 1.0)
-                {
-                    this.RemoveSelf();
-                }
+                if (percent >= 1)
+                    RemoveSelf();
                 else
                 {
-                    this.Position = this.Position + this.speed * Engine.DeltaTime;
-                    this.speed.X = Calc.Approach(this.speed.X, 0.0f, 180f * Engine.DeltaTime);
-                    this.speed.Y += 200f * Engine.DeltaTime;
-                    this.percent += Engine.DeltaTime / this.duration;
-                    this.sprite.Color = Color.White * (1f - this.percent);
+                    Position += speed * Engine.DeltaTime;
+                    speed.X = Calc.Approach(speed.X, 0.0f, 180f * Engine.DeltaTime);
+                    speed.Y += 200f * Engine.DeltaTime;
+                    percent += Engine.DeltaTime / duration;
+                    sprite.Color = Color.White * (1f - percent);
                 }
             }
 
             public override void Render()
             {
-                this.sprite.DrawOutline(Color.Black);
+                sprite.DrawOutline(Color.Black);
                 base.Render();
             }
         }

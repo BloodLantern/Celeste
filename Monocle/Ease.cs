@@ -11,9 +11,9 @@ namespace Monocle
     public static class Ease
     {
         public static readonly Ease.Easer Linear = (Ease.Easer) (t => t);
-        public static readonly Ease.Easer SineIn = (Ease.Easer) (t => (float) (-Math.Cos(1.5707963705062866 * (double) t) + 1.0));
-        public static readonly Ease.Easer SineOut = (Ease.Easer) (t => (float) Math.Sin(1.5707963705062866 * (double) t));
-        public static readonly Ease.Easer SineInOut = (Ease.Easer) (t => (float) (-Math.Cos(3.1415927410125732 * (double) t) / 2.0 + 0.5));
+        public static readonly Ease.Easer SineIn = (Ease.Easer) (t => (float) (-Math.Cos(Math.PI / 2 * (double) t) + 1.0));
+        public static readonly Ease.Easer SineOut = (Ease.Easer) (t => (float) Math.Sin(Math.PI / 2 * (double) t));
+        public static readonly Ease.Easer SineInOut = (Ease.Easer) (t => (float) (-Math.Cos(Math.PI * (double) t) / 2.0 + 0.5));
         public static readonly Ease.Easer QuadIn = (Ease.Easer) (t => t * t);
         public static readonly Ease.Easer QuadOut = Ease.Invert(Ease.QuadIn);
         public static readonly Ease.Easer QuadInOut = Ease.Follow(Ease.QuadIn, Ease.QuadOut);

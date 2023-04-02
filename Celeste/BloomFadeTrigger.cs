@@ -5,7 +5,6 @@
 // Assembly location: C:\Program Files (x86)\Steam\steamapps\common\Celeste\orig\Celeste.exe
 
 using Microsoft.Xna.Framework;
-using Monocle;
 
 namespace Celeste
 {
@@ -13,24 +12,24 @@ namespace Celeste
     {
         public float BloomAddFrom;
         public float BloomAddTo;
-        public Trigger.PositionModes PositionMode;
+        public PositionModes PositionMode;
 
         public BloomFadeTrigger(EntityData data, Vector2 offset)
             : base(data, offset)
         {
-            this.BloomAddFrom = data.Float("bloomAddFrom");
-            this.BloomAddTo = data.Float("bloomAddTo");
-            this.PositionMode = data.Enum<Trigger.PositionModes>("positionMode");
+            BloomAddFrom = data.Float("bloomAddFrom");
+            BloomAddTo = data.Float("bloomAddTo");
+            PositionMode = data.Enum<PositionModes>("positionMode");
         }
 
         public override void OnStay(Player player)
         {
-            Level scene = this.Scene as Level;
+            Level scene = Scene as Level;
             Session session = scene.Session;
-            float num1 = this.BloomAddFrom + (this.BloomAddTo - this.BloomAddFrom) * MathHelper.Clamp(this.GetPositionLerp(player, this.PositionMode), 0.0f, 1f);
-            double num2 = (double) num1;
-            session.BloomBaseAdd = (float) num2;
-            scene.Bloom.Base = AreaData.Get((Scene) scene).BloomBase + num1;
+            float num1 = BloomAddFrom + ((BloomAddTo - BloomAddFrom) * MathHelper.Clamp(GetPositionLerp(player, PositionMode), 0.0f, 1f));
+            double num2 = (double)num1;
+            session.BloomBaseAdd = (float)num2;
+            scene.Bloom.Base = AreaData.Get(scene).BloomBase + num1;
         }
     }
 }
