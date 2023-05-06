@@ -19,90 +19,102 @@ namespace Monocle
 
         public Grid(int cellsX, int cellsY, float cellWidth, float cellHeight)
         {
-            this.Data = new VirtualMap<bool>(cellsX, cellsY);
-            this.CellWidth = cellWidth;
-            this.CellHeight = cellHeight;
+            Data = new VirtualMap<bool>(cellsX, cellsY);
+            CellWidth = cellWidth;
+            CellHeight = cellHeight;
         }
 
         public Grid(float cellWidth, float cellHeight, string bitstring)
         {
-            this.CellWidth = cellWidth;
-            this.CellHeight = cellHeight;
-            int num = 0;
-            int val1 = 0;
+            CellWidth = cellWidth;
+            CellHeight = cellHeight;
+            int maxCols = 0;
+            int currentCols = 0;
             int rows = 1;
             for (int index = 0; index < bitstring.Length; ++index)
             {
                 if (bitstring[index] == '\n')
                 {
                     ++rows;
-                    num = Math.Max(val1, num);
-                    val1 = 0;
+                    maxCols = Math.Max(currentCols, maxCols);
+                    currentCols = 0;
                 }
                 else
-                    ++val1;
+                {
+                    ++currentCols;
+                }
             }
-            this.Data = new VirtualMap<bool>(num, rows);
-            this.LoadBitstring(bitstring);
+            Data = new VirtualMap<bool>(maxCols, rows);
+            LoadBitstring(bitstring);
         }
 
         public Grid(float cellWidth, float cellHeight, bool[,] data)
         {
-            this.CellWidth = cellWidth;
-            this.CellHeight = cellHeight;
-            this.Data = new VirtualMap<bool>(data);
+            CellWidth = cellWidth;
+            CellHeight = cellHeight;
+            Data = new VirtualMap<bool>(data);
         }
 
         public Grid(float cellWidth, float cellHeight, VirtualMap<bool> data)
         {
-            this.CellWidth = cellWidth;
-            this.CellHeight = cellHeight;
-            this.Data = data;
+            CellWidth = cellWidth;
+            CellHeight = cellHeight;
+            Data = data;
         }
 
         public void Extend(int left, int right, int up, int down)
         {
-            this.Position = this.Position - new Vector2((float) left * this.CellWidth, (float) up * this.CellHeight);
-            int columns = this.Data.Columns + left + right;
-            int rows = this.Data.Rows + up + down;
+            Position -= new Vector2(left * CellWidth, up * CellHeight);
+            int columns = Data.Columns + left + right;
+            int rows = Data.Rows + up + down;
             if (columns <= 0 || rows <= 0)
             {
-                this.Data = new VirtualMap<bool>(0, 0);
+                Data = new VirtualMap<bool>(0, 0);
             }
             else
             {
-                VirtualMap<bool> virtualMap = new VirtualMap<bool>(columns, rows);
-                for (int x1 = 0; x1 < this.Data.Columns; ++x1)
+                VirtualMap<bool> virtualMap = new(columns, rows);
+                for (int x1 = 0; x1 < Data.Columns; ++x1)
                 {
-                    for (int y1 = 0; y1 < this.Data.Rows; ++y1)
+                    for (int y1 = 0; y1 < Data.Rows; ++y1)
                     {
                         int x2 = x1 + left;
                         int y2 = y1 + up;
                         if (x2 >= 0 && x2 < columns && y2 >= 0 && y2 < rows)
-                            virtualMap[x2, y2] = this.Data[x1, y1];
+                        {
+                            virtualMap[x2, y2] = Data[x1, y1];
+                        }
                     }
                 }
                 for (int x = 0; x < left; ++x)
                 {
                     for (int y = 0; y < rows; ++y)
-                        virtualMap[x, y] = this.Data[0, Calc.Clamp(y - up, 0, this.Data.Rows - 1)];
+                    {
+                        virtualMap[x, y] = Data[0, Calc.Clamp(y - up, 0, Data.Rows - 1)];
+                    }
                 }
                 for (int x = columns - right; x < columns; ++x)
                 {
                     for (int y = 0; y < rows; ++y)
-                        virtualMap[x, y] = this.Data[this.Data.Columns - 1, Calc.Clamp(y - up, 0, this.Data.Rows - 1)];
+                    {
+                        virtualMap[x, y] = Data[Data.Columns - 1, Calc.Clamp(y - up, 0, Data.Rows - 1)];
+                    }
                 }
                 for (int y = 0; y < up; ++y)
                 {
                     for (int x = 0; x < columns; ++x)
-                        virtualMap[x, y] = this.Data[Calc.Clamp(x - left, 0, this.Data.Columns - 1), 0];
+                    {
+                        virtualMap[x, y] = Data[Calc.Clamp(x - left, 0, Data.Columns - 1), 0];
+                    }
                 }
                 for (int y = rows - down; y < rows; ++y)
                 {
                     for (int x = 0; x < columns; ++x)
-                        virtualMap[x, y] = this.Data[Calc.Clamp(x - left, 0, this.Data.Columns - 1), this.Data.Rows - 1];
+                    {
+                        virtualMap[x, y] = Data[Calc.Clamp(x - left, 0, Data.Columns - 1), Data.Rows - 1];
+                    }
                 }
-                this.Data = virtualMap;
+                Data = virtualMap;
             }
         }
 
@@ -114,23 +126,29 @@ namespace Monocle
             {
                 if (bitstring[index] == '\n')
                 {
-                    for (; x < this.CellsX; ++x)
-                        this.Data[x, y] = false;
+                    for (; x < CellsX; ++x)
+                    {
+                        Data[x, y] = false;
+                    }
+
                     x = 0;
                     ++y;
-                    if (y >= this.CellsY)
+
+                    if (y >= CellsY)
+                    {
                         break;
+                    }
                 }
-                else if (x < this.CellsX)
+                else if (x < CellsX)
                 {
                     if (bitstring[index] == '0')
                     {
-                        this.Data[x, y] = false;
+                        Data[x, y] = false;
                         ++x;
                     }
                     else
                     {
-                        this.Data[x, y] = true;
+                        Data[x, y] = true;
                         ++x;
                     }
                 }
@@ -140,22 +158,29 @@ namespace Monocle
         public string GetBitstring()
         {
             string bitstring = "";
-            for (int y = 0; y < this.CellsY; ++y)
+            for (int y = 0; y < CellsY; ++y)
             {
                 if (y != 0)
+                {
                     bitstring += "\n";
-                for (int x = 0; x < this.CellsX; ++x)
-                    bitstring = !this.Data[x, y] ? bitstring + "0" : bitstring + "1";
+                }
+
+                for (int x = 0; x < CellsX; ++x)
+                {
+                    bitstring = !Data[x, y] ? bitstring + "0" : bitstring + "1";
+                }
             }
             return bitstring;
         }
 
         public void Clear(bool to = false)
         {
-            for (int x = 0; x < this.CellsX; ++x)
+            for (int x = 0; x < CellsX; ++x)
             {
-                for (int y = 0; y < this.CellsY; ++y)
-                    this.Data[x, y] = to;
+                for (int y = 0; y < CellsY; ++y)
+                {
+                    Data[x, y] = to;
+                }
             }
         }
 
@@ -171,14 +196,22 @@ namespace Monocle
                 height += y;
                 y = 0;
             }
-            if (x + width > this.CellsX)
-                width = this.CellsX - x;
-            if (y + height > this.CellsY)
-                height = this.CellsY - y;
+            if (x + width > CellsX)
+            {
+                width = CellsX - x;
+            }
+
+            if (y + height > CellsY)
+            {
+                height = CellsY - y;
+            }
+
             for (int index1 = 0; index1 < width; ++index1)
             {
                 for (int index2 = 0; index2 < height; ++index2)
-                    this.Data[x + index1, y + index2] = to;
+                {
+                    Data[x + index1, y + index2] = to;
+                }
             }
         }
 
@@ -194,60 +227,73 @@ namespace Monocle
                 height += y;
                 y = 0;
             }
-            if (x + width > this.CellsX)
-                width = this.CellsX - x;
-            if (y + height > this.CellsY)
-                height = this.CellsY - y;
+            if (x + width > CellsX)
+            {
+                width = CellsX - x;
+            }
+
+            if (y + height > CellsY)
+            {
+                height = CellsY - y;
+            }
+
             for (int index1 = 0; index1 < width; ++index1)
             {
                 for (int index2 = 0; index2 < height; ++index2)
                 {
-                    if (this.Data[x + index1, y + index2])
+                    if (Data[x + index1, y + index2])
+                    {
                         return true;
+                    }
                 }
             }
+
             return false;
         }
 
         public bool CheckColumn(int x)
         {
-            for (int y = 0; y < this.CellsY; ++y)
+            for (int y = 0; y < CellsY; ++y)
             {
-                if (!this.Data[x, y])
+                if (!Data[x, y])
+                {
                     return false;
+                }
             }
             return true;
         }
 
         public bool CheckRow(int y)
         {
-            for (int x = 0; x < this.CellsX; ++x)
+            for (int x = 0; x < CellsX; ++x)
             {
-                if (!this.Data[x, y])
+                if (!Data[x, y])
+                {
                     return false;
+                }
             }
             return true;
         }
 
         public bool this[int x, int y]
         {
-            get => x >= 0 && y >= 0 && x < this.CellsX && y < this.CellsY && this.Data[x, y];
-            set => this.Data[x, y] = value;
+            get => x >= 0 && y >= 0 && x < CellsX && y < CellsY && Data[x, y];
+            set => Data[x, y] = value;
         }
 
-        public int CellsX => this.Data.Columns;
+        public int CellsX => Data.Columns;
 
-        public int CellsY => this.Data.Rows;
+        public int CellsY => Data.Rows;
 
         public override float Width
         {
-            get => this.CellWidth * (float) this.CellsX;
+            get => CellWidth * CellsX;
             set => throw new NotImplementedException();
         }
 
         public override float Height
         {
-            get => this.CellHeight * (float) this.CellsY;
+            get => CellHeight * CellsY;
             set => throw new NotImplementedException();
         }
 
@@ -255,12 +301,14 @@ namespace Monocle
         {
             get
             {
-                for (int x = 0; x < this.CellsX; ++x)
+                for (int x = 0; x < CellsX; ++x)
                 {
-                    for (int y = 0; y < this.CellsY; ++y)
+                    for (int y = 0; y < CellsY; ++y)
                     {
-                        if (this.Data[x, y])
+                        if (Data[x, y])
+                        {
                             return false;
+                        }
                     }
                 }
                 return true;
@@ -269,111 +317,123 @@ namespace Monocle
 
         public override float Left
         {
-            get => this.Position.X;
-            set => this.Position.X = value;
+            get => Position.X;
+            set => Position.X = value;
         }
 
         public override float Top
         {
-            get => this.Position.Y;
-            set => this.Position.Y = value;
+            get => Position.Y;
+            set => Position.Y = value;
         }
 
         public override float Right
         {
-            get => this.Position.X + this.Width;
-            set => this.Position.X = value - this.Width;
+            get => Position.X + Width;
+            set => Position.X = value - Width;
         }
 
         public override float Bottom
         {
-            get => this.Position.Y + this.Height;
-            set => this.Position.Y = value - this.Height;
+            get => Position.Y + Height;
+            set => Position.Y = value - Height;
         }
 
-        public override Collider Clone() => (Collider) new Grid(this.CellWidth, this.CellHeight, this.Data.Clone());
+        public override Collider Clone()
+        {
+            return new Grid(CellWidth, CellHeight, Data.Clone());
+        }
 
         public override void Render(Camera camera, Color color)
         {
             if (camera == null)
             {
-                for (int x = 0; x < this.CellsX; ++x)
+                for (int x = 0; x < CellsX; ++x)
                 {
-                    for (int y = 0; y < this.CellsY; ++y)
+                    for (int y = 0; y < CellsY; ++y)
                     {
-                        if (this.Data[x, y])
-                            Draw.HollowRect(this.AbsoluteLeft + (float) x * this.CellWidth, this.AbsoluteTop + (float) y * this.CellHeight, this.CellWidth, this.CellHeight, color);
+                        if (Data[x, y])
+                        {
+                            Draw.HollowRect(AbsoluteLeft + (x * CellWidth), AbsoluteTop + (y * CellHeight), CellWidth, CellHeight, color);
+                        }
                     }
                 }
             }
             else
             {
-                int num1 = (int) Math.Max(0.0f, (camera.Left - this.AbsoluteLeft) / this.CellWidth);
-                int num2 = (int) Math.Min((double) (this.CellsX - 1), Math.Ceiling(((double) camera.Right - (double) this.AbsoluteLeft) / (double) this.CellWidth));
-                int num3 = (int) Math.Max(0.0f, (camera.Top - this.AbsoluteTop) / this.CellHeight);
-                int num4 = (int) Math.Min((double) (this.CellsY - 1), Math.Ceiling(((double) camera.Bottom - (double) this.AbsoluteTop) / (double) this.CellHeight));
+                int num1 = (int) Math.Max(0, (camera.Left - AbsoluteLeft) / CellWidth);
+                int num2 = (int) Math.Min(CellsX - 1, Math.Ceiling((camera.Right - AbsoluteLeft) / CellWidth));
+                int num3 = (int) Math.Max(0, (camera.Top - AbsoluteTop) / CellHeight);
+                int num4 = (int) Math.Min(CellsY - 1, Math.Ceiling((camera.Bottom - AbsoluteTop) / CellHeight));
                 for (int x = num1; x <= num2; ++x)
                 {
                     for (int y = num3; y <= num4; ++y)
                     {
-                        if (this.Data[x, y])
-                            Draw.HollowRect(this.AbsoluteLeft + (float) x * this.CellWidth, this.AbsoluteTop + (float) y * this.CellHeight, this.CellWidth, this.CellHeight, color);
+                        if (Data[x, y])
+                        {
+                            Draw.HollowRect(AbsoluteLeft + (x * CellWidth), AbsoluteTop + (y * CellHeight), CellWidth, CellHeight, color);
+                        }
                     }
                 }
             }
         }
 
-        public override bool Collide(Vector2 point) => (double) point.X >= (double) this.AbsoluteLeft && (double) point.Y >= (double) this.AbsoluteTop && (double) point.X < (double) this.AbsoluteRight && (double) point.Y < (double) this.AbsoluteBottom && this.Data[(int) (((double) point.X - (double) this.AbsoluteLeft) / (double) this.CellWidth), (int) (((double) point.Y - (double) this.AbsoluteTop) / (double) this.CellHeight)];
+        public override bool Collide(Vector2 point)
+        {
+            return point.X >= (double)AbsoluteLeft && point.Y >= (double)AbsoluteTop && point.X < (double)AbsoluteRight && point.Y < (double)AbsoluteBottom && Data[(int)((point.X - (double)AbsoluteLeft) / (double)CellWidth), (int)((point.Y - (double)AbsoluteTop) / (double)CellHeight)];
+        }
 
         public override bool Collide(Rectangle rect)
         {
-            if (!rect.Intersects(this.Bounds))
+            if (!rect.Intersects(Bounds))
+            {
                 return false;
-            int x = (int) (((double) rect.Left - (double) this.AbsoluteLeft) / (double) this.CellWidth);
-            int y = (int) (((double) rect.Top - (double) this.AbsoluteTop) / (double) this.CellHeight);
-            int width = (int) (((double) rect.Right - (double) this.AbsoluteLeft - 1.0) / (double) this.CellWidth) - x + 1;
-            int height = (int) (((double) rect.Bottom - (double) this.AbsoluteTop - 1.0) / (double) this.CellHeight) - y + 1;
-            return this.CheckRect(x, y, width, height);
+            }
+
+            int x = (int)((rect.Left - AbsoluteLeft) / CellWidth);
+            int y = (int)((rect.Top - AbsoluteTop) / CellHeight);
+            int width = (int)((rect.Right - AbsoluteLeft - 1) / CellWidth) - x + 1;
+            int height = (int)((rect.Bottom - AbsoluteTop - 1) / CellHeight) - y + 1;
+            return CheckRect(x, y, width, height);
         }
 
         public override bool Collide(Vector2 from, Vector2 to)
         {
-            from -= this.AbsolutePosition;
-            to -= this.AbsolutePosition;
-            from /= new Vector2(this.CellWidth, this.CellHeight);
-            to /= new Vector2(this.CellWidth, this.CellHeight);
-            bool flag = (double) Math.Abs(to.Y - from.Y) > (double) Math.Abs(to.X - from.X);
+            from -= AbsolutePosition;
+            to -= AbsolutePosition;
+            from /= new Vector2(CellWidth, CellHeight);
+            to /= new Vector2(CellWidth, CellHeight);
+            bool flag = Math.Abs(to.Y - from.Y) > Math.Abs(to.X - from.X);
             if (flag)
             {
-                float x1 = from.X;
-                from.X = from.Y;
-                from.Y = x1;
-                float x2 = to.X;
-                to.X = to.Y;
-                to.Y = x2;
+                (from.Y, from.X) = (from.X, from.Y);
+                (to.Y, to.X) = (to.X, to.Y);
             }
-            if ((double) from.X > (double) to.X)
+            if (from.X > (double)to.X)
             {
-                Vector2 vector2 = from;
-                from = to;
-                to = vector2;
+                (to, from) = (from, to);
             }
             float num1 = 0.0f;
             float num2 = Math.Abs(to.Y - from.Y) / (to.X - from.X);
-            int num3 = (double) from.Y < (double) to.Y ? 1 : -1;
-            int y = (int) from.Y;
-            int x3 = (int) to.X;
-            for (int x4 = (int) from.X; x4 <= x3; ++x4)
+            int num3 = from.Y < (double)to.Y ? 1 : -1;
+            int y = (int)from.Y;
+            int x3 = (int)to.X;
+            for (int x4 = (int)from.X; x4 <= x3; ++x4)
             {
                 if (flag)
                 {
                     if (this[y, x4])
+                    {
                         return true;
+                    }
                 }
                 else if (this[x4, y])
+                {
                     return true;
+                }
+
                 num1 += num2;
-                if ((double) num1 >= 0.5)
+                if ((double)num1 >= 0.5)
                 {
                     y += num3;
                     --num1;
@@ -382,20 +442,34 @@ namespace Monocle
             return false;
         }
 
-        public override bool Collide(Hitbox hitbox) => this.Collide(hitbox.Bounds);
+        public override bool Collide(Hitbox hitbox)
+        {
+            return Collide(hitbox.Bounds);
+        }
 
-        public override bool Collide(Grid grid) => throw new NotImplementedException();
+        public override bool Collide(Grid grid)
+        {
+            throw new NotImplementedException();
+        }
 
-        public override bool Collide(Circle circle) => false;
+        public override bool Collide(Circle circle)
+        {
+            return false;
+        }
 
-        public override bool Collide(ColliderList list) => list.Collide(this);
+        public override bool Collide(ColliderList list)
+        {
+            return list.Collide(this);
+        }
 
         public static bool IsBitstringEmpty(string bitstring)
         {
             for (int index = 0; index < bitstring.Length; ++index)
             {
                 if (bitstring[index] == '1')
+                {
                     return false;
+                }
             }
             return true;
         }

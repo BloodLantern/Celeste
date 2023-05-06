@@ -198,17 +198,17 @@ namespace Celeste
         public bool MoveHExact(int moveH, Collision onCollide = null, Solid pusher = null)
         {
             Vector2 vector2 = Position + (Vector2.UnitX * moveH);
-            int num1 = Math.Sign(moveH);
+            int direction = Math.Sign(moveH);
             int num2 = 0;
             while (moveH != 0)
             {
-                Solid solid = CollideFirst<Solid>(Position + (Vector2.UnitX * num1));
+                Solid solid = CollideFirst<Solid>(Position + (Vector2.UnitX * direction));
                 if (solid != null)
                 {
                     movementCounter.X = 0.0f;
                     onCollide?.Invoke(new CollisionData()
                     {
-                        Direction = Vector2.UnitX * num1,
+                        Direction = Vector2.UnitX * direction,
                         Moved = Vector2.UnitX * num2,
                         TargetPosition = vector2,
                         Hit = solid,
@@ -216,9 +216,9 @@ namespace Celeste
                     });
                     return true;
                 }
-                num2 += num1;
-                moveH -= num1;
-                X += num1;
+                num2 += direction;
+                moveH -= direction;
+                X += direction;
             }
             return false;
         }
