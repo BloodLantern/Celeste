@@ -1,6 +1,6 @@
 ﻿// Decompiled with JetBrains decompiler
 // Type: Celeste.Checkpoint
-// Assembly: Celeste, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null
+// Assembly: Celeste, Version=1, Culture=neutral, PublicKeyToken=null
 // MVID: FAF6CA25-5C06-43EB-A08F-9CCF291FE6A3
 // Assembly location: C:\Program Files (x86)\Steam\steamapps\common\Celeste\orig\Celeste.exe
 
@@ -16,113 +16,114 @@ namespace Celeste
         private const float LightAlpha = 0.8f;
         private const float BloomAlpha = 0.5f;
         private const float TargetFade = 0.5f;
-        private Monocle.Image image;
+        private Image image;
         private Sprite sprite;
         private Sprite flash;
         private VertexLight light;
         private BloomPoint bloom;
         private bool triggered;
-        private float sine = 1.57079637f;
+        private float sine = (float) Math.PI / 2;
         private float fade = 1f;
-        private string bg;
+        private readonly string bg;
         public Vector2 SpawnOffset;
 
         public Checkpoint(Vector2 position, string bg = "", Vector2? spawnTarget = null)
             : base(position)
         {
-            this.Depth = 9990;
-            this.SpawnOffset = spawnTarget.HasValue ? spawnTarget.Value - this.Position : Vector2.Zero;
+            Depth = 9990;
+            SpawnOffset = spawnTarget.HasValue ? spawnTarget.Value - Position : Vector2.Zero;
             this.bg = bg;
         }
 
         public Checkpoint(EntityData data, Vector2 offset)
-            : this(data.Position + offset, data.Attr(nameof (bg)), data.FirstNodeNullable(new Vector2?(offset)))
+            : this(data.Position + offset, data.Attr(nameof(bg)), data.FirstNodeNullable(new Vector2?(offset)))
         {
         }
 
         public override void Added(Scene scene)
         {
             base.Added(scene);
-            Level scene1 = this.Scene as Level;
+            Level scene1 = Scene as Level;
             int id1 = scene1.Session.Area.ID;
-            string id2 = !string.IsNullOrWhiteSpace(this.bg) ? "objects/checkpoint/bg/" + this.bg : "objects/checkpoint/bg/" + (object) id1;
+            string id2 = !string.IsNullOrWhiteSpace(bg) ? "objects/checkpoint/bg/" + bg : "objects/checkpoint/bg/" + id1;
             if (GFX.Game.Has(id2))
             {
-                this.Add((Component) (this.image = new Monocle.Image(GFX.Game[id2])));
-                this.image.JustifyOrigin(0.5f, 1f);
+                Add(image = new Image(GFX.Game[id2]));
+                _ = image.JustifyOrigin(0.5f, 1f);
             }
-            this.Add((Component) (this.sprite = GFX.SpriteBank.Create("checkpoint_highlight")));
-            this.sprite.Play("off");
-            this.Add((Component) (this.flash = GFX.SpriteBank.Create("checkpoint_flash")));
-            this.flash.Visible = false;
-            this.flash.Color = Color.White * 0.6f;
+            Add(sprite = GFX.SpriteBank.Create("checkpoint_highlight"));
+            sprite.Play("off");
+            Add(flash = GFX.SpriteBank.Create("checkpoint_flash"));
+            flash.Visible = false;
+            flash.Color = Color.White * 0.6f;
             if (!SaveData.Instance.HasCheckpoint(scene1.Session.Area, scene1.Session.Level))
                 return;
-            this.TurnOn(false);
+
+            TurnOn(false);
         }
 
         public override void Update()
         {
-            if (!this.triggered)
+            if (!triggered)
             {
-                Level scene = this.Scene as Level;
-                Player entity = this.Scene.Tracker.GetEntity<Player>();
+                Level scene = Scene as Level;
+                Player entity = Scene.Tracker.GetEntity<Player>();
                 if (entity != null && !scene.Transitioning)
                 {
                     if (!entity.CollideCheck<CheckpointBlockerTrigger>() && SaveData.Instance.SetCheckpoint(scene.Session.Area, scene.Session.Level))
                     {
                         scene.AutoSave();
-                        this.TurnOn(true);
+                        TurnOn(true);
                     }
-                    this.triggered = true;
+                    triggered = true;
                 }
             }
-            if (this.triggered && this.sprite.CurrentAnimationID == "on")
+            if (triggered && sprite.CurrentAnimationID == "on")
             {
-                this.sine += Engine.DeltaTime * 2f;
-                this.fade = Calc.Approach(this.fade, 0.5f, Engine.DeltaTime);
-                this.sprite.Color = Color.White * (float) (0.5 + (double) ((float) (1.0 + Math.Sin((double) this.sine)) / 2f) * 0.5) * this.fade;
+                sine += Engine.DeltaTime * 2f;
+                fade = Calc.Approach(fade, 0.5f, Engine.DeltaTime);
+                sprite.Color = Color.White * (0.5f + ((1 + (float) Math.Sin(sine)) / 2f * 0.5f)) * fade;
             }
             base.Update();
         }
 
         private void TurnOn(bool animate)
         {
-            this.triggered = true;
-            this.Add((Component) (this.light = new VertexLight(Color.White, 0.0f, 16, 32)));
-            this.Add((Component) (this.bloom = new BloomPoint(0.0f, 16f)));
-            this.light.Position = new Vector2(0.0f, -8f);
-            this.bloom.Position = new Vector2(0.0f, -8f);
-            this.flash.Visible = true;
-            this.flash.Play("flash", true);
+            triggered = true;
+            Add(light = new VertexLight(Color.White, 0f, 16, 32));
+            Add(bloom = new BloomPoint(0f, 16f));
+            light.Position = new Vector2(0f, -8f);
+            bloom.Position = new Vector2(0f, -8f);
+            flash.Visible = true;
+            flash.Play("flash", true);
             if (animate)
             {
-                this.sprite.Play("turnOn");
-                this.Add((Component) new Coroutine(this.EaseLightsOn()));
-                this.fade = 1f;
+                sprite.Play("turnOn");
+                Add(new Coroutine(EaseLightsOn()));
+                fade = 1f;
             }
             else
             {
-                this.fade = 0.5f;
-                this.sprite.Play("on");
-                this.sprite.Color = Color.White * 0.5f;
-                this.light.Alpha = 0.8f;
-                this.bloom.Alpha = 0.5f;
+                fade = 0.5f;
+                sprite.Play("on");
+                sprite.Color = Color.White * 0.5f;
+                light.Alpha = 0.8f;
+                bloom.Alpha = 0.5f;
             }
         }
 
         private IEnumerator EaseLightsOn()
         {
-            float lightStartRadius = this.light.StartRadius;
-            float lightEndRadius = this.light.EndRadius;
-            for (float p = 0.0f; (double) p < 1.0; p += Engine.DeltaTime * 0.5f)
+            float lightStartRadius = light.StartRadius;
+            float lightEndRadius = light.EndRadius;
+            for (float p = 0f; p < 1; p += Engine.DeltaTime * 0.5f)
             {
                 float num = Ease.BigBackOut(p);
-                this.light.Alpha = 0.8f * num;
-                this.light.StartRadius = (float) (int) ((double) lightStartRadius + (double) Calc.YoYo(p) * 8.0);
-                this.light.EndRadius = (float) (int) ((double) lightEndRadius + (double) Calc.YoYo(p) * 16.0);
-                this.bloom.Alpha = 0.5f * num;
-                yield return (object) null;
+                light.Alpha = 0.8f * num;
+                light.StartRadius = (int)(lightStartRadius + (Calc.YoYo(p) * 8));
+                light.EndRadius = (int)(lightEndRadius + (Calc.YoYo(p) * 16));
+                bloom.Alpha = 0.5f * num;
+                yield return null;
             }
         }
     }

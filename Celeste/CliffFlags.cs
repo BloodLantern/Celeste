@@ -23,10 +23,10 @@ namespace Celeste
 
         public CliffFlags(Vector2 from, Vector2 to)
         {
-            this.Depth = 8999;
-            this.Position = from;
+            Depth = 8999;
+            Position = from;
             Flagline flagline;
-            this.Add((Component) (flagline = new Flagline(to, CliffFlags.lineColor, CliffFlags.pinColor, CliffFlags.colors, 10, 10, 10, 10, 2, 8)));
+            Add(flagline = new Flagline(to, lineColor, pinColor, colors, 10, 10, 10, 10, 2, 8));
             flagline.ClothDroopAmount = 0.2f;
         }
 

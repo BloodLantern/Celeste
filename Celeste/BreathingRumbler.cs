@@ -14,15 +14,19 @@ namespace Celeste
         public float Strength = 0.2f;
         private float currentRumble;
 
-        public BreathingRumbler() => this.currentRumble = this.Strength;
+        public BreathingRumbler()
+        {
+            currentRumble = Strength;
+        }
 
         public override void Update()
         {
             base.Update();
-            this.currentRumble = Calc.Approach(this.currentRumble, this.Strength, 2f * Engine.DeltaTime);
-            if ((double) this.currentRumble <= 0.0)
+            currentRumble = Calc.Approach(currentRumble, Strength, 2f * Engine.DeltaTime);
+            if (currentRumble <= 0f)
                 return;
-            Input.RumbleSpecific(this.currentRumble * 0.25f, 0.05f);
+
+            Input.RumbleSpecific(currentRumble * MaxRumble, 0.05f);
         }
     }
 }

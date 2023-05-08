@@ -19,15 +19,15 @@ namespace Celeste
         public CameraLocker(Level.CameraLockModes lockMode, float maxXOffset, float maxYOffset)
             : base(lockMode == Level.CameraLockModes.BoostSequence, false)
         {
-            this.LockMode = lockMode;
-            this.MaxXOffset = maxXOffset;
-            this.MaxYOffset = maxYOffset;
+            LockMode = lockMode;
+            MaxXOffset = maxXOffset;
+            MaxYOffset = maxYOffset;
         }
 
         public override void EntityAdded(Scene scene)
         {
             base.EntityAdded(scene);
-            this.SceneAs<Level>().CameraLockMode = this.LockMode;
+            SceneAs<Level>().CameraLockMode = LockMode;
         }
     }
 }

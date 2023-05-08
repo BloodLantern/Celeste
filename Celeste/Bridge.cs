@@ -18,12 +18,12 @@ namespace Celeste
         private bool canEndCollapseA;
         private bool canEndCollapseB;
         private float collapseTimer;
-        private int width;
-        private List<Rectangle> tileSizes = new List<Rectangle>();
+        private readonly int width;
+        private readonly List<Rectangle> tileSizes = new();
         private bool ending;
         private float gapStartX;
         private float gapEndX;
-        private SoundSource collapseSfx;
+        private readonly SoundSource collapseSfx;
 
         public Bridge(Vector2 position, int width, float gapStartX, float gapEndX)
             : base(position)
@@ -31,18 +31,18 @@ namespace Celeste
             this.width = width;
             this.gapStartX = gapStartX;
             this.gapEndX = gapEndX;
-            this.tileSizes.Add(new Rectangle(0, 0, 16, 52));
-            this.tileSizes.Add(new Rectangle(16, 0, 8, 52));
-            this.tileSizes.Add(new Rectangle(24, 0, 8, 52));
-            this.tileSizes.Add(new Rectangle(32, 0, 8, 52));
-            this.tileSizes.Add(new Rectangle(40, 0, 8, 52));
-            this.tileSizes.Add(new Rectangle(48, 0, 8, 52));
-            this.tileSizes.Add(new Rectangle(56, 0, 8, 52));
-            this.tileSizes.Add(new Rectangle(64, 0, 8, 52));
-            this.tileSizes.Add(new Rectangle(72, 0, 8, 52));
-            this.tileSizes.Add(new Rectangle(80, 0, 16, 52));
-            this.tileSizes.Add(new Rectangle(96, 0, 8, 52));
-            this.Add((Component) (this.collapseSfx = new SoundSource()));
+            tileSizes.Add(new Rectangle(0, 0, 16, 52));
+            tileSizes.Add(new Rectangle(16, 0, 8, 52));
+            tileSizes.Add(new Rectangle(24, 0, 8, 52));
+            tileSizes.Add(new Rectangle(32, 0, 8, 52));
+            tileSizes.Add(new Rectangle(40, 0, 8, 52));
+            tileSizes.Add(new Rectangle(48, 0, 8, 52));
+            tileSizes.Add(new Rectangle(56, 0, 8, 52));
+            tileSizes.Add(new Rectangle(64, 0, 8, 52));
+            tileSizes.Add(new Rectangle(72, 0, 8, 52));
+            tileSizes.Add(new Rectangle(80, 0, 16, 52));
+            tileSizes.Add(new Rectangle(96, 0, 8, 52));
+            Add(collapseSfx = new SoundSource());
         }
 
         public Bridge(EntityData data, Vector2 offset)
@@ -53,24 +53,24 @@ namespace Celeste
         public override void Added(Scene scene)
         {
             base.Added(scene);
-            this.level = scene as Level;
-            this.tiles = new List<BridgeTile>();
-            this.gapStartX += (float) this.level.Bounds.Left;
-            this.gapEndX += (float) this.level.Bounds.Left;
+            level = scene as Level;
+            tiles = new List<BridgeTile>();
+            gapStartX += level.Bounds.Left;
+            gapEndX += level.Bounds.Left;
             Calc.PushRandom(1);
-            Vector2 position = this.Position;
+            Vector2 position = Position;
             int index = 0;
-            while ((double) position.X < (double) this.X + (double) this.width)
+            while (position.X < X + width)
             {
-                Rectangle tileSize = index < 2 || index > 7 ? this.tileSizes[index] : this.tileSizes[2 + Calc.Random.Next(6)];
-                if ((double) position.X < (double) this.gapStartX || (double) position.X >= (double) this.gapEndX)
+                Rectangle tileSize = index is < 2 or > 7 ? tileSizes[index] : tileSizes[2 + Calc.Random.Next(6)];
+                if (position.X < gapStartX || position.X >= gapEndX)
                 {
-                    BridgeTile bridgeTile = new BridgeTile(position, tileSize);
-                    this.tiles.Add(bridgeTile);
-                    this.level.Add((Entity) bridgeTile);
+                    BridgeTile bridgeTile = new(position, tileSize);
+                    tiles.Add(bridgeTile);
+                    level.Add(bridgeTile);
                 }
-                position.X += (float) tileSize.Width;
-                index = (index + 1) % this.tileSizes.Count;
+                position.X += tileSize.Width;
+                index = (index + 1) % tileSizes.Count;
             }
             Calc.PopRandom();
         }
@@ -78,71 +78,79 @@ namespace Celeste
         public override void Update()
         {
             base.Update();
-            Player entity = this.level.Tracker.GetEntity<Player>();
+            Player entity = level.Tracker.GetEntity<Player>();
             if (entity == null || entity.Dead)
-                this.collapseSfx.Stop();
-            if (!this.canCollapse)
+                _ = collapseSfx.Stop();
+
+            if (!canCollapse)
             {
-                if (entity == null || (double) entity.X < (double) this.X + 112.0)
+                if (entity == null || entity.X < X + 112f)
                     return;
-                Audio.SetMusic("event:/music/lvl0/bridge");
-                this.collapseSfx.Play("event:/game/00_prologue/bridge_rumble_loop");
-                this.canCollapse = true;
-                this.canEndCollapseA = true;
-                this.canEndCollapseB = true;
+
+                _ = Audio.SetMusic("event:/music/lvl0/bridge");
+                _ = collapseSfx.Play("event:/game/00_prologue/bridge_rumble_loop");
+                canCollapse = true;
+                canEndCollapseA = true;
+                canEndCollapseB = true;
                 for (int index = 0; index < 11; ++index)
                 {
-                    this.tiles[0].Fall(Calc.Random.Range(0.1f, 0.5f));
-                    this.tiles.RemoveAt(0);
+                    tiles[0].Fall(Calc.Random.Range(0.1f, 0.5f));
+                    tiles.RemoveAt(0);
                 }
             }
-            else if (this.tiles.Count > 0)
+            else if (tiles.Count > 0)
             {
                 if (entity == null)
                     return;
-                if (this.canEndCollapseA && (double) entity.X > (double) this.X + (double) this.width - 216.0)
+
+                if (canEndCollapseA && entity.X > X + width - 216f)
                 {
-                    this.canEndCollapseA = false;
+                    canEndCollapseA = false;
                     for (int index = 0; index < 5; ++index)
                     {
-                        this.tiles[this.tiles.Count - 8].Fall(Calc.Random.Range(0.1f, 0.5f));
-                        this.tiles.RemoveAt(this.tiles.Count - 8);
+                        tiles[tiles.Count - 8].Fall(Calc.Random.Range(0.1f, 0.5f));
+                        tiles.RemoveAt(tiles.Count - 8);
                     }
                 }
-                else if (this.canEndCollapseB && (double) entity.X > (double) this.X + (double) this.width - 104.0)
+                else if (canEndCollapseB && entity.X > X + width - 104f)
                 {
-                    this.canEndCollapseB = false;
-                    for (int index = 0; index < 7 && this.tiles.Count > 0; ++index)
+                    canEndCollapseB = false;
+                    for (int index = 0; index < 7 && tiles.Count > 0; ++index)
                     {
-                        this.tiles[this.tiles.Count - 1].Fall(Calc.Random.Range(0.1f, 0.3f));
-                        this.tiles.RemoveAt(this.tiles.Count - 1);
+                        tiles[tiles.Count - 1].Fall(Calc.Random.Range(0.1f, 0.3f));
+                        tiles.RemoveAt(tiles.Count - 1);
                     }
                 }
-                else if ((double) this.collapseTimer > 0.0)
+                else if (collapseTimer > 0f)
                 {
-                    this.collapseTimer -= Engine.DeltaTime;
-                    if (this.tiles.Count < 5 || (double) entity.X < (double) this.tiles[4].X)
+                    collapseTimer -= Engine.DeltaTime;
+                    if (tiles.Count < 5 || entity.X < tiles[4].X)
                         return;
+
                     int index = 0;
-                    this.tiles[index].Fall();
-                    this.tiles.RemoveAt(index);
+                    tiles[index].Fall();
+                    tiles.RemoveAt(index);
                 }
                 else
                 {
-                    this.tiles[0].Fall();
-                    this.tiles.RemoveAt(0);
-                    this.collapseTimer = 0.2f;
+                    tiles[0].Fall();
+                    tiles.RemoveAt(0);
+                    collapseTimer = 0.2f;
                 }
             }
             else
             {
-                if (this.ending)
+                if (ending)
                     return;
-                this.ending = true;
-                this.StopCollapseLoop();
+
+                ending = true;
+                StopCollapseLoop();
             }
         }
 
-        public void StopCollapseLoop() => this.collapseSfx.Stop();
+        public void StopCollapseLoop()
+        {
+            _ = collapseSfx.Stop();
+        }
     }
 }

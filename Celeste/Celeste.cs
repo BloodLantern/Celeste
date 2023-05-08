@@ -60,7 +60,7 @@ namespace Celeste
             Stats.MakeRequest();
 #endif
             StatsForStadia.MakeRequest();
-            Console.WriteLine("CELESTE : " + (object)Version);
+            Console.WriteLine("CELESTE : " + Version);
         }
 
         protected override void Initialize()
@@ -69,6 +69,7 @@ namespace Celeste
             Settings.Instance.AfterLoad();
             if (Settings.Instance.Fullscreen)
                 ViewPadding = Settings.Instance.ViewportPadding;
+
             Settings.Instance.ApplyScreen();
             SFX.Initialize();
             Tags.Initialize();
@@ -86,8 +87,8 @@ namespace Celeste
             if (firstLoad)
             {
                 firstLoad = false;
-                HudTarget = VirtualContent.CreateRenderTarget("hud-target", 1922, 1082);
-                WipeTarget = VirtualContent.CreateRenderTarget("wipe-target", 1922, 1082);
+                HudTarget = VirtualContent.CreateRenderTarget("hud-target", TargetWidth + 2, TargetHeight + 2);
+                WipeTarget = VirtualContent.CreateRenderTarget("wipe-target", TargetWidth + 2, TargetHeight + 2);
                 OVR.Load();
                 GFX.Load();
                 MTN.Load();
@@ -120,12 +121,13 @@ namespace Celeste
         {
             if (last is not OverworldLoader || next is not Overworld)
                 base.OnSceneTransition(last, next);
+
             TimeRate = 1f;
             Audio.PauseGameplaySfx = false;
             Audio.SetMusicParam("fade", 1f);
-            Distort.Anxiety = 0.0f;
+            Distort.Anxiety = 0f;
             Distort.GameRate = 1f;
-            Glitch.Value = 0.0f;
+            Glitch.Value = 0f;
         }
 
         protected override void RenderCore()
@@ -133,6 +135,7 @@ namespace Celeste
             base.RenderCore();
             if (DisconnectUI == null)
                 return;
+
             DisconnectUI.Render();
         }
 
@@ -140,9 +143,11 @@ namespace Celeste
         {
             if (FreezeTimer >= time)
                 return;
+
             FreezeTimer = time;
             if (Scene == null)
                 return;
+
             Scene.Tracker.GetEntity<CassetteBlockManager>()?.AdvanceMusic(time);
         }
 
@@ -170,14 +175,14 @@ namespace Celeste
                 int num = Settings.Existed ? 1 : 0;
                 for (int index = 0; index < args.Length - 1; ++index)
                 {
-                    if (args[index] == "--language" || args[index] == "-l")
+                    if (args[index] is "--language" or "-l")
                         Settings.Instance.Language = args[++index];
-                    else if (args[index] == "--default-language" || args[index] == "-dl")
+                    else if (args[index] is "--default-language" or "-dl")
                     {
                         if (!Settings.Existed)
                             Settings.Instance.Language = args[++index];
                     }
-                    else if (args[index] == "--gui" || args[index] == "-g")
+                    else if (args[index] is "--gui" or "-g")
                         Input.OverrideInputPrefix = args[++index];
                 }
                 celeste = new Celeste();
@@ -210,17 +215,17 @@ namespace Celeste
         {
             if (levels)
                 ReloadLevels(area);
+
             if (!graphics)
                 return;
+
             ReloadGraphics(hires);
         }
 
         public static void ReloadLevels(AreaKey? area = null)
         {
             if (area is null)
-            {
                 throw new ArgumentNullException(nameof(area));
-            }
         }
 
         public static void ReloadPortraits() { }
@@ -241,7 +246,7 @@ namespace Celeste
                     Arguments = args
                 }
             };
-            process.Start();
+            _ = process.Start();
             process.WaitForExit();
         }
 

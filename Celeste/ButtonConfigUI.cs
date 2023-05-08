@@ -7,7 +7,6 @@
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Input;
 using Monocle;
-using System;
 using System.Collections.Generic;
 
 namespace Celeste
@@ -27,7 +26,7 @@ namespace Celeste
         private bool resetHeld;
         private float resetTime;
         private float resetDelay;
-        private List<Buttons> all = new List<Buttons>()
+        private readonly List<Buttons> all = new()
         {
             Buttons.A,
             Buttons.B,
@@ -42,91 +41,96 @@ namespace Celeste
 
         public ButtonConfigUI()
         {
-            this.Add((TextMenu.Item) new TextMenu.Header(Dialog.Clean("BTN_CONFIG_TITLE")));
-            this.Add((TextMenu.Item) new InputMappingInfo(true));
-            this.Add((TextMenu.Item) new TextMenu.SubHeader(Dialog.Clean("KEY_CONFIG_GAMEPLAY")));
-            this.AddMap("LEFT", Settings.Instance.Left);
-            this.AddMap("RIGHT", Settings.Instance.Right);
-            this.AddMap("UP", Settings.Instance.Up);
-            this.AddMap("DOWN", Settings.Instance.Down);
-            this.AddMap("JUMP", Settings.Instance.Jump);
-            this.AddMap("DASH", Settings.Instance.Dash);
-            this.AddMap("GRAB", Settings.Instance.Grab);
-            this.AddMap("TALK", Settings.Instance.Talk);
-            this.Add((TextMenu.Item) new TextMenu.SubHeader(Dialog.Clean("KEY_CONFIG_MENUS")));
-            this.Add((TextMenu.Item) new TextMenu.SubHeader(Dialog.Clean("KEY_CONFIG_MENU_NOTICE"), false));
-            this.AddMap("LEFT", Settings.Instance.MenuLeft);
-            this.AddMap("RIGHT", Settings.Instance.MenuRight);
-            this.AddMap("UP", Settings.Instance.MenuUp);
-            this.AddMap("DOWN", Settings.Instance.MenuDown);
-            this.AddMap("CONFIRM", Settings.Instance.Confirm);
-            this.AddMap("CANCEL", Settings.Instance.Cancel);
-            this.AddMap("JOURNAL", Settings.Instance.Journal);
-            this.AddMap("PAUSE", Settings.Instance.Pause);
-            this.Add((TextMenu.Item) new TextMenu.SubHeader(""));
-            TextMenu.Button button = new TextMenu.Button(Dialog.Clean("KEY_CONFIG_RESET"));
-            button.IncludeWidthInMeasurement = false;
-            button.AlwaysCenter = true;
-            button.OnPressed = (Action) (() =>
+            _ = Add(new Header(Dialog.Clean("BTN_CONFIG_TITLE")));
+            _ = Add(new InputMappingInfo(true));
+            _ = Add(new SubHeader(Dialog.Clean("KEY_CONFIG_GAMEPLAY")));
+            AddMap("LEFT", Settings.Instance.Left);
+            AddMap("RIGHT", Settings.Instance.Right);
+            AddMap("UP", Settings.Instance.Up);
+            AddMap("DOWN", Settings.Instance.Down);
+            AddMap("JUMP", Settings.Instance.Jump);
+            AddMap("DASH", Settings.Instance.Dash);
+            AddMap("GRAB", Settings.Instance.Grab);
+            AddMap("TALK", Settings.Instance.Talk);
+            _ = Add(new SubHeader(Dialog.Clean("KEY_CONFIG_MENUS")));
+            _ = Add(new SubHeader(Dialog.Clean("KEY_CONFIG_MENU_NOTICE"), false));
+            AddMap("LEFT", Settings.Instance.MenuLeft);
+            AddMap("RIGHT", Settings.Instance.MenuRight);
+            AddMap("UP", Settings.Instance.MenuUp);
+            AddMap("DOWN", Settings.Instance.MenuDown);
+            AddMap("CONFIRM", Settings.Instance.Confirm);
+            AddMap("CANCEL", Settings.Instance.Cancel);
+            AddMap("JOURNAL", Settings.Instance.Journal);
+            AddMap("PAUSE", Settings.Instance.Pause);
+            _ = Add(new SubHeader(""));
+            Button button = new(Dialog.Clean("KEY_CONFIG_RESET"))
             {
-                this.resetHeld = true;
-                this.resetTime = 0.0f;
-                this.resetDelay = 0.0f;
-            });
-            button.ConfirmSfx = "event:/ui/main/button_lowkey";
-            this.Add((TextMenu.Item) button);
-            this.Add((TextMenu.Item) new TextMenu.SubHeader(Dialog.Clean("KEY_CONFIG_ADVANCED")));
-            this.AddMap("QUICKRESTART", Settings.Instance.QuickRestart);
-            this.AddMap("DEMO", Settings.Instance.DemoDash);
-            this.Add((TextMenu.Item) new TextMenu.SubHeader(Dialog.Clean("KEY_CONFIG_MOVE_ONLY")));
-            this.AddMap("LEFT", Settings.Instance.LeftMoveOnly);
-            this.AddMap("RIGHT", Settings.Instance.RightMoveOnly);
-            this.AddMap("UP", Settings.Instance.UpMoveOnly);
-            this.AddMap("DOWN", Settings.Instance.DownMoveOnly);
-            this.Add((TextMenu.Item) new TextMenu.SubHeader(Dialog.Clean("KEY_CONFIG_DASH_ONLY")));
-            this.AddMap("LEFT", Settings.Instance.LeftDashOnly);
-            this.AddMap("RIGHT", Settings.Instance.RightDashOnly);
-            this.AddMap("UP", Settings.Instance.UpDashOnly);
-            this.AddMap("DOWN", Settings.Instance.DownDashOnly);
-            this.OnESC = this.OnCancel = (Action) (() =>
+                IncludeWidthInMeasurement = false,
+                AlwaysCenter = true,
+                OnPressed = () =>
+                {
+                    resetHeld = true;
+                    resetTime = 0f;
+                    resetDelay = 0f;
+                },
+                ConfirmSfx = "event:/ui/main/button_lowkey"
+            };
+            _ = Add(button);
+            _ = Add(new SubHeader(Dialog.Clean("KEY_CONFIG_ADVANCED")));
+            AddMap("QUICKRESTART", Settings.Instance.QuickRestart);
+            AddMap("DEMO", Settings.Instance.DemoDash);
+            _ = Add(new SubHeader(Dialog.Clean("KEY_CONFIG_MOVE_ONLY")));
+            AddMap("LEFT", Settings.Instance.LeftMoveOnly);
+            AddMap("RIGHT", Settings.Instance.RightMoveOnly);
+            AddMap("UP", Settings.Instance.UpMoveOnly);
+            AddMap("DOWN", Settings.Instance.DownMoveOnly);
+            _ = Add(new SubHeader(Dialog.Clean("KEY_CONFIG_DASH_ONLY")));
+            AddMap("LEFT", Settings.Instance.LeftDashOnly);
+            AddMap("RIGHT", Settings.Instance.RightDashOnly);
+            AddMap("UP", Settings.Instance.UpDashOnly);
+            AddMap("DOWN", Settings.Instance.DownDashOnly);
+            OnESC = OnCancel = () =>
             {
                 MenuOptions.UpdateCrouchDashModeVisibility();
-                this.Focused = false;
-                this.closing = true;
-            });
-            this.MinWidth = 600f;
-            this.Position.Y = this.ScrollTargetY;
-            this.Alpha = 0.0f;
+                Focused = false;
+                closing = true;
+            };
+            MinWidth = 600f;
+            Position.Y = ScrollTargetY;
+            Alpha = 0f;
         }
 
         private void AddMap(string label, Binding binding)
         {
             string txt = Dialog.Clean("KEY_CONFIG_" + label);
-            this.Add(new TextMenu.Setting(txt, binding, true).Pressed((Action) (() =>
+            _ = Add(new Setting(txt, binding, true).Pressed(() =>
             {
-                this.remappingText = txt;
-                this.Remap(binding);
-            })).AltPressed((Action) (() => this.Clear(binding))));
+                remappingText = txt;
+                Remap(binding);
+            }).AltPressed(() => Clear(binding)));
         }
 
         private void Remap(Binding binding)
         {
             if (!Input.GuiInputController())
                 return;
-            this.remapping = true;
-            this.remappingBinding = binding;
-            this.timeout = 5f;
-            this.Focused = false;
+
+            remapping = true;
+            remappingBinding = binding;
+            timeout = 5f;
+            Focused = false;
         }
 
         private void AddRemap(Buttons btn)
         {
-            while (this.remappingBinding.Controller.Count >= Input.MaxBindings)
-                this.remappingBinding.Controller.RemoveAt(0);
-            this.remapping = false;
-            this.inputDelay = 0.25f;
-            if (!this.remappingBinding.Add(btn))
-                Audio.Play("event:/ui/main/button_invalid");
+            while (remappingBinding.Controller.Count >= Input.MaxBindings)
+                remappingBinding.Controller.RemoveAt(0);
+
+            remapping = false;
+            inputDelay = 0.25f;
+            if (!remappingBinding.Add(btn))
+                _ = Audio.Play("event:/ui/main/button_invalid");
+
             Input.Initialize();
         }
 
@@ -134,139 +138,145 @@ namespace Celeste
         {
             if (binding.ClearGamepad())
                 return;
-            Audio.Play("event:/ui/main/button_invalid");
+
+            _ = Audio.Play("event:/ui/main/button_invalid");
         }
 
         public override void Update()
         {
-            if (this.resetHeld)
+            if (resetHeld)
             {
-                this.resetDelay += Engine.DeltaTime;
-                this.resetTime += Engine.DeltaTime;
-                if ((double) this.resetTime > 1.5)
+                resetDelay += Engine.DeltaTime;
+                resetTime += Engine.DeltaTime;
+                if (resetTime > 1.5)
                 {
-                    this.resetDelay = 0.0f;
-                    this.resetHeld = false;
+                    resetDelay = 0.0f;
+                    resetHeld = false;
                     Settings.Instance.SetDefaultButtonControls(true);
                     Input.Initialize();
-                    Audio.Play("event:/ui/main/button_select");
+                    _ = Audio.Play("event:/ui/main/button_select");
                 }
-                if (!Input.MenuConfirm.Check && (double) this.resetDelay > 0.30000001192092896)
+                if (!Input.MenuConfirm.Check && resetDelay > 0.3f)
                 {
-                    Audio.Play("event:/ui/main/button_invalid");
-                    this.resetHeld = false;
+                    _ = Audio.Play("event:/ui/main/button_invalid");
+                    resetHeld = false;
                 }
-                if (this.resetHeld)
+                if (resetHeld)
                     return;
             }
             base.Update();
-            this.Focused = !this.closing && (double) this.inputDelay <= 0.0 && !this.waitingForController && !this.remapping;
-            if (!this.closing)
+            Focused = !closing && inputDelay <= 0 && !waitingForController && !remapping;
+            if (!closing)
             {
                 if (!MInput.GamePads[Input.Gamepad].Attached)
-                    this.waitingForController = true;
-                else if (this.waitingForController)
-                    this.waitingForController = false;
-                if (Input.MenuCancel.Pressed && !this.remapping)
-                    this.OnCancel();
+                    waitingForController = true;
+                else if (waitingForController)
+                    waitingForController = false;
+
+                if (Input.MenuCancel.Pressed && !remapping)
+                    OnCancel();
             }
-            if ((double) this.inputDelay > 0.0 && !this.remapping)
-                this.inputDelay -= Engine.RawDeltaTime;
-            this.remappingEase = Calc.Approach(this.remappingEase, this.remapping ? 1f : 0.0f, Engine.RawDeltaTime * 4f);
-            if ((double) this.remappingEase >= 0.25 && this.remapping)
+            if (inputDelay > 0 && !remapping)
+                inputDelay -= Engine.RawDeltaTime;
+
+            remappingEase = Calc.Approach(remappingEase, remapping ? 1f : 0f, Engine.RawDeltaTime * 4f);
+            if (remappingEase >= 0.25 && remapping)
             {
-                if (Input.ESC.Pressed || (double) this.timeout <= 0.0 || !Input.GuiInputController())
+                if (Input.ESC.Pressed || timeout <= 0 || !Input.GuiInputController())
                 {
-                    this.remapping = false;
-                    this.Focused = true;
+                    remapping = false;
+                    Focused = true;
                 }
                 else
                 {
                     MInput.GamePadData gamePad = MInput.GamePads[Input.Gamepad];
                     float num = 0.25f;
                     if (gamePad.LeftStickLeftPressed(num))
-                        this.AddRemap(Buttons.LeftThumbstickLeft);
+                        AddRemap(Buttons.LeftThumbstickLeft);
                     else if (gamePad.LeftStickRightPressed(num))
-                        this.AddRemap(Buttons.LeftThumbstickRight);
+                        AddRemap(Buttons.LeftThumbstickRight);
                     else if (gamePad.LeftStickUpPressed(num))
-                        this.AddRemap(Buttons.LeftThumbstickUp);
+                        AddRemap(Buttons.LeftThumbstickUp);
                     else if (gamePad.LeftStickDownPressed(num))
-                        this.AddRemap(Buttons.LeftThumbstickDown);
+                        AddRemap(Buttons.LeftThumbstickDown);
                     else if (gamePad.RightStickLeftPressed(num))
-                        this.AddRemap(Buttons.RightThumbstickLeft);
+                        AddRemap(Buttons.RightThumbstickLeft);
                     else if (gamePad.RightStickRightPressed(num))
-                        this.AddRemap(Buttons.RightThumbstickRight);
+                        AddRemap(Buttons.RightThumbstickRight);
                     else if (gamePad.RightStickDownPressed(num))
-                        this.AddRemap(Buttons.RightThumbstickDown);
+                        AddRemap(Buttons.RightThumbstickDown);
                     else if (gamePad.RightStickUpPressed(num))
-                        this.AddRemap(Buttons.RightThumbstickUp);
+                        AddRemap(Buttons.RightThumbstickUp);
                     else if (gamePad.LeftTriggerPressed(num))
-                        this.AddRemap(Buttons.LeftTrigger);
+                        AddRemap(Buttons.LeftTrigger);
                     else if (gamePad.RightTriggerPressed(num))
-                        this.AddRemap(Buttons.RightTrigger);
+                        AddRemap(Buttons.RightTrigger);
                     else if (gamePad.Pressed(Buttons.DPadLeft))
-                        this.AddRemap(Buttons.DPadLeft);
+                        AddRemap(Buttons.DPadLeft);
                     else if (gamePad.Pressed(Buttons.DPadRight))
-                        this.AddRemap(Buttons.DPadRight);
+                        AddRemap(Buttons.DPadRight);
                     else if (gamePad.Pressed(Buttons.DPadUp))
-                        this.AddRemap(Buttons.DPadUp);
+                        AddRemap(Buttons.DPadUp);
                     else if (gamePad.Pressed(Buttons.DPadDown))
-                        this.AddRemap(Buttons.DPadDown);
+                        AddRemap(Buttons.DPadDown);
                     else if (gamePad.Pressed(Buttons.A))
-                        this.AddRemap(Buttons.A);
+                        AddRemap(Buttons.A);
                     else if (gamePad.Pressed(Buttons.B))
-                        this.AddRemap(Buttons.B);
+                        AddRemap(Buttons.B);
                     else if (gamePad.Pressed(Buttons.X))
-                        this.AddRemap(Buttons.X);
+                        AddRemap(Buttons.X);
                     else if (gamePad.Pressed(Buttons.Y))
-                        this.AddRemap(Buttons.Y);
+                        AddRemap(Buttons.Y);
                     else if (gamePad.Pressed(Buttons.Start))
-                        this.AddRemap(Buttons.Start);
+                        AddRemap(Buttons.Start);
                     else if (gamePad.Pressed(Buttons.Back))
-                        this.AddRemap(Buttons.Back);
+                        AddRemap(Buttons.Back);
                     else if (gamePad.Pressed(Buttons.LeftShoulder))
-                        this.AddRemap(Buttons.LeftShoulder);
+                        AddRemap(Buttons.LeftShoulder);
                     else if (gamePad.Pressed(Buttons.RightShoulder))
-                        this.AddRemap(Buttons.RightShoulder);
+                        AddRemap(Buttons.RightShoulder);
                     else if (gamePad.Pressed(Buttons.LeftStick))
-                        this.AddRemap(Buttons.LeftStick);
+                        AddRemap(Buttons.LeftStick);
                     else if (gamePad.Pressed(Buttons.RightStick))
-                        this.AddRemap(Buttons.RightStick);
+                        AddRemap(Buttons.RightStick);
                 }
-                this.timeout -= Engine.RawDeltaTime;
+                timeout -= Engine.RawDeltaTime;
             }
-            this.closingDelay -= Engine.RawDeltaTime;
-            this.Alpha = Calc.Approach(this.Alpha, !this.closing || (double) this.closingDelay > 0.0 ? 1f : 0.0f, Engine.RawDeltaTime * 8f);
-            if (!this.closing || (double) this.Alpha > 0.0)
+            closingDelay -= Engine.RawDeltaTime;
+            Alpha = Calc.Approach(Alpha, !closing || closingDelay > 0 ? 1f : 0f, Engine.RawDeltaTime * 8f);
+            if (!closing || Alpha > 0)
                 return;
-            this.Close();
+
+            Close();
         }
 
         public override void Render()
         {
-            Draw.Rect(-10f, -10f, 1940f, 1100f, Color.Black * Ease.CubeOut(this.Alpha));
+            Draw.Rect(-10f, -10f, 1940f, 1100f, Color.Black * Ease.CubeOut(Alpha));
             Vector2 position = new Vector2(1920f, 1080f) * 0.5f;
             if (MInput.GamePads[Input.Gamepad].Attached)
             {
                 base.Render();
-                if ((double) this.remappingEase > 0.0)
+                if (remappingEase > 0)
                 {
-                    Draw.Rect(-10f, -10f, 1940f, 1100f, Color.Black * 0.95f * Ease.CubeInOut(this.remappingEase));
-                    ActiveFont.Draw(Dialog.Get("BTN_CONFIG_CHANGING"), position + new Vector2(0.0f, -8f), new Vector2(0.5f, 1f), Vector2.One * 0.7f, Color.LightGray * Ease.CubeIn(this.remappingEase));
-                    ActiveFont.Draw(this.remappingText, position + new Vector2(0.0f, 8f), new Vector2(0.5f, 0.0f), Vector2.One * 2f, Color.White * Ease.CubeIn(this.remappingEase));
+                    Draw.Rect(-10f, -10f, 1940f, 1100f, Color.Black * 0.95f * Ease.CubeInOut(remappingEase));
+                    ActiveFont.Draw(Dialog.Get("BTN_CONFIG_CHANGING"), position + new Vector2(0f, -8f), new Vector2(0.5f, 1f), Vector2.One * 0.7f, Color.LightGray * Ease.CubeIn(remappingEase));
+                    ActiveFont.Draw(remappingText, position + new Vector2(0f, 8f), new Vector2(0.5f, 0f), Vector2.One * 2f, Color.White * Ease.CubeIn(remappingEase));
                 }
             }
             else
-                ActiveFont.Draw(Dialog.Clean("BTN_CONFIG_NOCONTROLLER"), position, new Vector2(0.5f, 0.5f), Vector2.One, Color.White * Ease.CubeOut(this.Alpha));
-            if (!this.resetHeld)
+                ActiveFont.Draw(Dialog.Clean("BTN_CONFIG_NOCONTROLLER"), position, new Vector2(0.5f, 0.5f), Vector2.One, Color.White * Ease.CubeOut(Alpha));
+
+            if (!resetHeld)
                 return;
-            float num1 = Ease.CubeInOut(Calc.Min(1f, this.resetDelay / 0.2f));
-            float num2 = Ease.SineOut(Calc.Min(1f, this.resetTime / 1.5f));
+
+            float num1 = Ease.CubeInOut(Calc.Min(1f, resetDelay / 0.2f));
+            float num2 = Ease.SineOut(Calc.Min(1f, resetTime / 1.5f));
             Draw.Rect(-10f, -10f, 1940f, 1100f, Color.Black * 0.95f * num1);
             float width = 480f;
-            double x = (1920.0 - (double) width) / 2.0;
-            Draw.Rect((float) x, 530f, width, 20f, Color.White * 0.25f * num1);
-            Draw.Rect((float) x, 530f, width * num2, 20f, Color.White * num1);
+            double x = (1920 - width) / 2;
+            Draw.Rect(x, 530f, width, 20f, Color.White * 0.25f * num1);
+            Draw.Rect(x, 530f, width * num2, 20f, Color.White * num1);
         }
     }
 }
