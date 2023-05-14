@@ -53,7 +53,9 @@ namespace Celeste
         public void Apply(VirtualRenderTarget target, Scene scene)
         {
             if (Strength <= 0)
+            {
                 return;
+            }
 
             VirtualRenderTarget tempA = GameplayBuffers.TempA;
             Texture2D texture = GaussianBlur.Blur((RenderTarget2D)target, GameplayBuffers.TempA, GameplayBuffers.TempB);
@@ -70,13 +72,22 @@ namespace Celeste
                 {
                     BloomPoint bloomPoint = component as BloomPoint;
                     if (bloomPoint.Visible && bloomPoint.Radius > 0 && bloomPoint.Alpha > 0)
+                    {
                         gradient.DrawCentered(bloomPoint.Entity.Position + bloomPoint.Position, Color.White * bloomPoint.Alpha, bloomPoint.Radius * 2f * num);
+                    }
                 }
                 foreach (CustomBloom component in scene.Tracker.GetComponents<CustomBloom>().Cast<CustomBloom>())
+                {
                     if (component.Visible && component.OnRenderBloom != null)
+                    {
                         component.OnRenderBloom();
+                    }
+                }
+
                 foreach (Entity entity in scene.Tracker.GetEntities<SeekerBarrier>())
+                {
                     Draw.Rect(entity.Collider, Color.White);
+                }
 
                 Draw.SpriteBatch.End();
                 if (components2.Count > 0)
@@ -86,7 +97,9 @@ namespace Celeste
                     {
                         EffectCutout effectCutout = component as EffectCutout;
                         if (effectCutout.Visible)
+                        {
                             Draw.Rect(effectCutout.Left, effectCutout.Top, effectCutout.Right - effectCutout.Left, effectCutout.Bottom - effectCutout.Top, Color.White * (1f - effectCutout.Alpha));
+                        }
                     }
                     Draw.SpriteBatch.End();
                 }
@@ -102,7 +115,7 @@ namespace Celeste
             for (int i = 0; i < Strength; ++i)
             {
                 float num = i < Strength - 1 ? 1f : Strength - i;
-                Draw.SpriteBatch.Draw((RenderTarget2D) tempA, Vector2.Zero, Color.White * num);
+                Draw.SpriteBatch.Draw((RenderTarget2D)tempA, Vector2.Zero, Color.White * num);
             }
             Draw.SpriteBatch.End();
         }

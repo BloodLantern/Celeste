@@ -18,28 +18,27 @@ namespace Celeste
         private float sinkTimer;
         private MTexture[] textures;
         private string lastSfx;
-        private SoundSource sfx;
+        private readonly SoundSource sfx;
 
         public MovingPlatform(Vector2 position, int width, Vector2 node)
             : base(position, width, false)
         {
-            this.start = this.Position;
-            this.end = node;
-            this.Add((Component) (this.sfx = new SoundSource()));
-            this.SurfaceSoundIndex = 5;
-            this.lastSfx = Math.Sign(this.start.X - this.end.X) > 0 || Math.Sign(this.start.Y - this.end.Y) > 0 ? "event:/game/03_resort/platform_horiz_left" : "event:/game/03_resort/platform_horiz_right";
+            start = Position;
+            end = node;
+            Add(sfx = new SoundSource());
+            SurfaceSoundIndex = 5;
+            lastSfx = Math.Sign(start.X - end.X) > 0 || Math.Sign(start.Y - end.Y) > 0 ? "event:/game/03_resort/platform_horiz_left" : "event:/game/03_resort/platform_horiz_right";
             Tween tween = Tween.Create(Tween.TweenMode.YoyoLooping, Ease.SineInOut, 2f);
-            tween.OnUpdate = (Action<Tween>) (t => this.MoveTo(Vector2.Lerp(this.start, this.end, t.Eased) + Vector2.UnitY * this.addY));
-            tween.OnStart = (Action<Tween>) (t =>
+            tween.OnUpdate = t => MoveTo(Vector2.Lerp(start, end, t.Eased) + (Vector2.UnitY * addY));
+            tween.OnStart = t =>
             {
-                if (this.lastSfx == "event:/game/03_resort/platform_horiz_left")
-                    this.sfx.Play(this.lastSfx = "event:/game/03_resort/platform_horiz_right");
-                else
-                    this.sfx.Play(this.lastSfx = "event:/game/03_resort/platform_horiz_left");
-            });
-            this.Add((Component) tween);
+                _ = lastSfx == "event:/game/03_resort/platform_horiz_left"
+                    ? sfx.Play(lastSfx = "event:/game/03_resort/platform_horiz_right")
+                    : sfx.Play(lastSfx = "event:/game/03_resort/platform_horiz_left");
+            };
+            Add(tween);
             tween.Start(false);
-            this.Add((Component) new LightOcclude(0.2f));
+            Add(new LightOcclude(0.2f));
         }
 
         public MovingPlatform(EntityData data, Vector2 offset)
@@ -50,41 +49,52 @@ namespace Celeste
         public override void Added(Scene scene)
         {
             base.Added(scene);
-            Session session = this.SceneAs<Level>().Session;
+            Session session = SceneAs<Level>().Session;
             MTexture mtexture = session.Area.ID != 7 || !session.Level.StartsWith("e-") ? GFX.Game["objects/woodPlatform/" + AreaData.Get(scene).WoodPlatform] : GFX.Game["objects/woodPlatform/" + AreaData.Get(4).WoodPlatform];
-            this.textures = new MTexture[mtexture.Width / 8];
-            for (int index = 0; index < this.textures.Length; ++index)
-                this.textures[index] = mtexture.GetSubtexture(index * 8, 0, 8, 8);
-            Vector2 vector2 = new Vector2(this.Width, this.Height + 4f) / 2f;
-            scene.Add((Entity) new MovingPlatformLine(this.start + vector2, this.end + vector2));
+            textures = new MTexture[mtexture.Width / 8];
+            for (int index = 0; index < textures.Length; ++index)
+            {
+                textures[index] = mtexture.GetSubtexture(index * 8, 0, 8, 8);
+            }
+
+            Vector2 vector2 = new Vector2(Width, Height + 4f) / 2f;
+            scene.Add(new MovingPlatformLine(start + vector2, end + vector2));
         }
 
         public override void Render()
         {
-            this.textures[0].Draw(this.Position);
-            for (int x = 8; (double) x < (double) this.Width - 8.0; x += 8)
-                this.textures[1].Draw(this.Position + new Vector2((float) x, 0.0f));
-            this.textures[3].Draw(this.Position + new Vector2(this.Width - 8f, 0.0f));
-            this.textures[2].Draw(this.Position + new Vector2((float) ((double) this.Width / 2.0 - 4.0), 0.0f));
+            textures[0].Draw(Position);
+            for (int x = 8; x < (double)Width - 8.0; x += 8)
+            {
+                textures[1].Draw(Position + new Vector2(x, 0.0f));
+            }
+
+            textures[3].Draw(Position + new Vector2(Width - 8f, 0.0f));
+            textures[2].Draw(Position + new Vector2((float)(((double)Width / 2.0) - 4.0), 0.0f));
         }
 
-        public override void OnStaticMoverTrigger(StaticMover sm) => this.sinkTimer = 0.4f;
+        public override void OnStaticMoverTrigger(StaticMover sm)
+        {
+            sinkTimer = 0.4f;
+        }
 
         public override void Update()
         {
             base.Update();
-            if (this.HasPlayerRider())
+            if (HasPlayerRider())
             {
-                this.sinkTimer = 0.2f;
-                this.addY = Calc.Approach(this.addY, 3f, 50f * Engine.DeltaTime);
+                sinkTimer = 0.2f;
+                addY = Calc.Approach(addY, 3f, 50f * Engine.DeltaTime);
             }
-            else if ((double) this.sinkTimer > 0.0)
+            else if (sinkTimer > 0.0)
             {
-                this.sinkTimer -= Engine.DeltaTime;
-                this.addY = Calc.Approach(this.addY, 3f, 50f * Engine.DeltaTime);
+                sinkTimer -= Engine.DeltaTime;
+                addY = Calc.Approach(addY, 3f, 50f * Engine.DeltaTime);
             }
             else
-                this.addY = Calc.Approach(this.addY, 0.0f, 20f * Engine.DeltaTime);
+            {
+                addY = Calc.Approach(addY, 0.0f, 20f * Engine.DeltaTime);
+            }
         }
     }
 }

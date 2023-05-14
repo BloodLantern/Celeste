@@ -21,23 +21,26 @@ namespace Celeste
         public NPC01_Theo(Vector2 position)
             : base(position)
         {
-            this.Add((Component) (this.Sprite = GFX.SpriteBank.Create("theo")));
-            this.Sprite.Play("idle");
+            Add(Sprite = GFX.SpriteBank.Create("theo"));
+            Sprite.Play("idle");
         }
 
         public override void Added(Scene scene)
         {
             base.Added(scene);
-            this.currentConversation = this.Session.GetCounter("theo");
-            if (this.Session.GetFlag("theoDoneTalking"))
+            currentConversation = Session.GetCounter("theo");
+            if (Session.GetFlag("theoDoneTalking"))
+            {
                 return;
-            this.Add((Component) (this.Talker = new TalkComponent(new Rectangle(-8, -8, 88, 8), new Vector2(0.0f, -24f), new Action<Player>(this.OnTalk))));
+            }
+
+            Add(Talker = new TalkComponent(new Rectangle(-8, -8, 88, 8), new Vector2(0.0f, -24f), new Action<Player>(OnTalk)));
         }
 
         private void OnTalk(Player player)
         {
-            this.Level.StartCutscene(new Action<Level>(this.OnTalkEnd));
-            this.Add((Component) (this.talkRoutine = new Coroutine(this.Talk(player))));
+            Level.StartCutscene(new Action<Level>(OnTalkEnd));
+            Add(talkRoutine = new Coroutine(Talk(player)));
         }
 
         private IEnumerator Talk(Player player)
@@ -45,38 +48,38 @@ namespace Celeste
             NPC01_Theo npC01Theo = this;
             if (npC01Theo.currentConversation == 0)
             {
-                yield return (object) npC01Theo.PlayerApproachRightSide(player);
-                yield return (object) Textbox.Say("CH1_THEO_A", new Func<IEnumerator>(((NPC) npC01Theo).PlayerApproach48px));
+                yield return npC01Theo.PlayerApproachRightSide(player);
+                yield return Textbox.Say("CH1_THEO_A", new Func<IEnumerator>(npC01Theo.PlayerApproach48px));
             }
             else if (npC01Theo.currentConversation == 1)
             {
-                yield return (object) npC01Theo.PlayerApproachRightSide(player);
-                yield return (object) 0.2f;
-                yield return (object) npC01Theo.PlayerApproach(player, spacing: new float?(48f));
-                yield return (object) Textbox.Say("CH1_THEO_B");
+                yield return npC01Theo.PlayerApproachRightSide(player);
+                yield return 0.2f;
+                yield return npC01Theo.PlayerApproach(player, spacing: new float?(48f));
+                yield return Textbox.Say("CH1_THEO_B");
             }
             else if (npC01Theo.currentConversation == 2)
             {
-                yield return (object) npC01Theo.PlayerApproachRightSide(player, spacing: new float?(48f));
-                yield return (object) Textbox.Say("CH1_THEO_C");
+                yield return npC01Theo.PlayerApproachRightSide(player, spacing: new float?(48f));
+                yield return Textbox.Say("CH1_THEO_C");
             }
             else if (npC01Theo.currentConversation == 3)
             {
-                yield return (object) npC01Theo.PlayerApproachRightSide(player, spacing: new float?(48f));
-                yield return (object) Textbox.Say("CH1_THEO_D");
+                yield return npC01Theo.PlayerApproachRightSide(player, spacing: new float?(48f));
+                yield return Textbox.Say("CH1_THEO_D");
             }
             else if (npC01Theo.currentConversation == 4)
             {
-                yield return (object) npC01Theo.PlayerApproachRightSide(player, spacing: new float?(48f));
-                yield return (object) Textbox.Say("CH1_THEO_E");
+                yield return npC01Theo.PlayerApproachRightSide(player, spacing: new float?(48f));
+                yield return Textbox.Say("CH1_THEO_E");
             }
             else if (npC01Theo.currentConversation == 5)
             {
-                yield return (object) npC01Theo.PlayerApproachRightSide(player, spacing: new float?(48f));
-                yield return (object) Textbox.Say("CH1_THEO_F", new Func<IEnumerator>(npC01Theo.Yolo));
+                yield return npC01Theo.PlayerApproachRightSide(player, spacing: new float?(48f));
+                yield return Textbox.Say("CH1_THEO_F", new Func<IEnumerator>(npC01Theo.Yolo));
                 npC01Theo.Sprite.Play("yoloEnd");
-                npC01Theo.Remove((Component) npC01Theo.Talker);
-                yield return (object) npC01Theo.Level.ZoomBack(0.5f);
+                npC01Theo.Remove(npC01Theo.Talker);
+                yield return npC01Theo.Level.ZoomBack(0.5f);
             }
             npC01Theo.Level.EndCutscene();
             npC01Theo.OnTalkEnd(npC01Theo.Level);
@@ -84,39 +87,43 @@ namespace Celeste
 
         private void OnTalkEnd(Level level)
         {
-            if (this.currentConversation == 0)
-                SaveData.Instance.SetFlag("MetTheo");
-            else if (this.currentConversation == 1)
-                SaveData.Instance.SetFlag("TheoKnowsName");
-            else if (this.currentConversation == 5)
+            if (currentConversation == 0)
             {
-                this.Session.SetFlag("theoDoneTalking");
-                this.Remove((Component) this.Talker);
+                SaveData.Instance.SetFlag("MetTheo");
             }
-            Player entity = this.Scene.Tracker.GetEntity<Player>();
+            else if (currentConversation == 1)
+            {
+                SaveData.Instance.SetFlag("TheoKnowsName");
+            }
+            else if (currentConversation == 5)
+            {
+                Session.SetFlag("theoDoneTalking");
+                Remove(Talker);
+            }
+            Player entity = Scene.Tracker.GetEntity<Player>();
             if (entity != null)
             {
                 entity.StateMachine.Locked = false;
                 entity.StateMachine.State = 0;
             }
-            this.Session.IncrementCounter("theo");
-            ++this.currentConversation;
-            this.talkRoutine.Cancel();
-            this.talkRoutine.RemoveSelf();
-            this.Sprite.Play("idle");
+            Session.IncrementCounter("theo");
+            ++currentConversation;
+            talkRoutine.Cancel();
+            talkRoutine.RemoveSelf();
+            Sprite.Play("idle");
         }
 
         private IEnumerator Yolo()
         {
             NPC01_Theo npC01Theo = this;
-            yield return (object) npC01Theo.Level.ZoomTo(new Vector2(128f, 128f), 2f, 0.5f);
-            yield return (object) 0.2f;
-            Audio.Play("event:/char/theo/yolo_fist", npC01Theo.Position);
+            yield return npC01Theo.Level.ZoomTo(new Vector2(128f, 128f), 2f, 0.5f);
+            yield return 0.2f;
+            _ = Audio.Play("event:/char/theo/yolo_fist", npC01Theo.Position);
             npC01Theo.Sprite.Play("yolo");
-            yield return (object) 0.1f;
+            yield return 0.1f;
             npC01Theo.Level.DirectionalShake(-Vector2.UnitY);
             npC01Theo.Level.ParticlesFG.Emit(NPC01_Theo.P_YOLO, 6, npC01Theo.Position + new Vector2(-3f, -24f), Vector2.One * 4f);
-            yield return (object) 0.5f;
+            yield return 0.5f;
         }
     }
 }

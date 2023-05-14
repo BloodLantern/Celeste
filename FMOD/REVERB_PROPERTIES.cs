@@ -35,18 +35,18 @@ namespace FMOD
             float earlyLateMix,
             float wetLevel)
         {
-            this.DecayTime = decayTime;
-            this.EarlyDelay = earlyDelay;
-            this.LateDelay = lateDelay;
-            this.HFReference = hfReference;
-            this.HFDecayRatio = hfDecayRatio;
-            this.Diffusion = diffusion;
-            this.Density = density;
-            this.LowShelfFrequency = lowShelfFrequency;
-            this.LowShelfGain = lowShelfGain;
-            this.HighCut = highCut;
-            this.EarlyLateMix = earlyLateMix;
-            this.WetLevel = wetLevel;
+            DecayTime = decayTime;
+            EarlyDelay = earlyDelay;
+            LateDelay = lateDelay;
+            HFReference = hfReference;
+            HFDecayRatio = hfDecayRatio;
+            Diffusion = diffusion;
+            Density = density;
+            LowShelfFrequency = lowShelfFrequency;
+            LowShelfGain = lowShelfGain;
+            HighCut = highCut;
+            EarlyLateMix = earlyLateMix;
+            WetLevel = wetLevel;
         }
     }
 }

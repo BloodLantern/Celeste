@@ -18,87 +18,95 @@ namespace Celeste
         public const float MinDist = 4f;
         public const float MaxDist = 24f;
         public float FlowSpeed;
-        public List<float> YNodes = new List<float>();
+        public List<float> YNodes = new();
         public Starfield.Star[] Stars = new Starfield.Star[128];
 
         public Starfield(Color color, float speed = 1f)
         {
-            this.Color = color;
-            this.FlowSpeed = speed;
+            Color = color;
+            FlowSpeed = speed;
             float num1 = Calc.Random.NextFloat(180f);
             int num2 = 0;
             while (num2 < 15)
             {
-                this.YNodes.Add(num1);
+                YNodes.Add(num1);
                 ++num2;
-                num1 += (float) Calc.Random.Choose<int>(-1, 1) * (16f + Calc.Random.NextFloat(24f));
+                num1 += Calc.Random.Choose<int>(-1, 1) * (16f + Calc.Random.NextFloat(24f));
             }
             for (int index = 0; index < 4; ++index)
-                this.YNodes[this.YNodes.Count - 1 - index] = Calc.LerpClamp(this.YNodes[this.YNodes.Count - 1 - index], this.YNodes[0], (float) (1.0 - (double) index / 4.0));
+            {
+                YNodes[YNodes.Count - 1 - index] = Calc.LerpClamp(YNodes[YNodes.Count - 1 - index], YNodes[0], (float)(1.0 - (index / 4.0)));
+            }
+
             List<MTexture> atlasSubtextures = GFX.Game.GetAtlasSubtextures("particles/starfield/");
-            for (int index1 = 0; index1 < this.Stars.Length; ++index1)
+            for (int index1 = 0; index1 < Stars.Length; ++index1)
             {
                 float num3 = Calc.Random.NextFloat(1f);
-                this.Stars[index1].NodeIndex = Calc.Random.Next(this.YNodes.Count - 1);
-                this.Stars[index1].NodePercent = Calc.Random.NextFloat(1f);
-                this.Stars[index1].Distance = (float) (4.0 + (double) num3 * 20.0);
-                this.Stars[index1].Sine = Calc.Random.NextFloat(6.28318548f);
-                this.Stars[index1].Position = this.GetTargetOfStar(ref this.Stars[index1]);
-                this.Stars[index1].Color = Color.Lerp(this.Color, Color.Transparent, num3 * 0.5f);
-                int index2 = (int) Calc.Clamp(Ease.CubeIn(1f - num3) * (float) atlasSubtextures.Count, 0.0f, (float) (atlasSubtextures.Count - 1));
-                this.Stars[index1].Texture = atlasSubtextures[index2];
+                Stars[index1].NodeIndex = Calc.Random.Next(YNodes.Count - 1);
+                Stars[index1].NodePercent = Calc.Random.NextFloat(1f);
+                Stars[index1].Distance = (float)(4.0 + ((double)num3 * 20.0));
+                Stars[index1].Sine = Calc.Random.NextFloat(6.28318548f);
+                Stars[index1].Position = GetTargetOfStar(ref Stars[index1]);
+                Stars[index1].Color = Color.Lerp(Color, Color.Transparent, num3 * 0.5f);
+                int index2 = (int)Calc.Clamp(Ease.CubeIn(1f - num3) * atlasSubtextures.Count, 0.0f, atlasSubtextures.Count - 1);
+                Stars[index1].Texture = atlasSubtextures[index2];
             }
         }
 
         public override void Update(Scene scene)
         {
             base.Update(scene);
-            for (int index = 0; index < this.Stars.Length; ++index)
-                this.UpdateStar(ref this.Stars[index]);
+            for (int index = 0; index < Stars.Length; ++index)
+            {
+                UpdateStar(ref Stars[index]);
+            }
         }
 
         private void UpdateStar(ref Starfield.Star star)
         {
-            star.Sine += Engine.DeltaTime * this.FlowSpeed;
-            star.NodePercent += Engine.DeltaTime * 0.25f * this.FlowSpeed;
-            if ((double) star.NodePercent >= 1.0)
+            star.Sine += Engine.DeltaTime * FlowSpeed;
+            star.NodePercent += Engine.DeltaTime * 0.25f * FlowSpeed;
+            if (star.NodePercent >= 1.0)
             {
                 --star.NodePercent;
                 ++star.NodeIndex;
-                if (star.NodeIndex >= this.YNodes.Count - 1)
+                if (star.NodeIndex >= YNodes.Count - 1)
                 {
                     star.NodeIndex = 0;
                     star.Position.X -= 448f;
                 }
             }
-            star.Position += (this.GetTargetOfStar(ref star) - star.Position) / 50f;
+            star.Position += (GetTargetOfStar(ref star) - star.Position) / 50f;
         }
 
         private Vector2 GetTargetOfStar(ref Starfield.Star star)
         {
-            Vector2 vector2_1 = new Vector2((float) (star.NodeIndex * 32), this.YNodes[star.NodeIndex]);
-            Vector2 vector2_2 = new Vector2((float) ((star.NodeIndex + 1) * 32), this.YNodes[star.NodeIndex + 1]);
-            Vector2 vector2_3 = vector2_1 + (vector2_2 - vector2_1) * star.NodePercent;
+            Vector2 vector2_1 = new(star.NodeIndex * 32, YNodes[star.NodeIndex]);
+            Vector2 vector2_2 = new((star.NodeIndex + 1) * 32, YNodes[star.NodeIndex + 1]);
+            Vector2 vector2_3 = vector2_1 + ((vector2_2 - vector2_1) * star.NodePercent);
             Vector2 vector2_4 = (vector2_2 - vector2_1).SafeNormalize();
-            Vector2 vector2_5 = new Vector2(-vector2_4.Y, vector2_4.X) * star.Distance * (float) Math.Sin((double) star.Sine);
+            Vector2 vector2_5 = new Vector2(-vector2_4.Y, vector2_4.X) * star.Distance * (float)Math.Sin(star.Sine);
             return vector2_3 + vector2_5;
         }
 
         public override void Render(Scene scene)
         {
             Vector2 position1 = (scene as Level).Camera.Position;
-            for (int index = 0; index < this.Stars.Length; ++index)
+            for (int index = 0; index < Stars.Length; ++index)
             {
-                Vector2 position2 = new Vector2()
+                Vector2 position2 = new()
                 {
-                    X = this.Mod(this.Stars[index].Position.X - position1.X * this.Scroll.X, 448f) - 64f,
-                    Y = this.Mod(this.Stars[index].Position.Y - position1.Y * this.Scroll.Y, 212f) - 16f
+                    X = Mod(Stars[index].Position.X - (position1.X * Scroll.X), 448f) - 64f,
+                    Y = Mod(Stars[index].Position.Y - (position1.Y * Scroll.Y), 212f) - 16f
                 };
-                this.Stars[index].Texture.DrawCentered(position2, this.Stars[index].Color * this.FadeAlphaMultiplier);
+                Stars[index].Texture.DrawCentered(position2, Stars[index].Color * FadeAlphaMultiplier);
             }
         }
 
-        private float Mod(float x, float m) => (x % m + m) % m;
+        private float Mod(float x, float m)
+        {
+            return ((x % m) + m) % m;
+        }
 
         public struct Star
         {

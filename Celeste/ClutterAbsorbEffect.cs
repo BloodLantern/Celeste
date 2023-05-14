@@ -20,7 +20,7 @@ namespace Celeste
         public ClutterAbsorbEffect()
         {
             Position = Vector2.Zero;
-            Tag = (int) Tags.TransitionUpdate;
+            Tag = (int)Tags.TransitionUpdate;
             Depth = -10001;
         }
 
@@ -29,7 +29,9 @@ namespace Celeste
             base.Added(scene);
             level = SceneAs<Level>();
             foreach (Entity entity in level.Tracker.GetEntities<ClutterCabinet>())
+            {
                 cabinets.Add(entity as ClutterCabinet);
+            }
         }
 
         public void FlyClutter(Vector2 position, MTexture texture, bool shake, float delay)
@@ -74,10 +76,14 @@ namespace Celeste
                 img.Position = curve.GetPoint(Ease.CubeInOut(time));
                 img.Scale = Vector2.One * Ease.CubeInOut(1 - (time * 0.5f));
                 if (time > 0.5f && !cabinet.Opened)
+                {
                     cabinet.Open();
+                }
 
                 if (clutterAbsorbEffect.level.OnInterval(0.25f))
+                {
                     clutterAbsorbEffect.level.ParticlesFG.Emit(ClutterSwitch.P_ClutterFly, img.Position);
+                }
 
                 yield return null;
             }
@@ -97,7 +103,9 @@ namespace Celeste
             {
                 cabinet.Close();
                 if (i++ % 3 == 0)
+                {
                     yield return 0.1f;
+                }
             }
         }
     }

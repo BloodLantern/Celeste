@@ -14,29 +14,31 @@ namespace Monocle
     [Serializable]
     public class Binding
     {
-        public List<Keys> Keyboard = new List<Keys>();
-        public List<Buttons> Controller = new List<Buttons>();
+        public List<Keys> Keyboard = new();
+        public List<Buttons> Controller = new();
         [XmlIgnore]
-        public List<Binding> ExclusiveFrom = new List<Binding>();
+        public List<Binding> ExclusiveFrom = new();
 
-        public bool HasInput => this.Keyboard.Count > 0 || this.Controller.Count > 0;
+        public bool HasInput => Keyboard.Count > 0 || Controller.Count > 0;
 
         public bool Add(params Keys[] keys)
         {
             bool flag = false;
             Keys[] keysArray = keys;
-label_9:
+        label_9:
             for (int index = 0; index < keysArray.Length; ++index)
             {
                 Keys key = keysArray[index];
-                if (!this.Keyboard.Contains(key))
+                if (!Keyboard.Contains(key))
                 {
-                    foreach (Binding binding in this.ExclusiveFrom)
+                    foreach (Binding binding in ExclusiveFrom)
                     {
                         if (binding.Needs(key))
+                        {
                             goto label_9;
+                        }
                     }
-                    this.Keyboard.Add(key);
+                    Keyboard.Add(key);
                     flag = true;
                 }
             }
@@ -47,18 +49,20 @@ label_9:
         {
             bool flag = false;
             Buttons[] buttonsArray = buttons;
-label_9:
+        label_9:
             for (int index = 0; index < buttonsArray.Length; ++index)
             {
                 Buttons button = buttonsArray[index];
-                if (!this.Controller.Contains(button))
+                if (!Controller.Contains(button))
                 {
-                    foreach (Binding binding in this.ExclusiveFrom)
+                    foreach (Binding binding in ExclusiveFrom)
                     {
                         if (binding.Needs(button))
+                        {
                             goto label_9;
+                        }
                     }
-                    this.Controller.Add(button);
+                    Controller.Add(button);
                     flag = true;
                 }
             }
@@ -67,155 +71,213 @@ label_9:
 
         public bool Needs(Buttons button)
         {
-            if (!this.Controller.Contains(button))
-                return false;
-            if (this.Controller.Count <= 1)
-                return true;
-            if (!this.IsExclusive(button))
-                return false;
-            foreach (Buttons button1 in this.Controller)
+            if (!Controller.Contains(button))
             {
-                if (button1 != button && this.IsExclusive(button1))
+                return false;
+            }
+
+            if (Controller.Count <= 1)
+            {
+                return true;
+            }
+
+            if (!IsExclusive(button))
+            {
+                return false;
+            }
+
+            foreach (Buttons button1 in Controller)
+            {
+                if (button1 != button && IsExclusive(button1))
+                {
                     return false;
+                }
             }
             return true;
         }
 
         public bool Needs(Keys key)
         {
-            if (!this.Keyboard.Contains(key))
-                return false;
-            if (this.Keyboard.Count <= 1)
-                return true;
-            if (!this.IsExclusive(key))
-                return false;
-            foreach (Keys key1 in this.Keyboard)
+            if (!Keyboard.Contains(key))
             {
-                if (key1 != key && this.IsExclusive(key1))
+                return false;
+            }
+
+            if (Keyboard.Count <= 1)
+            {
+                return true;
+            }
+
+            if (!IsExclusive(key))
+            {
+                return false;
+            }
+
+            foreach (Keys key1 in Keyboard)
+            {
+                if (key1 != key && IsExclusive(key1))
+                {
                     return false;
+                }
             }
             return true;
         }
 
         public bool IsExclusive(Buttons button)
         {
-            foreach (Binding binding in this.ExclusiveFrom)
+            foreach (Binding binding in ExclusiveFrom)
             {
                 if (binding.Controller.Contains(button))
+                {
                     return false;
+                }
             }
             return true;
         }
 
         public bool IsExclusive(Keys key)
         {
-            foreach (Binding binding in this.ExclusiveFrom)
+            foreach (Binding binding in ExclusiveFrom)
             {
                 if (binding.Keyboard.Contains(key))
+                {
                     return false;
+                }
             }
             return true;
         }
 
         public bool ClearKeyboard()
         {
-            if (this.ExclusiveFrom.Count > 0)
+            if (ExclusiveFrom.Count > 0)
             {
-                if (this.Keyboard.Count <= 1)
-                    return false;
-                int index1 = 0;
-                for (int index2 = 1; index2 < this.Keyboard.Count; ++index2)
+                if (Keyboard.Count <= 1)
                 {
-                    if (this.IsExclusive(this.Keyboard[index2]))
-                        index1 = index2;
+                    return false;
                 }
-                Keys keys = this.Keyboard[index1];
-                this.Keyboard.Clear();
-                this.Keyboard.Add(keys);
+
+                int index1 = 0;
+                for (int index2 = 1; index2 < Keyboard.Count; ++index2)
+                {
+                    if (IsExclusive(Keyboard[index2]))
+                    {
+                        index1 = index2;
+                    }
+                }
+                Keys keys = Keyboard[index1];
+                Keyboard.Clear();
+                Keyboard.Add(keys);
             }
             else
-                this.Keyboard.Clear();
+            {
+                Keyboard.Clear();
+            }
+
             return true;
         }
 
         public bool ClearGamepad()
         {
-            if (this.ExclusiveFrom.Count > 0)
+            if (ExclusiveFrom.Count > 0)
             {
-                if (this.Controller.Count <= 1)
-                    return false;
-                int index1 = 0;
-                for (int index2 = 1; index2 < this.Controller.Count; ++index2)
+                if (Controller.Count <= 1)
                 {
-                    if (this.IsExclusive(this.Controller[index2]))
-                        index1 = index2;
+                    return false;
                 }
-                Buttons buttons = this.Controller[index1];
-                this.Controller.Clear();
-                this.Controller.Add(buttons);
+
+                int index1 = 0;
+                for (int index2 = 1; index2 < Controller.Count; ++index2)
+                {
+                    if (IsExclusive(Controller[index2]))
+                    {
+                        index1 = index2;
+                    }
+                }
+                Buttons buttons = Controller[index1];
+                Controller.Clear();
+                Controller.Add(buttons);
             }
             else
-                this.Controller.Clear();
+            {
+                Controller.Clear();
+            }
+
             return true;
         }
 
         public float Axis(int gamepadIndex, float threshold)
         {
-            foreach (Keys key in this.Keyboard)
+            foreach (Keys key in Keyboard)
             {
                 if (MInput.Keyboard.Check(key))
+                {
                     return 1f;
+                }
             }
-            foreach (Buttons button in this.Controller)
+            foreach (Buttons button in Controller)
             {
                 float num = MInput.GamePads[gamepadIndex].Axis(button, threshold);
-                if ((double) num != 0.0)
+                if ((double)num != 0.0)
+                {
                     return num;
+                }
             }
             return 0.0f;
         }
 
         public bool Check(int gamepadIndex, float threshold)
         {
-            for (int index = 0; index < this.Keyboard.Count; ++index)
+            for (int index = 0; index < Keyboard.Count; ++index)
             {
-                if (MInput.Keyboard.Check(this.Keyboard[index]))
+                if (MInput.Keyboard.Check(Keyboard[index]))
+                {
                     return true;
+                }
             }
-            for (int index = 0; index < this.Controller.Count; ++index)
+            for (int index = 0; index < Controller.Count; ++index)
             {
-                if (MInput.GamePads[gamepadIndex].Check(this.Controller[index], threshold))
+                if (MInput.GamePads[gamepadIndex].Check(Controller[index], threshold))
+                {
                     return true;
+                }
             }
             return false;
         }
 
         public bool Pressed(int gamepadIndex, float threshold)
         {
-            for (int index = 0; index < this.Keyboard.Count; ++index)
+            for (int index = 0; index < Keyboard.Count; ++index)
             {
-                if (MInput.Keyboard.Pressed(this.Keyboard[index]))
+                if (MInput.Keyboard.Pressed(Keyboard[index]))
+                {
                     return true;
+                }
             }
-            for (int index = 0; index < this.Controller.Count; ++index)
+            for (int index = 0; index < Controller.Count; ++index)
             {
-                if (MInput.GamePads[gamepadIndex].Pressed(this.Controller[index], threshold))
+                if (MInput.GamePads[gamepadIndex].Pressed(Controller[index], threshold))
+                {
                     return true;
+                }
             }
             return false;
         }
 
         public bool Released(int gamepadIndex, float threshold)
         {
-            for (int index = 0; index < this.Keyboard.Count; ++index)
+            for (int index = 0; index < Keyboard.Count; ++index)
             {
-                if (MInput.Keyboard.Released(this.Keyboard[index]))
+                if (MInput.Keyboard.Released(Keyboard[index]))
+                {
                     return true;
+                }
             }
-            for (int index = 0; index < this.Controller.Count; ++index)
+            for (int index = 0; index < Controller.Count; ++index)
             {
-                if (MInput.GamePads[gamepadIndex].Released(this.Controller[index], threshold))
+                if (MInput.GamePads[gamepadIndex].Released(Controller[index], threshold))
+                {
                     return true;
+                }
             }
             return false;
         }
@@ -223,7 +285,10 @@ label_9:
         public static void SetExclusive(params Binding[] list)
         {
             foreach (Binding binding in list)
+            {
                 binding.ExclusiveFrom.Clear();
+            }
+
             foreach (Binding binding1 in list)
             {
                 foreach (Binding binding2 in list)

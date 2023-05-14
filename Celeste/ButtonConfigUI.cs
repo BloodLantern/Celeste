@@ -113,7 +113,9 @@ namespace Celeste
         private void Remap(Binding binding)
         {
             if (!Input.GuiInputController())
+            {
                 return;
+            }
 
             remapping = true;
             remappingBinding = binding;
@@ -124,12 +126,16 @@ namespace Celeste
         private void AddRemap(Buttons btn)
         {
             while (remappingBinding.Controller.Count >= Input.MaxBindings)
+            {
                 remappingBinding.Controller.RemoveAt(0);
+            }
 
             remapping = false;
             inputDelay = 0.25f;
             if (!remappingBinding.Add(btn))
+            {
                 _ = Audio.Play("event:/ui/main/button_invalid");
+            }
 
             Input.Initialize();
         }
@@ -137,7 +143,9 @@ namespace Celeste
         private void Clear(Binding binding)
         {
             if (binding.ClearGamepad())
+            {
                 return;
+            }
 
             _ = Audio.Play("event:/ui/main/button_invalid");
         }
@@ -162,22 +170,32 @@ namespace Celeste
                     resetHeld = false;
                 }
                 if (resetHeld)
+                {
                     return;
+                }
             }
             base.Update();
             Focused = !closing && inputDelay <= 0 && !waitingForController && !remapping;
             if (!closing)
             {
                 if (!MInput.GamePads[Input.Gamepad].Attached)
+                {
                     waitingForController = true;
+                }
                 else if (waitingForController)
+                {
                     waitingForController = false;
+                }
 
                 if (Input.MenuCancel.Pressed && !remapping)
+                {
                     OnCancel();
+                }
             }
             if (inputDelay > 0 && !remapping)
+            {
                 inputDelay -= Engine.RawDeltaTime;
+            }
 
             remappingEase = Calc.Approach(remappingEase, remapping ? 1f : 0f, Engine.RawDeltaTime * 4f);
             if (remappingEase >= 0.25 && remapping)
@@ -192,60 +210,110 @@ namespace Celeste
                     MInput.GamePadData gamePad = MInput.GamePads[Input.Gamepad];
                     float num = 0.25f;
                     if (gamePad.LeftStickLeftPressed(num))
+                    {
                         AddRemap(Buttons.LeftThumbstickLeft);
+                    }
                     else if (gamePad.LeftStickRightPressed(num))
+                    {
                         AddRemap(Buttons.LeftThumbstickRight);
+                    }
                     else if (gamePad.LeftStickUpPressed(num))
+                    {
                         AddRemap(Buttons.LeftThumbstickUp);
+                    }
                     else if (gamePad.LeftStickDownPressed(num))
+                    {
                         AddRemap(Buttons.LeftThumbstickDown);
+                    }
                     else if (gamePad.RightStickLeftPressed(num))
+                    {
                         AddRemap(Buttons.RightThumbstickLeft);
+                    }
                     else if (gamePad.RightStickRightPressed(num))
+                    {
                         AddRemap(Buttons.RightThumbstickRight);
+                    }
                     else if (gamePad.RightStickDownPressed(num))
+                    {
                         AddRemap(Buttons.RightThumbstickDown);
+                    }
                     else if (gamePad.RightStickUpPressed(num))
+                    {
                         AddRemap(Buttons.RightThumbstickUp);
+                    }
                     else if (gamePad.LeftTriggerPressed(num))
+                    {
                         AddRemap(Buttons.LeftTrigger);
+                    }
                     else if (gamePad.RightTriggerPressed(num))
+                    {
                         AddRemap(Buttons.RightTrigger);
+                    }
                     else if (gamePad.Pressed(Buttons.DPadLeft))
+                    {
                         AddRemap(Buttons.DPadLeft);
+                    }
                     else if (gamePad.Pressed(Buttons.DPadRight))
+                    {
                         AddRemap(Buttons.DPadRight);
+                    }
                     else if (gamePad.Pressed(Buttons.DPadUp))
+                    {
                         AddRemap(Buttons.DPadUp);
+                    }
                     else if (gamePad.Pressed(Buttons.DPadDown))
+                    {
                         AddRemap(Buttons.DPadDown);
+                    }
                     else if (gamePad.Pressed(Buttons.A))
+                    {
                         AddRemap(Buttons.A);
+                    }
                     else if (gamePad.Pressed(Buttons.B))
+                    {
                         AddRemap(Buttons.B);
+                    }
                     else if (gamePad.Pressed(Buttons.X))
+                    {
                         AddRemap(Buttons.X);
+                    }
                     else if (gamePad.Pressed(Buttons.Y))
+                    {
                         AddRemap(Buttons.Y);
+                    }
                     else if (gamePad.Pressed(Buttons.Start))
+                    {
                         AddRemap(Buttons.Start);
+                    }
                     else if (gamePad.Pressed(Buttons.Back))
+                    {
                         AddRemap(Buttons.Back);
+                    }
                     else if (gamePad.Pressed(Buttons.LeftShoulder))
+                    {
                         AddRemap(Buttons.LeftShoulder);
+                    }
                     else if (gamePad.Pressed(Buttons.RightShoulder))
+                    {
                         AddRemap(Buttons.RightShoulder);
+                    }
                     else if (gamePad.Pressed(Buttons.LeftStick))
+                    {
                         AddRemap(Buttons.LeftStick);
+                    }
                     else if (gamePad.Pressed(Buttons.RightStick))
+                    {
                         AddRemap(Buttons.RightStick);
+                    }
                 }
                 timeout -= Engine.RawDeltaTime;
             }
             closingDelay -= Engine.RawDeltaTime;
             Alpha = Calc.Approach(Alpha, !closing || closingDelay > 0 ? 1f : 0f, Engine.RawDeltaTime * 8f);
             if (!closing || Alpha > 0)
+            {
                 return;
+            }
 
             Close();
         }
@@ -265,16 +333,20 @@ namespace Celeste
                 }
             }
             else
+            {
                 ActiveFont.Draw(Dialog.Clean("BTN_CONFIG_NOCONTROLLER"), position, new Vector2(0.5f, 0.5f), Vector2.One, Color.White * Ease.CubeOut(Alpha));
+            }
 
             if (!resetHeld)
+            {
                 return;
+            }
 
             float num1 = Ease.CubeInOut(Calc.Min(1f, resetDelay / 0.2f));
             float num2 = Ease.SineOut(Calc.Min(1f, resetTime / 1.5f));
             Draw.Rect(-10f, -10f, 1940f, 1100f, Color.Black * 0.95f * num1);
             float width = 480f;
-            double x = (1920 - width) / 2;
+            float x = (1920 - width) / 2;
             Draw.Rect(x, 530f, width, 20f, Color.White * 0.25f * num1);
             Draw.Rect(x, 530f, width * num2, 20f, Color.White * num1);
         }

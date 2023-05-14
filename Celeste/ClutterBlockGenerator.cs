@@ -25,7 +25,9 @@ namespace Celeste
         public static void Init(Level lvl)
         {
             if (initialized)
+            {
                 return;
+            }
 
             initialized = true;
             level = lvl;
@@ -33,13 +35,18 @@ namespace Celeste
             rows = (level.Bounds.Height / 8) + 1;
             tiles ??= new Tile[200, 200];
             for (int index1 = 0; index1 < columns; ++index1)
+            {
                 for (int index2 = 0; index2 < rows; ++index2)
                 {
                     tiles[index1, index2].Color = -1;
                     tiles[index1, index2].Block = null;
                 }
+            }
+
             for (int index = 0; index < enabled.Length; ++index)
+            {
                 enabled[index] = !level.Session.GetFlag("oshiro_clutter_cleared_" + index);
+            }
 
             if (textures == null)
             {
@@ -53,11 +60,14 @@ namespace Celeste
                         int num2 = atlasSubtexture.Height / 8;
                         TextureSet textureSet1 = null;
                         foreach (TextureSet textureSet2 in textureSetList1)
+                        {
                             if (textureSet2.Columns == num1 && textureSet2.Rows == num2)
                             {
                                 textureSet1 = textureSet2;
                                 break;
                             }
+                        }
+
                         if (textureSet1 == null)
                         {
                             List<TextureSet> textureSetList2 = textureSetList1;
@@ -77,8 +87,12 @@ namespace Celeste
             }
             Point levelSolidOffset = level.LevelSolidOffset;
             for (int index3 = 0; index3 < columns; ++index3)
+            {
                 for (int index4 = 0; index4 < rows; ++index4)
+                {
                     tiles[index3, index4].Wall = level.SolidsData[levelSolidOffset.X + index3, levelSolidOffset.Y + index4] != '0';
+                }
+            }
         }
 
         public static void Dispose()
@@ -90,9 +104,11 @@ namespace Celeste
 
         public static void Add(int x, int y, int w, int h, ClutterBlock.Colors color)
         {
-            level.Add(new ClutterBlockBase(new Vector2(level.Bounds.X, level.Bounds.Y) + (new Vector2(x, y) * 8f), w * 8, h * 8, enabled[(int) color], color));
-            if (!enabled[(int) color])
+            level.Add(new ClutterBlockBase(new Vector2(level.Bounds.X, level.Bounds.Y) + (new Vector2(x, y) * 8f), w * 8, h * 8, enabled[(int)color], color));
+            if (!enabled[(int)color])
+            {
                 return;
+            }
 
             int x1 = Math.Max(0, x);
             for (int index1 = Math.Min(columns, x + w); x1 < index1; ++x1)
@@ -101,7 +117,7 @@ namespace Celeste
                 for (int index2 = Math.Min(rows, y + h); y1 < index2; ++y1)
                 {
                     Point point = new(x1, y1);
-                    tiles[point.X, point.Y].Color = (int) color;
+                    tiles[point.X, point.Y].Color = (int)color;
                     active.Add(point);
                 }
             }
@@ -110,7 +126,9 @@ namespace Celeste
         public static void Generate()
         {
             if (!initialized)
+            {
                 return;
+            }
 
             active.Shuffle();
             List<ClutterBlock> clutterBlockList = new();
@@ -137,18 +155,27 @@ namespace Celeste
                                 {
                                     Tile tile = tiles[x, y];
                                     if (tile.Block != null || tile.Color != color)
+                                    {
                                         flag = false;
+                                    }
                                 }
                             }
                             if (flag)
+                            {
                                 break;
+                            }
                         }
                         ++index1;
                     }
                     ClutterBlock clutterBlock = new(new Vector2(bounds.X, bounds.Y) + (new Vector2(point.X, point.Y) * 8f), Calc.Random.Choose<MTexture>(textureSet.textures), (ClutterBlock.Colors)color);
                     for (int x = point.X; x < point.X + textureSet.Columns; ++x)
+                    {
                         for (int y = point.Y; y < point.Y + textureSet.Rows; ++y)
+                        {
                             tiles[x, y].Block = clutterBlock;
+                        }
+                    }
+
                     clutterBlockList.Add(clutterBlock);
                     level.Add(clutterBlock);
                 }
@@ -162,19 +189,27 @@ namespace Celeste
                     {
                         ClutterBlock block = tile1.Block;
                         if (!block.TopSideOpen && (index5 == 0 || tiles[index4, index5 - 1].Empty))
+                        {
                             block.TopSideOpen = true;
+                        }
 
                         if (!block.LeftSideOpen && (index4 == 0 || tiles[index4 - 1, index5].Empty))
+                        {
                             block.LeftSideOpen = true;
+                        }
 
                         if (!block.RightSideOpen && (index4 == columns - 1 || tiles[index4 + 1, index5].Empty))
+                        {
                             block.RightSideOpen = true;
+                        }
 
                         if (!block.OnTheGround && index5 < rows - 1)
                         {
                             Tile tile2 = tiles[index4, index5 + 1];
                             if (tile2.Wall)
+                            {
                                 block.OnTheGround = true;
+                            }
                             else if (tile2.Block != null && tile2.Block != block && !block.HasBelow.Contains(tile2.Block))
                             {
                                 _ = block.HasBelow.Add(tile2.Block);
@@ -186,8 +221,13 @@ namespace Celeste
                 }
             }
             foreach (ClutterBlock block in clutterBlockList)
+            {
                 if (block.OnTheGround)
+                {
                     SetAboveToOnGround(block);
+                }
+            }
+
             initialized = false;
             level = null;
             active.Clear();
@@ -196,11 +236,13 @@ namespace Celeste
         private static void SetAboveToOnGround(ClutterBlock block)
         {
             foreach (ClutterBlock block1 in block.Above)
+            {
                 if (!block1.OnTheGround)
                 {
                     block1.OnTheGround = true;
                     SetAboveToOnGround(block1);
                 }
+            }
         }
 
         private struct Tile

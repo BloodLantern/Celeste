@@ -11,32 +11,57 @@ namespace FMOD
 {
     public class Channel : ChannelControl
     {
-        public RESULT setFrequency(float frequency) => Channel.FMOD_Channel_SetFrequency(this.getRaw(), frequency);
+        public RESULT setFrequency(float frequency)
+        {
+            return Channel.FMOD_Channel_SetFrequency(getRaw(), frequency);
+        }
 
-        public RESULT getFrequency(out float frequency) => Channel.FMOD_Channel_GetFrequency(this.getRaw(), out frequency);
+        public RESULT getFrequency(out float frequency)
+        {
+            return Channel.FMOD_Channel_GetFrequency(getRaw(), out frequency);
+        }
 
-        public RESULT setPriority(int priority) => Channel.FMOD_Channel_SetPriority(this.getRaw(), priority);
+        public RESULT setPriority(int priority)
+        {
+            return Channel.FMOD_Channel_SetPriority(getRaw(), priority);
+        }
 
-        public RESULT getPriority(out int priority) => Channel.FMOD_Channel_GetPriority(this.getRaw(), out priority);
+        public RESULT getPriority(out int priority)
+        {
+            return Channel.FMOD_Channel_GetPriority(getRaw(), out priority);
+        }
 
-        public RESULT setPosition(uint position, TIMEUNIT postype) => Channel.FMOD_Channel_SetPosition(this.getRaw(), position, postype);
+        public RESULT setPosition(uint position, TIMEUNIT postype)
+        {
+            return Channel.FMOD_Channel_SetPosition(getRaw(), position, postype);
+        }
 
-        public RESULT getPosition(out uint position, TIMEUNIT postype) => Channel.FMOD_Channel_GetPosition(this.getRaw(), out position, postype);
+        public RESULT getPosition(out uint position, TIMEUNIT postype)
+        {
+            return Channel.FMOD_Channel_GetPosition(getRaw(), out position, postype);
+        }
 
-        public RESULT setChannelGroup(ChannelGroup channelgroup) => Channel.FMOD_Channel_SetChannelGroup(this.getRaw(), channelgroup.getRaw());
+        public RESULT setChannelGroup(ChannelGroup channelgroup)
+        {
+            return Channel.FMOD_Channel_SetChannelGroup(getRaw(), channelgroup.getRaw());
+        }
 
         public RESULT getChannelGroup(out ChannelGroup channelgroup)
         {
-            channelgroup = (ChannelGroup) null;
-            IntPtr channelgroup1;
-            int channelGroup = (int) Channel.FMOD_Channel_GetChannelGroup(this.getRaw(), out channelgroup1);
+            int channelGroup = (int)Channel.FMOD_Channel_GetChannelGroup(getRaw(), out IntPtr channelgroup1);
             channelgroup = new ChannelGroup(channelgroup1);
-            return (RESULT) channelGroup;
+            return (RESULT)channelGroup;
         }
 
-        public RESULT setLoopCount(int loopcount) => Channel.FMOD_Channel_SetLoopCount(this.getRaw(), loopcount);
+        public RESULT setLoopCount(int loopcount)
+        {
+            return Channel.FMOD_Channel_SetLoopCount(getRaw(), loopcount);
+        }
 
-        public RESULT getLoopCount(out int loopcount) => Channel.FMOD_Channel_GetLoopCount(this.getRaw(), out loopcount);
+        public RESULT getLoopCount(out int loopcount)
+        {
+            return Channel.FMOD_Channel_GetLoopCount(getRaw(), out loopcount);
+        }
 
         public RESULT setLoopPoints(
             uint loopstart,
@@ -44,7 +69,7 @@ namespace FMOD
             uint loopend,
             TIMEUNIT loopendtype)
         {
-            return Channel.FMOD_Channel_SetLoopPoints(this.getRaw(), loopstart, loopstarttype, loopend, loopendtype);
+            return Channel.FMOD_Channel_SetLoopPoints(getRaw(), loopstart, loopstarttype, loopend, loopendtype);
         }
 
         public RESULT getLoopPoints(
@@ -53,21 +78,25 @@ namespace FMOD
             out uint loopend,
             TIMEUNIT loopendtype)
         {
-            return Channel.FMOD_Channel_GetLoopPoints(this.getRaw(), out loopstart, loopstarttype, out loopend, loopendtype);
+            return Channel.FMOD_Channel_GetLoopPoints(getRaw(), out loopstart, loopstarttype, out loopend, loopendtype);
         }
 
-        public RESULT isVirtual(out bool isvirtual) => Channel.FMOD_Channel_IsVirtual(this.getRaw(), out isvirtual);
+        public RESULT isVirtual(out bool isvirtual)
+        {
+            return Channel.FMOD_Channel_IsVirtual(getRaw(), out isvirtual);
+        }
 
         public RESULT getCurrentSound(out Sound sound)
         {
-            sound = (Sound) null;
-            IntPtr sound1;
-            int currentSound = (int) Channel.FMOD_Channel_GetCurrentSound(this.getRaw(), out sound1);
+            int currentSound = (int)Channel.FMOD_Channel_GetCurrentSound(getRaw(), out IntPtr sound1);
             sound = new Sound(sound1);
-            return (RESULT) currentSound;
+            return (RESULT)currentSound;
         }
 
-        public RESULT getIndex(out int index) => Channel.FMOD_Channel_GetIndex(this.getRaw(), out index);
+        public RESULT getIndex(out int index)
+        {
+            return Channel.FMOD_Channel_GetIndex(getRaw(), out index);
+        }
 
         [DllImport("fmod")]
         private static extern RESULT FMOD_Channel_SetFrequency(IntPtr channel, float frequency);

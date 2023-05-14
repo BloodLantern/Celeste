@@ -6,7 +6,6 @@
 
 using Microsoft.Xna.Framework;
 using System;
-using System.Collections.Generic;
 using System.Linq;
 
 namespace Monocle
@@ -15,59 +14,69 @@ namespace Monocle
     {
         public Collider[] colliders { get; private set; }
 
-        public ColliderList(params Collider[] colliders) => this.colliders = colliders;
+        public ColliderList(params Collider[] colliders)
+        {
+            this.colliders = colliders;
+        }
 
         public void Add(params Collider[] toAdd)
         {
-            Collider[] colliderArray = new Collider[this.colliders.Length + toAdd.Length];
-            for (int index = 0; index < this.colliders.Length; ++index)
-                colliderArray[index] = this.colliders[index];
+            Collider[] colliderArray = new Collider[colliders.Length + toAdd.Length];
+            for (int index = 0; index < colliders.Length; ++index)
+            {
+                colliderArray[index] = colliders[index];
+            }
+
             for (int index = 0; index < toAdd.Length; ++index)
             {
-                colliderArray[index + this.colliders.Length] = toAdd[index];
-                toAdd[index].Added(this.Entity);
+                colliderArray[index + colliders.Length] = toAdd[index];
+                toAdd[index].Added(Entity);
             }
-            this.colliders = colliderArray;
+            colliders = colliderArray;
         }
 
         public void Remove(params Collider[] toRemove)
         {
-            Collider[] colliderArray = new Collider[this.colliders.Length - toRemove.Length];
+            Collider[] colliderArray = new Collider[colliders.Length - toRemove.Length];
             int index = 0;
-            foreach (Collider collider in this.colliders)
+            foreach (Collider collider in colliders)
             {
-                if (!((IEnumerable<Collider>) toRemove).Contains<Collider>(collider))
+                if (!toRemove.Contains<Collider>(collider))
                 {
                     colliderArray[index] = collider;
                     ++index;
                 }
             }
-            this.colliders = colliderArray;
+            colliders = colliderArray;
         }
 
         internal override void Added(Entity entity)
         {
             base.Added(entity);
-            foreach (Collider collider in this.colliders)
+            foreach (Collider collider in colliders)
+            {
                 collider.Added(entity);
+            }
         }
 
         internal override void Removed()
         {
             base.Removed();
-            foreach (Collider collider in this.colliders)
+            foreach (Collider collider in colliders)
+            {
                 collider.Removed();
+            }
         }
 
         public override float Width
         {
-            get => this.Right - this.Left;
+            get => Right - Left;
             set => throw new NotImplementedException();
         }
 
         public override float Height
         {
-            get => this.Bottom - this.Top;
+            get => Bottom - Top;
             set => throw new NotImplementedException();
         }
 
@@ -75,19 +84,23 @@ namespace Monocle
         {
             get
             {
-                float left = this.colliders[0].Left;
-                for (int index = 1; index < this.colliders.Length; ++index)
+                float left = colliders[0].Left;
+                for (int index = 1; index < colliders.Length; ++index)
                 {
-                    if ((double) this.colliders[index].Left < (double) left)
-                        left = this.colliders[index].Left;
+                    if ((double)colliders[index].Left < (double)left)
+                    {
+                        left = colliders[index].Left;
+                    }
                 }
                 return left;
             }
             set
             {
-                float num = value - this.Left;
-                foreach (Collider collider in this.colliders)
-                    this.Position.X += num;
+                float num = value - Left;
+                foreach (Collider collider in colliders)
+                {
+                    Position.X += num;
+                }
             }
         }
 
@@ -95,19 +108,23 @@ namespace Monocle
         {
             get
             {
-                float right = this.colliders[0].Right;
-                for (int index = 1; index < this.colliders.Length; ++index)
+                float right = colliders[0].Right;
+                for (int index = 1; index < colliders.Length; ++index)
                 {
-                    if ((double) this.colliders[index].Right > (double) right)
-                        right = this.colliders[index].Right;
+                    if ((double)colliders[index].Right > (double)right)
+                    {
+                        right = colliders[index].Right;
+                    }
                 }
                 return right;
             }
             set
             {
-                float num = value - this.Right;
-                foreach (Collider collider in this.colliders)
-                    this.Position.X += num;
+                float num = value - Right;
+                foreach (Collider collider in colliders)
+                {
+                    Position.X += num;
+                }
             }
         }
 
@@ -115,19 +132,23 @@ namespace Monocle
         {
             get
             {
-                float top = this.colliders[0].Top;
-                for (int index = 1; index < this.colliders.Length; ++index)
+                float top = colliders[0].Top;
+                for (int index = 1; index < colliders.Length; ++index)
                 {
-                    if ((double) this.colliders[index].Top < (double) top)
-                        top = this.colliders[index].Top;
+                    if ((double)colliders[index].Top < (double)top)
+                    {
+                        top = colliders[index].Top;
+                    }
                 }
                 return top;
             }
             set
             {
-                float num = value - this.Top;
-                foreach (Collider collider in this.colliders)
-                    this.Position.Y += num;
+                float num = value - Top;
+                foreach (Collider collider in colliders)
+                {
+                    Position.Y += num;
+                }
             }
         }
 
@@ -135,102 +156,125 @@ namespace Monocle
         {
             get
             {
-                float bottom = this.colliders[0].Bottom;
-                for (int index = 1; index < this.colliders.Length; ++index)
+                float bottom = colliders[0].Bottom;
+                for (int index = 1; index < colliders.Length; ++index)
                 {
-                    if ((double) this.colliders[index].Bottom > (double) bottom)
-                        bottom = this.colliders[index].Bottom;
+                    if ((double)colliders[index].Bottom > (double)bottom)
+                    {
+                        bottom = colliders[index].Bottom;
+                    }
                 }
                 return bottom;
             }
             set
             {
-                float num = value - this.Bottom;
-                foreach (Collider collider in this.colliders)
-                    this.Position.Y += num;
+                float num = value - Bottom;
+                foreach (Collider collider in colliders)
+                {
+                    Position.Y += num;
+                }
             }
         }
 
         public override Collider Clone()
         {
-            Collider[] colliderArray = new Collider[this.colliders.Length];
-            for (int index = 0; index < this.colliders.Length; ++index)
-                colliderArray[index] = this.colliders[index].Clone();
-            return (Collider) new ColliderList(colliderArray);
+            Collider[] colliderArray = new Collider[colliders.Length];
+            for (int index = 0; index < colliders.Length; ++index)
+            {
+                colliderArray[index] = colliders[index].Clone();
+            }
+
+            return new ColliderList(colliderArray);
         }
 
         public override void Render(Camera camera, Color color)
         {
-            foreach (Collider collider in this.colliders)
+            foreach (Collider collider in colliders)
+            {
                 collider.Render(camera, color);
+            }
         }
 
         public override bool Collide(Vector2 point)
         {
-            foreach (Collider collider in this.colliders)
+            foreach (Collider collider in colliders)
             {
                 if (collider.Collide(point))
+                {
                     return true;
+                }
             }
             return false;
         }
 
         public override bool Collide(Rectangle rect)
         {
-            foreach (Collider collider in this.colliders)
+            foreach (Collider collider in colliders)
             {
                 if (collider.Collide(rect))
+                {
                     return true;
+                }
             }
             return false;
         }
 
         public override bool Collide(Vector2 from, Vector2 to)
         {
-            foreach (Collider collider in this.colliders)
+            foreach (Collider collider in colliders)
             {
                 if (collider.Collide(from, to))
+                {
                     return true;
+                }
             }
             return false;
         }
 
         public override bool Collide(Hitbox hitbox)
         {
-            foreach (Collider collider in this.colliders)
+            foreach (Collider collider in colliders)
             {
                 if (collider.Collide(hitbox))
+                {
                     return true;
+                }
             }
             return false;
         }
 
         public override bool Collide(Grid grid)
         {
-            foreach (Collider collider in this.colliders)
+            foreach (Collider collider in colliders)
             {
                 if (collider.Collide(grid))
+                {
                     return true;
+                }
             }
             return false;
         }
 
         public override bool Collide(Circle circle)
         {
-            foreach (Collider collider in this.colliders)
+            foreach (Collider collider in colliders)
             {
                 if (collider.Collide(circle))
+                {
                     return true;
+                }
             }
             return false;
         }
 
         public override bool Collide(ColliderList list)
         {
-            foreach (Collider collider in this.colliders)
+            foreach (Collider collider in colliders)
             {
                 if (collider.Collide(list))
+                {
                     return true;
+                }
             }
             return false;
         }

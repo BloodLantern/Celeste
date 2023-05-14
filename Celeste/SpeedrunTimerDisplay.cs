@@ -17,17 +17,17 @@ namespace Celeste
         public const int GuiFileHeight = 78;
         private static float numberWidth;
         private static float spacerWidth;
-        private MTexture bg = GFX.Gui["strawberryCountBG"];
+        private readonly MTexture bg = GFX.Gui["strawberryCountBG"];
         public float DrawLerp;
-        private Wiggler wiggler;
+        private readonly Wiggler wiggler;
 
         public SpeedrunTimerDisplay()
         {
-            this.Tag = (int) Tags.HUD | (int) Tags.Global | (int) Tags.PauseUpdate | (int) Tags.TransitionUpdate;
-            this.Depth = -100;
-            this.Y = 60f;
+            Tag = (int)Tags.HUD | (int)Tags.Global | (int)Tags.PauseUpdate | (int)Tags.TransitionUpdate;
+            Depth = -100;
+            Y = 60f;
             SpeedrunTimerDisplay.CalculateBaseSizes();
-            this.Add((Component) (this.wiggler = Wiggler.Create(0.5f, 4f)));
+            Add(wiggler = Wiggler.Create(0.5f, 4f));
         }
 
         public static void CalculateBaseSizes()
@@ -36,64 +36,79 @@ namespace Celeste
             for (int index = 0; index < 10; ++index)
             {
                 float x = pixelFontSize.Measure(index.ToString()).X;
-                if ((double) x > (double) SpeedrunTimerDisplay.numberWidth)
+                if ((double)x > numberWidth)
+                {
                     SpeedrunTimerDisplay.numberWidth = x;
+                }
             }
             SpeedrunTimerDisplay.spacerWidth = pixelFontSize.Measure('.').X;
         }
 
         public override void Update()
         {
-            Level scene = this.Scene as Level;
+            Level scene = Scene as Level;
             if (scene.Completed)
             {
-                if ((double) this.CompleteTimer == 0.0)
-                    this.wiggler.Start();
-                this.CompleteTimer += Engine.DeltaTime;
+                if (CompleteTimer == 0.0)
+                {
+                    wiggler.Start();
+                }
+
+                CompleteTimer += Engine.DeltaTime;
             }
             bool flag = false;
             if (scene.Session.Area.ID != 8 && !scene.TimerHidden)
             {
                 if (Settings.Instance.SpeedrunClock == SpeedrunType.Chapter)
                 {
-                    if ((double) this.CompleteTimer < 3.0)
+                    if (CompleteTimer < 3.0)
+                    {
                         flag = true;
+                    }
                 }
                 else if (Settings.Instance.SpeedrunClock == SpeedrunType.File)
+                {
                     flag = true;
+                }
             }
-            this.DrawLerp = Calc.Approach(this.DrawLerp, flag ? 1f : 0.0f, Engine.DeltaTime * 4f);
+            DrawLerp = Calc.Approach(DrawLerp, flag ? 1f : 0.0f, Engine.DeltaTime * 4f);
             base.Update();
         }
 
         public override void Render()
         {
-            if ((double) this.DrawLerp <= 0.0)
+            if (DrawLerp <= 0.0)
+            {
                 return;
-            float x = -300f * Ease.CubeIn(1f - this.DrawLerp);
-            Level scene = this.Scene as Level;
+            }
+
+            float x = -300f * Ease.CubeIn(1f - DrawLerp);
+            Level scene = Scene as Level;
             Session session = scene.Session;
             if (Settings.Instance.SpeedrunClock == SpeedrunType.Chapter)
             {
                 string timeString = TimeSpan.FromTicks(session.Time).ShortGameplayFormat();
-                this.bg.Draw(new Vector2(x, this.Y));
-                SpeedrunTimerDisplay.DrawTime(new Vector2(x + 32f, this.Y + 44f), timeString, (float) (1.0 + (double) this.wiggler.Value * 0.15000000596046448), session.StartedFromBeginning, scene.Completed, session.BeatBestTime);
+                bg.Draw(new Vector2(x, Y));
+                SpeedrunTimerDisplay.DrawTime(new Vector2(x + 32f, Y + 44f), timeString, (float)(1.0 + ((double)wiggler.Value * 0.15000000596046448)), session.StartedFromBeginning, scene.Completed, session.BeatBestTime);
             }
             else
             {
                 if (Settings.Instance.SpeedrunClock != SpeedrunType.File)
+                {
                     return;
+                }
+
                 TimeSpan timeSpan1 = TimeSpan.FromTicks(session.Time);
-                string timeString1 = timeSpan1.TotalHours < 1.0 ? timeSpan1.ToString("mm\\:ss") : ((int) timeSpan1.TotalHours).ToString() + ":" + timeSpan1.ToString("mm\\:ss");
+                string timeString1 = timeSpan1.TotalHours < 1.0 ? timeSpan1.ToString("mm\\:ss") : ((int)timeSpan1.TotalHours).ToString() + ":" + timeSpan1.ToString("mm\\:ss");
                 TimeSpan timeSpan2 = TimeSpan.FromTicks(SaveData.Instance.Time);
-                int totalHours = (int) timeSpan2.TotalHours;
+                int totalHours = (int)timeSpan2.TotalHours;
                 string timeString2 = totalHours.ToString() + timeSpan2.ToString("\\:mm\\:ss\\.fff");
                 int num = totalHours < 10 ? 64 : (totalHours < 100 ? 96 : 128);
-                Draw.Rect(x, this.Y, (float) (num + 2), 38f, Color.Black);
-                this.bg.Draw(new Vector2(x + (float) num, this.Y));
-                SpeedrunTimerDisplay.DrawTime(new Vector2(x + 32f, this.Y + 44f), timeString2);
-                this.bg.Draw(new Vector2(x, this.Y + 38f), Vector2.Zero, Color.White, 0.6f);
-                SpeedrunTimerDisplay.DrawTime(new Vector2(x + 32f, (float) ((double) this.Y + 40.0 + 26.400001525878906)), timeString1, (float) ((1.0 + (double) this.wiggler.Value * 0.15000000596046448) * 0.60000002384185791), session.StartedFromBeginning, scene.Completed, session.BeatBestTime, 0.6f);
+                Draw.Rect(x, Y, num + 2, 38f, Color.Black);
+                bg.Draw(new Vector2(x + num, Y));
+                SpeedrunTimerDisplay.DrawTime(new Vector2(x + 32f, Y + 44f), timeString2);
+                bg.Draw(new Vector2(x, Y + 38f), Vector2.Zero, Color.White, 0.6f);
+                SpeedrunTimerDisplay.DrawTime(new Vector2(x + 32f, (float)((double)Y + 40.0 + 26.400001525878906)), timeString1, (float)((1.0 + ((double)wiggler.Value * 0.15000000596046448)) * 0.60000002384185791), session.StartedFromBeginning, scene.Completed, session.BeatBestTime, 0.6f);
             }
         }
 
@@ -136,9 +151,9 @@ namespace Celeste
                     num1 = scale * 0.7f;
                     y -= 5f * scale;
                 }
-                Color color3 = ch == ':' || ch == '.' || (double) num1 < (double) scale ? color2 : color1;
-                float num2 = (float) ((ch == ':' || ch == '.' ? (double) SpeedrunTimerDisplay.spacerWidth : (double) SpeedrunTimerDisplay.numberWidth) + 4.0) * num1;
-                font.DrawOutline(fontFaceSize, ch.ToString(), new Vector2(x + num2 / 2f, y), new Vector2(0.5f, 1f), Vector2.One * num1, color3, 2f, Color.Black);
+                Color color3 = ch == ':' || ch == '.' || (double)num1 < (double)scale ? color2 : color1;
+                float num2 = (float)((ch is ':' or '.' ? spacerWidth : numberWidth) + 4.0) * num1;
+                font.DrawOutline(fontFaceSize, ch.ToString(), new Vector2(x + (num2 / 2f), y), new Vector2(0.5f, 1f), Vector2.One * num1, color3, 2f, Color.Black);
                 x += num2;
             }
         }
@@ -151,8 +166,11 @@ namespace Celeste
             {
                 char ch = timeString[index];
                 if (ch == '.')
+                {
                     num1 = scale * 0.7f;
-                float num2 = (float) ((ch == ':' || ch == '.' ? (double) SpeedrunTimerDisplay.spacerWidth : (double) SpeedrunTimerDisplay.numberWidth) + 4.0) * num1;
+                }
+
+                float num2 = (float)((ch is ':' or '.' ? spacerWidth : numberWidth) + 4.0) * num1;
                 timeWidth += num2;
             }
             return timeWidth;

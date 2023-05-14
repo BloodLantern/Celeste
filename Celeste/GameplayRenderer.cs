@@ -17,20 +17,29 @@ namespace Celeste
         public GameplayRenderer()
         {
             GameplayRenderer.instance = this;
-            this.Camera = new Camera(320, 180);
+            Camera = new Camera(320, 180);
         }
 
-        public static void Begin() => Draw.SpriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, SamplerState.PointWrap, DepthStencilState.None, RasterizerState.CullNone, (Effect) null, GameplayRenderer.instance.Camera.Matrix);
+        public static void Begin()
+        {
+            Draw.SpriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, SamplerState.PointWrap, DepthStencilState.None, RasterizerState.CullNone, null, GameplayRenderer.instance.Camera.Matrix);
+        }
 
         public override void Render(Scene scene)
         {
             GameplayRenderer.Begin();
-            scene.Entities.RenderExcept((int) Tags.HUD);
+            scene.Entities.RenderExcept((int)Tags.HUD);
             if (Engine.Commands.Open)
-                scene.Entities.DebugRender(this.Camera);
+            {
+                scene.Entities.DebugRender(Camera);
+            }
+
             GameplayRenderer.End();
         }
 
-        public static void End() => Draw.SpriteBatch.End();
+        public static void End()
+        {
+            Draw.SpriteBatch.End();
+        }
     }
 }

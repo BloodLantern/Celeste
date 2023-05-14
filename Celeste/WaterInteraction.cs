@@ -21,19 +21,25 @@ namespace Celeste
         public WaterInteraction(Func<bool> isDashing)
             : base(false, false)
         {
-            this.IsDashing = isDashing;
+            IsDashing = isDashing;
         }
 
         public override void Update()
         {
-            if ((double) this.DrippingTimer <= 0.0)
+            if (DrippingTimer <= 0.0)
+            {
                 return;
-            this.DrippingTimer -= Engine.DeltaTime;
-            if (!this.Scene.OnInterval(0.1f))
+            }
+
+            DrippingTimer -= Engine.DeltaTime;
+            if (!Scene.OnInterval(0.1f))
+            {
                 return;
-            float x = this.Entity.Left - 2f + Calc.Random.NextFloat(this.Entity.Width + 4f);
-            float y = this.Entity.Top + this.DrippingOffset + Calc.Random.NextFloat(this.Entity.Height - this.DrippingOffset);
-            (this.Scene as Level).ParticlesFG.Emit(WaterInteraction.P_Drip, new Vector2(x, y));
+            }
+
+            float x = Entity.Left - 2f + Calc.Random.NextFloat(Entity.Width + 4f);
+            float y = Entity.Top + DrippingOffset + Calc.Random.NextFloat(Entity.Height - DrippingOffset);
+            (Scene as Level).ParticlesFG.Emit(WaterInteraction.P_Drip, new Vector2(x, y));
         }
     }
 }

@@ -22,15 +22,15 @@ namespace Monocle
         private const float OPACITY = 0.8f;
         public bool Enabled = true;
         public bool Open;
-        private Dictionary<string, Commands.CommandInfo> commands;
-        private List<string> sorted;
+        private readonly Dictionary<string, Commands.CommandInfo> commands;
+        private readonly List<string> sorted;
         private KeyboardState oldState;
         private KeyboardState currentState;
         private string currentText = "";
-        private List<Commands.Line> drawCommands;
+        private readonly List<Commands.Line> drawCommands;
         private bool underscore;
         private float underscoreCounter;
-        private List<string> commandHistory;
+        private readonly List<string> commandHistory;
         private int seekIndex = -1;
         private int tabIndex = -1;
         private string tabSearch;
@@ -42,12 +42,12 @@ namespace Monocle
 
         public Commands()
         {
-            this.commandHistory = new List<string>();
-            this.drawCommands = new List<Commands.Line>();
-            this.commands = new Dictionary<string, Commands.CommandInfo>();
-            this.sorted = new List<string>();
-            this.FunctionKeyActions = new Action[12];
-            this.BuildCommandsList();
+            commandHistory = new List<string>();
+            drawCommands = new List<Commands.Line>();
+            commands = new Dictionary<string, Commands.CommandInfo>();
+            sorted = new List<string>();
+            FunctionKeyActions = new Action[12];
+            BuildCommandsList();
         }
 
         public void Log(object obj, Color color)
@@ -56,81 +56,104 @@ namespace Monocle
             if (text.Contains("\n"))
             {
                 string str = text;
-                char[] chArray = new char[1]{ '\n' };
+                char[] chArray = new char[1] { '\n' };
                 foreach (object obj1 in str.Split(chArray))
-                    this.Log(obj1, color);
+                {
+                    Log(obj1, color);
+                }
             }
             else
             {
                 int length;
-                for (int index1 = Engine.Instance.Window.ClientBounds.Width - 40; (double) Draw.DefaultFont.MeasureString(text).X > (double) index1; text = text.Substring(length + 1))
+                for (int index1 = Engine.Instance.Window.ClientBounds.Width - 40; Draw.DefaultFont.MeasureString(text).X > (double)index1; text = text.Substring(length + 1))
                 {
                     length = -1;
                     for (int index2 = 0; index2 < text.Length; ++index2)
                     {
                         if (text[index2] == ' ')
                         {
-                            if ((double) Draw.DefaultFont.MeasureString(text.Substring(0, index2)).X <= (double) index1)
+                            if (Draw.DefaultFont.MeasureString(text.Substring(0, index2)).X <= (double)index1)
+                            {
                                 length = index2;
+                            }
                             else
+                            {
                                 break;
+                            }
                         }
                     }
                     if (length != -1)
-                        this.drawCommands.Insert(0, new Commands.Line(text.Substring(0, length), color));
+                    {
+                        drawCommands.Insert(0, new Commands.Line(text.Substring(0, length), color));
+                    }
                     else
+                    {
                         break;
+                    }
                 }
-                this.drawCommands.Insert(0, new Commands.Line(text, color));
+                drawCommands.Insert(0, new Commands.Line(text, color));
                 int num = (Engine.Instance.Window.ClientBounds.Height - 100) / 30;
-                while (this.drawCommands.Count > num)
-                    this.drawCommands.RemoveAt(this.drawCommands.Count - 1);
+                while (drawCommands.Count > num)
+                {
+                    drawCommands.RemoveAt(drawCommands.Count - 1);
+                }
             }
         }
 
-        public void Log(object obj) => this.Log(obj, Color.White);
+        public void Log(object obj)
+        {
+            Log(obj, Color.White);
+        }
 
         internal void UpdateClosed()
         {
-            if (!this.canOpen)
-                this.canOpen = true;
+            if (!canOpen)
+            {
+                canOpen = true;
+            }
             else if (MInput.Keyboard.Pressed(Keys.OemTilde, Keys.Oem8))
             {
-                this.Open = true;
-                this.currentState = Keyboard.GetState();
+                Open = true;
+                currentState = Keyboard.GetState();
             }
-            for (int num = 0; num < this.FunctionKeyActions.Length; ++num)
+            for (int num = 0; num < FunctionKeyActions.Length; ++num)
             {
-                if (MInput.Keyboard.Pressed((Keys) (112 + num)))
-                    this.ExecuteFunctionKeyAction(num);
+                if (MInput.Keyboard.Pressed((Keys)(112 + num)))
+                {
+                    ExecuteFunctionKeyAction(num);
+                }
             }
         }
 
         internal void UpdateOpen()
         {
-            this.oldState = this.currentState;
-            this.currentState = Keyboard.GetState();
-            this.underscoreCounter += Engine.DeltaTime;
-            while ((double) this.underscoreCounter >= 0.5)
+            oldState = currentState;
+            currentState = Keyboard.GetState();
+            underscoreCounter += Engine.DeltaTime;
+            while (underscoreCounter >= 0.5)
             {
-                this.underscoreCounter -= 0.5f;
-                this.underscore = !this.underscore;
+                underscoreCounter -= 0.5f;
+                underscore = !underscore;
             }
-            if (this.repeatKey.HasValue)
+            if (repeatKey.HasValue)
             {
-                if (this.currentState[this.repeatKey.Value] == KeyState.Down)
+                if (currentState[repeatKey.Value] == KeyState.Down)
                 {
-                    for (this.repeatCounter += Engine.DeltaTime; (double) this.repeatCounter >= 0.5; this.repeatCounter -= 0.0333333351f)
-                        this.HandleKey(this.repeatKey.Value);
+                    for (repeatCounter += Engine.DeltaTime; repeatCounter >= 0.5; repeatCounter -= 0.0333333351f)
+                    {
+                        HandleKey(repeatKey.Value);
+                    }
                 }
                 else
-                    this.repeatKey = new Keys?();
-            }
-            foreach (Keys pressedKey in this.currentState.GetPressedKeys())
-            {
-                if (this.oldState[pressedKey] == KeyState.Up)
                 {
-                    this.HandleKey(pressedKey);
+                    repeatKey = new Keys?();
+                }
+            }
+            foreach (Keys pressedKey in currentState.GetPressedKeys())
+            {
+                if (oldState[pressedKey] == KeyState.Up)
+                {
+                    HandleKey(pressedKey);
                     break;
                 }
             }
@@ -138,16 +161,19 @@ namespace Monocle
 
         private void HandleKey(Keys key)
         {
-            if (key != Keys.Tab && key != Keys.LeftShift && key != Keys.RightShift && key != Keys.RightAlt && key != Keys.LeftAlt && key != Keys.RightControl && key != Keys.LeftControl)
-                this.tabIndex = -1;
-            if (key != Keys.OemTilde && key != Keys.Oem8 && key != Keys.Enter)
+            if (key is not Keys.Tab and not Keys.LeftShift and not Keys.RightShift and not Keys.RightAlt and not Keys.LeftAlt and not Keys.RightControl and not Keys.LeftControl)
+            {
+                tabIndex = -1;
+            }
+
+            if (key is not Keys.OemTilde and not Keys.Oem8 and not Keys.Enter)
             {
                 Keys? repeatKey = this.repeatKey;
                 Keys keys = key;
                 if (!(repeatKey.GetValueOrDefault() == keys & repeatKey.HasValue))
                 {
                     this.repeatKey = new Keys?(key);
-                    this.repeatCounter = 0.0f;
+                    repeatCounter = 0.0f;
                 }
             }
             if (key <= Keys.Enter)
@@ -158,50 +184,63 @@ namespace Monocle
                     {
                         if (key == Keys.Enter)
                         {
-                            if (this.currentText.Length <= 0)
+                            if (currentText.Length <= 0)
+                            {
                                 return;
-                            this.EnterCommand();
+                            }
+
+                            EnterCommand();
                             return;
                         }
                     }
                     else
                     {
-                        if (this.currentState[Keys.LeftShift] == KeyState.Down || this.currentState[Keys.RightShift] == KeyState.Down)
+                        if (currentState[Keys.LeftShift] == KeyState.Down || currentState[Keys.RightShift] == KeyState.Down)
                         {
-                            if (this.tabIndex == -1)
+                            if (tabIndex == -1)
                             {
-                                this.tabSearch = this.currentText;
-                                this.FindLastTab();
+                                tabSearch = currentText;
+                                FindLastTab();
                             }
                             else
                             {
-                                --this.tabIndex;
-                                if (this.tabIndex < 0 || this.tabSearch != "" && this.sorted[this.tabIndex].IndexOf(this.tabSearch) != 0)
-                                    this.FindLastTab();
+                                --tabIndex;
+                                if (tabIndex < 0 || (tabSearch != "" && sorted[tabIndex].IndexOf(tabSearch) != 0))
+                                {
+                                    FindLastTab();
+                                }
                             }
                         }
-                        else if (this.tabIndex == -1)
+                        else if (tabIndex == -1)
                         {
-                            this.tabSearch = this.currentText;
-                            this.FindFirstTab();
+                            tabSearch = currentText;
+                            FindFirstTab();
                         }
                         else
                         {
-                            ++this.tabIndex;
-                            if (this.tabIndex >= this.sorted.Count || this.tabSearch != "" && this.sorted[this.tabIndex].IndexOf(this.tabSearch) != 0)
-                                this.FindFirstTab();
+                            ++tabIndex;
+                            if (tabIndex >= sorted.Count || (tabSearch != "" && sorted[tabIndex].IndexOf(tabSearch) != 0))
+                            {
+                                FindFirstTab();
+                            }
                         }
-                        if (this.tabIndex == -1)
+                        if (tabIndex == -1)
+                        {
                             return;
-                        this.currentText = this.sorted[this.tabIndex];
+                        }
+
+                        currentText = sorted[tabIndex];
                         return;
                     }
                 }
                 else
                 {
-                    if (this.currentText.Length <= 0)
+                    if (currentText.Length <= 0)
+                    {
                         return;
-                    this.currentText = this.currentText.Substring(0, this.currentText.Length - 1);
+                    }
+
+                    currentText = currentText.Substring(0, currentText.Length - 1);
                     return;
                 }
             }
@@ -210,131 +249,137 @@ namespace Monocle
                 switch (key - 32)
                 {
                     case Keys.None:
-                        this.currentText += " ";
+                        currentText += " ";
                         return;
-                    case (Keys) 1:
-                    case (Keys) 2:
-                    case (Keys) 3:
-                    case (Keys) 4:
-                    case (Keys) 5:
-                    case (Keys) 7:
+                    case (Keys)1:
+                    case (Keys)2:
+                    case (Keys)3:
+                    case (Keys)4:
+                    case (Keys)5:
+                    case (Keys)7:
                     case Keys.Tab:
-                    case (Keys) 10:
-                    case (Keys) 11:
-                    case (Keys) 12:
+                    case (Keys)10:
+                    case (Keys)11:
+                    case (Keys)12:
                     case Keys.Enter:
-                    case (Keys) 15:
+                    case (Keys)15:
                         break;
-                    case (Keys) 6:
-                        if (this.seekIndex >= this.commandHistory.Count - 1)
-                            return;
-                        ++this.seekIndex;
-                        this.currentText = string.Join(" ", new string[1]
+                    case (Keys)6:
+                        if (seekIndex >= commandHistory.Count - 1)
                         {
-                            this.commandHistory[this.seekIndex]
+                            return;
+                        }
+
+                        ++seekIndex;
+                        currentText = string.Join(" ", new string[1]
+                        {
+                            commandHistory[seekIndex]
                         });
                         return;
                     case Keys.Back:
-                        if (this.seekIndex <= -1)
-                            return;
-                        --this.seekIndex;
-                        if (this.seekIndex == -1)
+                        if (seekIndex <= -1)
                         {
-                            this.currentText = "";
                             return;
                         }
-                        this.currentText = string.Join(" ", new string[1]
+
+                        --seekIndex;
+                        if (seekIndex == -1)
                         {
-                            this.commandHistory[this.seekIndex]
+                            currentText = "";
+                            return;
+                        }
+                        currentText = string.Join(" ", new string[1]
+                        {
+                            commandHistory[seekIndex]
                         });
                         return;
-                    case (Keys) 14:
-                        this.currentText = "";
+                    case (Keys)14:
+                        currentText = "";
                         return;
-                    case (Keys) 16:
-                        if (this.currentState[Keys.LeftShift] == KeyState.Down || this.currentState[Keys.RightShift] == KeyState.Down)
+                    case (Keys)16:
+                        if (currentState[Keys.LeftShift] == KeyState.Down || currentState[Keys.RightShift] == KeyState.Down)
                         {
-                            this.currentText += ")";
+                            currentText += ")";
                             return;
                         }
-                        this.currentText += "0";
+                        currentText += "0";
                         return;
-                    case (Keys) 17:
-                        if (this.currentState[Keys.LeftShift] == KeyState.Down || this.currentState[Keys.RightShift] == KeyState.Down)
+                    case (Keys)17:
+                        if (currentState[Keys.LeftShift] == KeyState.Down || currentState[Keys.RightShift] == KeyState.Down)
                         {
-                            this.currentText += "!";
+                            currentText += "!";
                             return;
                         }
-                        this.currentText += "1";
+                        currentText += "1";
                         return;
-                    case (Keys) 18:
-                        if (this.currentState[Keys.LeftShift] == KeyState.Down || this.currentState[Keys.RightShift] == KeyState.Down)
+                    case (Keys)18:
+                        if (currentState[Keys.LeftShift] == KeyState.Down || currentState[Keys.RightShift] == KeyState.Down)
                         {
-                            this.currentText += "@";
+                            currentText += "@";
                             return;
                         }
-                        this.currentText += "2";
+                        currentText += "2";
                         return;
                     case Keys.Pause:
-                        if (this.currentState[Keys.LeftShift] == KeyState.Down || this.currentState[Keys.RightShift] == KeyState.Down)
+                        if (currentState[Keys.LeftShift] == KeyState.Down || currentState[Keys.RightShift] == KeyState.Down)
                         {
-                            this.currentText += "#";
+                            currentText += "#";
                             return;
                         }
-                        this.currentText += "3";
+                        currentText += "3";
                         return;
                     case Keys.CapsLock:
-                        if (this.currentState[Keys.LeftShift] == KeyState.Down || this.currentState[Keys.RightShift] == KeyState.Down)
+                        if (currentState[Keys.LeftShift] == KeyState.Down || currentState[Keys.RightShift] == KeyState.Down)
                         {
-                            this.currentText += "$";
+                            currentText += "$";
                             return;
                         }
-                        this.currentText += "4";
+                        currentText += "4";
                         return;
                     case Keys.Kana:
-                        if (this.currentState[Keys.LeftShift] == KeyState.Down || this.currentState[Keys.RightShift] == KeyState.Down)
+                        if (currentState[Keys.LeftShift] == KeyState.Down || currentState[Keys.RightShift] == KeyState.Down)
                         {
-                            this.currentText += "%";
+                            currentText += "%";
                             return;
                         }
-                        this.currentText += "5";
+                        currentText += "5";
                         return;
-                    case (Keys) 22:
-                        if (this.currentState[Keys.LeftShift] == KeyState.Down || this.currentState[Keys.RightShift] == KeyState.Down)
+                    case (Keys)22:
+                        if (currentState[Keys.LeftShift] == KeyState.Down || currentState[Keys.RightShift] == KeyState.Down)
                         {
-                            this.currentText += "^";
+                            currentText += "^";
                             return;
                         }
-                        this.currentText += "6";
+                        currentText += "6";
                         return;
-                    case (Keys) 23:
-                        if (this.currentState[Keys.LeftShift] == KeyState.Down || this.currentState[Keys.RightShift] == KeyState.Down)
+                    case (Keys)23:
+                        if (currentState[Keys.LeftShift] == KeyState.Down || currentState[Keys.RightShift] == KeyState.Down)
                         {
-                            this.currentText += "&";
+                            currentText += "&";
                             return;
                         }
-                        this.currentText += "7";
+                        currentText += "7";
                         return;
-                    case (Keys) 24:
-                        if (this.currentState[Keys.LeftShift] == KeyState.Down || this.currentState[Keys.RightShift] == KeyState.Down)
+                    case (Keys)24:
+                        if (currentState[Keys.LeftShift] == KeyState.Down || currentState[Keys.RightShift] == KeyState.Down)
                         {
-                            this.currentText += "*";
+                            currentText += "*";
                             return;
                         }
-                        this.currentText += "8";
+                        currentText += "8";
                         return;
                     case Keys.Kanji:
-                        if (this.currentState[Keys.LeftShift] == KeyState.Down || this.currentState[Keys.RightShift] == KeyState.Down)
+                        if (currentState[Keys.LeftShift] == KeyState.Down || currentState[Keys.RightShift] == KeyState.Down)
                         {
-                            this.currentText += "(";
+                            currentText += "(";
                             return;
                         }
-                        this.currentText += "9";
+                        currentText += "9";
                         return;
                     default:
-                        if ((uint) (key - 112) <= 11U)
+                        if ((uint)(key - 112) <= 11U)
                         {
-                            this.ExecuteFunctionKeyAction((int) (key - 112));
+                            ExecuteFunctionKeyAction((int)(key - 112));
                             return;
                         }
                         break;
@@ -345,131 +390,144 @@ namespace Monocle
                 switch (key - 186)
                 {
                     case Keys.None:
-                        if (this.currentState[Keys.LeftShift] == KeyState.Down || this.currentState[Keys.RightShift] == KeyState.Down)
+                        if (currentState[Keys.LeftShift] == KeyState.Down || currentState[Keys.RightShift] == KeyState.Down)
                         {
-                            this.currentText += ":";
+                            currentText += ":";
                             return;
                         }
-                        this.currentText += ";";
+                        currentText += ";";
                         return;
-                    case (Keys) 1:
-                        if (this.currentState[Keys.LeftShift] == KeyState.Down || this.currentState[Keys.RightShift] == KeyState.Down)
+                    case (Keys)1:
+                        if (currentState[Keys.LeftShift] == KeyState.Down || currentState[Keys.RightShift] == KeyState.Down)
                         {
-                            this.currentText += "+";
+                            currentText += "+";
                             return;
                         }
-                        this.currentText += "=";
+                        currentText += "=";
                         return;
-                    case (Keys) 2:
-                        if (this.currentState[Keys.LeftShift] == KeyState.Down || this.currentState[Keys.RightShift] == KeyState.Down)
+                    case (Keys)2:
+                        if (currentState[Keys.LeftShift] == KeyState.Down || currentState[Keys.RightShift] == KeyState.Down)
                         {
-                            this.currentText += "<";
+                            currentText += "<";
                             return;
                         }
-                        this.currentText += ",";
+                        currentText += ",";
                         return;
-                    case (Keys) 3:
-                        if (this.currentState[Keys.LeftShift] == KeyState.Down || this.currentState[Keys.RightShift] == KeyState.Down)
+                    case (Keys)3:
+                        if (currentState[Keys.LeftShift] == KeyState.Down || currentState[Keys.RightShift] == KeyState.Down)
                         {
-                            this.currentText += "_";
+                            currentText += "_";
                             return;
                         }
-                        this.currentText += "-";
+                        currentText += "-";
                         return;
-                    case (Keys) 4:
-                        if (this.currentState[Keys.LeftShift] == KeyState.Down || this.currentState[Keys.RightShift] == KeyState.Down)
+                    case (Keys)4:
+                        if (currentState[Keys.LeftShift] == KeyState.Down || currentState[Keys.RightShift] == KeyState.Down)
                         {
-                            this.currentText += ">";
+                            currentText += ">";
                             return;
                         }
-                        this.currentText += ".";
+                        currentText += ".";
                         return;
-                    case (Keys) 5:
-                        if (this.currentState[Keys.LeftShift] == KeyState.Down || this.currentState[Keys.RightShift] == KeyState.Down)
+                    case (Keys)5:
+                        if (currentState[Keys.LeftShift] == KeyState.Down || currentState[Keys.RightShift] == KeyState.Down)
                         {
-                            this.currentText += "?";
+                            currentText += "?";
                             return;
                         }
-                        this.currentText += "/";
+                        currentText += "/";
                         return;
-                    case (Keys) 6:
-label_104:
-                        this.Open = this.canOpen = false;
+                    case (Keys)6:
+                    label_104:
+                        Open = canOpen = false;
                         return;
                     default:
                         switch (key - 219)
                         {
                             case Keys.None:
-                                if (this.currentState[Keys.LeftShift] == KeyState.Down || this.currentState[Keys.RightShift] == KeyState.Down)
+                                if (currentState[Keys.LeftShift] == KeyState.Down || currentState[Keys.RightShift] == KeyState.Down)
                                 {
-                                    this.currentText += "{";
+                                    currentText += "{";
                                     return;
                                 }
-                                this.currentText += "[";
+                                currentText += "[";
                                 return;
-                            case (Keys) 2:
-                                if (this.currentState[Keys.LeftShift] == KeyState.Down || this.currentState[Keys.RightShift] == KeyState.Down)
+                            case (Keys)2:
+                                if (currentState[Keys.LeftShift] == KeyState.Down || currentState[Keys.RightShift] == KeyState.Down)
                                 {
-                                    this.currentText += "}";
+                                    currentText += "}";
                                     return;
                                 }
-                                this.currentText += "]";
+                                currentText += "]";
                                 return;
-                            case (Keys) 3:
-                                if (this.currentState[Keys.LeftShift] == KeyState.Down || this.currentState[Keys.RightShift] == KeyState.Down)
+                            case (Keys)3:
+                                if (currentState[Keys.LeftShift] == KeyState.Down || currentState[Keys.RightShift] == KeyState.Down)
                                 {
-                                    this.currentText += "\"";
+                                    currentText += "\"";
                                     return;
                                 }
-                                this.currentText += "'";
+                                currentText += "'";
                                 return;
-                            case (Keys) 4:
+                            case (Keys)4:
                                 goto label_104;
-                            case (Keys) 7:
-                                if (this.currentState[Keys.LeftShift] == KeyState.Down || this.currentState[Keys.RightShift] == KeyState.Down)
+                            case (Keys)7:
+                                if (currentState[Keys.LeftShift] == KeyState.Down || currentState[Keys.RightShift] == KeyState.Down)
                                 {
-                                    this.currentText += "|";
+                                    currentText += "|";
                                     return;
                                 }
-                                this.currentText += "\\";
+                                currentText += "\\";
                                 return;
                         }
                         break;
                 }
             }
             if (key.ToString().Length != 1)
+            {
                 return;
-            if (this.currentState[Keys.LeftShift] == KeyState.Down || this.currentState[Keys.RightShift] == KeyState.Down)
-                this.currentText += key.ToString();
+            }
+
+            if (currentState[Keys.LeftShift] == KeyState.Down || currentState[Keys.RightShift] == KeyState.Down)
+            {
+                currentText += key.ToString();
+            }
             else
-                this.currentText += key.ToString().ToLower();
+            {
+                currentText += key.ToString().ToLower();
+            }
         }
 
         private void EnterCommand()
         {
-            string[] strArray = this.currentText.Split(new char[2]
+            string[] strArray = currentText.Split(new char[2]
             {
                 ' ',
                 ','
             }, StringSplitOptions.RemoveEmptyEntries);
-            if (this.commandHistory.Count == 0 || this.commandHistory[0] != this.currentText)
-                this.commandHistory.Insert(0, this.currentText);
-            this.drawCommands.Insert(0, new Commands.Line(this.currentText, Color.Aqua));
-            this.currentText = "";
-            this.seekIndex = -1;
+            if (commandHistory.Count == 0 || commandHistory[0] != currentText)
+            {
+                commandHistory.Insert(0, currentText);
+            }
+
+            drawCommands.Insert(0, new Commands.Line(currentText, Color.Aqua));
+            currentText = "";
+            seekIndex = -1;
             string[] args = new string[strArray.Length - 1];
             for (int index = 1; index < strArray.Length; ++index)
+            {
                 args[index - 1] = strArray[index];
-            this.ExecuteCommand(strArray[0].ToLower(), args);
+            }
+
+            ExecuteCommand(strArray[0].ToLower(), args);
         }
 
         private void FindFirstTab()
         {
-            for (int index = 0; index < this.sorted.Count; ++index)
+            for (int index = 0; index < sorted.Count; ++index)
             {
-                if (this.tabSearch == "" || this.sorted[index].IndexOf(this.tabSearch) == 0)
+                if (tabSearch == "" || sorted[index].IndexOf(tabSearch) == 0)
                 {
-                    this.tabIndex = index;
+                    tabIndex = index;
                     break;
                 }
             }
@@ -477,10 +535,12 @@ label_104:
 
         private void FindLastTab()
         {
-            for (int index = 0; index < this.sorted.Count; ++index)
+            for (int index = 0; index < sorted.Count; ++index)
             {
-                if (this.tabSearch == "" || this.sorted[index].IndexOf(this.tabSearch) == 0)
-                    this.tabIndex = index;
+                if (tabSearch == "" || sorted[index].IndexOf(tabSearch) == 0)
+                {
+                    tabIndex = index;
+                }
             }
         }
 
@@ -489,34 +549,48 @@ label_104:
             int viewWidth = Engine.ViewWidth;
             int viewHeight = Engine.ViewHeight;
             Draw.SpriteBatch.Begin();
-            Draw.Rect(10f, (float) (viewHeight - 50), (float) (viewWidth - 20), 40f, Color.Black * 0.8f);
-            if (this.underscore)
-                Draw.SpriteBatch.DrawString(Draw.DefaultFont, ">" + this.currentText + "_", new Vector2(20f, (float) (viewHeight - 42)), Color.White);
-            else
-                Draw.SpriteBatch.DrawString(Draw.DefaultFont, ">" + this.currentText, new Vector2(20f, (float) (viewHeight - 42)), Color.White);
-            if (this.drawCommands.Count > 0)
+            Draw.Rect(10f, viewHeight - 50, viewWidth - 20, 40f, Color.Black * 0.8f);
+            if (underscore)
             {
-                int height = 10 + 30 * this.drawCommands.Count;
-                Draw.Rect(10f, (float) (viewHeight - height - 60), (float) (viewWidth - 20), (float) height, Color.Black * 0.8f);
-                for (int index = 0; index < this.drawCommands.Count; ++index)
-                    Draw.SpriteBatch.DrawString(Draw.DefaultFont, this.drawCommands[index].Text, new Vector2(20f, (float) (viewHeight - 92 - 30 * index)), this.drawCommands[index].Color);
+                Draw.SpriteBatch.DrawString(Draw.DefaultFont, ">" + currentText + "_", new Vector2(20f, viewHeight - 42), Color.White);
+            }
+            else
+            {
+                Draw.SpriteBatch.DrawString(Draw.DefaultFont, ">" + currentText, new Vector2(20f, viewHeight - 42), Color.White);
+            }
+
+            if (drawCommands.Count > 0)
+            {
+                int height = 10 + (30 * drawCommands.Count);
+                Draw.Rect(10f, viewHeight - height - 60, viewWidth - 20, height, Color.Black * 0.8f);
+                for (int index = 0; index < drawCommands.Count; ++index)
+                {
+                    Draw.SpriteBatch.DrawString(Draw.DefaultFont, drawCommands[index].Text, new Vector2(20f, viewHeight - 92 - (30 * index)), drawCommands[index].Color);
+                }
             }
             Draw.SpriteBatch.End();
         }
 
         public void ExecuteCommand(string command, string[] args)
         {
-            if (this.commands.ContainsKey(command))
-                this.commands[command].Action(args);
+            if (commands.ContainsKey(command))
+            {
+                commands[command].Action(args);
+            }
             else
-                this.Log((object) ("Command '" + command + "' not found! Type 'help' for list of commands"), Color.Yellow);
+            {
+                Log("Command '" + command + "' not found! Type 'help' for list of commands", Color.Yellow);
+            }
         }
 
         public void ExecuteFunctionKeyAction(int num)
         {
-            if (this.FunctionKeyActions[num] == null)
+            if (FunctionKeyActions[num] == null)
+            {
                 return;
-            this.FunctionKeyActions[num]();
+            }
+
+            FunctionKeyActions[num]();
         }
 
         private void BuildCommandsList()
@@ -524,30 +598,48 @@ label_104:
             foreach (Type type in Assembly.GetCallingAssembly().GetTypes())
             {
                 foreach (MethodInfo method in type.GetMethods(BindingFlags.Static | BindingFlags.Public | BindingFlags.NonPublic))
-                    this.ProcessMethod(method);
+                {
+                    ProcessMethod(method);
+                }
             }
             foreach (Type type in Assembly.GetEntryAssembly().GetTypes())
             {
                 foreach (MethodInfo method in type.GetMethods(BindingFlags.Static | BindingFlags.Public | BindingFlags.NonPublic))
-                    this.ProcessMethod(method);
+                {
+                    ProcessMethod(method);
+                }
             }
-            foreach (KeyValuePair<string, Commands.CommandInfo> command in this.commands)
-                this.sorted.Add(command.Key);
-            this.sorted.Sort();
+            foreach (KeyValuePair<string, Commands.CommandInfo> command in commands)
+            {
+                sorted.Add(command.Key);
+            }
+
+            sorted.Sort();
         }
 
         private void ProcessMethod(MethodInfo method)
         {
-            Command command = (Command) null;
-            object[] customAttributes = method.GetCustomAttributes(typeof (Command), false);
+            Command command = null;
+            object[] customAttributes = method.GetCustomAttributes(typeof(Command), false);
             if (customAttributes.Length != 0)
+            {
                 command = customAttributes[0] as Command;
+            }
+
             if (command == null)
+            {
                 return;
+            }
+
             if (!method.IsStatic)
+            {
                 throw new Exception(method.DeclaringType.Name + "." + method.Name + " is marked as a command, but is not static");
-            Commands.CommandInfo commandInfo = new Commands.CommandInfo();
-            commandInfo.Help = command.Help;
+            }
+
+            Commands.CommandInfo commandInfo = new()
+            {
+                Help = command.Help
+            };
             ParameterInfo[] parameters = method.GetParameters();
             object[] defaults = new object[parameters.Length];
             string[] strArray = new string[parameters.Length];
@@ -555,34 +647,38 @@ label_104:
             {
                 ParameterInfo parameterInfo = parameters[index];
                 strArray[index] = parameterInfo.Name + ":";
-                if (parameterInfo.ParameterType == typeof (string))
+                if (parameterInfo.ParameterType == typeof(string))
                 {
                     // ISSUE: explicit reference operation
                     strArray[index] += "string";
                 }
-                else if (parameterInfo.ParameterType == typeof (int))
+                else if (parameterInfo.ParameterType == typeof(int))
                 {
                     // ISSUE: explicit reference operation
                     strArray[index] += "int";
                 }
-                else if (parameterInfo.ParameterType == typeof (float))
+                else if (parameterInfo.ParameterType == typeof(float))
                 {
                     // ISSUE: explicit reference operation
                     strArray[index] += "float";
                 }
                 else
                 {
-                    if (!(parameterInfo.ParameterType == typeof (bool)))
+                    if (!(parameterInfo.ParameterType == typeof(bool)))
+                    {
                         throw new Exception(method.DeclaringType.Name + "." + method.Name + " is marked as a command, but has an invalid parameter type. Allowed types are: string, int, float, and bool");
+                    }
                     // ISSUE: explicit reference operation
                     strArray[index] += "bool";
                 }
                 if (parameterInfo.DefaultValue == DBNull.Value)
-                    defaults[index] = (object) null;
+                {
+                    defaults[index] = null;
+                }
                 else if (parameterInfo.DefaultValue != null)
                 {
                     defaults[index] = parameterInfo.DefaultValue;
-                    if (parameterInfo.ParameterType == typeof (string))
+                    if (parameterInfo.ParameterType == typeof(string))
                     {
                         ref string local = ref strArray[index];
                         local = local + "=\"" + parameterInfo.DefaultValue + "\"";
@@ -594,71 +690,93 @@ label_104:
                     }
                 }
                 else
-                    defaults[index] = (object) null;
+                {
+                    defaults[index] = null;
+                }
             }
             commandInfo.Usage = strArray.Length != 0 ? "[" + string.Join(" ", strArray) + "]" : "";
-            commandInfo.Action = (Action<string[]>) (args =>
+            commandInfo.Action = args =>
             {
                 if (parameters.Length == 0)
                 {
-                    this.InvokeMethod(method);
+                    InvokeMethod(method);
                 }
                 else
                 {
-                    object[] objArray = (object[]) defaults.Clone();
+                    object[] objArray = (object[])defaults.Clone();
                     for (int index = 0; index < objArray.Length && index < args.Length; ++index)
                     {
-                        if (parameters[index].ParameterType == typeof (string))
-                            objArray[index] = (object) Commands.ArgString(args[index]);
-                        else if (parameters[index].ParameterType == typeof (int))
-                            objArray[index] = (object) Commands.ArgInt(args[index]);
-                        else if (parameters[index].ParameterType == typeof (float))
-                            objArray[index] = (object) Commands.ArgFloat(args[index]);
-                        else if (parameters[index].ParameterType == typeof (bool))
-                            objArray[index] = (object) Commands.ArgBool(args[index]);
+                        if (parameters[index].ParameterType == typeof(string))
+                        {
+                            objArray[index] = Commands.ArgString(args[index]);
+                        }
+                        else if (parameters[index].ParameterType == typeof(int))
+                        {
+                            objArray[index] = Commands.ArgInt(args[index]);
+                        }
+                        else if (parameters[index].ParameterType == typeof(float))
+                        {
+                            objArray[index] = Commands.ArgFloat(args[index]);
+                        }
+                        else if (parameters[index].ParameterType == typeof(bool))
+                        {
+                            objArray[index] = Commands.ArgBool(args[index]);
+                        }
                     }
-                    this.InvokeMethod(method, objArray);
+                    InvokeMethod(method, objArray);
                 }
-            });
-            this.commands[command.Name] = commandInfo;
+            };
+            commands[command.Name] = commandInfo;
         }
 
         private void InvokeMethod(MethodInfo method, object[] param = null)
         {
             try
             {
-                method.Invoke((object) null, param);
+                _ = method.Invoke(null, param);
             }
             catch (Exception ex)
             {
-                Engine.Commands.Log((object) ex.InnerException.Message, Color.Yellow);
-                this.LogStackTrace(ex.InnerException.StackTrace);
+                Engine.Commands.Log(ex.InnerException.Message, Color.Yellow);
+                LogStackTrace(ex.InnerException.StackTrace);
             }
         }
 
         private void LogStackTrace(string stackTrace)
         {
             string str1 = stackTrace;
-            char[] chArray = new char[1]{ '\n' };
+            char[] chArray = new char[1] { '\n' };
             foreach (string str2 in str1.Split(chArray))
             {
                 string strOut = str2;
                 int length1 = strOut.LastIndexOf(" in ") + 4;
                 int startIndex1 = strOut.LastIndexOf('\\') + 1;
                 if (length1 != -1 && startIndex1 != -1)
+                {
                     strOut = strOut.Substring(0, length1) + strOut.Substring(startIndex1);
+                }
+
                 int length2 = strOut.IndexOf('(') + 1;
                 int startIndex2 = strOut.IndexOf(')');
                 if (length2 != -1 && startIndex2 != -1)
+                {
                     strOut = strOut.Substring(0, length2) + strOut.Substring(startIndex2);
+                }
+
                 int startIndex3 = strOut.LastIndexOf(':');
                 if (startIndex3 != -1)
+                {
                     strOut = strOut.Insert(startIndex3 + 1, " ").Insert(startIndex3, " ");
-                Engine.Commands.Log((object) ("-> " + strOut.TrimStart()), Color.White);
+                }
+
+                Engine.Commands.Log("-> " + strOut.TrimStart(), Color.White);
             }
         }
 
-        private static string ArgString(string arg) => arg == null ? "" : arg;
+        private static string ArgString(string arg)
+        {
+            return arg ?? "";
+        }
 
         private static bool ArgBool(string arg)
         {
@@ -670,7 +788,10 @@ label_104:
                     return false;
                 default:
                     if (!(arg.ToLower() == "false"))
+                    {
                         return !(arg.ToLower() == "f");
+                    }
+
                     goto case "0";
             }
         }
@@ -691,7 +812,7 @@ label_104:
         {
             try
             {
-                return Convert.ToSingle(arg, (IFormatProvider) CultureInfo.InvariantCulture);
+                return Convert.ToSingle(arg, CultureInfo.InvariantCulture);
             }
             catch
             {
@@ -700,59 +821,86 @@ label_104:
         }
 
         [Command("clear", "Clears the terminal")]
-        public static void Clear() => Engine.Commands.drawCommands.Clear();
+        public static void Clear()
+        {
+            Engine.Commands.drawCommands.Clear();
+        }
 
         [Command("exit", "Exits the game")]
-        private static void Exit() => Engine.Instance.Exit();
+        private static void Exit()
+        {
+            Engine.Instance.Exit();
+        }
 
         [Command("vsync", "Enables or disables vertical sync")]
         private static void Vsync(bool enabled = true)
         {
             Engine.Graphics.SynchronizeWithVerticalRetrace = enabled;
             Engine.Graphics.ApplyChanges();
-            Engine.Commands.Log((object) ("Vertical Sync " + (enabled ? "Enabled" : "Disabled")));
+            Engine.Commands.Log("Vertical Sync " + (enabled ? "Enabled" : "Disabled"));
         }
 
         [Command("count", "Logs amount of Entities in the Scene. Pass a tagIndex to count only Entities with that tag")]
         private static void Count(int tagIndex = -1)
         {
             if (Engine.Scene == null)
-                Engine.Commands.Log((object) "Current Scene is null!");
+            {
+                Engine.Commands.Log("Current Scene is null!");
+            }
             else if (tagIndex < 0)
-                Engine.Commands.Log((object) Engine.Scene.Entities.Count.ToString());
+            {
+                Engine.Commands.Log(Engine.Scene.Entities.Count.ToString());
+            }
             else
-                Engine.Commands.Log((object) Engine.Scene.TagLists[tagIndex].Count.ToString());
+            {
+                Engine.Commands.Log(Engine.Scene.TagLists[tagIndex].Count.ToString());
+            }
         }
 
         [Command("tracker", "Logs all tracked objects in the scene. Set mode to 'e' for just entities, or 'c' for just components")]
         private static void Tracker(string mode)
         {
             if (Engine.Scene == null)
-                Engine.Commands.Log((object) "Current Scene is null!");
+            {
+                Engine.Commands.Log("Current Scene is null!");
+            }
             else if (!(mode == "e"))
             {
                 if (!(mode == "c"))
                 {
-                    Engine.Commands.Log((object) "-- Entities --");
+                    Engine.Commands.Log("-- Entities --");
                     Engine.Scene.Tracker.LogEntities();
-                    Engine.Commands.Log((object) "-- Components --");
+                    Engine.Commands.Log("-- Components --");
                     Engine.Scene.Tracker.LogComponents();
                 }
                 else
+                {
                     Engine.Scene.Tracker.LogComponents();
+                }
             }
             else
+            {
                 Engine.Scene.Tracker.LogEntities();
+            }
         }
 
         [Command("pooler", "Logs the pooled Entity counts")]
-        private static void Pooler() => Engine.Pooler.Log();
+        private static void Pooler()
+        {
+            Engine.Pooler.Log();
+        }
 
         [Command("fullscreen", "Switches to fullscreen mode")]
-        private static void Fullscreen() => Engine.SetFullscreen();
+        private static void Fullscreen()
+        {
+            Engine.SetFullscreen();
+        }
 
         [Command("window", "Switches to window mode")]
-        private static void Window(int scale = 1) => Engine.SetWindowed(320 * scale, 180 * scale);
+        private static void Window(int scale = 1)
+        {
+            Engine.SetWindowed(320 * scale, 180 * scale);
+        }
 
         [Command("help", "Shows usage help for a given command")]
         private static void Help(string command)
@@ -760,27 +908,31 @@ label_104:
             if (Engine.Commands.sorted.Contains(command))
             {
                 Commands.CommandInfo command1 = Engine.Commands.commands[command];
-                StringBuilder stringBuilder = new StringBuilder();
-                stringBuilder.Append(":: ");
-                stringBuilder.Append(command);
+                StringBuilder stringBuilder = new();
+                _ = stringBuilder.Append(":: ");
+                _ = stringBuilder.Append(command);
                 if (!string.IsNullOrEmpty(command1.Usage))
                 {
-                    stringBuilder.Append(" ");
-                    stringBuilder.Append(command1.Usage);
+                    _ = stringBuilder.Append(" ");
+                    _ = stringBuilder.Append(command1.Usage);
                 }
-                Engine.Commands.Log((object) stringBuilder.ToString());
+                Engine.Commands.Log(stringBuilder.ToString());
                 if (string.IsNullOrEmpty(command1.Help))
-                    Engine.Commands.Log((object) "No help info set");
+                {
+                    Engine.Commands.Log("No help info set");
+                }
                 else
-                    Engine.Commands.Log((object) command1.Help);
+                {
+                    Engine.Commands.Log(command1.Help);
+                }
             }
             else
             {
-                StringBuilder stringBuilder = new StringBuilder();
-                stringBuilder.Append("Commands list: ");
-                stringBuilder.Append(string.Join(", ", (IEnumerable<string>) Engine.Commands.sorted));
-                Engine.Commands.Log((object) stringBuilder.ToString());
-                Engine.Commands.Log((object) "Type 'help command' for more info on that command!");
+                StringBuilder stringBuilder = new();
+                _ = stringBuilder.Append("Commands list: ");
+                _ = stringBuilder.Append(string.Join(", ", Engine.Commands.sorted));
+                Engine.Commands.Log(stringBuilder.ToString());
+                Engine.Commands.Log("Type 'help command' for more info on that command!");
             }
         }
 
@@ -798,14 +950,14 @@ label_104:
 
             public Line(string text)
             {
-                this.Text = text;
-                this.Color = Color.White;
+                Text = text;
+                Color = Color.White;
             }
 
             public Line(string text, Color color)
             {
-                this.Text = text;
-                this.Color = color;
+                Text = text;
+                Color = color;
             }
         }
     }

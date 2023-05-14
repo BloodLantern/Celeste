@@ -14,11 +14,11 @@ namespace Celeste
     public class TempleCrackedBlock : Solid
     {
         private EntityID eid;
-        private bool persistent;
-        private MTexture[,,] tiles;
+        private readonly bool persistent;
+        private readonly MTexture[,,] tiles;
         private float frame;
         private bool broken;
-        private int frames;
+        private readonly int frames;
 
         public TempleCrackedBlock(
             EntityID eid,
@@ -30,77 +30,100 @@ namespace Celeste
         {
             this.eid = eid;
             this.persistent = persistent;
-            this.Collidable = this.Visible = false;
-            int length1 = (int) ((double) width / 8.0);
-            int length2 = (int) ((double) height / 8.0);
+            Collidable = Visible = false;
+            int length1 = (int)((double)width / 8.0);
+            int length2 = (int)((double)height / 8.0);
             List<MTexture> atlasSubtextures = GFX.Game.GetAtlasSubtextures("objects/temple/breakBlock");
-            this.tiles = new MTexture[length1, length2, atlasSubtextures.Count];
-            this.frames = atlasSubtextures.Count;
+            tiles = new MTexture[length1, length2, atlasSubtextures.Count];
+            frames = atlasSubtextures.Count;
             for (int index1 = 0; index1 < length1; ++index1)
             {
                 for (int index2 = 0; index2 < length2; ++index2)
                 {
-                    int num1 = index1 >= length1 / 2 || index1 >= 2 ? (index1 < length1 / 2 || index1 < length1 - 2 ? 2 + index1 % 2 : 5 - (length1 - index1 - 1)) : index1;
-                    int num2 = index2 >= length2 / 2 || index2 >= 2 ? (index2 < length2 / 2 || index2 < length2 - 2 ? 2 + index2 % 2 : 5 - (length2 - index2 - 1)) : index2;
+                    int num1 = index1 >= length1 / 2 || index1 >= 2 ? (index1 < length1 / 2 || index1 < length1 - 2 ? 2 + (index1 % 2) : 5 - (length1 - index1 - 1)) : index1;
+                    int num2 = index2 >= length2 / 2 || index2 >= 2 ? (index2 < length2 / 2 || index2 < length2 - 2 ? 2 + (index2 % 2) : 5 - (length2 - index2 - 1)) : index2;
                     for (int index3 = 0; index3 < atlasSubtextures.Count; ++index3)
-                        this.tiles[index1, index2, index3] = atlasSubtextures[index3].GetSubtexture(num1 * 8, num2 * 8, 8, 8);
+                    {
+                        tiles[index1, index2, index3] = atlasSubtextures[index3].GetSubtexture(num1 * 8, num2 * 8, 8, 8);
+                    }
                 }
             }
-            this.Add((Component) new LightOcclude(0.5f));
+            Add(new LightOcclude(0.5f));
         }
 
         public TempleCrackedBlock(EntityID eid, EntityData data, Vector2 offset)
-            : this(eid, data.Position + offset, (float) data.Width, (float) data.Height, data.Bool(nameof (persistent)))
+            : this(eid, data.Position + offset, data.Width, data.Height, data.Bool(nameof(persistent)))
         {
         }
 
         public override void Added(Scene scene)
         {
             base.Added(scene);
-            if (this.CollideCheck<Player>())
+            if (CollideCheck<Player>())
             {
-                if (this.persistent)
-                    this.SceneAs<Level>().Session.DoNotLoad.Add(this.eid);
-                this.RemoveSelf();
+                if (persistent)
+                {
+                    _ = SceneAs<Level>().Session.DoNotLoad.Add(eid);
+                }
+
+                RemoveSelf();
             }
             else
-                this.Collidable = this.Visible = true;
+            {
+                Collidable = Visible = true;
+            }
         }
 
         public override void Update()
         {
             base.Update();
-            if (!this.broken)
+            if (!broken)
+            {
                 return;
-            this.frame += Engine.DeltaTime * 15f;
-            if ((double) this.frame < (double) this.frames)
+            }
+
+            frame += Engine.DeltaTime * 15f;
+            if (frame < (double)frames)
+            {
                 return;
-            this.RemoveSelf();
+            }
+
+            RemoveSelf();
         }
 
         public override void Render()
         {
-            int frame = (int) this.frame;
-            if (frame >= this.frames)
-                return;
-            for (int x = 0; (double) x < (double) this.Width / 8.0; ++x)
+            int frame = (int)this.frame;
+            if (frame >= frames)
             {
-                for (int y = 0; (double) y < (double) this.Height / 8.0; ++y)
-                    this.tiles[x, y, frame].Draw(this.Position + new Vector2((float) x, (float) y) * 8f);
+                return;
+            }
+
+            for (int x = 0; x < (double)Width / 8.0; ++x)
+            {
+                for (int y = 0; y < (double)Height / 8.0; ++y)
+                {
+                    tiles[x, y, frame].Draw(Position + (new Vector2(x, y) * 8f));
+                }
             }
         }
 
         public void Break(Vector2 from)
         {
-            if (this.persistent)
-                this.SceneAs<Level>().Session.DoNotLoad.Add(this.eid);
-            Audio.Play("event:/game/05_mirror_temple/crackedwall_vanish", this.Center);
-            this.broken = true;
-            this.Collidable = false;
-            for (int index1 = 0; (double) index1 < (double) this.Width / 8.0; ++index1)
+            if (persistent)
             {
-                for (int index2 = 0; (double) index2 < (double) this.Height / 8.0; ++index2)
-                    this.Scene.Add((Entity) Engine.Pooler.Create<Debris>().Init(this.Position + new Vector2((float) (index1 * 8 + 4), (float) (index2 * 8 + 4)), '1').BlastFrom(from));
+                _ = SceneAs<Level>().Session.DoNotLoad.Add(eid);
+            }
+
+            _ = Audio.Play("event:/game/05_mirror_temple/crackedwall_vanish", Center);
+            broken = true;
+            Collidable = false;
+            for (int index1 = 0; index1 < (double)Width / 8.0; ++index1)
+            {
+                for (int index2 = 0; index2 < (double)Height / 8.0; ++index2)
+                {
+                    Scene.Add(Engine.Pooler.Create<Debris>().Init(Position + new Vector2((index1 * 8) + 4, (index2 * 8) + 4), '1').BlastFrom(from));
+                }
             }
         }
     }

@@ -24,46 +24,53 @@ namespace Celeste
 
         public CutsceneEntity(bool fadeInOnSkip = true, bool endingChapterAfter = false)
         {
-            this.FadeInOnSkip = fadeInOnSkip;
-            this.EndingChapterAfter = endingChapterAfter;
+            FadeInOnSkip = fadeInOnSkip;
+            EndingChapterAfter = endingChapterAfter;
         }
 
         public override void Added(Scene scene)
         {
             base.Added(scene);
-            this.Level = scene as Level;
-            this.Start();
+            Level = scene as Level;
+            Start();
         }
 
         public void Start()
         {
-            this.Running = true;
-            this.Level.StartCutscene(new Action<Level>(this.SkipCutscene), this.FadeInOnSkip, this.EndingChapterAfter);
-            this.OnBegin(this.Level);
+            Running = true;
+            Level.StartCutscene(new Action<Level>(SkipCutscene), FadeInOnSkip, EndingChapterAfter);
+            OnBegin(Level);
         }
 
         public override void Update()
         {
-            if (this.Level.RetryPlayerCorpse != null)
-                this.Active = false;
+            if (Level.RetryPlayerCorpse != null)
+            {
+                Active = false;
+            }
             else
+            {
                 base.Update();
+            }
         }
 
         private void SkipCutscene(Level level)
         {
-            this.WasSkipped = true;
-            this.EndCutscene(level, this.RemoveOnSkipped);
+            WasSkipped = true;
+            EndCutscene(level, RemoveOnSkipped);
         }
 
         public void EndCutscene(Level level, bool removeSelf = true)
         {
-            this.Running = false;
-            this.OnEnd(level);
+            Running = false;
+            OnEnd(level);
             level.EndCutscene();
             if (!removeSelf)
+            {
                 return;
-            this.RemoveSelf();
+            }
+
+            RemoveSelf();
         }
 
         public abstract void OnBegin(Level level);
@@ -76,16 +83,18 @@ namespace Celeste
             Ease.Easer ease = null,
             float delay = 0.0f)
         {
-            if (ease == null)
-                ease = Ease.CubeInOut;
-            if ((double) delay > 0.0)
-                yield return (object) delay;
+            ease ??= Ease.CubeInOut;
+            if ((double)delay > 0.0)
+            {
+                yield return delay;
+            }
+
             Level level = Engine.Scene as Level;
             Vector2 from = level.Camera.Position;
-            for (float p = 0.0f; (double) p < 1.0; p += Engine.DeltaTime / duration)
+            for (float p = 0.0f; (double)p < 1.0; p += Engine.DeltaTime / duration)
             {
-                level.Camera.Position = from + (target - from) * ease(p);
-                yield return (object) null;
+                level.Camera.Position = from + ((target - from) * ease(p));
+                yield return null;
             }
             level.Camera.Position = target;
         }

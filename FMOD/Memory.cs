@@ -22,9 +22,15 @@ namespace FMOD
             return Memory.FMOD_Memory_Initialize(poolmem, poollen, useralloc, userrealloc, userfree, memtypeflags);
         }
 
-        public static RESULT GetStats(out int currentalloced, out int maxalloced) => Memory.GetStats(out currentalloced, out maxalloced, false);
+        public static RESULT GetStats(out int currentalloced, out int maxalloced)
+        {
+            return Memory.GetStats(out currentalloced, out maxalloced, false);
+        }
 
-        public static RESULT GetStats(out int currentalloced, out int maxalloced, bool blocking) => Memory.FMOD_Memory_GetStats(out currentalloced, out maxalloced, blocking);
+        public static RESULT GetStats(out int currentalloced, out int maxalloced, bool blocking)
+        {
+            return Memory.FMOD_Memory_GetStats(out currentalloced, out maxalloced, blocking);
+        }
 
         [DllImport("fmod")]
         private static extern RESULT FMOD_Memory_Initialize(

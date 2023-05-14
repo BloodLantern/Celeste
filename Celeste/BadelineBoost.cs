@@ -56,9 +56,11 @@ namespace Celeste
             _ = stretch.CenterOrigin();
             Add(light = new VertexLight(Color.White, 0.7f, 12, 20));
             Add(bloom = new BloomPoint(0.5f, 12f));
-            Add(wiggler = Wiggler.Create(0.4f, 3f, f => sprite.Scale = Vector2.One * (1 + wiggler.Value * 0.4f)));
+            Add(wiggler = Wiggler.Create(0.4f, 3f, f => sprite.Scale = Vector2.One * (1 + (wiggler.Value * 0.4f))));
             if (lockCamera)
+            {
                 Add(new CameraLocker(Level.CameraLockModes.BoostSequence, 0.0f, 160f));
+            }
 
             Add(relocateSfx = new SoundSource());
         }
@@ -72,7 +74,9 @@ namespace Celeste
         {
             base.Awake(scene);
             if (!CollideCheck<FakeWall>())
+            {
                 return;
+            }
 
             Depth = -12500;
         }
@@ -95,16 +99,21 @@ namespace Celeste
             Level level = boost.Scene as Level;
             bool endLevel = false;
             if (finalBoost && boost.finalCh9GoldenBoost)
+            {
                 endLevel = true;
+            }
             else
             {
                 bool flag = false;
                 foreach (Component follower in player.Leader.Followers)
+                {
                     if (follower.Entity is Strawberry entity && entity.Golden)
                     {
                         flag = true;
                         break;
                     }
+                }
+
                 endLevel = finalBoost && boost.finalCh9Boost && !flag;
             }
             Stopwatch sw = new();
@@ -116,21 +125,29 @@ namespace Celeste
                     : Audio.Play("event:/char/badeline/booster_final", boost.Position);
 
             if (player.Holding != null)
+            {
                 player.Drop();
+            }
 
             player.StateMachine.State = 11;
             player.DummyAutoAnimate = false;
             player.DummyGravity = false;
             if (player.Inventory.Dashes > 1)
+            {
                 player.Dashes = 1;
+            }
             else
+            {
                 _ = player.RefillDash();
+            }
 
             player.RefillStamina();
             player.Speed = Vector2.Zero;
             int num = Math.Sign(player.X - boost.X);
             if (num == 0)
+            {
                 num = -1;
+            }
 
             BadelineDummy badeline = new(boost.Position);
             boost.Scene.Add(badeline);
@@ -144,10 +161,14 @@ namespace Celeste
             {
                 Vector2 vector2 = Vector2.Lerp(playerFrom, playerTo, p);
                 if (player.Scene != null)
+                {
                     player.MoveToX(vector2.X);
+                }
 
                 if (player.Scene != null)
+                {
                     player.MoveToY(vector2.Y);
+                }
 
                 badeline.Position = Vector2.Lerp(badelineFrom, badelineTo, p);
                 yield return null;
@@ -163,12 +184,16 @@ namespace Celeste
                 Engine.TimeRate = 0.5f;
             }
             else
+            {
                 _ = Audio.Play("event:/char/badeline/booster_throw", boost.Position);
+            }
 
             badeline.Sprite.Play("boost");
             yield return 0.1f;
             if (!player.Dead)
+            {
                 _ = player.MoveV(5f);
+            }
 
             yield return 0.1f;
             if (endLevel)
@@ -189,7 +214,9 @@ namespace Celeste
             boost.Add(Alarm.Create(Alarm.AlarmMode.Oneshot, () =>
             {
                 if (player.Dashes < player.Inventory.Dashes)
+                {
                     ++player.Dashes;
+                }
 
                 Scene.Remove(badeline);
                 _ = (Scene as Level).Displacement.AddBurst(badeline.Position, 0.25f, 8f, 32f, 0.5f);
@@ -208,10 +235,12 @@ namespace Celeste
                 tween.OnUpdate = t =>
                 {
                     Position = Vector2.Lerp(from, to, t.Eased);
-                    stretch.Scale.X = 1 + Calc.YoYo(t.Eased) * 2;
-                    stretch.Scale.Y = 1 - Calc.YoYo(t.Eased) * 0.75f;
+                    stretch.Scale.X = 1 + (Calc.YoYo(t.Eased) * 2);
+                    stretch.Scale.Y = 1 - (Calc.YoYo(t.Eased) * 0.75f);
                     if (t.Eased >= 0.9f || !Scene.OnInterval(0.03f))
+                    {
                         return;
+                    }
 
                     TrailManager.Add(this, Player.TwoDashesHairColor, 0.5f);
                     level.ParticlesFG.Emit(P_Move, 1, Center, Vector2.One * 4f);
@@ -240,13 +269,17 @@ namespace Celeste
             else
             {
                 if (boost.finalCh9Boost)
+                {
                     boost.Ch9FinalBoostSfx = Audio.Play("event:/new_content/char/badeline/booster_finalfinal_part2", boost.Position);
+                }
 
                 Console.WriteLine("TIME: " + sw.ElapsedMilliseconds);
                 Engine.FreezeTimer = 0.1f;
                 yield return null;
                 if (endLevel)
+                {
                     level.TimerHidden = true;
+                }
 
                 Input.Rumble(RumbleStrength.Strong, RumbleLength.Long);
                 level.Flash(Color.White * 0.5f, true);
@@ -274,10 +307,12 @@ namespace Celeste
             tween.OnUpdate = t =>
             {
                 Position = Vector2.Lerp(from, to, t.Eased);
-                stretch.Scale.X = 1 + Calc.YoYo(t.Eased) * 2;
-                stretch.Scale.Y = 1 - Calc.YoYo(t.Eased) * 0.75f;
+                stretch.Scale.X = 1 + (Calc.YoYo(t.Eased) * 2);
+                stretch.Scale.Y = 1 - (Calc.YoYo(t.Eased) * 0.75f);
                 if (t.Eased >= 0.9f || !Scene.OnInterval(0.03f))
+                {
                     return;
+                }
 
                 TrailManager.Add(this, Player.TwoDashesHairColor, 0.5f);
                 level.ParticlesFG.Emit(BadelineBoost.P_Move, 1, Center, Vector2.One * 4f);
@@ -312,10 +347,14 @@ namespace Celeste
         public override void Update()
         {
             if (sprite.Visible && Scene.OnInterval(0.05f))
+            {
                 SceneAs<Level>().ParticlesBG.Emit(P_Ambience, 1, Center, Vector2.One * 3f);
+            }
 
             if (holding != null)
+            {
                 holding.Speed = Vector2.Zero;
+            }
 
             if (!travelling)
             {
@@ -325,7 +364,9 @@ namespace Celeste
                     float num = Calc.ClampedMap((entity.Center - Position).Length(), 16f, 64f, 12f, 0.0f);
                     sprite.Position = Calc.Approach(sprite.Position, (entity.Center - Position).SafeNormalize() * num, 32f * Engine.DeltaTime);
                     if (canSkip && entity.Position.X - X >= 100 && nodeIndex + 1 < nodes.Length)
+                    {
                         Skip();
+                    }
                 }
             }
             light.Visible = bloom.Visible = sprite.Visible || stretch.Visible;

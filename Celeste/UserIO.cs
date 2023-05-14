@@ -24,11 +24,20 @@ namespace Celeste
         private static byte[] savingFileData;
         private static byte[] savingSettingsData;
 
-        private static string GetHandle(string name) => Path.Combine("Saves", name + ".celeste");
+        private static string GetHandle(string name)
+        {
+            return Path.Combine("Saves", name + ".celeste");
+        }
 
-        private static string GetBackupHandle(string name) => Path.Combine("Backups", name + ".celeste");
+        private static string GetBackupHandle(string name)
+        {
+            return Path.Combine("Backups", name + ".celeste");
+        }
 
-        public static bool Open(UserIO.Mode mode) => true;
+        public static bool Open(UserIO.Mode mode)
+        {
+            return true;
+        }
 
         public static bool Save<T>(string path, byte[] data) where T : class
         {
@@ -39,13 +48,22 @@ namespace Celeste
                 string backupHandle = UserIO.GetBackupHandle(path);
                 DirectoryInfo directory1 = new FileInfo(handle).Directory;
                 if (!directory1.Exists)
+                {
                     directory1.Create();
+                }
+
                 DirectoryInfo directory2 = new FileInfo(backupHandle).Directory;
                 if (!directory2.Exists)
+                {
                     directory2.Create();
+                }
+
                 using (FileStream fileStream = File.Open(backupHandle, FileMode.Create, FileAccess.Write))
+                {
                     fileStream.Write(data, 0, data.Length);
-                if ((object) UserIO.Load<T>(path, true) != null)
+                }
+
+                if (UserIO.Load<T>(path, true) is not null)
                 {
                     File.Copy(backupHandle, handle, true);
                     flag = true;
@@ -57,20 +75,23 @@ namespace Celeste
                 ErrorLog.Write(ex);
             }
             if (!flag)
+            {
                 Console.WriteLine("Save Failed");
+            }
+
             return flag;
         }
 
         public static T Load<T>(string path, bool backup = false) where T : class
         {
             string path1 = !backup ? UserIO.GetHandle(path) : UserIO.GetBackupHandle(path);
-            T obj = default (T);
+            T obj = default;
             try
             {
                 if (File.Exists(path1))
                 {
-                    using (FileStream fileStream = File.OpenRead(path1))
-                        obj = UserIO.Deserialize<T>((Stream) fileStream);
+                    using FileStream fileStream = File.OpenRead(path1);
+                    obj = UserIO.Deserialize<T>(fileStream);
                 }
             }
             catch (Exception ex)
@@ -81,15 +102,24 @@ namespace Celeste
             return obj;
         }
 
-        private static T Deserialize<T>(Stream stream) where T : class => (T) new XmlSerializer(typeof (T)).Deserialize(stream);
+        private static T Deserialize<T>(Stream stream) where T : class
+        {
+            return (T)new XmlSerializer(typeof(T)).Deserialize(stream);
+        }
 
-        public static bool Exists(string path) => File.Exists(UserIO.GetHandle(path));
+        public static bool Exists(string path)
+        {
+            return File.Exists(UserIO.GetHandle(path));
+        }
 
         public static bool Delete(string path)
         {
             string handle = UserIO.GetHandle(path);
             if (!File.Exists(handle))
+            {
                 return false;
+            }
+
             File.Delete(handle);
             return true;
         }
@@ -100,11 +130,9 @@ namespace Celeste
 
         public static byte[] Serialize<T>(T instance)
         {
-            using (MemoryStream memoryStream = new MemoryStream())
-            {
-                new XmlSerializer(typeof (T)).Serialize((Stream) memoryStream, (object) instance);
-                return memoryStream.ToArray();
-            }
+            using MemoryStream memoryStream = new();
+            new XmlSerializer(typeof(T)).Serialize(memoryStream, instance);
+            return memoryStream.ToArray();
         }
 
         public static bool Saving { get; private set; }
@@ -114,7 +142,10 @@ namespace Celeste
         public static void SaveHandler(bool file, bool settings)
         {
             if (UserIO.Saving)
+            {
                 return;
+            }
+
             UserIO.Saving = true;
             Celeste.SaveRoutine = new Coroutine(UserIO.SaveRoutine(file, settings));
         }
@@ -132,28 +163,38 @@ namespace Celeste
                     UserIO.savingFileData = UserIO.Serialize<SaveData>(SaveData.Instance);
                 }
                 if (UserIO.savingSettings)
+                {
                     UserIO.savingSettingsData = UserIO.Serialize<Settings>(Settings.Instance);
+                }
+
                 UserIO.savingInternal = true;
                 UserIO.SavingResult = false;
                 RunThread.Start(new Action(UserIO.SaveThread), "USER_IO");
                 SaveLoadIcon.Show(Engine.Scene);
                 while (UserIO.savingInternal)
-                    yield return (object) null;
+                {
+                    yield return null;
+                }
+
                 SaveLoadIcon.Hide();
                 if (!UserIO.SavingResult)
                 {
                     menu = new FileErrorOverlay(FileErrorOverlay.Error.Save);
                     while (menu.Open)
-                        yield return (object) null;
+                    {
+                        yield return null;
+                    }
                 }
                 else
+                {
                     goto label_14;
+                }
             }
             while (menu.TryAgain);
-            menu = (FileErrorOverlay) null;
-label_14:
+            menu = null;
+        label_14:
             UserIO.Saving = false;
-            Celeste.SaveRoutine = (Coroutine) null;
+            Celeste.SaveRoutine = null;
         }
 
         private static void SaveThread()
@@ -163,9 +204,15 @@ label_14:
             {
                 UserIO.SavingResult = true;
                 if (UserIO.savingFile)
+                {
                     UserIO.SavingResult &= UserIO.Save<SaveData>(SaveData.GetFilename(), UserIO.savingFileData);
+                }
+
                 if (UserIO.savingSettings)
+                {
                     UserIO.SavingResult &= UserIO.Save<Settings>("settings", UserIO.savingSettingsData);
+                }
+
                 UserIO.Close();
             }
             UserIO.savingInternal = false;

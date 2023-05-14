@@ -33,7 +33,9 @@ namespace Celeste
         public override void OnStay(Player player)
         {
             if (!string.IsNullOrEmpty(DeleteFlag) && SceneAs<Level>().Session.GetFlag(DeleteFlag))
+            {
                 return;
+            }
 
             player.CameraAnchor = Target;
             player.CameraAnchorLerp = Vector2.One * MathHelper.Clamp(LerpStrength * GetPositionLerp(player, PositionMode), 0f, 1f);
@@ -46,20 +48,30 @@ namespace Celeste
             base.OnLeave(player);
             bool flag = false;
             foreach (Trigger entity in Scene.Tracker.GetEntities<CameraTargetTrigger>())
+            {
                 if (entity.PlayerIsInside)
                 {
                     flag = true;
                     break;
                 }
+            }
+
             if (!flag)
+            {
                 foreach (Trigger entity in Scene.Tracker.GetEntities<CameraAdvanceTargetTrigger>())
+                {
                     if (entity.PlayerIsInside)
                     {
                         flag = true;
                         break;
                     }
+                }
+            }
+
             if (flag)
+            {
                 return;
+            }
 
             player.CameraAnchorLerp = Vector2.Zero;
         }

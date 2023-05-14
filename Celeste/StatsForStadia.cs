@@ -11,8 +11,8 @@ namespace Celeste
 {
     public static class StatsForStadia
     {
-        private static Dictionary<StadiaStat, string> statToString = new Dictionary<StadiaStat, string>();
-        private static bool ready;
+        private static readonly Dictionary<StadiaStat, string> statToString = new();
+        private static readonly bool ready;
 
         public static void MakeRequest()
         {

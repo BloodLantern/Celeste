@@ -6,7 +6,6 @@
 
 using Microsoft.Xna.Framework;
 using Monocle;
-using System;
 using System.Collections;
 
 namespace Celeste
@@ -21,8 +20,11 @@ namespace Celeste
         {
             Vector2[] vector2Array = data.NodesOffset(offset);
             if (vector2Array.Length != 0)
-                this.Target = vector2Array[0];
-            this.Global = data.Bool("global", true);
+            {
+                Target = vector2Array[0];
+            }
+
+            Global = data.Bool("global", true);
         }
 
         public override void OnEnter(Player player)
@@ -31,7 +33,9 @@ namespace Celeste
             for (int index = player.Leader.Followers.Count - 1; index >= 0; --index)
             {
                 if (player.Leader.Followers[index].Entity is Strawberry)
-                    this.Add((Component) new Coroutine(this.DetatchFollower(player.Leader.Followers[index])));
+                {
+                    Add(new Coroutine(DetatchFollower(player.Leader.Followers[index])));
+                }
             }
         }
 
@@ -39,27 +43,33 @@ namespace Celeste
         {
             Leader leader = follower.Leader;
             Entity entity = follower.Entity;
-            float time = (entity.Position - this.Target).Length() / 200f;
+            float time = (entity.Position - Target).Length() / 200f;
             if (entity is Strawberry strawberry)
+            {
                 strawberry.ReturnHomeWhenLost = false;
+            }
+
             Follower follower1 = follower;
             leader.LoseFollower(follower1);
             entity.Active = false;
             entity.Collidable = false;
-            if (this.Global)
+            if (Global)
             {
-                entity.AddTag((int) Tags.Global);
-                follower.OnGainLeader += (Action) (() => entity.RemoveTag((int) Tags.Global));
+                entity.AddTag((int)Tags.Global);
+                follower.OnGainLeader += () => entity.RemoveTag((int)Tags.Global);
             }
             else
-                entity.AddTag((int) Tags.Persistent);
-            Audio.Play("event:/new_content/game/10_farewell/strawberry_gold_detach", entity.Position);
+            {
+                entity.AddTag((int)Tags.Persistent);
+            }
+
+            _ = Audio.Play("event:/new_content/game/10_farewell/strawberry_gold_detach", entity.Position);
             Vector2 position = entity.Position;
-            SimpleCurve curve = new SimpleCurve(position, this.Target, position + (this.Target - position) * 0.5f + new Vector2(0.0f, -64f));
-            for (float p = 0.0f; (double) p < 1.0; p += Engine.DeltaTime / time)
+            SimpleCurve curve = new(position, Target, position + ((Target - position) * 0.5f) + new Vector2(0.0f, -64f));
+            for (float p = 0.0f; (double)p < 1.0; p += Engine.DeltaTime / time)
             {
                 entity.Position = curve.GetPoint(Ease.CubeInOut(p));
-                yield return (object) null;
+                yield return null;
             }
             entity.Active = true;
             entity.Collidable = true;

@@ -19,19 +19,23 @@ namespace Celeste
         public MusicFadeTrigger(EntityData data, Vector2 offset)
             : base(data, offset)
         {
-            this.LeftToRight = data.Attr("direction", "leftToRight") == "leftToRight";
-            this.FadeA = data.Float("fadeA");
-            this.FadeB = data.Float("fadeB", 1f);
-            this.Parameter = data.Attr("parameter");
+            LeftToRight = data.Attr("direction", "leftToRight") == "leftToRight";
+            FadeA = data.Float("fadeA");
+            FadeB = data.Float("fadeB", 1f);
+            Parameter = data.Attr("parameter");
         }
 
         public override void OnStay(Player player)
         {
-            float num = !this.LeftToRight ? Calc.ClampedMap(player.Center.Y, this.Top, this.Bottom, this.FadeA, this.FadeB) : Calc.ClampedMap(player.Center.X, this.Left, this.Right, this.FadeA, this.FadeB);
-            if (string.IsNullOrEmpty(this.Parameter))
+            float num = !LeftToRight ? Calc.ClampedMap(player.Center.Y, Top, Bottom, FadeA, FadeB) : Calc.ClampedMap(player.Center.X, Left, Right, FadeA, FadeB);
+            if (string.IsNullOrEmpty(Parameter))
+            {
                 Audio.SetMusicParam("fade", num);
+            }
             else
-                Audio.SetMusicParam(this.Parameter, num);
+            {
+                Audio.SetMusicParam(Parameter, num);
+            }
         }
     }
 }

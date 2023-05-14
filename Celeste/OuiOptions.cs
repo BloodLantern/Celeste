@@ -19,25 +19,28 @@ namespace Celeste
         private string currentLanguage;
         private float alpha;
 
-        public override void Added(Scene scene) => base.Added(scene);
+        public override void Added(Scene scene)
+        {
+            base.Added(scene);
+        }
 
         private void ReloadMenu()
         {
             Vector2 vector2 = Vector2.Zero;
             int num = -1;
-            if (this.menu != null)
+            if (menu != null)
             {
-                vector2 = this.menu.Position;
-                num = this.menu.Selection;
-                this.Scene.Remove((Entity) this.menu);
+                vector2 = menu.Position;
+                num = menu.Selection;
+                Scene.Remove(menu);
             }
-            this.menu = MenuOptions.Create();
+            menu = MenuOptions.Create();
             if (num >= 0)
             {
-                this.menu.Selection = num;
-                this.menu.Position = vector2;
+                menu.Selection = num;
+                menu.Position = vector2;
             }
-            this.Scene.Add((Entity) this.menu);
+            Scene.Add(menu);
         }
 
         public override IEnumerator Enter(Oui from)
@@ -47,11 +50,11 @@ namespace Celeste
             ouiOptions.menu.Visible = ouiOptions.Visible = true;
             ouiOptions.menu.Focused = false;
             ouiOptions.currentLanguage = ouiOptions.startLanguage = Settings.Instance.Language;
-            for (float p = 0.0f; (double) p < 1.0; p += Engine.DeltaTime * 4f)
+            for (float p = 0.0f; (double)p < 1.0; p += Engine.DeltaTime * 4f)
             {
-                ouiOptions.menu.X = (float) (2880.0 + -1920.0 * (double) Ease.CubeOut(p));
+                ouiOptions.menu.X = (float)(2880.0 + (-1920.0 * (double)Ease.CubeOut(p)));
                 ouiOptions.alpha = Ease.CubeOut(p);
-                yield return (object) null;
+                yield return null;
             }
             ouiOptions.menu.Focused = true;
         }
@@ -59,46 +62,52 @@ namespace Celeste
         public override IEnumerator Leave(Oui next)
         {
             OuiOptions ouiOptions = this;
-            Audio.Play("event:/ui/main/whoosh_large_out");
+            _ = Audio.Play("event:/ui/main/whoosh_large_out");
             ouiOptions.menu.Focused = false;
             UserIO.SaveHandler(false, true);
             while (UserIO.Saving)
-                yield return (object) null;
-            for (float p = 0.0f; (double) p < 1.0; p += Engine.DeltaTime * 4f)
             {
-                ouiOptions.menu.X = (float) (960.0 + 1920.0 * (double) Ease.CubeIn(p));
+                yield return null;
+            }
+
+            for (float p = 0.0f; (double)p < 1.0; p += Engine.DeltaTime * 4f)
+            {
+                ouiOptions.menu.X = (float)(960.0 + (1920.0 * (double)Ease.CubeIn(p)));
                 ouiOptions.alpha = 1f - Ease.CubeIn(p);
-                yield return (object) null;
+                yield return null;
             }
             if (ouiOptions.startLanguage != Settings.Instance.Language)
             {
                 ouiOptions.Overworld.ReloadMenus(Overworld.StartMode.ReturnFromOptions);
-                yield return (object) null;
+                yield return null;
             }
             ouiOptions.menu.Visible = ouiOptions.Visible = false;
             ouiOptions.menu.RemoveSelf();
-            ouiOptions.menu = (TextMenu) null;
+            ouiOptions.menu = null;
         }
 
         public override void Update()
         {
-            if (this.menu != null && this.menu.Focused && this.Selected && Input.MenuCancel.Pressed)
+            if (menu != null && menu.Focused && Selected && Input.MenuCancel.Pressed)
             {
-                Audio.Play("event:/ui/main/button_back");
-                this.Overworld.Goto<OuiMainMenu>();
+                _ = Audio.Play("event:/ui/main/button_back");
+                _ = Overworld.Goto<OuiMainMenu>();
             }
-            if (this.Selected && this.currentLanguage != Settings.Instance.Language)
+            if (Selected && currentLanguage != Settings.Instance.Language)
             {
-                this.currentLanguage = Settings.Instance.Language;
-                this.ReloadMenu();
+                currentLanguage = Settings.Instance.Language;
+                ReloadMenu();
             }
             base.Update();
         }
 
         public override void Render()
         {
-            if ((double) this.alpha > 0.0)
-                Draw.Rect(-10f, -10f, 1940f, 1100f, Color.Black * this.alpha * 0.4f);
+            if (alpha > 0.0)
+            {
+                Draw.Rect(-10f, -10f, 1940f, 1100f, Color.Black * alpha * 0.4f);
+            }
+
             base.Render();
         }
     }

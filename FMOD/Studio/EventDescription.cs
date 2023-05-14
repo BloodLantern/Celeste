@@ -12,33 +12,43 @@ namespace FMOD.Studio
 {
     public class EventDescription : HandleBase
     {
-        public RESULT getID(out Guid id) => EventDescription.FMOD_Studio_EventDescription_GetID(this.rawPtr, out id);
+        public RESULT getID(out Guid id)
+        {
+            return EventDescription.FMOD_Studio_EventDescription_GetID(rawPtr, out id);
+        }
 
         public RESULT getPath(out string path)
         {
-            path = (string) null;
+            path = null;
             byte[] numArray = new byte[256];
-            int retrieved = 0;
-            RESULT path1 = EventDescription.FMOD_Studio_EventDescription_GetPath(this.rawPtr, numArray, numArray.Length, out retrieved);
+            RESULT path1 = EventDescription.FMOD_Studio_EventDescription_GetPath(rawPtr, numArray, numArray.Length, out int retrieved);
             if (path1 == RESULT.ERR_TRUNCATED)
             {
                 numArray = new byte[retrieved];
-                path1 = EventDescription.FMOD_Studio_EventDescription_GetPath(this.rawPtr, numArray, numArray.Length, out retrieved);
+                path1 = EventDescription.FMOD_Studio_EventDescription_GetPath(rawPtr, numArray, numArray.Length, out retrieved);
             }
             if (path1 == RESULT.OK)
+            {
                 path = Encoding.UTF8.GetString(numArray, 0, retrieved - 1);
+            }
+
             return path1;
         }
 
-        public RESULT getParameterCount(out int count) => EventDescription.FMOD_Studio_EventDescription_GetParameterCount(this.rawPtr, out count);
+        public RESULT getParameterCount(out int count)
+        {
+            return EventDescription.FMOD_Studio_EventDescription_GetParameterCount(rawPtr, out count);
+        }
 
         public RESULT getParameterByIndex(int index, out PARAMETER_DESCRIPTION parameter)
         {
             parameter = new PARAMETER_DESCRIPTION();
-            PARAMETER_DESCRIPTION_INTERNAL parameter1;
-            RESULT parameterByIndex = EventDescription.FMOD_Studio_EventDescription_GetParameterByIndex(this.rawPtr, index, out parameter1);
+            RESULT parameterByIndex = EventDescription.FMOD_Studio_EventDescription_GetParameterByIndex(rawPtr, index, out PARAMETER_DESCRIPTION_INTERNAL parameter1);
             if (parameterByIndex != RESULT.OK)
+            {
                 return parameterByIndex;
+            }
+
             parameter1.assign(out parameter);
             return parameterByIndex;
         }
@@ -46,20 +56,24 @@ namespace FMOD.Studio
         public RESULT getParameter(string name, out PARAMETER_DESCRIPTION parameter)
         {
             parameter = new PARAMETER_DESCRIPTION();
-            PARAMETER_DESCRIPTION_INTERNAL parameter1;
-            RESULT parameter2 = EventDescription.FMOD_Studio_EventDescription_GetParameter(this.rawPtr, Encoding.UTF8.GetBytes(name + "\0"), out parameter1);
+            RESULT parameter2 = EventDescription.FMOD_Studio_EventDescription_GetParameter(rawPtr, Encoding.UTF8.GetBytes(name + "\0"), out PARAMETER_DESCRIPTION_INTERNAL parameter1);
             if (parameter2 != RESULT.OK)
+            {
                 return parameter2;
+            }
+
             parameter1.assign(out parameter);
             return parameter2;
         }
 
-        public RESULT getUserPropertyCount(out int count) => EventDescription.FMOD_Studio_EventDescription_GetUserPropertyCount(this.rawPtr, out count);
+        public RESULT getUserPropertyCount(out int count)
+        {
+            return EventDescription.FMOD_Studio_EventDescription_GetUserPropertyCount(rawPtr, out count);
+        }
 
         public RESULT getUserPropertyByIndex(int index, out USER_PROPERTY property)
         {
-            USER_PROPERTY_INTERNAL property1;
-            RESULT userPropertyByIndex = EventDescription.FMOD_Studio_EventDescription_GetUserPropertyByIndex(this.rawPtr, index, out property1);
+            RESULT userPropertyByIndex = EventDescription.FMOD_Studio_EventDescription_GetUserPropertyByIndex(rawPtr, index, out USER_PROPERTY_INTERNAL property1);
             if (userPropertyByIndex != RESULT.OK)
             {
                 property = new USER_PROPERTY();
@@ -71,8 +85,7 @@ namespace FMOD.Studio
 
         public RESULT getUserProperty(string name, out USER_PROPERTY property)
         {
-            USER_PROPERTY_INTERNAL property1;
-            RESULT userProperty = EventDescription.FMOD_Studio_EventDescription_GetUserProperty(this.rawPtr, Encoding.UTF8.GetBytes(name + "\0"), out property1);
+            RESULT userProperty = EventDescription.FMOD_Studio_EventDescription_GetUserProperty(rawPtr, Encoding.UTF8.GetBytes(name + "\0"), out USER_PROPERTY_INTERNAL property1);
             if (userProperty != RESULT.OK)
             {
                 property = new USER_PROPERTY();
@@ -82,75 +95,139 @@ namespace FMOD.Studio
             return RESULT.OK;
         }
 
-        public RESULT getLength(out int length) => EventDescription.FMOD_Studio_EventDescription_GetLength(this.rawPtr, out length);
+        public RESULT getLength(out int length)
+        {
+            return EventDescription.FMOD_Studio_EventDescription_GetLength(rawPtr, out length);
+        }
 
-        public RESULT getMinimumDistance(out float distance) => EventDescription.FMOD_Studio_EventDescription_GetMinimumDistance(this.rawPtr, out distance);
+        public RESULT getMinimumDistance(out float distance)
+        {
+            return EventDescription.FMOD_Studio_EventDescription_GetMinimumDistance(rawPtr, out distance);
+        }
 
-        public RESULT getMaximumDistance(out float distance) => EventDescription.FMOD_Studio_EventDescription_GetMaximumDistance(this.rawPtr, out distance);
+        public RESULT getMaximumDistance(out float distance)
+        {
+            return EventDescription.FMOD_Studio_EventDescription_GetMaximumDistance(rawPtr, out distance);
+        }
 
-        public RESULT getSoundSize(out float size) => EventDescription.FMOD_Studio_EventDescription_GetSoundSize(this.rawPtr, out size);
+        public RESULT getSoundSize(out float size)
+        {
+            return EventDescription.FMOD_Studio_EventDescription_GetSoundSize(rawPtr, out size);
+        }
 
-        public RESULT isSnapshot(out bool snapshot) => EventDescription.FMOD_Studio_EventDescription_IsSnapshot(this.rawPtr, out snapshot);
+        public RESULT isSnapshot(out bool snapshot)
+        {
+            return EventDescription.FMOD_Studio_EventDescription_IsSnapshot(rawPtr, out snapshot);
+        }
 
-        public RESULT isOneshot(out bool oneshot) => EventDescription.FMOD_Studio_EventDescription_IsOneshot(this.rawPtr, out oneshot);
+        public RESULT isOneshot(out bool oneshot)
+        {
+            return EventDescription.FMOD_Studio_EventDescription_IsOneshot(rawPtr, out oneshot);
+        }
 
-        public RESULT isStream(out bool isStream) => EventDescription.FMOD_Studio_EventDescription_IsStream(this.rawPtr, out isStream);
+        public RESULT isStream(out bool isStream)
+        {
+            return EventDescription.FMOD_Studio_EventDescription_IsStream(rawPtr, out isStream);
+        }
 
-        public RESULT is3D(out bool is3D) => EventDescription.FMOD_Studio_EventDescription_Is3D(this.rawPtr, out is3D);
+        public RESULT is3D(out bool is3D)
+        {
+            return EventDescription.FMOD_Studio_EventDescription_Is3D(rawPtr, out is3D);
+        }
 
-        public RESULT hasCue(out bool cue) => EventDescription.FMOD_Studio_EventDescription_HasCue(this.rawPtr, out cue);
+        public RESULT hasCue(out bool cue)
+        {
+            return EventDescription.FMOD_Studio_EventDescription_HasCue(rawPtr, out cue);
+        }
 
         public RESULT createInstance(out EventInstance instance)
         {
-            instance = (EventInstance) null;
-            IntPtr instance1 = new IntPtr();
-            RESULT instance2 = EventDescription.FMOD_Studio_EventDescription_CreateInstance(this.rawPtr, out instance1);
+            instance = null;
+            _ = new IntPtr();
+            RESULT instance2 = EventDescription.FMOD_Studio_EventDescription_CreateInstance(rawPtr, out IntPtr instance1);
             if (instance2 != RESULT.OK)
+            {
                 return instance2;
+            }
+
             instance = new EventInstance(instance1);
             return instance2;
         }
 
-        public RESULT getInstanceCount(out int count) => EventDescription.FMOD_Studio_EventDescription_GetInstanceCount(this.rawPtr, out count);
+        public RESULT getInstanceCount(out int count)
+        {
+            return EventDescription.FMOD_Studio_EventDescription_GetInstanceCount(rawPtr, out count);
+        }
 
         public RESULT getInstanceList(out EventInstance[] array)
         {
-            array = (EventInstance[]) null;
-            int count1;
-            RESULT instanceCount = EventDescription.FMOD_Studio_EventDescription_GetInstanceCount(this.rawPtr, out count1);
+            array = null;
+            RESULT instanceCount = EventDescription.FMOD_Studio_EventDescription_GetInstanceCount(rawPtr, out int count1);
             if (instanceCount != RESULT.OK)
+            {
                 return instanceCount;
+            }
+
             if (count1 == 0)
             {
                 array = new EventInstance[0];
                 return instanceCount;
             }
             IntPtr[] array1 = new IntPtr[count1];
-            int count2;
-            RESULT instanceList = EventDescription.FMOD_Studio_EventDescription_GetInstanceList(this.rawPtr, array1, count1, out count2);
+            RESULT instanceList = EventDescription.FMOD_Studio_EventDescription_GetInstanceList(rawPtr, array1, count1, out int count2);
             if (instanceList != RESULT.OK)
+            {
                 return instanceList;
+            }
+
             if (count2 > count1)
+            {
                 count2 = count1;
+            }
+
             array = new EventInstance[count2];
             for (int index = 0; index < count2; ++index)
+            {
                 array[index] = new EventInstance(array1[index]);
+            }
+
             return RESULT.OK;
         }
 
-        public RESULT loadSampleData() => EventDescription.FMOD_Studio_EventDescription_LoadSampleData(this.rawPtr);
+        public RESULT loadSampleData()
+        {
+            return EventDescription.FMOD_Studio_EventDescription_LoadSampleData(rawPtr);
+        }
 
-        public RESULT unloadSampleData() => EventDescription.FMOD_Studio_EventDescription_UnloadSampleData(this.rawPtr);
+        public RESULT unloadSampleData()
+        {
+            return EventDescription.FMOD_Studio_EventDescription_UnloadSampleData(rawPtr);
+        }
 
-        public RESULT getSampleLoadingState(out LOADING_STATE state) => EventDescription.FMOD_Studio_EventDescription_GetSampleLoadingState(this.rawPtr, out state);
+        public RESULT getSampleLoadingState(out LOADING_STATE state)
+        {
+            return EventDescription.FMOD_Studio_EventDescription_GetSampleLoadingState(rawPtr, out state);
+        }
 
-        public RESULT releaseAllInstances() => EventDescription.FMOD_Studio_EventDescription_ReleaseAllInstances(this.rawPtr);
+        public RESULT releaseAllInstances()
+        {
+            return EventDescription.FMOD_Studio_EventDescription_ReleaseAllInstances(rawPtr);
+        }
 
-        public RESULT setCallback(EVENT_CALLBACK callback, EVENT_CALLBACK_TYPE callbackmask = EVENT_CALLBACK_TYPE.ALL) => EventDescription.FMOD_Studio_EventDescription_SetCallback(this.rawPtr, callback, callbackmask);
+        public RESULT setCallback(EVENT_CALLBACK callback, EVENT_CALLBACK_TYPE callbackmask = EVENT_CALLBACK_TYPE.ALL)
+        {
+            return EventDescription.FMOD_Studio_EventDescription_SetCallback(rawPtr, callback, callbackmask);
+        }
 
-        public RESULT getUserData(out IntPtr userdata) => EventDescription.FMOD_Studio_EventDescription_GetUserData(this.rawPtr, out userdata);
+        public RESULT getUserData(out IntPtr userdata)
+        {
+            return EventDescription.FMOD_Studio_EventDescription_GetUserData(rawPtr, out userdata);
+        }
 
-        public RESULT setUserData(IntPtr userdata) => EventDescription.FMOD_Studio_EventDescription_SetUserData(this.rawPtr, userdata);
+        public RESULT setUserData(IntPtr userdata)
+        {
+            return EventDescription.FMOD_Studio_EventDescription_SetUserData(rawPtr, userdata);
+        }
 
         [DllImport("fmodstudio")]
         private static extern bool FMOD_Studio_EventDescription_IsValid(IntPtr eventdescription);
@@ -301,6 +378,9 @@ namespace FMOD.Studio
         {
         }
 
-        protected override bool isValidInternal() => EventDescription.FMOD_Studio_EventDescription_IsValid(this.rawPtr);
+        protected override bool isValidInternal()
+        {
+            return EventDescription.FMOD_Studio_EventDescription_IsValid(rawPtr);
+        }
     }
 }

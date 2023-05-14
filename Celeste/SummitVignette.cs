@@ -15,7 +15,7 @@ namespace Celeste
     {
         private CompleteRenderer complete;
         private bool slideFinished;
-        private Session session;
+        private readonly Session session;
         private bool ending;
         private bool ready;
         private bool addedRenderer;
@@ -24,40 +24,51 @@ namespace Celeste
         {
             this.session = session;
             session.Audio.Apply();
-            RunThread.Start(new Action(this.LoadCompleteThread), "SUMMIT_VIGNETTE");
+            RunThread.Start(new Action(LoadCompleteThread), "SUMMIT_VIGNETTE");
         }
 
         private void LoadCompleteThread()
         {
-            Atlas atlas = (Atlas) null;
+            Atlas atlas = null;
             XmlElement xml = GFX.CompleteScreensXml["Screens"]["SummitIntro"];
             if (xml != null)
+            {
                 atlas = Atlas.FromAtlas(Path.Combine("Graphics", "Atlases", xml.Attr("atlas")), Atlas.AtlasDataFormat.PackerNoAtlas);
-            this.complete = new CompleteRenderer(xml, atlas, 0.0f, (Action) (() => this.slideFinished = true));
-            this.complete.SlideDuration = 7.5f;
-            this.ready = true;
+            }
+
+            complete = new CompleteRenderer(xml, atlas, 0.0f, () => slideFinished = true)
+            {
+                SlideDuration = 7.5f
+            };
+            ready = true;
         }
 
         public override void Update()
         {
-            if (this.ready && !this.addedRenderer)
+            if (ready && !addedRenderer)
             {
-                this.Add((Monocle.Renderer) this.complete);
-                this.addedRenderer = true;
+                Add(complete);
+                addedRenderer = true;
             }
             base.Update();
-            if (!Input.MenuConfirm.Pressed && !this.slideFinished || this.ending || !this.ready)
+            if ((!Input.MenuConfirm.Pressed && !slideFinished) || ending || !ready)
+            {
                 return;
-            this.ending = true;
-            MountainWipe mountainWipe = new MountainWipe((Scene) this, false, (Action) (() => Engine.Scene = (Scene) new LevelLoader(this.session)));
+            }
+
+            ending = true;
+            MountainWipe mountainWipe = new(this, false, () => Engine.Scene = new LevelLoader(session));
         }
 
         public override void End()
         {
             base.End();
-            if (this.complete == null)
+            if (complete == null)
+            {
                 return;
-            this.complete.Dispose();
+            }
+
+            complete.Dispose();
         }
     }
 }

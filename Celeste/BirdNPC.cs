@@ -37,15 +37,19 @@ namespace Celeste
             : base(position)
         {
             Add(Sprite = GFX.SpriteBank.Create("bird"));
-            Sprite.Scale.X = (float) Facing;
+            Sprite.Scale.X = (float)Facing;
             Sprite.UseRawDeltaTime = true;
             Sprite.OnFrameChange = spr =>
             {
                 if (level != null && X > level.Camera.Left + 64 && X < level.Camera.Right - 64 && (spr.Equals("peck") || spr.Equals("peckRare")) && Sprite.CurrentAnimationFrame == 6)
+                {
                     _ = Audio.Play("event:/game/general/bird_peck", Position);
+                }
 
                 if (level == null || level.Session.Area.ID != 10 || DisableFlapSfx)
+                {
                     return;
+                }
 
                 FlapSfxCheck(Sprite);
             };
@@ -105,11 +109,15 @@ namespace Celeste
             base.Added(scene);
             level = scene as Level;
             if (mode == Modes.ClimbingTutorial && level.Session.GetLevelFlag("2"))
+            {
                 RemoveSelf();
+            }
             else
             {
                 if (mode != Modes.FlyAway || !level.Session.GetFlag(FlownFlag + level.Session.Level))
+                {
                     return;
+                }
 
                 RemoveSelf();
             }
@@ -122,26 +130,32 @@ namespace Celeste
             {
                 Player entity = scene.Tracker.GetEntity<Player>();
                 if (entity != null && entity.Y < Y + 32.0)
+                {
                     RemoveSelf();
+                }
             }
             if (!onlyIfPlayerLeft)
+            {
                 return;
+            }
 
             Player entity1 = level.Tracker.GetEntity<Player>();
             if (entity1 == null || entity1.X <= X)
+            {
                 return;
+            }
 
             RemoveSelf();
         }
 
         public override bool IsRiding(Solid solid)
         {
-            return Scene.CollideCheck(new Rectangle((int) X - 4, (int) Y, 8, 2), solid);
+            return Scene.CollideCheck(new Rectangle((int)X - 4, (int)Y, 8, 2), solid);
         }
 
         public override void Update()
         {
-            Sprite.Scale.X = (float) Facing;
+            Sprite.Scale.X = (float)Facing;
             base.Update();
         }
 
@@ -150,7 +164,9 @@ namespace Celeste
             BirdNPC birdNpc = this;
             birdNpc.Sprite.Play("croak");
             while (birdNpc.Sprite.CurrentAnimationFrame < 9)
+            {
                 yield return null;
+            }
 
             _ = Audio.Play("event:/game/general/bird_squawk", birdNpc.Position);
         }
@@ -159,13 +175,17 @@ namespace Celeste
         {
             BirdNPC birdNpc = this;
             if (caw)
+            {
                 yield return birdNpc.Caw();
+            }
 
             birdNpc.gui = gui;
             gui.Open = true;
             birdNpc.Scene.Add(gui);
             while (gui.Scale < 1.0)
+            {
                 yield return null;
+            }
         }
 
         public IEnumerator HideTutorial()
@@ -175,7 +195,9 @@ namespace Celeste
             {
                 birdNpc.gui.Open = false;
                 while (birdNpc.gui.Scale > 0.0)
+                {
                     yield return null;
+                }
 
                 birdNpc.Scene.Remove(birdNpc.gui);
                 birdNpc.gui = null;
@@ -200,11 +222,11 @@ namespace Celeste
                 birdNpc.staticMover = null;
             }
             birdNpc.Sprite.Play("fly");
-            birdNpc.Facing = (Facings) (-(int) birdNpc.Facing);
-            Vector2 speed = new((int) birdNpc.Facing * 20, -40f * upwardsMultiplier);
+            birdNpc.Facing = (Facings)(-(int)birdNpc.Facing);
+            Vector2 speed = new((int)birdNpc.Facing * 20, -40f * upwardsMultiplier);
             while (birdNpc.Y > birdNpc.level.Bounds.Top)
             {
-                speed += new Vector2((int) birdNpc.Facing * 140, -120f * upwardsMultiplier) * Engine.DeltaTime;
+                speed += new Vector2((int)birdNpc.Facing * 140, -120f * upwardsMultiplier) * Engine.DeltaTime;
                 birdNpc.Position += speed * Engine.DeltaTime;
                 yield return null;
             }
@@ -217,7 +239,9 @@ namespace Celeste
             yield return 0.25f;
             Player p = birdNpc.Scene.Tracker.GetEntity<Player>();
             while (Math.Abs(p.X - birdNpc.X) > 120.0)
+            {
                 yield return null;
+            }
 
             BirdTutorialGui tut1 = new(birdNpc, new Vector2(0.0f, -16f), Dialog.Clean("tutorial_climb"), new object[2]
             {
@@ -236,7 +260,9 @@ namespace Celeste
                 yield return birdNpc.ShowTutorial(tut1, first);
                 first = false;
                 while (p.StateMachine.State != 1 && (double)p.Y > (double)birdNpc.Y)
+                {
                     yield return null;
+                }
 
                 if ((double)p.Y > (double)birdNpc.Y)
                 {
@@ -245,11 +271,15 @@ namespace Celeste
                     yield return birdNpc.ShowTutorial(tut2);
                 }
                 while (p.Scene != null && (!p.OnGround() || p.StateMachine.State == 1))
+                {
                     yield return null;
+                }
 
                 willEnd = (double)p.Y <= (double)birdNpc.Y + 4.0;
                 if (!willEnd)
+                {
                     _ = Audio.Play("event:/ui/game/tutorial_note_flip_front");
+                }
 
                 yield return birdNpc.HideTutorial();
             }
@@ -265,7 +295,9 @@ namespace Celeste
             Player player = bird.Scene.Tracker.GetEntity<Player>();
             Bridge bridge = bird.Scene.Entities.FindFirst<Bridge>();
             while ((player == null || player.X <= bird.StartPosition.X - 92 || player.Y <= bird.StartPosition.Y - 20 || player.Y >= bird.StartPosition.Y - 10) && (!SaveData.Instance.Assists.Invincible || player == null || player.X <= bird.StartPosition.X - 60 || player.Y <= bird.StartPosition.Y || player.Y >= bird.StartPosition.Y + 34))
+            {
                 yield return null;
+            }
 
             bird.Scene.Add(new CS00_Ending(player, bird, bridge));
         }
@@ -283,18 +315,26 @@ namespace Celeste
             {
                 Player entity = birdNpc.Scene.Tracker.GetEntity<Player>();
                 if (entity == null || (entity.X <= birdNpc.X && (birdNpc.Position - entity.Position).Length() >= 32))
+                {
                     yield return null;
+                }
                 else
+                {
                     break;
+                }
             }
             yield return birdNpc.HideTutorial();
             while (true)
             {
                 Player entity = birdNpc.Scene.Tracker.GetEntity<Player>();
                 if (entity == null || (birdNpc.Position - entity.Position).Length() >= 24)
+                {
                     yield return null;
+                }
                 else
+                {
                     break;
+                }
             }
             yield return birdNpc.StartleAndFlyAway();
         }
@@ -359,18 +399,26 @@ namespace Celeste
             {
                 Player entity = birdNpc.Scene.Tracker.GetEntity<Player>();
                 if (entity == null || Math.Abs(entity.X - birdNpc.X) >= 120)
+                {
                     yield return null;
+                }
                 else
+                {
                     break;
+                }
             }
             yield return birdNpc.Caw();
             while (!birdNpc.AutoFly)
             {
                 Player entity = birdNpc.Scene.Tracker.GetEntity<Player>();
                 if (entity == null || (entity.Center - birdNpc.Position).Length() >= 32)
+                {
                     yield return null;
+                }
                 else
+                {
                     break;
+                }
             }
             yield return birdNpc.StartleAndFlyAway();
         }
@@ -379,26 +427,34 @@ namespace Celeste
         {
             BirdNPC birdNpc = this;
             if (!multiplier.HasValue)
+            {
                 multiplier = new Vector2?(new Vector2(1f, 1f));
+            }
 
             if (!string.IsNullOrWhiteSpace(startleSound))
+            {
                 _ = Audio.Play(startleSound, birdNpc.Position);
+            }
 
-            Dust.Burst(birdNpc.Position, (float) -Math.PI / 2, 8);
+            Dust.Burst(birdNpc.Position, (float)-Math.PI / 2, 8);
             birdNpc.Sprite.Play("jump");
             Tween tween = Tween.Create(Tween.TweenMode.Oneshot, Ease.CubeOut, duration, true);
             tween.OnUpdate = t =>
             {
                 if ((double)t.Eased < 0.5 && Scene.OnInterval(0.05f))
+                {
                     level.Particles.Emit(P_Feather, 2, Position + (Vector2.UnitY * -6f), Vector2.One * 4f);
+                }
 
                 Vector2 vector2 = Vector2.Lerp(new Vector2(100f, -100f) * multiplier.Value, new Vector2(20f, -20f) * multiplier.Value, t.Eased);
-                vector2.X *= -(int) Facing;
+                vector2.X *= -(int)Facing;
                 Position += vector2 * Engine.DeltaTime;
             };
             birdNpc.Add(tween);
             while (tween.Active)
+            {
                 yield return null;
+            }
         }
 
         public IEnumerator FlyTo(Vector2 target, float durationMult = 1f, bool relocateSfx = true)
@@ -406,11 +462,15 @@ namespace Celeste
             BirdNPC birdNpc = this;
             birdNpc.Sprite.Play("fly");
             if (relocateSfx)
+            {
                 birdNpc.Add(new SoundSource().Play("event:/new_content/game/10_farewell/bird_relocate"));
+            }
 
-            Facings facing = (Facings) Math.Sign(target.X - birdNpc.X);
+            Facings facing = (Facings)Math.Sign(target.X - birdNpc.X);
             if (facing != 0)
+            {
                 birdNpc.Facing = facing;
+            }
 
             Vector2 position = birdNpc.Position;
             Vector2 end = target;
@@ -437,7 +497,9 @@ namespace Celeste
             {
                 Player entity = birdNpc.Scene.Tracker.GetEntity<Player>();
                 if (entity == null || (double)(entity.Center - birdNpc.Position).Length() >= 80.0)
+                {
                     yield return null;
+                }
                 else
                 {
                     birdNpc.Depth = -1000000;
@@ -452,11 +514,13 @@ namespace Celeste
                         birdNpc.Tag = Tags.Persistent;
                         birdNpc.Add(new SoundSource().Play("event:/new_content/game/10_farewell/bird_relocate"));
                         if (birdNpc.onlyOnce)
+                        {
                             _ = birdNpc.level.Session.DoNotLoad.Add(birdNpc.EntityID);
+                        }
 
                         birdNpc.Sprite.Play("fly");
                         birdNpc.Facing = Facings.Right;
-                        Vector2 speed = new((int) birdNpc.Facing * 20, -40f);
+                        Vector2 speed = new((int)birdNpc.Facing * 20, -40f);
                         while (birdNpc.Y > birdNpc.level.Bounds.Top - 200)
                         {
                             speed += new Vector2((int)birdNpc.Facing * 140, -60f) * Engine.DeltaTime;
@@ -475,10 +539,14 @@ namespace Celeste
             BirdNPC birdNpc = this;
             birdNpc.Sprite.Play("hoverStressed");
             while (birdNpc.Scene.Entities.FindFirst<Lightning>() != null)
+            {
                 yield return null;
+            }
 
             if (birdNpc.WaitForLightningPostDelay > 0.0)
+            {
                 yield return birdNpc.WaitForLightningPostDelay;
+            }
 
             Vector2 speed;
             if (!birdNpc.FlyAwayUp)
@@ -518,7 +586,9 @@ namespace Celeste
         {
             base.DebugRender(camera);
             if (mode != Modes.DashingTutorial)
+            {
                 return;
+            }
 
             float x1 = StartPosition.X - 92f;
             float right1 = level.Bounds.Right;
@@ -545,12 +615,16 @@ namespace Celeste
                 Camera camera = (sprite.Entity.Scene as Level).Camera;
                 Vector2 renderPosition = sprite.RenderPosition;
                 if (renderPosition.X < camera.X - 32 || renderPosition.Y < camera.Y - 32 || renderPosition.X > camera.X + 320 + 32 || renderPosition.Y > camera.Y + 180 + 32)
+                {
                     return;
+                }
             }
             string currentAnimationId = sprite.CurrentAnimationID;
             int currentAnimationFrame = sprite.CurrentAnimationFrame;
             if ((!(currentAnimationId == "hover") || currentAnimationFrame != 0) && (!(currentAnimationId == "hoverStressed") || currentAnimationFrame != 0) && (!(currentAnimationId == "fly") || currentAnimationFrame != 0))
+            {
                 return;
+            }
 
             _ = Audio.Play("event:/new_content/game/10_farewell/bird_wingflap", sprite.RenderPosition);
         }

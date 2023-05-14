@@ -17,7 +17,7 @@ namespace Celeste
             : base(data.Position + offset)
         {
             Add(sfx = new SoundSource());
-            sfx.Play("event:/3d_testing");
+            _ = sfx.Play("event:/3d_testing");
         }
 
         public override void Render()

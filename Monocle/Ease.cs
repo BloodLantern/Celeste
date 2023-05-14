@@ -11,9 +11,9 @@ namespace Monocle
     public static class Ease
     {
         public static readonly Easer Linear = t => t;
-        public static readonly Easer SineIn = t => (float) -Math.Cos(Math.PI / 2 * t) + 1;
-        public static readonly Easer SineOut = t => (float) Math.Sin(Math.PI / 2 * t);
-        public static readonly Easer SineInOut = t => (float) -Math.Cos(Math.PI * t) / 2 + 0.5f;
+        public static readonly Easer SineIn = t => (float)-Math.Cos(Math.PI / 2 * t) + 1;
+        public static readonly Easer SineOut = t => (float)Math.Sin(Math.PI / 2 * t);
+        public static readonly Easer SineInOut = t => ((float)-Math.Cos(Math.PI * t) / 2) + 0.5f;
         public static readonly Easer QuadIn = t => t * t;
         public static readonly Easer QuadOut = Invert(QuadIn);
         public static readonly Easer QuadInOut = Follow(QuadIn, QuadOut);
@@ -23,7 +23,7 @@ namespace Monocle
         public static readonly Easer QuintIn = t => t * t * t * t * t;
         public static readonly Easer QuintOut = Invert(QuintIn);
         public static readonly Easer QuintInOut = Follow(QuintIn, QuintOut);
-        public static readonly Easer ExpoIn = t => (float) Math.Pow(2, 10 * (t - 1));
+        public static readonly Easer ExpoIn = t => (float)Math.Pow(2, 10 * (t - 1));
         public static readonly Easer ExpoOut = Invert(ExpoIn);
         public static readonly Easer ExpoInOut = Follow(ExpoIn, ExpoOut);
         public static readonly Easer BackIn = t => t * t * ((2.7f * t) - 1.7f);
@@ -72,14 +72,14 @@ namespace Monocle
         {
             if (t < 0.5)
             {
-                t = (1 - (t * 2));
+                t = 1 - (t * 2);
                 return t < B1
                     ? ((1 - (121 / 16 * t * t)) / 2)
                     : t < B2
                     ? ((1 - ((121 / 16 * (t - B3) * (t - B3)) + 0.75f)) / 2)
                     : t < B4 ? ((1 - ((121 / 16 * (t - B5) * (t - B5)) + (15 / 16))) / 2) : ((1 - ((121 / 16 * (t - B6) * (t - B6)) + (63 / 64))) / 2);
             }
-            t = ((t * 2) - 1);
+            t = (t * 2) - 1;
             return t < B1
                 ? ((121 / 16 * t * t / 2) + 0.5f)
                 : t < B2

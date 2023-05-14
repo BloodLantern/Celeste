@@ -178,69 +178,85 @@ namespace Celeste
             if (player != null && player.Dead)
             {
                 Sprite.Play("laugh");
-                Sprite.X = (float) Math.Sin(hoveringTimer) * 4;
+                Sprite.X = (float)Math.Sin(hoveringTimer) * 4;
                 Hovering = true;
                 hoveringTimer += Engine.DeltaTime * 2f;
                 Depth = -12500;
                 foreach (KeyValuePair<string, SoundSource> loopingSound in loopingSounds)
+                {
                     _ = loopingSound.Value.Stop();
+                }
 
                 Trail();
             }
             else
                 if (following && player.GetChasePosition(Scene.TimeActive, followBehindTime + followBehindIndexDelay, out Player.ChaserState chaseState))
+            {
+                Position = Calc.Approach(Position, chaseState.Position, 500f * Engine.DeltaTime);
+                if (!ignorePlayerAnim && chaseState.Animation != Sprite.CurrentAnimationID && chaseState.Animation != null && Sprite.Has(chaseState.Animation))
                 {
-                    Position = Calc.Approach(Position, chaseState.Position, 500f * Engine.DeltaTime);
-                    if (!ignorePlayerAnim && chaseState.Animation != Sprite.CurrentAnimationID && chaseState.Animation != null && Sprite.Has(chaseState.Animation))
-                        Sprite.Play(chaseState.Animation, true);
+                    Sprite.Play(chaseState.Animation, true);
+                }
 
-                    if (!ignorePlayerAnim)
-                        Sprite.Scale.X = Math.Abs(Sprite.Scale.X) * (float)chaseState.Facing;
+                if (!ignorePlayerAnim)
+                {
+                    Sprite.Scale.X = Math.Abs(Sprite.Scale.X) * (float)chaseState.Facing;
+                }
 
-                    for (int index = 0; index < chaseState.Sounds; ++index)
+                for (int index = 0; index < chaseState.Sounds; ++index)
+                {
+                    if (chaseState[index].Action == Player.ChaserStateSound.Actions.Oneshot)
                     {
-                        if (chaseState[index].Action == Player.ChaserStateSound.Actions.Oneshot)
-                            _ = Audio.Play(chaseState[index].Event, Position, chaseState[index].Parameter, chaseState[index].ParameterValue, "chaser_count", this.index);
-                        else if (chaseState[index].Action == Player.ChaserStateSound.Actions.Loop && !loopingSounds.ContainsKey(chaseState[index].Event))
+                        _ = Audio.Play(chaseState[index].Event, Position, chaseState[index].Parameter, chaseState[index].ParameterValue, "chaser_count", this.index);
+                    }
+                    else if (chaseState[index].Action == Player.ChaserStateSound.Actions.Loop && !loopingSounds.ContainsKey(chaseState[index].Event))
+                    {
+                        SoundSource soundSource;
+                        if (inactiveLoopingSounds.Count > 0)
                         {
-                            SoundSource soundSource;
-                            if (inactiveLoopingSounds.Count > 0)
-                            {
-                                soundSource = inactiveLoopingSounds[0];
-                                inactiveLoopingSounds.RemoveAt(0);
-                            }
-                            else
-                                Add(soundSource = new SoundSource());
-
-                            _ = soundSource.Play(chaseState[index].Event, "chaser_count", this.index);
-                            loopingSounds.Add(chaseState[index].Event, soundSource);
+                            soundSource = inactiveLoopingSounds[0];
+                            inactiveLoopingSounds.RemoveAt(0);
                         }
-                        else if (chaseState[index].Action == Player.ChaserStateSound.Actions.Stop)
+                        else
                         {
-                            if (loopingSounds.TryGetValue(chaseState[index].Event, out SoundSource soundSource))
-                            {
-                                _ = soundSource.Stop();
-                                _ = loopingSounds.Remove(chaseState[index].Event);
-                                inactiveLoopingSounds.Add(soundSource);
-                            }
+                            Add(soundSource = new SoundSource());
+                        }
+
+                        _ = soundSource.Play(chaseState[index].Event, "chaser_count", this.index);
+                        loopingSounds.Add(chaseState[index].Event, soundSource);
+                    }
+                    else if (chaseState[index].Action == Player.ChaserStateSound.Actions.Stop)
+                    {
+                        if (loopingSounds.TryGetValue(chaseState[index].Event, out SoundSource soundSource))
+                        {
+                            _ = soundSource.Stop();
+                            _ = loopingSounds.Remove(chaseState[index].Event);
+                            inactiveLoopingSounds.Add(soundSource);
                         }
                     }
-                    Depth = chaseState.Depth;
-                    Trail();
                 }
+                Depth = chaseState.Depth;
+                Trail();
+            }
             if (Sprite.Scale.X != 0.0)
+            {
                 Hair.Facing = (Facings)Math.Sign(Sprite.Scale.X);
+            }
 
             if (Hovering)
             {
                 hoveringTimer += Engine.DeltaTime;
-                Sprite.Y = (float) Math.Sin(hoveringTimer * 2) * 4;
+                Sprite.Y = (float)Math.Sin(hoveringTimer * 2) * 4;
             }
             else
+            {
                 Sprite.Y = Calc.Approach(Sprite.Y, 0.0f, Engine.DeltaTime * 4f);
+            }
 
             if (occlude != null)
+            {
                 occlude.Visible = !CollideCheck<Solid>();
+            }
 
             base.Update();
         }

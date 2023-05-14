@@ -63,7 +63,9 @@ namespace Celeste
             sprite.OnFrameChange = s =>
             {
                 if (!(s == "spawn") || sprite.CurrentAnimationFrame != 6)
+                {
                     return;
+                }
 
                 wiggler.Start();
             };
@@ -77,12 +79,14 @@ namespace Celeste
             timer += Engine.DeltaTime;
             sprite.Position = GetPlayerRider() != null
                 ? Vector2.Zero
-                : Calc.Approach(sprite.Position, new Vector2(0f, (float) Math.Sin(timer * 2)), Engine.DeltaTime * 4f);
+                : Calc.Approach(sprite.Position, new Vector2(0f, (float)Math.Sin(timer * 2)), Engine.DeltaTime * 4f);
             if (respawnTimer > 0)
             {
                 respawnTimer -= Engine.DeltaTime;
                 if (respawnTimer > 0)
+                {
                     return;
+                }
 
                 waiting = true;
                 Y = startY;
@@ -96,7 +100,9 @@ namespace Celeste
             {
                 Player playerRider = GetPlayerRider();
                 if (playerRider == null || playerRider.Speed.Y < 0)
+                {
                     return;
+                }
 
                 canRumble = true;
                 speed = 180f;
@@ -111,7 +117,9 @@ namespace Celeste
                 speed = Calc.Approach(speed, 180f, 600f * Engine.DeltaTime);
                 MoveTowardsY(startY, speed * Engine.DeltaTime);
                 if (ExactPosition.Y != startY)
+                {
                     return;
+                }
 
                 returning = false;
                 waiting = true;
@@ -128,16 +136,24 @@ namespace Celeste
                 {
                     canRumble = false;
                     if (HasPlayerRider())
+                    {
                         Input.Rumble(RumbleStrength.Medium, RumbleLength.Medium);
+                    }
                 }
                 if (speed < 0 && Scene.OnInterval(02f))
-                    (Scene as Level).ParticlesBG.Emit(particleType, 1, Position + new Vector2(0f, 2f), new Vector2(Collider.Width / 2f, 1f), (float) Math.PI / 2);
+                {
+                    (Scene as Level).ParticlesBG.Emit(particleType, 1, Position + new Vector2(0f, 2f), new Vector2(Collider.Width / 2f, 1f), (float)Math.PI / 2);
+                }
 
                 if (fragile && speed < 0)
+                {
                     sprite.Scale.Y = Calc.Approach(sprite.Scale.Y, 0f, Engine.DeltaTime * 4f);
+                }
 
                 if (Y >= startY)
+                {
                     speed -= 1200f * Engine.DeltaTime;
+                }
                 else
                 {
                     speed += 1200f * Engine.DeltaTime;
@@ -145,7 +161,9 @@ namespace Celeste
                     {
                         Player playerRider = GetPlayerRider();
                         if (playerRider != null && playerRider.Speed.Y >= 0)
+                        {
                             playerRider.Speed.Y = -200f;
+                        }
 
                         if (fragile)
                         {
@@ -162,7 +180,9 @@ namespace Celeste
                 }
                 float liftSpeedV = speed;
                 if (liftSpeedV < 0)
+                {
                     liftSpeedV = -220f;
+                }
 
                 MoveV(speed * Engine.DeltaTime, liftSpeedV);
             }
@@ -170,7 +190,7 @@ namespace Celeste
 
         public override void Render()
         {
-            sprite.Scale = scale * (1 + 0.1f * wiggler.Value);
+            sprite.Scale = scale * (1 + (0.1f * wiggler.Value));
             base.Render();
         }
     }

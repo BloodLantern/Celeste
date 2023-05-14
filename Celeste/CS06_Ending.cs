@@ -13,9 +13,9 @@ namespace Celeste
 {
     public class CS06_Ending : CutsceneEntity
     {
-        private Player player;
+        private readonly Player player;
         private BadelineDummy badeline;
-        private NPC granny;
+        private readonly NPC granny;
         private NPC theo;
 
         public CS06_Ending(Player player, NPC granny)
@@ -28,8 +28,8 @@ namespace Celeste
         public override void OnBegin(Level level)
         {
             level.RegisterAreaComplete();
-            this.theo = (NPC) this.Scene.Entities.FindFirst<NPC06_Theo_Ending>();
-            this.Add((Component) new Coroutine(this.Cutscene(level)));
+            theo = Scene.Entities.FindFirst<NPC06_Theo_Ending>();
+            Add(new Coroutine(Cutscene(level)));
         }
 
         private IEnumerator Cutscene(Level level)
@@ -37,18 +37,18 @@ namespace Celeste
             CS06_Ending cs06Ending = this;
             cs06Ending.player.StateMachine.State = 11;
             cs06Ending.player.StateMachine.Locked = true;
-            yield return (object) 1f;
+            yield return 1f;
             cs06Ending.player.Dashes = 1;
             level.Session.Inventory.Dashes = 1;
-            level.Add((Entity) (cs06Ending.badeline = new BadelineDummy(cs06Ending.player.Center)));
+            level.Add(cs06Ending.badeline = new BadelineDummy(cs06Ending.player.Center));
             cs06Ending.badeline.Appear(level, true);
             cs06Ending.badeline.FloatSpeed = 80f;
             cs06Ending.badeline.Sprite.Scale.X = -1f;
-            Audio.Play("event:/char/badeline/maddy_split", cs06Ending.player.Center);
-            yield return (object) cs06Ending.badeline.FloatTo(cs06Ending.player.Position + new Vector2(24f, -20f), new int?(-1), false);
-            yield return (object) level.ZoomTo(new Vector2(160f, 120f), 2f, 1f);
-            yield return (object) Textbox.Say("ch6_ending", new Func<IEnumerator>(cs06Ending.GrannyEnter), new Func<IEnumerator>(cs06Ending.TheoEnter), new Func<IEnumerator>(cs06Ending.MaddyTurnsRight), new Func<IEnumerator>(cs06Ending.BadelineTurnsRight), new Func<IEnumerator>(cs06Ending.BadelineTurnsLeft), new Func<IEnumerator>(cs06Ending.WaitAbit), new Func<IEnumerator>(cs06Ending.TurnToLeft), new Func<IEnumerator>(cs06Ending.TheoRaiseFist), new Func<IEnumerator>(cs06Ending.TheoStopTired));
-            Audio.Play("event:/char/madeline/backpack_drop", cs06Ending.player.Position);
+            _ = Audio.Play("event:/char/badeline/maddy_split", cs06Ending.player.Center);
+            yield return cs06Ending.badeline.FloatTo(cs06Ending.player.Position + new Vector2(24f, -20f), new int?(-1), false);
+            yield return level.ZoomTo(new Vector2(160f, 120f), 2f, 1f);
+            yield return Textbox.Say("ch6_ending", new Func<IEnumerator>(cs06Ending.GrannyEnter), new Func<IEnumerator>(cs06Ending.TheoEnter), new Func<IEnumerator>(cs06Ending.MaddyTurnsRight), new Func<IEnumerator>(cs06Ending.BadelineTurnsRight), new Func<IEnumerator>(cs06Ending.BadelineTurnsLeft), new Func<IEnumerator>(cs06Ending.WaitAbit), new Func<IEnumerator>(cs06Ending.TurnToLeft), new Func<IEnumerator>(cs06Ending.TheoRaiseFist), new Func<IEnumerator>(cs06Ending.TheoStopTired));
+            _ = Audio.Play("event:/char/madeline/backpack_drop", cs06Ending.player.Position);
             cs06Ending.player.DummyAutoAnimate = false;
             cs06Ending.player.Sprite.Play("bagdown");
             cs06Ending.EndCutscene(level);
@@ -57,12 +57,12 @@ namespace Celeste
         private IEnumerator GrannyEnter()
         {
             CS06_Ending cs06Ending = this;
-            yield return (object) 0.25f;
+            yield return 0.25f;
             cs06Ending.badeline.Sprite.Scale.X = 1f;
-            yield return (object) 0.1f;
+            yield return 0.1f;
             cs06Ending.granny.Visible = true;
-            cs06Ending.Add((Component) new Coroutine(cs06Ending.badeline.FloatTo(new Vector2(cs06Ending.badeline.X - 10f, cs06Ending.badeline.Y), new int?(1), false)));
-            yield return (object) cs06Ending.granny.MoveTo(cs06Ending.player.Position + new Vector2(40f, 0.0f));
+            cs06Ending.Add(new Coroutine(cs06Ending.badeline.FloatTo(new Vector2(cs06Ending.badeline.X - 10f, cs06Ending.badeline.Y), new int?(1), false)));
+            yield return cs06Ending.granny.MoveTo(cs06Ending.player.Position + new Vector2(40f, 0.0f));
         }
 
         private IEnumerator TheoEnter()
@@ -70,73 +70,73 @@ namespace Celeste
             CS06_Ending cs06Ending = this;
             cs06Ending.player.Facing = Facings.Left;
             cs06Ending.badeline.Sprite.Scale.X = -1f;
-            yield return (object) 0.25f;
-            yield return (object) CutsceneEntity.CameraTo(new Vector2(cs06Ending.Level.Camera.X - 40f, cs06Ending.Level.Camera.Y), 1f);
+            yield return 0.25f;
+            yield return CutsceneEntity.CameraTo(new Vector2(cs06Ending.Level.Camera.X - 40f, cs06Ending.Level.Camera.Y), 1f);
             cs06Ending.theo.Visible = true;
-            cs06Ending.Add((Component) new Coroutine(CutsceneEntity.CameraTo(new Vector2(cs06Ending.Level.Camera.X + 40f, cs06Ending.Level.Camera.Y), 2f, delay: 1f)));
-            cs06Ending.Add((Component) new Coroutine(cs06Ending.badeline.FloatTo(new Vector2(cs06Ending.badeline.X + 6f, cs06Ending.badeline.Y + 4f), new int?(-1), false)));
-            yield return (object) cs06Ending.theo.MoveTo(cs06Ending.player.Position + new Vector2(-32f, 0.0f));
+            cs06Ending.Add(new Coroutine(CutsceneEntity.CameraTo(new Vector2(cs06Ending.Level.Camera.X + 40f, cs06Ending.Level.Camera.Y), 2f, delay: 1f)));
+            cs06Ending.Add(new Coroutine(cs06Ending.badeline.FloatTo(new Vector2(cs06Ending.badeline.X + 6f, cs06Ending.badeline.Y + 4f), new int?(-1), false)));
+            yield return cs06Ending.theo.MoveTo(cs06Ending.player.Position + new Vector2(-32f, 0.0f));
             cs06Ending.theo.Sprite.Play("tired");
         }
 
         private IEnumerator MaddyTurnsRight()
         {
-            yield return (object) 0.1f;
-            this.player.Facing = Facings.Right;
-            yield return (object) 0.1f;
-            yield return (object) this.badeline.FloatTo(this.badeline.Position + new Vector2(-2f, 10f), new int?(-1), false);
-            yield return (object) 0.1f;
+            yield return 0.1f;
+            player.Facing = Facings.Right;
+            yield return 0.1f;
+            yield return badeline.FloatTo(badeline.Position + new Vector2(-2f, 10f), new int?(-1), false);
+            yield return 0.1f;
         }
 
         private IEnumerator BadelineTurnsRight()
         {
-            yield return (object) 0.1f;
-            this.badeline.Sprite.Scale.X = 1f;
-            yield return (object) 0.1f;
+            yield return 0.1f;
+            badeline.Sprite.Scale.X = 1f;
+            yield return 0.1f;
         }
 
         private IEnumerator BadelineTurnsLeft()
         {
-            yield return (object) 0.1f;
-            this.badeline.Sprite.Scale.X = -1f;
-            yield return (object) 0.1f;
+            yield return 0.1f;
+            badeline.Sprite.Scale.X = -1f;
+            yield return 0.1f;
         }
 
         private IEnumerator WaitAbit()
         {
-            yield return (object) 0.4f;
+            yield return 0.4f;
         }
 
         private IEnumerator TurnToLeft()
         {
-            yield return (object) 0.1f;
-            this.player.Facing = Facings.Left;
-            yield return (object) 0.05f;
-            this.badeline.Sprite.Scale.X = -1f;
-            yield return (object) 0.1f;
+            yield return 0.1f;
+            player.Facing = Facings.Left;
+            yield return 0.05f;
+            badeline.Sprite.Scale.X = -1f;
+            yield return 0.1f;
         }
 
         // ISSUE: reference to a compiler-generated field
         private IEnumerator TheoRaiseFist()
         {
-                this.theo.Sprite.Play("yolo", false, false);
-                base.Add(Alarm.Create(Alarm.AlarmMode.Oneshot, delegate
-                {
-                        this.theo.Sprite.Play("yoloEnd", false, false);
-                }, 0.8f, true));
-                yield return null;
-                yield break;
+            theo.Sprite.Play("yolo", false, false);
+            base.Add(Alarm.Create(Alarm.AlarmMode.Oneshot, delegate
+            {
+                theo.Sprite.Play("yoloEnd", false, false);
+            }, 0.8f, true));
+            yield return null;
+            yield break;
         }
 
         private IEnumerator TheoStopTired()
         {
-            this.theo.Sprite.Play("idle");
-            yield return (object) null;
+            theo.Sprite.Play("idle");
+            yield return null;
         }
 
         public override void OnEnd(Level level)
         {
-            level.CompleteArea();
+            _ = level.CompleteArea();
             SpotlightWipe.FocusPoint += new Vector2(0.0f, -20f);
         }
     }

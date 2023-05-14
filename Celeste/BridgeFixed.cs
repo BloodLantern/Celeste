@@ -19,7 +19,9 @@ namespace Celeste
             {
                 Rectangle rectangle = new(0, 0, texture.Width, texture.Height);
                 if (x + rectangle.Width > Width)
+                {
                     rectangle.Width = (int)Width - x;
+                }
 
                 Image image = new(texture)
                 {

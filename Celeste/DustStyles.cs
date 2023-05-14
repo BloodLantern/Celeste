@@ -12,7 +12,7 @@ namespace Celeste
 {
     public static class DustStyles
     {
-        public static Dictionary<int, DustStyles.DustStyle> Styles = new Dictionary<int, DustStyles.DustStyle>()
+        public static Dictionary<int, DustStyles.DustStyle> Styles = new()
         {
             {
                 3,
@@ -44,9 +44,15 @@ namespace Celeste
             }
         };
 
-        public static DustStyles.DustStyle Get(Session session) => !DustStyles.Styles.ContainsKey(session.Area.ID) ? DustStyles.Styles[3] : DustStyles.Styles[session.Area.ID];
+        public static DustStyles.DustStyle Get(Session session)
+        {
+            return !DustStyles.Styles.ContainsKey(session.Area.ID) ? DustStyles.Styles[3] : DustStyles.Styles[session.Area.ID];
+        }
 
-        public static DustStyles.DustStyle Get(Scene scene) => DustStyles.Get((scene as Level).Session);
+        public static DustStyles.DustStyle Get(Scene scene)
+        {
+            return DustStyles.Get((scene as Level).Session);
+        }
 
         public struct DustStyle
         {

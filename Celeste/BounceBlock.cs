@@ -75,6 +75,7 @@ namespace Celeste
             int num1 = source.Width / 8;
             int num2 = source.Height / 8;
             for (int x = 0; x < Width; x += 8)
+            {
                 for (int y = 0; y < Height; y += 8)
                 {
                     int num3 = x != 0 ? (x < Width - 8 ? Calc.Random.Next(1, num1 - 1) : num1 - 1) : 0;
@@ -86,6 +87,8 @@ namespace Celeste
                     imageList.Add(image);
                     Add(image);
                 }
+            }
+
             return imageList;
         }
 
@@ -94,10 +97,14 @@ namespace Celeste
             hotCenterSprite.Visible = !iceMode;
             coldCenterSprite.Visible = iceMode;
             foreach (Component hotImage in hotImages)
+            {
                 hotImage.Visible = !iceMode;
+            }
 
             foreach (Component coldImage in coldImages)
+            {
                 coldImage.Visible = iceMode;
+            }
         }
 
         public override void Added(Scene scene)
@@ -115,7 +122,9 @@ namespace Celeste
         private void CheckModeChange()
         {
             if (iceModeNext == iceMode)
+            {
                 return;
+            }
 
             iceMode = iceModeNext;
             ToggleSprite();
@@ -126,7 +135,9 @@ namespace Celeste
             Vector2 position = Position;
             Position += Shake;
             if (state != States.Broken && reformed)
+            {
                 base.Render();
+            }
 
             if (reappearFlash > 0)
             {
@@ -152,7 +163,9 @@ namespace Celeste
                 windUpProgress = Calc.Approach(windUpProgress, 0f, 1f * Engine.DeltaTime);
                 Player player = WindUpPlayerCheck();
                 if (player == null)
+                {
                     return;
+                }
 
                 moveSpeed = 80f;
                 windUpStartTimer = 0f;
@@ -165,13 +178,17 @@ namespace Celeste
                     _ = Audio.Play("event:/game/09_core/iceblock_touch", Center);
                 }
                 else
+                {
                     _ = Audio.Play("event:/game/09_core/bounceblock_touch", Center);
+                }
             }
             else if (state == States.WindingUp)
             {
                 Player player = WindUpPlayerCheck();
                 if (player != null)
+                {
                     bounceDir = !iceMode ? (player.Center - Center).SafeNormalize() : -Vector2.UnitY;
+                }
 
                 if (windUpStartTimer > WindUpDelay)
                 {
@@ -189,17 +206,27 @@ namespace Celeste
                     MoveTo(position, liftSpeed);
                     windUpProgress = Calc.ClampedMap(Vector2.Distance(ExactPosition, target), IceWindUpDist, 2f);
                     if (iceMode && Vector2.DistanceSquared(ExactPosition, target) <= 12)
+                    {
                         StartShaking(WallPushTime);
+                    }
                     else if (!iceMode && windUpProgress >= 0.5f)
+                    {
                         StartShaking(WallPushTime);
+                    }
 
                     if ((double)Vector2.DistanceSquared(ExactPosition, target) > 2)
+                    {
                         return;
+                    }
 
                     if (iceMode)
+                    {
                         Break();
+                    }
                     else
+                    {
                         state = States.Bouncing;
+                    }
 
                     moveSpeed = 0f;
                 }
@@ -214,7 +241,9 @@ namespace Celeste
                 MoveTo(position, bounceLift);
                 windUpProgress = 1f;
                 if ((ExactPosition == target ? 1 : (iceMode ? 0 : (WindUpPlayerCheck() == null ? 1 : 0))) == 0)
+                {
                     return;
+                }
 
                 debrisDirection = (target - startPos).SafeNormalize();
                 state = States.BounceEnd;
@@ -227,19 +256,25 @@ namespace Celeste
             {
                 bounceEndTimer -= Engine.DeltaTime;
                 if (bounceEndTimer > 0)
+                {
                     return;
+                }
 
                 Break();
             }
             else
             {
                 if (state != States.Broken)
+                {
                     return;
+                }
 
                 Depth = 8990;
                 reformed = false;
                 if (respawnTimer > 0)
+                {
                     respawnTimer -= Engine.DeltaTime;
+                }
                 else
                 {
                     Vector2 position = Position;
@@ -250,11 +285,14 @@ namespace Celeste
                         _ = Audio.Play(iceMode ? "event:/game/09_core/iceblock_reappear" : "event:/game/09_core/bounceblock_reappear", Center);
                         float duration = 0.35f;
                         for (int index1 = 0; index1 < Width; index1 += 8)
+                        {
                             for (int index2 = 0; index2 < Height; index2 += 8)
                             {
                                 Vector2 to = new(X + index1 + 4, Y + index2 + 4);
                                 Scene.Add(Engine.Pooler.Create<RespawnDebris>().Init(to + ((to - Center).SafeNormalize() * 12f), to, iceMode, duration));
                             }
+                        }
+
                         _ = Alarm.Set(this, duration, () =>
                         {
                             reformed = true;
@@ -268,7 +306,9 @@ namespace Celeste
                         state = States.Waiting;
                     }
                     else
+                    {
                         Position = position;
+                    }
                 }
             }
         }
@@ -278,12 +318,12 @@ namespace Celeste
             Level level = SceneAs<Level>();
             for (int index = 0; index < Width; index += 4)
             {
-                level.Particles.Emit(P_Reform, new Vector2(X + 2f + index + Calc.Random.Range(-1, 1), Y), (float) -Math.PI / 2);
-                level.Particles.Emit(P_Reform, new Vector2(X + 2f + index + Calc.Random.Range(-1, 1), Bottom - 1f), (float) -Math.PI / 2);
+                level.Particles.Emit(P_Reform, new Vector2(X + 2f + index + Calc.Random.Range(-1, 1), Y), (float)-Math.PI / 2);
+                level.Particles.Emit(P_Reform, new Vector2(X + 2f + index + Calc.Random.Range(-1, 1), Bottom - 1f), (float)-Math.PI / 2);
             }
             for (int index = 0; index < Height; index += 4)
             {
-                level.Particles.Emit(P_Reform, new Vector2(X, Y + 2f + index + Calc.Random.Range(-1, 1)), (float) Math.PI);
+                level.Particles.Emit(P_Reform, new Vector2(X, Y + 2f + index + Calc.Random.Range(-1, 1)), (float)Math.PI);
                 level.Particles.Emit(P_Reform, new Vector2(Right - 1f, Y + 2f + index + Calc.Random.Range(-1, 1)), 0.0f);
             }
         }
@@ -292,7 +332,9 @@ namespace Celeste
         {
             Player player = CollideFirst<Player>(Position - Vector2.UnitY);
             if (player != null && player.Speed.Y < 0)
+            {
                 player = null;
+            }
 
             if (player == null)
             {
@@ -301,7 +343,9 @@ namespace Celeste
                 {
                     player = CollideFirst<Player>(Position - Vector2.UnitX);
                     if (player == null || player.StateMachine.State != 1 || player.Facing != Facings.Right)
+                    {
                         player = null;
+                    }
                 }
             }
             return player;
@@ -311,7 +355,9 @@ namespace Celeste
         {
             Player player = WindUpPlayerCheck();
             if (player == null)
+            {
                 return;
+            }
 
             player.StateMachine.State = 0;
             player.Speed = liftSpeed;
@@ -321,7 +367,9 @@ namespace Celeste
         private void Break()
         {
             if (!iceMode)
+            {
                 _ = Audio.Play("event:/game/09_core/bounceblock_break", Center);
+            }
 
             Input.Rumble(RumbleStrength.Light, RumbleLength.Medium);
             state = States.Broken;
@@ -330,26 +378,35 @@ namespace Celeste
             respawnTimer = RespawnTime;
             Vector2 direction1 = new(0.0f, 1f);
             if (!iceMode)
+            {
                 direction1 = debrisDirection;
+            }
 
             Vector2 center = Center;
             for (int tileX = 0; tileX < Width; tileX += 8)
+            {
                 for (int tileY = 0; tileY < Height; tileY += 8)
                 {
                     if (iceMode)
+                    {
                         direction1 = (new Vector2(X + tileX + 4, Y + tileY + 4) - center).SafeNormalize();
+                    }
 
                     Scene.Add(Engine.Pooler.Create<BreakDebris>().Init(new Vector2(X + tileX + 4, Y + tileY + 4), direction1, iceMode));
                 }
+            }
+
             float num = debrisDirection.Angle();
             Level level = SceneAs<Level>();
             for (int halfTileX = 0; halfTileX < Width; halfTileX += 4)
+            {
                 for (int halfTileY = 0; halfTileY < Height; halfTileY += 4)
                 {
                     Vector2 position = Position + new Vector2(2 + halfTileX, 2 + halfTileY) + Calc.Random.Range(-Vector2.One, Vector2.One);
                     float direction2 = iceMode ? (position - center).Angle() : num;
                     level.Particles.Emit(iceMode ? P_IceBreak : P_FireBreak, position, direction2);
                 }
+            }
         }
 
         private enum States
@@ -384,7 +441,9 @@ namespace Celeste
                     _ = sprite.CenterOrigin();
                 }
                 else
+                {
                     sprite.Texture = texture;
+                }
 
                 Position = this.from = from;
                 percent = 0.0f;
@@ -396,7 +455,9 @@ namespace Celeste
             public override void Update()
             {
                 if (percent > 1)
+                {
                     RemoveSelf();
+                }
                 else
                 {
                     percent += Engine.DeltaTime / duration;
@@ -430,7 +491,9 @@ namespace Celeste
                     _ = sprite.CenterOrigin();
                 }
                 else
+                {
                     sprite.Texture = texture;
+                }
 
                 Position = position;
                 direction = Calc.AngleToVector(direction.Angle() + Calc.Random.Range(-0.1f, 0.1f), 1f);
@@ -444,7 +507,9 @@ namespace Celeste
             {
                 base.Update();
                 if (percent >= 1)
+                {
                     RemoveSelf();
+                }
                 else
                 {
                     Position += speed * Engine.DeltaTime;

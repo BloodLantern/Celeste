@@ -64,7 +64,9 @@ namespace Celeste
                 }
             }
             if (flag)
+            {
                 return;
+            }
 
             player.CameraAnchorLerp = Vector2.Zero;
         }

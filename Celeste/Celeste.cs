@@ -68,7 +68,9 @@ namespace Celeste
             base.Initialize();
             Settings.Instance.AfterLoad();
             if (Settings.Instance.Fullscreen)
+            {
                 ViewPadding = Settings.Instance.ViewportPadding;
+            }
 
             Settings.Instance.ApplyScreen();
             SFX.Initialize();
@@ -120,7 +122,9 @@ namespace Celeste
         protected override void OnSceneTransition(Scene last, Scene next)
         {
             if (last is not OverworldLoader || next is not Overworld)
+            {
                 base.OnSceneTransition(last, next);
+            }
 
             TimeRate = 1f;
             Audio.PauseGameplaySfx = false;
@@ -134,7 +138,9 @@ namespace Celeste
         {
             base.RenderCore();
             if (DisconnectUI == null)
+            {
                 return;
+            }
 
             DisconnectUI.Render();
         }
@@ -142,11 +148,15 @@ namespace Celeste
         public static void Freeze(float time)
         {
             if (FreezeTimer >= time)
+            {
                 return;
+            }
 
             FreezeTimer = time;
             if (Scene == null)
+            {
                 return;
+            }
 
             Scene.Tracker.GetEntity<CassetteBlockManager>()?.AdvanceMusic(time);
         }
@@ -176,14 +186,20 @@ namespace Celeste
                 for (int index = 0; index < args.Length - 1; ++index)
                 {
                     if (args[index] is "--language" or "-l")
+                    {
                         Settings.Instance.Language = args[++index];
+                    }
                     else if (args[index] is "--default-language" or "-dl")
                     {
                         if (!Settings.Existed)
+                        {
                             Settings.Instance.Language = args[++index];
+                        }
                     }
                     else if (args[index] is "--gui" or "-g")
+                    {
                         Input.OverrideInputPrefix = args[++index];
+                    }
                 }
                 celeste = new Celeste();
             }
@@ -214,10 +230,14 @@ namespace Celeste
         public static void ReloadAssets(bool levels, bool graphics, bool hires, AreaKey? area = null)
         {
             if (levels)
+            {
                 ReloadLevels(area);
+            }
 
             if (!graphics)
+            {
                 return;
+            }
 
             ReloadGraphics(hires);
         }
@@ -225,7 +245,9 @@ namespace Celeste
         public static void ReloadLevels(AreaKey? area = null)
         {
             if (area is null)
+            {
                 throw new ArgumentNullException(nameof(area));
+            }
         }
 
         public static void ReloadPortraits() { }

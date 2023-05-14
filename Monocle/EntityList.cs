@@ -13,262 +13,311 @@ namespace Monocle
 {
     public class EntityList : IEnumerable<Entity>, IEnumerable
     {
-        private List<Entity> entities;
-        private List<Entity> toAdd;
-        private List<Entity> toAwake;
-        private List<Entity> toRemove;
-        private HashSet<Entity> current;
-        private HashSet<Entity> adding;
-        private HashSet<Entity> removing;
+        private readonly List<Entity> entities;
+        private readonly List<Entity> toAdd;
+        private readonly List<Entity> toAwake;
+        private readonly List<Entity> toRemove;
+        private readonly HashSet<Entity> current;
+        private readonly HashSet<Entity> adding;
+        private readonly HashSet<Entity> removing;
         private bool unsorted;
-        public static Comparison<Entity> CompareDepth = (Comparison<Entity>) ((a, b) => Math.Sign(b.actualDepth - a.actualDepth));
+        public static Comparison<Entity> CompareDepth = (a, b) => Math.Sign(b.actualDepth - a.actualDepth);
 
         public Scene Scene { get; private set; }
 
         internal EntityList(Scene scene)
         {
-            this.Scene = scene;
-            this.entities = new List<Entity>();
-            this.toAdd = new List<Entity>();
-            this.toAwake = new List<Entity>();
-            this.toRemove = new List<Entity>();
-            this.current = new HashSet<Entity>();
-            this.adding = new HashSet<Entity>();
-            this.removing = new HashSet<Entity>();
+            Scene = scene;
+            entities = new List<Entity>();
+            toAdd = new List<Entity>();
+            toAwake = new List<Entity>();
+            toRemove = new List<Entity>();
+            current = new HashSet<Entity>();
+            adding = new HashSet<Entity>();
+            removing = new HashSet<Entity>();
         }
 
-        internal void MarkUnsorted() => this.unsorted = true;
+        internal void MarkUnsorted()
+        {
+            unsorted = true;
+        }
 
         public void UpdateLists()
         {
-            if (this.toAdd.Count > 0)
+            if (toAdd.Count > 0)
             {
-                for (int index = 0; index < this.toAdd.Count; ++index)
+                for (int index = 0; index < toAdd.Count; ++index)
                 {
-                    Entity entity = this.toAdd[index];
-                    if (!this.current.Contains(entity))
+                    Entity entity = toAdd[index];
+                    if (!current.Contains(entity))
                     {
-                        this.current.Add(entity);
-                        this.entities.Add(entity);
-                        if (this.Scene != null)
+                        _ = current.Add(entity);
+                        entities.Add(entity);
+                        if (Scene != null)
                         {
-                            this.Scene.TagLists.EntityAdded(entity);
-                            this.Scene.Tracker.EntityAdded(entity);
-                            entity.Added(this.Scene);
+                            Scene.TagLists.EntityAdded(entity);
+                            Scene.Tracker.EntityAdded(entity);
+                            entity.Added(Scene);
                         }
                     }
                 }
-                this.unsorted = true;
+                unsorted = true;
             }
-            if (this.toRemove.Count > 0)
+            if (toRemove.Count > 0)
             {
-                for (int index = 0; index < this.toRemove.Count; ++index)
+                for (int index = 0; index < toRemove.Count; ++index)
                 {
-                    Entity entity = this.toRemove[index];
-                    if (this.entities.Contains(entity))
+                    Entity entity = toRemove[index];
+                    if (entities.Contains(entity))
                     {
-                        this.current.Remove(entity);
-                        this.entities.Remove(entity);
-                        if (this.Scene != null)
+                        _ = current.Remove(entity);
+                        _ = entities.Remove(entity);
+                        if (Scene != null)
                         {
-                            entity.Removed(this.Scene);
-                            this.Scene.TagLists.EntityRemoved(entity);
-                            this.Scene.Tracker.EntityRemoved(entity);
+                            entity.Removed(Scene);
+                            Scene.TagLists.EntityRemoved(entity);
+                            Scene.Tracker.EntityRemoved(entity);
                             Engine.Pooler.EntityRemoved(entity);
                         }
                     }
                 }
-                this.toRemove.Clear();
-                this.removing.Clear();
+                toRemove.Clear();
+                removing.Clear();
             }
-            if (this.unsorted)
+            if (unsorted)
             {
-                this.unsorted = false;
-                this.entities.Sort(EntityList.CompareDepth);
+                unsorted = false;
+                entities.Sort(EntityList.CompareDepth);
             }
-            if (this.toAdd.Count <= 0)
+            if (toAdd.Count <= 0)
+            {
                 return;
-            this.toAwake.AddRange((IEnumerable<Entity>) this.toAdd);
-            this.toAdd.Clear();
-            this.adding.Clear();
-            foreach (Entity entity in this.toAwake)
-            {
-                if (entity.Scene == this.Scene)
-                    entity.Awake(this.Scene);
             }
-            this.toAwake.Clear();
+
+            toAwake.AddRange(toAdd);
+            toAdd.Clear();
+            adding.Clear();
+            foreach (Entity entity in toAwake)
+            {
+                if (entity.Scene == Scene)
+                {
+                    entity.Awake(Scene);
+                }
+            }
+            toAwake.Clear();
         }
 
         public void Add(Entity entity)
         {
-            if (this.adding.Contains(entity) || this.current.Contains(entity))
+            if (adding.Contains(entity) || current.Contains(entity))
+            {
                 return;
-            this.adding.Add(entity);
-            this.toAdd.Add(entity);
+            }
+
+            _ = adding.Add(entity);
+            toAdd.Add(entity);
         }
 
         public void Remove(Entity entity)
         {
-            if (this.removing.Contains(entity) || !this.current.Contains(entity))
+            if (removing.Contains(entity) || !current.Contains(entity))
+            {
                 return;
-            this.removing.Add(entity);
-            this.toRemove.Add(entity);
+            }
+
+            _ = removing.Add(entity);
+            toRemove.Add(entity);
         }
 
         public void Add(IEnumerable<Entity> entities)
         {
             foreach (Entity entity in entities)
-                this.Add(entity);
+            {
+                Add(entity);
+            }
         }
 
         public void Remove(IEnumerable<Entity> entities)
         {
             foreach (Entity entity in entities)
-                this.Remove(entity);
+            {
+                Remove(entity);
+            }
         }
 
         public void Add(params Entity[] entities)
         {
             for (int index = 0; index < entities.Length; ++index)
-                this.Add(entities[index]);
+            {
+                Add(entities[index]);
+            }
         }
 
         public void Remove(params Entity[] entities)
         {
             for (int index = 0; index < entities.Length; ++index)
-                this.Remove(entities[index]);
-        }
-
-        public int Count => this.entities.Count;
-
-        public Entity this[int index]
-        {
-            get
             {
-                if (index < 0 || index >= this.entities.Count)
-                    throw new IndexOutOfRangeException();
-                return this.entities[index];
+                Remove(entities[index]);
             }
         }
+
+        public int Count => entities.Count;
+
+        public Entity this[int index] => index < 0 || index >= entities.Count ? throw new IndexOutOfRangeException() : entities[index];
 
         public int AmountOf<T>() where T : Entity
         {
             int num = 0;
-            foreach (Entity entity in this.entities)
+            foreach (Entity entity in entities)
             {
                 if (entity is T)
+                {
                     ++num;
+                }
             }
             return num;
         }
 
         public T FindFirst<T>() where T : Entity
         {
-            foreach (Entity entity in this.entities)
+            foreach (Entity entity in entities)
             {
                 if (entity is T)
+                {
                     return entity as T;
+                }
             }
-            return default (T);
+            return default;
         }
 
         public List<T> FindAll<T>() where T : Entity
         {
-            List<T> all = new List<T>();
-            foreach (Entity entity in this.entities)
+            List<T> all = new();
+            foreach (Entity entity in entities)
             {
                 if (entity is T)
+                {
                     all.Add(entity as T);
+                }
             }
             return all;
         }
 
         public void With<T>(Action<T> action) where T : Entity
         {
-            foreach (Entity entity in this.entities)
+            foreach (Entity entity in entities)
             {
                 if (entity is T)
+                {
                     action(entity as T);
+                }
             }
         }
 
-        public IEnumerator<Entity> GetEnumerator() => (IEnumerator<Entity>) this.entities.GetEnumerator();
+        public IEnumerator<Entity> GetEnumerator()
+        {
+            return entities.GetEnumerator();
+        }
 
-        IEnumerator IEnumerable.GetEnumerator() => (IEnumerator) this.GetEnumerator();
+        IEnumerator IEnumerable.GetEnumerator()
+        {
+            return GetEnumerator();
+        }
 
-        public Entity[] ToArray() => this.entities.ToArray<Entity>();
+        public Entity[] ToArray()
+        {
+            return entities.ToArray<Entity>();
+        }
 
         public bool HasVisibleEntities(int matchTags)
         {
-            foreach (Entity entity in this.entities)
+            foreach (Entity entity in entities)
             {
                 if (entity.Visible && entity.TagCheck(matchTags))
+                {
                     return true;
+                }
             }
             return false;
         }
 
         internal void Update()
         {
-            foreach (Entity entity in this.entities)
+            foreach (Entity entity in entities)
             {
                 if (entity.Active)
+                {
                     entity.Update();
+                }
             }
         }
 
         public void Render()
         {
-            foreach (Entity entity in this.entities)
+            foreach (Entity entity in entities)
             {
                 if (entity.Visible)
+                {
                     entity.Render();
+                }
             }
         }
 
         public void RenderOnly(int matchTags)
         {
-            foreach (Entity entity in this.entities)
+            foreach (Entity entity in entities)
             {
                 if (entity.Visible && entity.TagCheck(matchTags))
+                {
                     entity.Render();
+                }
             }
         }
 
         public void RenderOnlyFullMatch(int matchTags)
         {
-            foreach (Entity entity in this.entities)
+            foreach (Entity entity in entities)
             {
                 if (entity.Visible && entity.TagFullCheck(matchTags))
+                {
                     entity.Render();
+                }
             }
         }
 
         public void RenderExcept(int excludeTags)
         {
-            foreach (Entity entity in this.entities)
+            foreach (Entity entity in entities)
             {
                 if (entity.Visible && !entity.TagCheck(excludeTags))
+                {
                     entity.Render();
+                }
             }
         }
 
         public void DebugRender(Camera camera)
         {
-            foreach (Entity entity in this.entities)
+            foreach (Entity entity in entities)
+            {
                 entity.DebugRender(camera);
+            }
         }
 
         internal void HandleGraphicsReset()
         {
-            foreach (Entity entity in this.entities)
+            foreach (Entity entity in entities)
+            {
                 entity.HandleGraphicsReset();
+            }
         }
 
         internal void HandleGraphicsCreate()
         {
-            foreach (Entity entity in this.entities)
+            foreach (Entity entity in entities)
+            {
                 entity.HandleGraphicsCreate();
+            }
         }
     }
 }

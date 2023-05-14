@@ -33,16 +33,26 @@ namespace Celeste
         public static bool Check(Scene scene, Entity entity)
         {
             foreach (ClimbBlocker component in scene.Tracker.GetComponents<ClimbBlocker>())
+            {
                 if (component.Blocking && entity.CollideCheck(component.Entity))
+                {
                     return true;
+                }
+            }
+
             return false;
         }
 
         public static bool EdgeCheck(Scene scene, Entity entity, int dir)
         {
             foreach (ClimbBlocker component in scene.Tracker.GetComponents<ClimbBlocker>())
+            {
                 if (component.Blocking && component.Edge && entity.CollideCheck(component.Entity, entity.Position + (Vector2.UnitX * dir)))
+                {
                     return true;
+                }
+            }
+
             return false;
         }
     }

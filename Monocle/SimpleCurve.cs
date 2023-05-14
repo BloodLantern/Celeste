@@ -16,26 +16,29 @@ namespace Monocle
 
         public SimpleCurve(Vector2 begin, Vector2 end, Vector2 control)
         {
-            this.Begin = begin;
-            this.End = end;
-            this.Control = control;
+            Begin = begin;
+            End = end;
+            Control = control;
         }
 
-        public void DoubleControl() => this.Control += this.Control - (this.Begin + (this.End - this.Begin) / 2f);
+        public void DoubleControl()
+        {
+            Control += Control - (Begin + ((End - Begin) / 2f));
+        }
 
         public Vector2 GetPoint(float percent)
         {
             float num = 1f - percent;
-            return num * num * this.Begin + 2f * num * percent * this.Control + percent * percent * this.End;
+            return (num * num * Begin) + (2f * num * percent * Control) + (percent * percent * End);
         }
 
         public float GetLengthParametric(int resolution)
         {
-            Vector2 vector2 = this.Begin;
+            Vector2 vector2 = Begin;
             float lengthParametric = 0.0f;
             for (int index = 1; index <= resolution; ++index)
             {
-                Vector2 point = this.GetPoint((float) index / (float) resolution);
+                Vector2 point = GetPoint(index / (float)resolution);
                 lengthParametric += (point - vector2).Length();
                 vector2 = point;
             }
@@ -44,10 +47,10 @@ namespace Monocle
 
         public void Render(Vector2 offset, Color color, int resolution)
         {
-            Vector2 start = offset + this.Begin;
+            Vector2 start = offset + Begin;
             for (int index = 1; index <= resolution; ++index)
             {
-                Vector2 end = offset + this.GetPoint((float) index / (float) resolution);
+                Vector2 end = offset + GetPoint(index / (float)resolution);
                 Draw.Line(start, end, color);
                 start = end;
             }
@@ -55,17 +58,23 @@ namespace Monocle
 
         public void Render(Vector2 offset, Color color, int resolution, float thickness)
         {
-            Vector2 start = offset + this.Begin;
+            Vector2 start = offset + Begin;
             for (int index = 1; index <= resolution; ++index)
             {
-                Vector2 end = offset + this.GetPoint((float) index / (float) resolution);
+                Vector2 end = offset + GetPoint(index / (float)resolution);
                 Draw.Line(start, end, color, thickness);
                 start = end;
             }
         }
 
-        public void Render(Color color, int resolution) => this.Render(Vector2.Zero, color, resolution);
+        public void Render(Color color, int resolution)
+        {
+            Render(Vector2.Zero, color, resolution);
+        }
 
-        public void Render(Color color, int resolution, float thickness) => this.Render(Vector2.Zero, color, resolution, thickness);
+        public void Render(Color color, int resolution, float thickness)
+        {
+            Render(Vector2.Zero, color, resolution, thickness);
+        }
     }
 }

@@ -13,7 +13,7 @@ namespace Celeste
 {
     public class DisperseImage : Entity
     {
-        private List<DisperseImage.Particle> particles = new List<DisperseImage.Particle>();
+        private readonly List<DisperseImage.Particle> particles = new();
         private Vector2 scale;
 
         public DisperseImage(
@@ -23,15 +23,16 @@ namespace Celeste
             Vector2 scale,
             MTexture texture)
         {
-            this.Position = position;
+            Position = position;
             this.scale = new Vector2(Math.Abs(scale.X), Math.Abs(scale.Y));
             float num = direction.Angle();
             for (int x = 0; x < texture.Width; ++x)
             {
                 for (int y = 0; y < texture.Height; ++y)
-                    this.particles.Add(new DisperseImage.Particle()
+                {
+                    particles.Add(new DisperseImage.Particle()
                     {
-                        Position = position + scale * (new Vector2((float) x, (float) y) - origin),
+                        Position = position + (scale * (new Vector2(x, y) - origin)),
                         Direction = Calc.AngleToVector(num + Calc.Random.Range(-0.2f, 0.2f), 1f),
                         Sin = Calc.Random.NextFloat(6.28318548f),
                         Speed = Calc.Random.Range(0.0f, 4f),
@@ -40,31 +41,39 @@ namespace Celeste
                         Duration = Calc.Random.Range(1f, 3f),
                         Image = new MTexture(texture, x, y, 1, 1)
                     });
+                }
             }
         }
 
         public override void Update()
         {
             bool flag = false;
-            foreach (DisperseImage.Particle particle in this.particles)
+            foreach (DisperseImage.Particle particle in particles)
             {
                 particle.Percent += Engine.DeltaTime / particle.Duration;
                 particle.Position += particle.Direction * particle.Speed * Engine.DeltaTime;
-                particle.Position += (float) Math.Sin((double) particle.Sin) * particle.Direction.Perpendicular() * particle.Percent * 4f * Engine.DeltaTime;
-                particle.Speed += Engine.DeltaTime * (float) (4.0 + (double) particle.Percent * 80.0);
+                particle.Position += (float)Math.Sin(particle.Sin) * particle.Direction.Perpendicular() * particle.Percent * 4f * Engine.DeltaTime;
+                particle.Speed += Engine.DeltaTime * (float)(4.0 + (particle.Percent * 80.0));
                 particle.Sin += Engine.DeltaTime * 4f;
-                if ((double) particle.Percent < 1.0)
+                if (particle.Percent < 1.0)
+                {
                     flag = true;
+                }
             }
             if (flag)
+            {
                 return;
-            this.RemoveSelf();
+            }
+
+            RemoveSelf();
         }
 
         public override void Render()
         {
-            foreach (DisperseImage.Particle particle in this.particles)
-                particle.Image.Draw(particle.Position, Vector2.Zero, Color.White * (1f - particle.Percent), this.scale);
+            foreach (DisperseImage.Particle particle in particles)
+            {
+                particle.Image.Draw(particle.Position, Vector2.Zero, Color.White * (1f - particle.Percent), scale);
+            }
         }
 
         private class Particle

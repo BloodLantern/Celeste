@@ -13,13 +13,13 @@ namespace Celeste
 {
     public class MoonParticle3D : Entity
     {
-        private MountainModel model;
-        private List<MoonParticle3D.Particle> particles = new List<MoonParticle3D.Particle>();
+        private readonly MountainModel model;
+        private readonly List<MoonParticle3D.Particle> particles = new();
 
         public MoonParticle3D(MountainModel model, Vector3 center)
         {
             this.model = model;
-            this.Visible = false;
+            Visible = false;
             Matrix rotationZ = Matrix.CreateRotationZ(0.4f);
             Color[] colorArray1 = new Color[2]
             {
@@ -27,9 +27,15 @@ namespace Celeste
                 Calc.HexToColor("53c9f3")
             };
             for (int index = 0; index < 20; ++index)
-                this.Add((Component) new MoonParticle3D.Particle(OVR.Atlas["star"], Calc.Random.Choose<Color>(colorArray1), center, 1f, rotationZ));
+            {
+                Add(new MoonParticle3D.Particle(OVR.Atlas["star"], Calc.Random.Choose<Color>(colorArray1), center, 1f, rotationZ));
+            }
+
             for (int index = 0; index < 30; ++index)
-                this.Add((Component) new MoonParticle3D.Particle(OVR.Atlas["snow"], Calc.Random.Choose<Color>(colorArray1), center, 0.3f, rotationZ));
+            {
+                Add(new MoonParticle3D.Particle(OVR.Atlas["snow"], Calc.Random.Choose<Color>(colorArray1), center, 0.3f, rotationZ));
+            }
+
             Matrix matrix = Matrix.CreateRotationZ(0.8f) * Matrix.CreateRotationX(0.4f);
             Color[] colorArray2 = new Color[2]
             {
@@ -37,15 +43,20 @@ namespace Celeste
                 Calc.HexToColor("fa70ea")
             };
             for (int index = 0; index < 20; ++index)
-                this.Add((Component) new MoonParticle3D.Particle(OVR.Atlas["star"], Calc.Random.Choose<Color>(colorArray2), center, 1f, matrix));
+            {
+                Add(new MoonParticle3D.Particle(OVR.Atlas["star"], Calc.Random.Choose<Color>(colorArray2), center, 1f, matrix));
+            }
+
             for (int index = 0; index < 30; ++index)
-                this.Add((Component) new MoonParticle3D.Particle(OVR.Atlas["snow"], Calc.Random.Choose<Color>(colorArray2), center, 0.3f, matrix));
+            {
+                Add(new MoonParticle3D.Particle(OVR.Atlas["snow"], Calc.Random.Choose<Color>(colorArray2), center, 0.3f, matrix));
+            }
         }
 
         public override void Update()
         {
             base.Update();
-            this.Visible = (double) this.model.StarEase > 0.0;
+            Visible = model.StarEase > 0.0;
         }
 
         public class Particle : Billboard
@@ -60,19 +71,19 @@ namespace Celeste
             public Particle(MTexture texture, Color color, Vector3 center, float size, Matrix matrix)
                 : base(texture, Vector3.Zero, color: new Color?(color))
             {
-                this.Center = center;
-                this.Matrix = matrix;
-                this.Size = Vector2.One * Calc.Random.Range(0.05f, 0.15f) * size;
-                this.Distance = Calc.Random.Range(1.8f, 1.9f);
-                this.Rotation = Calc.Random.NextFloat(6.28318548f);
-                this.YOff = Calc.Random.Range(-0.1f, 0.1f);
-                this.Spd = Calc.Random.Range(0.8f, 1.2f);
+                Center = center;
+                Matrix = matrix;
+                Size = Vector2.One * Calc.Random.Range(0.05f, 0.15f) * size;
+                Distance = Calc.Random.Range(1.8f, 1.9f);
+                Rotation = Calc.Random.NextFloat(6.28318548f);
+                YOff = Calc.Random.Range(-0.1f, 0.1f);
+                Spd = Calc.Random.Range(0.8f, 1.2f);
             }
 
             public override void Update()
             {
-                this.Rotation += Engine.DeltaTime * 0.4f * this.Spd;
-                this.Position = this.Center + Vector3.Transform(new Vector3((float) Math.Cos((double) this.Rotation) * this.Distance, (float) Math.Sin((double) this.Rotation * 3.0) * 0.25f + this.YOff, (float) Math.Sin((double) this.Rotation) * this.Distance), this.Matrix);
+                Rotation += Engine.DeltaTime * 0.4f * Spd;
+                Position = Center + Vector3.Transform(new Vector3((float)Math.Cos(Rotation) * Distance, ((float)Math.Sin(Rotation * 3.0) * 0.25f) + YOff, (float)Math.Sin(Rotation) * Distance), Matrix);
             }
         }
     }

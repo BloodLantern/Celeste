@@ -14,65 +14,103 @@ namespace FMOD
     {
         public RESULT release()
         {
-            int num = (int) SoundGroup.FMOD_SoundGroup_Release(this.getRaw());
+            int num = (int)SoundGroup.FMOD_SoundGroup_Release(getRaw());
             if (num != 0)
-                return (RESULT) num;
-            this.rawPtr = IntPtr.Zero;
-            return (RESULT) num;
+            {
+                return (RESULT)num;
+            }
+
+            rawPtr = IntPtr.Zero;
+            return (RESULT)num;
         }
 
         public RESULT getSystemObject(out FMOD.System system)
         {
-            system = (FMOD.System) null;
-            IntPtr system1;
-            int systemObject = (int) SoundGroup.FMOD_SoundGroup_GetSystemObject(this.rawPtr, out system1);
+            int systemObject = (int)SoundGroup.FMOD_SoundGroup_GetSystemObject(rawPtr, out IntPtr system1);
             system = new FMOD.System(system1);
-            return (RESULT) systemObject;
+            return (RESULT)systemObject;
         }
 
-        public RESULT setMaxAudible(int maxaudible) => SoundGroup.FMOD_SoundGroup_SetMaxAudible(this.rawPtr, maxaudible);
+        public RESULT setMaxAudible(int maxaudible)
+        {
+            return SoundGroup.FMOD_SoundGroup_SetMaxAudible(rawPtr, maxaudible);
+        }
 
-        public RESULT getMaxAudible(out int maxaudible) => SoundGroup.FMOD_SoundGroup_GetMaxAudible(this.rawPtr, out maxaudible);
+        public RESULT getMaxAudible(out int maxaudible)
+        {
+            return SoundGroup.FMOD_SoundGroup_GetMaxAudible(rawPtr, out maxaudible);
+        }
 
-        public RESULT setMaxAudibleBehavior(SOUNDGROUP_BEHAVIOR behavior) => SoundGroup.FMOD_SoundGroup_SetMaxAudibleBehavior(this.rawPtr, behavior);
+        public RESULT setMaxAudibleBehavior(SOUNDGROUP_BEHAVIOR behavior)
+        {
+            return SoundGroup.FMOD_SoundGroup_SetMaxAudibleBehavior(rawPtr, behavior);
+        }
 
-        public RESULT getMaxAudibleBehavior(out SOUNDGROUP_BEHAVIOR behavior) => SoundGroup.FMOD_SoundGroup_GetMaxAudibleBehavior(this.rawPtr, out behavior);
+        public RESULT getMaxAudibleBehavior(out SOUNDGROUP_BEHAVIOR behavior)
+        {
+            return SoundGroup.FMOD_SoundGroup_GetMaxAudibleBehavior(rawPtr, out behavior);
+        }
 
-        public RESULT setMuteFadeSpeed(float speed) => SoundGroup.FMOD_SoundGroup_SetMuteFadeSpeed(this.rawPtr, speed);
+        public RESULT setMuteFadeSpeed(float speed)
+        {
+            return SoundGroup.FMOD_SoundGroup_SetMuteFadeSpeed(rawPtr, speed);
+        }
 
-        public RESULT getMuteFadeSpeed(out float speed) => SoundGroup.FMOD_SoundGroup_GetMuteFadeSpeed(this.rawPtr, out speed);
+        public RESULT getMuteFadeSpeed(out float speed)
+        {
+            return SoundGroup.FMOD_SoundGroup_GetMuteFadeSpeed(rawPtr, out speed);
+        }
 
-        public RESULT setVolume(float volume) => SoundGroup.FMOD_SoundGroup_SetVolume(this.rawPtr, volume);
+        public RESULT setVolume(float volume)
+        {
+            return SoundGroup.FMOD_SoundGroup_SetVolume(rawPtr, volume);
+        }
 
-        public RESULT getVolume(out float volume) => SoundGroup.FMOD_SoundGroup_GetVolume(this.rawPtr, out volume);
+        public RESULT getVolume(out float volume)
+        {
+            return SoundGroup.FMOD_SoundGroup_GetVolume(rawPtr, out volume);
+        }
 
-        public RESULT stop() => SoundGroup.FMOD_SoundGroup_Stop(this.rawPtr);
+        public RESULT stop()
+        {
+            return SoundGroup.FMOD_SoundGroup_Stop(rawPtr);
+        }
 
         public RESULT getName(StringBuilder name, int namelen)
         {
             IntPtr num = Marshal.AllocHGlobal(name.Capacity);
-            int name1 = (int) SoundGroup.FMOD_SoundGroup_GetName(this.rawPtr, num, namelen);
+            int name1 = (int)SoundGroup.FMOD_SoundGroup_GetName(rawPtr, num, namelen);
             StringMarshalHelper.NativeToBuilder(name, num);
             Marshal.FreeHGlobal(num);
-            return (RESULT) name1;
+            return (RESULT)name1;
         }
 
-        public RESULT getNumSounds(out int numsounds) => SoundGroup.FMOD_SoundGroup_GetNumSounds(this.rawPtr, out numsounds);
+        public RESULT getNumSounds(out int numsounds)
+        {
+            return SoundGroup.FMOD_SoundGroup_GetNumSounds(rawPtr, out numsounds);
+        }
 
         public RESULT getSound(int index, out Sound sound)
         {
-            sound = (Sound) null;
-            IntPtr sound1;
-            int sound2 = (int) SoundGroup.FMOD_SoundGroup_GetSound(this.rawPtr, index, out sound1);
+            int sound2 = (int)SoundGroup.FMOD_SoundGroup_GetSound(rawPtr, index, out IntPtr sound1);
             sound = new Sound(sound1);
-            return (RESULT) sound2;
+            return (RESULT)sound2;
         }
 
-        public RESULT getNumPlaying(out int numplaying) => SoundGroup.FMOD_SoundGroup_GetNumPlaying(this.rawPtr, out numplaying);
+        public RESULT getNumPlaying(out int numplaying)
+        {
+            return SoundGroup.FMOD_SoundGroup_GetNumPlaying(rawPtr, out numplaying);
+        }
 
-        public RESULT setUserData(IntPtr userdata) => SoundGroup.FMOD_SoundGroup_SetUserData(this.rawPtr, userdata);
+        public RESULT setUserData(IntPtr userdata)
+        {
+            return SoundGroup.FMOD_SoundGroup_SetUserData(rawPtr, userdata);
+        }
 
-        public RESULT getUserData(out IntPtr userdata) => SoundGroup.FMOD_SoundGroup_GetUserData(this.rawPtr, out userdata);
+        public RESULT getUserData(out IntPtr userdata)
+        {
+            return SoundGroup.FMOD_SoundGroup_GetUserData(rawPtr, out userdata);
+        }
 
         [DllImport("fmod")]
         private static extern RESULT FMOD_SoundGroup_Release(IntPtr soundgroup);

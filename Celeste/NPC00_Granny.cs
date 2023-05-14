@@ -19,33 +19,36 @@ namespace Celeste
         public NPC00_Granny(Vector2 position)
             : base(position)
         {
-            this.Add((Component) (this.Sprite = GFX.SpriteBank.Create("granny")));
-            this.Sprite.Play("idle");
-            this.Add((Component) (this.LaughSfx = new GrannyLaughSfx(this.Sprite)));
+            Add(Sprite = GFX.SpriteBank.Create("granny"));
+            Sprite.Play("idle");
+            Add(LaughSfx = new GrannyLaughSfx(Sprite));
         }
 
         public override void Added(Scene scene)
         {
             base.Added(scene);
             if ((scene as Level).Session.GetFlag("granny"))
-                this.Sprite.Play("laugh");
-            scene.Add((Entity) (this.Hahaha = new Hahaha(this.Position + new Vector2(8f, -4f))));
-            this.Hahaha.Enabled = false;
+            {
+                Sprite.Play("laugh");
+            }
+
+            scene.Add(Hahaha = new Hahaha(Position + new Vector2(8f, -4f)));
+            Hahaha.Enabled = false;
         }
 
         public override void Update()
         {
-            Player entity = this.Level.Tracker.GetEntity<Player>();
-            if (entity != null && !this.Session.GetFlag("granny") && !this.talking)
+            Player entity = Level.Tracker.GetEntity<Player>();
+            if (entity != null && !Session.GetFlag("granny") && !talking)
             {
-                int num = this.Level.Bounds.Left + 96;
-                if (entity.OnGround() && (double) entity.X >= (double) num && (double) entity.X <= (double) this.X + 16.0 && (double) Math.Abs(entity.Y - this.Y) < 4.0 && entity.Facing == (Facings) Math.Sign(this.X - entity.X))
+                int num = Level.Bounds.Left + 96;
+                if (entity.OnGround() && (double)entity.X >= num && (double)entity.X <= (double)X + 16.0 && (double)Math.Abs(entity.Y - Y) < 4.0 && entity.Facing == (Facings)Math.Sign(X - entity.X))
                 {
-                    this.talking = true;
-                    this.Scene.Add((Entity) new CS00_Granny(this, entity));
+                    talking = true;
+                    Scene.Add(new CS00_Granny(this, entity));
                 }
             }
-            this.Hahaha.Enabled = this.Sprite.CurrentAnimationID == "laugh";
+            Hahaha.Enabled = Sprite.CurrentAnimationID == "laugh";
             base.Update();
         }
     }

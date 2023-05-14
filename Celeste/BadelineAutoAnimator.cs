@@ -29,7 +29,9 @@ namespace Celeste
             {
                 Sprite sprite = Entity.Get<Sprite>();
                 if (sprite == null)
+                {
                     return;
+                }
 
                 sprite.Scale = new Vector2(Math.Sign(sprite.Scale.X), 1f) * (1 + (0.25f * f));
             }));
@@ -50,16 +52,22 @@ namespace Celeste
         {
             Sprite sprite = Entity.Get<Sprite>();
             if (Scene == null || sprite == null)
+            {
                 return;
+            }
 
             bool flag = false;
             Textbox entity = Scene.Tracker.GetEntity<Textbox>();
             if (Enabled && entity != null)
+            {
                 if (entity.PortraitName.IsIgnoreCase("badeline"))
+                {
                     if (entity.PortraitAnimation.IsIgnoreCase("scoff"))
                     {
                         if (!wasSyncingSprite)
+                        {
                             lastAnimation = sprite.CurrentAnimationID;
+                        }
 
                         sprite.Play("laugh");
                         wasSyncingSprite = flag = true;
@@ -74,15 +82,24 @@ namespace Celeste
                         sprite.Play("angry");
                         wasSyncingSprite = flag = true;
                     }
+                }
+            }
+
             if (!wasSyncingSprite || flag)
+            {
                 return;
+            }
 
             wasSyncingSprite = false;
             if (string.IsNullOrEmpty(lastAnimation) || lastAnimation == "spin")
+            {
                 lastAnimation = "fallSlow";
+            }
 
             if (sprite.CurrentAnimationID == "angry")
+            {
                 pop.Start();
+            }
 
             sprite.Play(lastAnimation);
         }

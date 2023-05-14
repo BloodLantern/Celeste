@@ -21,14 +21,16 @@ namespace Celeste
         {
             Color = data.Enum("type", ClutterBlock.Colors.Green);
             SurfaceSoundIndex = 20;
-            Tag = (int) Tags.TransitionUpdate;
+            Tag = (int)Tags.TransitionUpdate;
             Add(sprite = GFX.SpriteBank.Create("ghost_door"));
             sprite.Position = new Vector2(Width, Height) / 2f;
             sprite.Play("idle");
             OnDashCollide = new DashCollision(OnDashed);
-            Add(wiggler = Wiggler.Create(0.6f, 3f, f => sprite.Scale = Vector2.One * (1 - f * 0.2f)));
+            Add(wiggler = Wiggler.Create(0.6f, 3f, f => sprite.Scale = Vector2.One * (1 - (f * 0.2f))));
             if (IsLocked(session))
+            {
                 return;
+            }
 
             InstantUnlock();
         }
@@ -58,7 +60,7 @@ namespace Celeste
 
         public bool IsComplete(Session session)
         {
-            return session.GetFlag("oshiro_clutter_cleared_" + (int) Color);
+            return session.GetFlag("oshiro_clutter_cleared_" + (int)Color);
         }
 
         public IEnumerator UnlockRoutine()
@@ -69,11 +71,13 @@ namespace Celeste
             Vector2 to = clutterDoor.CameraTarget();
             float p;
             if ((from - to).Length() > 8)
+            {
                 for (p = 0f; p < 1; p += Engine.DeltaTime)
                 {
                     camera.Position = from + ((to - from) * Ease.CubeInOut(p));
                     yield return null;
                 }
+            }
             else
             {
                 yield return 0.2f;

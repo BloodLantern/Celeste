@@ -20,41 +20,53 @@ namespace Celeste
         public PlayerCollider(Action<Player> onCollide, Collider collider = null, Collider featherCollider = null)
             : base(false, false)
         {
-            this.OnCollide = onCollide;
-            this.Collider = collider;
-            this.FeatherCollider = featherCollider;
+            OnCollide = onCollide;
+            Collider = collider;
+            FeatherCollider = featherCollider;
         }
 
         public bool Check(Player player)
         {
-            Collider collider1 = this.Collider;
-            if (this.FeatherCollider != null && player.StateMachine.State == 19)
-                collider1 = this.FeatherCollider;
+            Collider collider1 = Collider;
+            if (FeatherCollider != null && player.StateMachine.State == 19)
+            {
+                collider1 = FeatherCollider;
+            }
+
             if (collider1 == null)
             {
-                if (!player.CollideCheck(this.Entity))
+                if (!player.CollideCheck(Entity))
+                {
                     return false;
-                this.OnCollide(player);
+                }
+
+                OnCollide(player);
                 return true;
             }
-            Collider collider2 = this.Entity.Collider;
-            this.Entity.Collider = collider1;
-            int num = player.CollideCheck(this.Entity) ? 1 : 0;
-            this.Entity.Collider = collider2;
+            Collider collider2 = Entity.Collider;
+            Entity.Collider = collider1;
+            int num = player.CollideCheck(Entity) ? 1 : 0;
+            Entity.Collider = collider2;
             if (num == 0)
+            {
                 return false;
-            this.OnCollide(player);
+            }
+
+            OnCollide(player);
             return true;
         }
 
         public override void DebugRender(Camera camera)
         {
-            if (this.Collider == null)
+            if (Collider == null)
+            {
                 return;
-            Collider collider = this.Entity.Collider;
-            this.Entity.Collider = this.Collider;
-            this.Collider.Render(camera, Color.HotPink);
-            this.Entity.Collider = collider;
+            }
+
+            Collider collider = Entity.Collider;
+            Entity.Collider = Collider;
+            Collider.Render(camera, Color.HotPink);
+            Entity.Collider = collider;
         }
     }
 }

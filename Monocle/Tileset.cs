@@ -19,7 +19,9 @@ namespace Monocle
             for (int index1 = 0; index1 < Texture.Width / tileWidth; ++index1)
             {
                 for (int index2 = 0; index2 < Texture.Height / tileHeight; ++index2)
+                {
                     tiles[index1, index2] = new MTexture(Texture, index1 * tileWidth, index2 * tileHeight, tileWidth, tileHeight);
+                }
             }
         }
 
@@ -31,6 +33,6 @@ namespace Monocle
 
         public MTexture this[int x, int y] => tiles[x, y];
 
-        public MTexture this[int index] => index < 0 ? (MTexture) null : tiles[index % tiles.GetLength(0), index / tiles.GetLength(0)];
+        public MTexture this[int index] => index < 0 ? null : tiles[index % tiles.GetLength(0), index / tiles.GetLength(0)];
     }
 }

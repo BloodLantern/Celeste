@@ -15,28 +15,36 @@ namespace Monocle
 
         public Component(bool active, bool visible)
         {
-            this.Active = active;
-            this.Visible = visible;
+            Active = active;
+            Visible = visible;
         }
 
         public virtual void Added(Entity entity)
         {
-            this.Entity = entity;
-            if (this.Scene == null)
+            Entity = entity;
+            if (Scene == null)
+            {
                 return;
-            this.Scene.Tracker.ComponentAdded(this);
+            }
+
+            Scene.Tracker.ComponentAdded(this);
         }
 
         public virtual void Removed(Entity entity)
         {
-            if (this.Scene != null)
-                this.Scene.Tracker.ComponentRemoved(this);
-            this.Entity = (Entity) null;
+            Scene?.Tracker.ComponentRemoved(this);
+            Entity = null;
         }
 
-        public virtual void EntityAdded(Scene scene) => scene.Tracker.ComponentAdded(this);
+        public virtual void EntityAdded(Scene scene)
+        {
+            scene.Tracker.ComponentAdded(this);
+        }
 
-        public virtual void EntityRemoved(Scene scene) => scene.Tracker.ComponentRemoved(this);
+        public virtual void EntityRemoved(Scene scene)
+        {
+            scene.Tracker.ComponentRemoved(this);
+        }
 
         public virtual void SceneEnd(Scene scene)
         {
@@ -68,15 +76,24 @@ namespace Monocle
 
         public void RemoveSelf()
         {
-            if (this.Entity == null)
+            if (Entity == null)
+            {
                 return;
-            this.Entity.Remove(this);
+            }
+
+            Entity.Remove(this);
         }
 
-        public T SceneAs<T>() where T : Scene => this.Scene as T;
+        public T SceneAs<T>() where T : Scene
+        {
+            return Scene as T;
+        }
 
-        public T EntityAs<T>() where T : Entity => this.Entity as T;
+        public T EntityAs<T>() where T : Entity
+        {
+            return Entity as T;
+        }
 
-        public Scene Scene => this.Entity == null ? (Scene) null : this.Entity.Scene;
+        public Scene Scene => Entity?.Scene;
     }
 }

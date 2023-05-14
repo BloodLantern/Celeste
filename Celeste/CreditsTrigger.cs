@@ -17,15 +17,18 @@ namespace Celeste
         public CreditsTrigger(EntityData data, Vector2 offset)
             : base(data, offset)
         {
-            this.Event = data.Attr("event");
+            Event = data.Attr("event");
         }
 
         public override void OnEnter(Player player)
         {
-            this.Triggered = true;
+            Triggered = true;
             if (CS07_Credits.Instance == null)
+            {
                 return;
-            CS07_Credits.Instance.Event = this.Event;
+            }
+
+            CS07_Credits.Instance.Event = Event;
         }
     }
 }

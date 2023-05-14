@@ -13,7 +13,7 @@ namespace Celeste
 {
     public class Selfie : Entity
     {
-        private Level level;
+        private readonly Level level;
         private Monocle.Image image;
         private Monocle.Image overImage;
         private bool waitForKeyPress;
@@ -22,112 +22,132 @@ namespace Celeste
 
         public Selfie(Level level)
         {
-            this.Tag = (int) Tags.HUD;
+            Tag = (int)Tags.HUD;
             this.level = level;
         }
 
         public IEnumerator PictureRoutine(string photo = "selfie")
         {
-            this.level.Flash(Color.White);
-            yield return (object) 0.5f;
-            yield return (object) this.OpenRoutine(photo);
-            yield return (object) this.WaitForInput();
-            yield return (object) this.EndRoutine();
+            level.Flash(Color.White);
+            yield return 0.5f;
+            yield return OpenRoutine(photo);
+            yield return WaitForInput();
+            yield return EndRoutine();
         }
 
         public IEnumerator FilterRoutine()
         {
-            yield return (object) this.OpenRoutine();
-            yield return (object) 0.5f;
+            yield return OpenRoutine();
+            yield return 0.5f;
             MTexture tex = GFX.Portraits["selfieFilter"];
-            this.overImage = new Monocle.Image(tex);
-            this.overImage.Visible = false;
-            this.overImage.CenterOrigin();
-            int atWidth = 0;
-            this.tween = Tween.Create(Tween.TweenMode.Oneshot, Ease.SineInOut, 0.4f, true);
-            this.tween.OnUpdate = (Action<Tween>) (t =>
+            overImage = new Monocle.Image(tex)
             {
-                int num = (int) Math.Round((double) MathHelper.Lerp(0.0f, (float) tex.Width, t.Eased));
+                Visible = false
+            };
+            _ = overImage.CenterOrigin();
+            int atWidth = 0;
+            tween = Tween.Create(Tween.TweenMode.Oneshot, Ease.SineInOut, 0.4f, true);
+            tween.OnUpdate = t =>
+            {
+                int num = (int)Math.Round((double)MathHelper.Lerp(0.0f, tex.Width, t.Eased));
                 if (num == atWidth)
+                {
                     return;
+                }
+
                 atWidth = num;
-                this.overImage.Texture = tex.GetSubtexture(tex.Width - atWidth, 0, atWidth, tex.Height);
-                this.overImage.Visible = true;
-                this.overImage.Origin.X = (float) (atWidth - tex.Width / 2);
-            });
-            Audio.Play("event:/game/02_old_site/theoselfie_photo_filter");
-            yield return (object) this.tween.Wait();
-            yield return (object) this.WaitForInput();
-            yield return (object) this.EndRoutine();
+                overImage.Texture = tex.GetSubtexture(tex.Width - atWidth, 0, atWidth, tex.Height);
+                overImage.Visible = true;
+                overImage.Origin.X = atWidth - (tex.Width / 2);
+            };
+            _ = Audio.Play("event:/game/02_old_site/theoselfie_photo_filter");
+            yield return tween.Wait();
+            yield return WaitForInput();
+            yield return EndRoutine();
         }
 
         public IEnumerator OpenRoutine(string selfie = "selfie")
         {
-            Audio.Play("event:/game/02_old_site/theoselfie_photo_in");
-            this.image = new Monocle.Image(GFX.Portraits[selfie]);
-            this.image.CenterOrigin();
+            _ = Audio.Play("event:/game/02_old_site/theoselfie_photo_in");
+            image = new Monocle.Image(GFX.Portraits[selfie]);
+            _ = image.CenterOrigin();
             float percent = 0.0f;
-            while ((double) percent < 1.0)
+            while ((double)percent < 1.0)
             {
                 percent += Engine.DeltaTime;
-                this.image.Position = Vector2.Lerp(new Vector2(992f, (float) (1080.0 + (double) this.image.Height / 2.0)), new Vector2(960f, 540f), Ease.CubeOut(percent));
-                this.image.Rotation = MathHelper.Lerp(0.5f, 0.0f, Ease.BackOut(percent));
-                yield return (object) null;
+                image.Position = Vector2.Lerp(new Vector2(992f, (float)(1080.0 + ((double)image.Height / 2.0))), new Vector2(960f, 540f), Ease.CubeOut(percent));
+                image.Rotation = MathHelper.Lerp(0.5f, 0.0f, Ease.BackOut(percent));
+                yield return null;
             }
         }
 
         public IEnumerator WaitForInput()
         {
-            this.waitForKeyPress = true;
+            waitForKeyPress = true;
             while (!Input.MenuCancel.Pressed && !Input.MenuConfirm.Pressed)
-                yield return (object) null;
-            Audio.Play("event:/ui/main/button_lowkey");
-            this.waitForKeyPress = false;
+            {
+                yield return null;
+            }
+
+            _ = Audio.Play("event:/ui/main/button_lowkey");
+            waitForKeyPress = false;
         }
 
         public IEnumerator EndRoutine()
         {
             Selfie selfie = this;
-            Audio.Play("event:/game/02_old_site/theoselfie_photo_out");
+            _ = Audio.Play("event:/game/02_old_site/theoselfie_photo_out");
             float percent = 0.0f;
-            while ((double) percent < 1.0)
+            while ((double)percent < 1.0)
             {
                 percent += Engine.DeltaTime * 2f;
-                selfie.image.Position = Vector2.Lerp(new Vector2(960f, 540f), new Vector2(928f, (float) (-(double) selfie.image.Height / 2.0)), Ease.BackIn(percent));
+                selfie.image.Position = Vector2.Lerp(new Vector2(960f, 540f), new Vector2(928f, (float)(-(double)selfie.image.Height / 2.0)), Ease.BackIn(percent));
                 selfie.image.Rotation = MathHelper.Lerp(0.0f, -0.15f, Ease.BackIn(percent));
-                yield return (object) null;
+                yield return null;
             }
-            yield return (object) null;
-            selfie.level.Remove((Entity) selfie);
+            yield return null;
+            selfie.level.Remove(selfie);
         }
 
         public override void Update()
         {
-            if (this.tween != null && this.tween.Active)
-                this.tween.Update();
-            if (!this.waitForKeyPress)
+            if (tween != null && tween.Active)
+            {
+                tween.Update();
+            }
+
+            if (!waitForKeyPress)
+            {
                 return;
-            this.timer += Engine.DeltaTime;
+            }
+
+            timer += Engine.DeltaTime;
         }
 
         public override void Render()
         {
-            if (this.Scene is Level scene && (scene.FrozenOrPaused || scene.RetryPlayerCorpse != null || scene.SkippingCutscene))
-                return;
-            if (this.image != null && this.image.Visible)
+            if (Scene is Level scene && (scene.FrozenOrPaused || scene.RetryPlayerCorpse != null || scene.SkippingCutscene))
             {
-                this.image.Render();
-                if (this.overImage != null && this.overImage.Visible)
+                return;
+            }
+
+            if (image != null && image.Visible)
+            {
+                image.Render();
+                if (overImage != null && overImage.Visible)
                 {
-                    this.overImage.Position = this.image.Position;
-                    this.overImage.Rotation = this.image.Rotation;
-                    this.overImage.Scale = this.image.Scale;
-                    this.overImage.Render();
+                    overImage.Position = image.Position;
+                    overImage.Rotation = image.Rotation;
+                    overImage.Scale = image.Scale;
+                    overImage.Render();
                 }
             }
-            if (!this.waitForKeyPress)
+            if (!waitForKeyPress)
+            {
                 return;
-            GFX.Gui["textboxbutton"].DrawCentered(this.image.Position + new Vector2((float) ((double) this.image.Width / 2.0 + 40.0), (float) ((double) this.image.Height / 2.0 + ((double) this.timer % 1.0 < 0.25 ? 6.0 : 0.0))));
+            }
+
+            GFX.Gui["textboxbutton"].DrawCentered(image.Position + new Vector2((float)(((double)image.Width / 2.0) + 40.0), (float)(((double)image.Height / 2.0) + (timer % 1.0 < 0.25 ? 6.0 : 0.0))));
         }
     }
 }

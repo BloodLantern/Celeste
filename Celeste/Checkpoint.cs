@@ -22,7 +22,7 @@ namespace Celeste
         private VertexLight light;
         private BloomPoint bloom;
         private bool triggered;
-        private float sine = (float) Math.PI / 2;
+        private float sine = (float)Math.PI / 2;
         private float fade = 1f;
         private readonly string bg;
         public Vector2 SpawnOffset;
@@ -57,7 +57,9 @@ namespace Celeste
             flash.Visible = false;
             flash.Color = Color.White * 0.6f;
             if (!SaveData.Instance.HasCheckpoint(scene1.Session.Area, scene1.Session.Level))
+            {
                 return;
+            }
 
             TurnOn(false);
         }
@@ -82,7 +84,7 @@ namespace Celeste
             {
                 sine += Engine.DeltaTime * 2f;
                 fade = Calc.Approach(fade, 0.5f, Engine.DeltaTime);
-                sprite.Color = Color.White * (0.5f + ((1 + (float) Math.Sin(sine)) / 2f * 0.5f)) * fade;
+                sprite.Color = Color.White * (0.5f + ((1 + (float)Math.Sin(sine)) / 2f * 0.5f)) * fade;
             }
             base.Update();
         }

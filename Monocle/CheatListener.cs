@@ -37,21 +37,33 @@ namespace Monocle
                 }
             }
             if (!flag)
+            {
                 return;
+            }
+
             if (CurrentInput.Length > maxInput)
+            {
                 CurrentInput = CurrentInput.Substring(CurrentInput.Length - maxInput);
+            }
+
             if (Logging)
+            {
                 Calc.Log(CurrentInput);
+            }
+
             foreach (Tuple<string, Action> cheat in cheats)
             {
                 if (CurrentInput.Contains(cheat.Item1))
                 {
                     CurrentInput = "";
                     cheat.Item2?.Invoke();
-                    cheats.Remove(cheat);
+                    _ = cheats.Remove(cheat);
                     if (!Logging)
+                    {
                         break;
-                    Calc.Log(("Cheat Activated: " + cheat.Item1));
+                    }
+
+                    Calc.Log("Cheat Activated: " + cheat.Item1);
                     break;
                 }
             }
@@ -63,6 +75,9 @@ namespace Monocle
             maxInput = Math.Max(code.Length, maxInput);
         }
 
-        public void AddInput(char id, Func<bool> checker) => inputs.Add(new Tuple<char, Func<bool>>(id, checker));
+        public void AddInput(char id, Func<bool> checker)
+        {
+            inputs.Add(new Tuple<char, Func<bool>>(id, checker));
+        }
     }
 }

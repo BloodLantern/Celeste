@@ -21,7 +21,7 @@ namespace Celeste
         public Switch(bool groundReset)
             : base(true, false)
         {
-            this.GroundReset = groundReset;
+            GroundReset = groundReset;
         }
 
         public bool Activated { get; private set; }
@@ -31,58 +31,84 @@ namespace Celeste
         public override void EntityAdded(Scene scene)
         {
             base.EntityAdded(scene);
-            if (!Switch.CheckLevelFlag(this.SceneAs<Level>()))
+            if (!Switch.CheckLevelFlag(SceneAs<Level>()))
+            {
                 return;
-            this.StartFinished();
+            }
+
+            StartFinished();
         }
 
         public override void Update()
         {
             base.Update();
-            if (!this.GroundReset || !this.Activated || this.Finished)
+            if (!GroundReset || !Activated || Finished)
+            {
                 return;
-            Player entity = this.Scene.Tracker.GetEntity<Player>();
+            }
+
+            Player entity = Scene.Tracker.GetEntity<Player>();
             if (entity == null || !entity.OnGround())
+            {
                 return;
-            this.Deactivate();
+            }
+
+            Deactivate();
         }
 
         public bool Activate()
         {
-            if (this.Finished || this.Activated)
+            if (Finished || Activated)
+            {
                 return false;
-            this.Activated = true;
-            if (this.OnActivate != null)
-                this.OnActivate();
-            return Switch.FinishedCheck(this.SceneAs<Level>());
+            }
+
+            Activated = true;
+            OnActivate?.Invoke();
+            return Switch.FinishedCheck(SceneAs<Level>());
         }
 
         public void Deactivate()
         {
-            if (this.Finished || !this.Activated)
+            if (Finished || !Activated)
+            {
                 return;
-            this.Activated = false;
-            if (this.OnDeactivate == null)
+            }
+
+            Activated = false;
+            if (OnDeactivate == null)
+            {
                 return;
-            this.OnDeactivate();
+            }
+
+            OnDeactivate();
         }
 
         public void Finish()
         {
-            this.Finished = true;
-            if (this.OnFinish == null)
+            Finished = true;
+            if (OnFinish == null)
+            {
                 return;
-            this.OnFinish();
+            }
+
+            OnFinish();
         }
 
         public void StartFinished()
         {
-            if (this.Finished)
+            if (Finished)
+            {
                 return;
-            this.Finished = this.Activated = true;
-            if (this.OnStartFinished == null)
+            }
+
+            Finished = Activated = true;
+            if (OnStartFinished == null)
+            {
                 return;
-            this.OnStartFinished();
+            }
+
+            OnStartFinished();
         }
 
         public static bool Check(Scene scene)
@@ -96,15 +122,26 @@ namespace Celeste
             foreach (Switch component in level.Tracker.GetComponents<Switch>())
             {
                 if (!component.Activated)
+                {
                     return false;
+                }
             }
             foreach (Switch component in level.Tracker.GetComponents<Switch>())
+            {
                 component.Finish();
+            }
+
             return true;
         }
 
-        public static bool CheckLevelFlag(Level level) => level.Session.GetFlag("switches_" + level.Session.Level);
+        public static bool CheckLevelFlag(Level level)
+        {
+            return level.Session.GetFlag("switches_" + level.Session.Level);
+        }
 
-        public static void SetLevelFlag(Level level) => level.Session.SetFlag("switches_" + level.Session.Level);
+        public static void SetLevelFlag(Level level)
+        {
+            level.Session.SetFlag("switches_" + level.Session.Level);
+        }
     }
 }

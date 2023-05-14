@@ -30,52 +30,80 @@ namespace Celeste
 
         public void Destroy()
         {
-            if (this.OnDestroy != null)
-                this.OnDestroy();
+            if (OnDestroy != null)
+            {
+                OnDestroy();
+            }
             else
-                this.Entity.RemoveSelf();
+            {
+                Entity.RemoveSelf();
+            }
         }
 
         public void Shake(Vector2 amount)
         {
-            if (this.OnShake == null)
+            if (OnShake == null)
+            {
                 return;
-            this.OnShake(amount);
+            }
+
+            OnShake(amount);
         }
 
         public void Move(Vector2 amount)
         {
-            if (this.OnMove != null)
-                this.OnMove(amount);
+            if (OnMove != null)
+            {
+                OnMove(amount);
+            }
             else
-                this.Entity.Position += amount;
+            {
+                Entity.Position += amount;
+            }
         }
 
-        public bool IsRiding(Solid solid) => this.SolidChecker != null && this.SolidChecker(solid);
+        public bool IsRiding(Solid solid)
+        {
+            return SolidChecker != null && SolidChecker(solid);
+        }
 
-        public bool IsRiding(JumpThru jumpThru) => this.JumpThruChecker != null && this.JumpThruChecker(jumpThru);
+        public bool IsRiding(JumpThru jumpThru)
+        {
+            return JumpThruChecker != null && JumpThruChecker(jumpThru);
+        }
 
         public void TriggerPlatform()
         {
-            if (this.Platform == null)
+            if (Platform == null)
+            {
                 return;
-            this.Platform.OnStaticMoverTrigger(this);
+            }
+
+            Platform.OnStaticMoverTrigger(this);
         }
 
         public void Disable()
         {
-            if (this.OnDisable != null)
-                this.OnDisable();
+            if (OnDisable != null)
+            {
+                OnDisable();
+            }
             else
-                this.Entity.Active = this.Entity.Visible = this.Entity.Collidable = false;
+            {
+                Entity.Active = Entity.Visible = Entity.Collidable = false;
+            }
         }
 
         public void Enable()
         {
-            if (this.OnEnable != null)
-                this.OnEnable();
+            if (OnEnable != null)
+            {
+                OnEnable();
+            }
             else
-                this.Entity.Active = this.Entity.Visible = this.Entity.Collidable = true;
+            {
+                Entity.Active = Entity.Visible = Entity.Collidable = true;
+            }
         }
     }
 }

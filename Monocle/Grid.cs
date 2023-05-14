@@ -361,10 +361,10 @@ namespace Monocle
             }
             else
             {
-                int num1 = (int) Math.Max(0, (camera.Left - AbsoluteLeft) / CellWidth);
-                int num2 = (int) Math.Min(CellsX - 1, Math.Ceiling((camera.Right - AbsoluteLeft) / CellWidth));
-                int num3 = (int) Math.Max(0, (camera.Top - AbsoluteTop) / CellHeight);
-                int num4 = (int) Math.Min(CellsY - 1, Math.Ceiling((camera.Bottom - AbsoluteTop) / CellHeight));
+                int num1 = (int)Math.Max(0, (camera.Left - AbsoluteLeft) / CellWidth);
+                int num2 = (int)Math.Min(CellsX - 1, Math.Ceiling((camera.Right - AbsoluteLeft) / CellWidth));
+                int num3 = (int)Math.Max(0, (camera.Top - AbsoluteTop) / CellHeight);
+                int num4 = (int)Math.Min(CellsY - 1, Math.Ceiling((camera.Bottom - AbsoluteTop) / CellHeight));
                 for (int x = num1; x <= num2; ++x)
                 {
                     for (int y = num3; y <= num4; ++y)

@@ -60,10 +60,10 @@ namespace Celeste
             else
             {
                 Camera clipCamera = ClipCamera;
-                val1_1 = (int) Math.Max(0, Math.Floor((clipCamera.Left - vector2.X) / 8) - extend);
-                val1_2 = (int) Math.Max(0, Math.Floor((clipCamera.Top - vector2.Y) / 8) - extend);
-                val1_3 = (int) Math.Min(tiles.Columns, Math.Ceiling((clipCamera.Right - vector2.X) / 8) + extend);
-                val1_4 = (int) Math.Min(tiles.Rows, Math.Ceiling((clipCamera.Bottom - vector2.Y) / 8) + extend);
+                val1_1 = (int)Math.Max(0, Math.Floor((clipCamera.Left - vector2.X) / 8) - extend);
+                val1_2 = (int)Math.Max(0, Math.Floor((clipCamera.Top - vector2.Y) / 8) - extend);
+                val1_3 = (int)Math.Min(tiles.Columns, Math.Ceiling((clipCamera.Right - vector2.X) / 8) + extend);
+                val1_4 = (int)Math.Min(tiles.Rows, Math.Ceiling((clipCamera.Bottom - vector2.Y) / 8) + extend);
             }
             int x = Math.Max(val1_1, 0);
             int y = Math.Max(val1_2, 0);

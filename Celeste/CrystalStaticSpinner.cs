@@ -16,7 +16,7 @@ namespace Celeste
     {
         public static ParticleType P_Move;
         public const float ParticleInterval = 0.02f;
-        private static Dictionary<CrystalColor, string> fgTextureLookup = new Dictionary<CrystalColor, string>()
+        private static readonly Dictionary<CrystalColor, string> fgTextureLookup = new()
         {
             {
                 CrystalColor.Blue,
@@ -35,7 +35,7 @@ namespace Celeste
                 "danger/crystal/fg_white"
             }
         };
-        private static Dictionary<CrystalColor, string> bgTextureLookup = new Dictionary<CrystalColor, string>()
+        private static readonly Dictionary<CrystalColor, string> bgTextureLookup = new()
         {
             {
                 CrystalColor.Blue,
@@ -57,35 +57,38 @@ namespace Celeste
         public bool AttachToSolid;
         private Entity filler;
         private CrystalStaticSpinner.Border border;
-        private float offset = Calc.Random.NextFloat();
+        private readonly float offset = Calc.Random.NextFloat();
         private bool expanded;
-        private int randomSeed;
+        private readonly int randomSeed;
         private CrystalColor color;
 
         public CrystalStaticSpinner(Vector2 position, bool attachToSolid, CrystalColor color)
             : base(position)
         {
             this.color = color;
-            this.Tag = (int) Tags.TransitionUpdate;
-            this.Collider = (Collider) new ColliderList(new Collider[2]
+            Tag = (int)Tags.TransitionUpdate;
+            Collider = new ColliderList(new Collider[2]
             {
-                (Collider) new Monocle.Circle(6f),
-                (Collider) new Hitbox(16f, 4f, -8f, -3f)
+                 new Monocle.Circle(6f),
+                 new Hitbox(16f, 4f, -8f, -3f)
             });
-            this.Visible = false;
-            this.Add((Component) new PlayerCollider(new Action<Player>(this.OnPlayer)));
-            this.Add((Component) new HoldableCollider(new Action<Holdable>(this.OnHoldable)));
-            this.Add((Component) new LedgeBlocker());
-            this.Depth = -8500;
-            this.AttachToSolid = attachToSolid;
+            Visible = false;
+            Add(new PlayerCollider(new Action<Player>(OnPlayer)));
+            Add(new HoldableCollider(new Action<Holdable>(OnHoldable)));
+            Add(new LedgeBlocker());
+            Depth = -8500;
+            AttachToSolid = attachToSolid;
             if (attachToSolid)
-                this.Add((Component) new StaticMover()
+            {
+                Add(new StaticMover()
                 {
-                    OnShake = new Action<Vector2>(this.OnShake),
-                    SolidChecker = new Func<Solid, bool>(this.IsRiding),
-                    OnDestroy = new Action(((Entity) this).RemoveSelf)
+                    OnShake = new Action<Vector2>(OnShake),
+                    SolidChecker = new Func<Solid, bool>(IsRiding),
+                    OnDestroy = new Action(RemoveSelf)
                 });
-            this.randomSeed = Calc.Random.Next();
+            }
+
+            randomSeed = Calc.Random.Next();
         }
 
         public CrystalStaticSpinner(EntityData data, Vector2 offset, CrystalColor color)
@@ -98,190 +101,271 @@ namespace Celeste
             base.Awake(scene);
             if ((scene as Level).Session.Area.ID == 9)
             {
-                this.Add((Component) new CrystalStaticSpinner.CoreModeListener(this));
-                this.color = (scene as Level).CoreMode != Session.CoreModes.Cold ? CrystalColor.Red : CrystalColor.Blue;
+                Add(new CrystalStaticSpinner.CoreModeListener(this));
+                color = (scene as Level).CoreMode != Session.CoreModes.Cold ? CrystalColor.Red : CrystalColor.Blue;
             }
-            if (!this.InView())
+            if (!InView())
+            {
                 return;
-            this.CreateSprites();
+            }
+
+            CreateSprites();
         }
 
         public void ForceInstantiate()
         {
-            this.CreateSprites();
-            this.Visible = true;
+            CreateSprites();
+            Visible = true;
         }
 
         public override void Update()
         {
-            if (!this.Visible)
+            if (!Visible)
             {
-                this.Collidable = false;
-                if (this.InView())
+                Collidable = false;
+                if (InView())
                 {
-                    this.Visible = true;
-                    if (!this.expanded)
-                        this.CreateSprites();
-                    if (this.color == CrystalColor.Rainbow)
-                        this.UpdateHue();
+                    Visible = true;
+                    if (!expanded)
+                    {
+                        CreateSprites();
+                    }
+
+                    if (color == CrystalColor.Rainbow)
+                    {
+                        UpdateHue();
+                    }
                 }
             }
             else
             {
                 base.Update();
-                if (this.color == CrystalColor.Rainbow && this.Scene.OnInterval(0.08f, this.offset))
-                    this.UpdateHue();
-                if (this.Scene.OnInterval(0.25f, this.offset) && !this.InView())
-                    this.Visible = false;
-                if (this.Scene.OnInterval(0.05f, this.offset))
+                if (color == CrystalColor.Rainbow && Scene.OnInterval(0.08f, offset))
                 {
-                    Player entity = this.Scene.Tracker.GetEntity<Player>();
+                    UpdateHue();
+                }
+
+                if (Scene.OnInterval(0.25f, offset) && !InView())
+                {
+                    Visible = false;
+                }
+
+                if (Scene.OnInterval(0.05f, offset))
+                {
+                    Player entity = Scene.Tracker.GetEntity<Player>();
                     if (entity != null)
-                        this.Collidable = (double) Math.Abs(entity.X - this.X) < 128.0 && (double) Math.Abs(entity.Y - this.Y) < 128.0;
+                    {
+                        Collidable = (double)Math.Abs(entity.X - X) < 128.0 && (double)Math.Abs(entity.Y - Y) < 128.0;
+                    }
                 }
             }
-            if (this.filler == null)
+            if (filler == null)
+            {
                 return;
-            this.filler.Position = this.Position;
+            }
+
+            filler.Position = Position;
         }
 
         private void UpdateHue()
         {
-            foreach (Component component in this.Components)
+            foreach (Component component in Components)
             {
                 if (component is Monocle.Image image)
-                    image.Color = this.GetHue(this.Position + image.Position);
+                {
+                    image.Color = GetHue(Position + image.Position);
+                }
             }
-            if (this.filler == null)
+            if (filler == null)
+            {
                 return;
-            foreach (Component component in this.filler.Components)
+            }
+
+            foreach (Component component in filler.Components)
             {
                 if (component is Monocle.Image image)
-                    image.Color = this.GetHue(this.Position + image.Position);
+                {
+                    image.Color = GetHue(Position + image.Position);
+                }
             }
         }
 
         private bool InView()
         {
-            Camera camera = (this.Scene as Level).Camera;
-            return (double) this.X > (double) camera.X - 16.0 && (double) this.Y > (double) camera.Y - 16.0 && (double) this.X < (double) camera.X + 320.0 + 16.0 && (double) this.Y < (double) camera.Y + 180.0 + 16.0;
+            Camera camera = (Scene as Level).Camera;
+            return (double)X > (double)camera.X - 16.0 && (double)Y > (double)camera.Y - 16.0 && (double)X < (double)camera.X + 320.0 + 16.0 && (double)Y < (double)camera.Y + 180.0 + 16.0;
         }
 
         private void CreateSprites()
         {
-            if (this.expanded)
+            if (expanded)
+            {
                 return;
-            Calc.PushRandom(this.randomSeed);
+            }
+
+            Calc.PushRandom(randomSeed);
             List<MTexture> atlasSubtextures = GFX.Game.GetAtlasSubtextures(CrystalStaticSpinner.fgTextureLookup[this.color]);
             MTexture mtexture = Calc.Random.Choose<MTexture>(atlasSubtextures);
             Color color = Color.White;
             if (this.color == CrystalColor.Rainbow)
-                color = this.GetHue(this.Position);
-            if (!this.SolidCheck(new Vector2(this.X - 4f, this.Y - 4f)))
-                this.Add((Component) new Monocle.Image(mtexture.GetSubtexture(0, 0, 14, 14)).SetOrigin(12f, 12f).SetColor(color));
-            if (!this.SolidCheck(new Vector2(this.X + 4f, this.Y - 4f)))
-                this.Add((Component) new Monocle.Image(mtexture.GetSubtexture(10, 0, 14, 14)).SetOrigin(2f, 12f).SetColor(color));
-            if (!this.SolidCheck(new Vector2(this.X + 4f, this.Y + 4f)))
-                this.Add((Component) new Monocle.Image(mtexture.GetSubtexture(10, 10, 14, 14)).SetOrigin(2f, 2f).SetColor(color));
-            if (!this.SolidCheck(new Vector2(this.X - 4f, this.Y + 4f)))
-                this.Add((Component) new Monocle.Image(mtexture.GetSubtexture(0, 10, 14, 14)).SetOrigin(12f, 2f).SetColor(color));
-            foreach (CrystalStaticSpinner entity in this.Scene.Tracker.GetEntities<CrystalStaticSpinner>())
             {
-                if (entity != this && entity.AttachToSolid == this.AttachToSolid && (double) entity.X >= (double) this.X && (double) (entity.Position - this.Position).Length() < 24.0)
-                    this.AddSprite((this.Position + entity.Position) / 2f - this.Position);
+                color = GetHue(Position);
             }
-            this.Scene.Add((Entity) (this.border = new CrystalStaticSpinner.Border((Entity) this, this.filler)));
-            this.expanded = true;
+
+            if (!SolidCheck(new Vector2(X - 4f, Y - 4f)))
+            {
+                Add(new Monocle.Image(mtexture.GetSubtexture(0, 0, 14, 14)).SetOrigin(12f, 12f).SetColor(color));
+            }
+
+            if (!SolidCheck(new Vector2(X + 4f, Y - 4f)))
+            {
+                Add(new Monocle.Image(mtexture.GetSubtexture(10, 0, 14, 14)).SetOrigin(2f, 12f).SetColor(color));
+            }
+
+            if (!SolidCheck(new Vector2(X + 4f, Y + 4f)))
+            {
+                Add(new Monocle.Image(mtexture.GetSubtexture(10, 10, 14, 14)).SetOrigin(2f, 2f).SetColor(color));
+            }
+
+            if (!SolidCheck(new Vector2(X - 4f, Y + 4f)))
+            {
+                Add(new Monocle.Image(mtexture.GetSubtexture(0, 10, 14, 14)).SetOrigin(12f, 2f).SetColor(color));
+            }
+
+            foreach (CrystalStaticSpinner entity in Scene.Tracker.GetEntities<CrystalStaticSpinner>())
+            {
+                if (entity != this && entity.AttachToSolid == AttachToSolid && (double)entity.X >= (double)X && (double)(entity.Position - Position).Length() < 24.0)
+                {
+                    AddSprite(((Position + entity.Position) / 2f) - Position);
+                }
+            }
+            Scene.Add(border = new CrystalStaticSpinner.Border(this, filler));
+            expanded = true;
             Calc.PopRandom();
         }
 
         private void AddSprite(Vector2 offset)
         {
-            if (this.filler == null)
+            if (filler == null)
             {
-                this.Scene.Add(this.filler = new Entity(this.Position));
-                this.filler.Depth = this.Depth + 1;
+                Scene.Add(filler = new Entity(Position));
+                filler.Depth = Depth + 1;
             }
-            List<MTexture> atlasSubtextures = GFX.Game.GetAtlasSubtextures(CrystalStaticSpinner.bgTextureLookup[this.color]);
-            Monocle.Image image = new Monocle.Image(Calc.Random.Choose<MTexture>(atlasSubtextures));
-            image.Position = offset;
-            image.Rotation = (float) Calc.Random.Choose<int>(0, 1, 2, 3) * 1.57079637f;
-            image.CenterOrigin();
-            if (this.color == CrystalColor.Rainbow)
-                image.Color = this.GetHue(this.Position + offset);
-            this.filler.Add((Component) image);
+            List<MTexture> atlasSubtextures = GFX.Game.GetAtlasSubtextures(CrystalStaticSpinner.bgTextureLookup[color]);
+            Monocle.Image image = new(Calc.Random.Choose<MTexture>(atlasSubtextures))
+            {
+                Position = offset,
+                Rotation = Calc.Random.Choose<int>(0, 1, 2, 3) * 1.57079637f
+            };
+            _ = image.CenterOrigin();
+            if (color == CrystalColor.Rainbow)
+            {
+                image.Color = GetHue(Position + offset);
+            }
+
+            filler.Add(image);
         }
 
         private bool SolidCheck(Vector2 position)
         {
-            if (this.AttachToSolid)
+            if (AttachToSolid)
+            {
                 return false;
-            foreach (Solid solid in this.Scene.CollideAll<Solid>(position))
+            }
+
+            foreach (Solid solid in Scene.CollideAll<Solid>(position))
             {
                 if (solid is SolidTiles)
+                {
                     return true;
+                }
             }
             return false;
         }
 
         private void ClearSprites()
         {
-            if (this.filler != null)
-                this.filler.RemoveSelf();
-            this.filler = (Entity) null;
-            if (this.border != null)
-                this.border.RemoveSelf();
-            this.border = (CrystalStaticSpinner.Border) null;
-            foreach (Component component in this.Components.GetAll<Monocle.Image>())
+            filler?.RemoveSelf();
+            filler = null;
+            border?.RemoveSelf();
+            border = null;
+            foreach (Component component in Components.GetAll<Monocle.Image>())
+            {
                 component.RemoveSelf();
-            this.expanded = false;
+            }
+
+            expanded = false;
         }
 
         private void OnShake(Vector2 pos)
         {
-            foreach (Component component in this.Components)
+            foreach (Component component in Components)
             {
                 if (component is Monocle.Image)
+                {
                     (component as Monocle.Image).Position = pos;
+                }
             }
         }
 
-        private bool IsRiding(Solid solid) => this.CollideCheck((Entity) solid);
+        private bool IsRiding(Solid solid)
+        {
+            return CollideCheck(solid);
+        }
 
-        private void OnPlayer(Player player) => player.Die((player.Position - this.Position).SafeNormalize());
+        private void OnPlayer(Player player)
+        {
+            _ = player.Die((player.Position - Position).SafeNormalize());
+        }
 
-        private void OnHoldable(Holdable h) => h.HitSpinner((Entity) this);
+        private void OnHoldable(Holdable h)
+        {
+            h.HitSpinner(this);
+        }
 
         public override void Removed(Scene scene)
         {
-            if (this.filler != null && this.filler.Scene == scene)
-                this.filler.RemoveSelf();
-            if (this.border != null && this.border.Scene == scene)
-                this.border.RemoveSelf();
+            if (filler != null && filler.Scene == scene)
+            {
+                filler.RemoveSelf();
+            }
+
+            if (border != null && border.Scene == scene)
+            {
+                border.RemoveSelf();
+            }
+
             base.Removed(scene);
         }
 
         public void Destroy(bool boss = false)
         {
-            if (this.InView())
+            if (InView())
             {
-                Audio.Play("event:/game/06_reflection/fall_spike_smash", this.Position);
+                _ = Audio.Play("event:/game/06_reflection/fall_spike_smash", Position);
                 Color color = Color.White;
                 if (this.color == CrystalColor.Red)
+                {
                     color = Calc.HexToColor("ff4f4f");
+                }
                 else if (this.color == CrystalColor.Blue)
+                {
                     color = Calc.HexToColor("639bff");
+                }
                 else if (this.color == CrystalColor.Purple)
+                {
                     color = Calc.HexToColor("ff4fef");
-                CrystalDebris.Burst(this.Position, color, boss, 8);
+                }
+
+                CrystalDebris.Burst(Position, color, boss, 8);
             }
-            this.RemoveSelf();
+            RemoveSelf();
         }
 
         private Color GetHue(Vector2 position)
         {
             float num = 280f;
-            return Calc.HsvToColor((float) (0.40000000596046448 + (double) Calc.YoYo((position.Length() + this.Scene.TimeActive * 50f) % num / num) * 0.40000000596046448), 0.4f, 0.9f);
+            return Calc.HsvToColor((float)(0.40000000596046448 + ((double)Calc.YoYo((position.Length() + (Scene.TimeActive * 50f)) % num / num) * 0.40000000596046448)), 0.4f, 0.9f);
         }
 
         private class CoreModeListener : Component
@@ -291,43 +375,52 @@ namespace Celeste
             public CoreModeListener(CrystalStaticSpinner parent)
                 : base(true, false)
             {
-                this.Parent = parent;
+                Parent = parent;
             }
 
             public override void Update()
             {
-                Level scene = this.Scene as Level;
-                if ((this.Parent.color != CrystalColor.Blue || scene.CoreMode != Session.CoreModes.Hot) && (this.Parent.color != CrystalColor.Red || scene.CoreMode != Session.CoreModes.Cold))
+                Level scene = Scene as Level;
+                if ((Parent.color != CrystalColor.Blue || scene.CoreMode != Session.CoreModes.Hot) && (Parent.color != CrystalColor.Red || scene.CoreMode != Session.CoreModes.Cold))
+                {
                     return;
-                this.Parent.color = this.Parent.color != CrystalColor.Blue ? CrystalColor.Blue : CrystalColor.Red;
-                this.Parent.ClearSprites();
-                this.Parent.CreateSprites();
+                }
+
+                Parent.color = Parent.color != CrystalColor.Blue ? CrystalColor.Blue : CrystalColor.Red;
+                Parent.ClearSprites();
+                Parent.CreateSprites();
             }
         }
 
         private class Border : Entity
         {
-            private Entity[] drawing = new Entity[2];
+            private readonly Entity[] drawing = new Entity[2];
 
             public Border(Entity parent, Entity filler)
             {
-                this.drawing[0] = parent;
-                this.drawing[1] = filler;
-                this.Depth = parent.Depth + 2;
+                drawing[0] = parent;
+                drawing[1] = filler;
+                Depth = parent.Depth + 2;
             }
 
             public override void Render()
             {
-                if (!this.drawing[0].Visible)
+                if (!drawing[0].Visible)
+                {
                     return;
-                this.DrawBorder(this.drawing[0]);
-                this.DrawBorder(this.drawing[1]);
+                }
+
+                DrawBorder(drawing[0]);
+                DrawBorder(drawing[1]);
             }
 
             private void DrawBorder(Entity entity)
             {
                 if (entity == null)
+                {
                     return;
+                }
+
                 foreach (Component component in entity.Components)
                 {
                     if (component is Monocle.Image image)

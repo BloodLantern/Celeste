@@ -18,10 +18,10 @@ namespace Monocle
 
         public SingleTagRenderer(BitTag tag)
         {
-            this.Tag = tag;
-            this.BlendState = BlendState.AlphaBlend;
-            this.SamplerState = SamplerState.LinearClamp;
-            this.Camera = new Camera();
+            Tag = tag;
+            BlendState = BlendState.AlphaBlend;
+            SamplerState = SamplerState.LinearClamp;
+            Camera = new Camera();
         }
 
         public override void BeforeRender(Scene scene)
@@ -30,16 +30,20 @@ namespace Monocle
 
         public override void Render(Scene scene)
         {
-            Draw.SpriteBatch.Begin(SpriteSortMode.Deferred, this.BlendState, this.SamplerState, DepthStencilState.None, RasterizerState.CullNone, this.Effect, this.Camera.Matrix * Engine.ScreenMatrix);
-            foreach (Entity entity in scene[this.Tag])
+            Draw.SpriteBatch.Begin(SpriteSortMode.Deferred, BlendState, SamplerState, DepthStencilState.None, RasterizerState.CullNone, Effect, Camera.Matrix * Engine.ScreenMatrix);
+            foreach (Entity entity in scene[Tag])
             {
                 if (entity.Visible)
+                {
                     entity.Render();
+                }
             }
             if (Engine.Commands.Open)
             {
-                foreach (Entity entity in scene[this.Tag])
-                    entity.DebugRender(this.Camera);
+                foreach (Entity entity in scene[Tag])
+                {
+                    entity.DebugRender(Camera);
+                }
             }
             Draw.SpriteBatch.End();
         }

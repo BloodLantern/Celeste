@@ -16,29 +16,36 @@ namespace Celeste
         public NPC03_Oshiro_Hallway2(Vector2 position)
             : base(position)
         {
-            this.Add((Component) (this.Sprite = (Sprite) new OshiroSprite(-1)));
-            this.Add((Component) (this.Light = new VertexLight(-Vector2.UnitY * 16f, Color.White, 1f, 32, 64)));
-            this.MoveAnim = "move";
-            this.IdleAnim = "idle";
+            Add(Sprite = new OshiroSprite(-1));
+            Add(Light = new VertexLight(-Vector2.UnitY * 16f, Color.White, 1f, 32, 64));
+            MoveAnim = "move";
+            IdleAnim = "idle";
         }
 
         public override void Added(Scene scene)
         {
             base.Added(scene);
-            if (this.Session.GetFlag("oshiro_resort_talked_3"))
-                this.RemoveSelf();
+            if (Session.GetFlag("oshiro_resort_talked_3"))
+            {
+                RemoveSelf();
+            }
             else
-                this.Session.LightingAlphaAdd = 0.15f;
+            {
+                Session.LightingAlphaAdd = 0.15f;
+            }
         }
 
         public override void Update()
         {
             base.Update();
-            Player entity = this.Scene.Tracker.GetEntity<Player>();
-            if (this.talked || entity == null || (double) entity.X <= (double) this.X - 60.0)
+            Player entity = Scene.Tracker.GetEntity<Player>();
+            if (talked || entity == null || (double)entity.X <= (double)X - 60.0)
+            {
                 return;
-            this.Scene.Add((Entity) new CS03_OshiroHallway2(entity, (NPC) this));
-            this.talked = true;
+            }
+
+            Scene.Add(new CS03_OshiroHallway2(entity, this));
+            talked = true;
         }
     }
 }

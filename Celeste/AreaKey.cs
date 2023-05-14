@@ -63,7 +63,7 @@ namespace Celeste
 
         public override int GetHashCode()
         {
-            return ID * 3 + (int) Mode;
+            return (ID * 3) + (int)Mode;
         }
 
         public override string ToString()

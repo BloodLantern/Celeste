@@ -6,7 +6,6 @@
 
 using Microsoft.Xna.Framework;
 using Monocle;
-using System;
 using System.Collections;
 using System.Collections.Generic;
 
@@ -19,25 +18,25 @@ namespace Celeste
         private const float poemHeight = 44f;
         private const float poemSpacing = 4f;
         private const float poemStanzaSpacing = 16f;
-        private List<OuiJournalPoem.PoemLine> lines = new List<OuiJournalPoem.PoemLine>();
+        private readonly List<OuiJournalPoem.PoemLine> lines = new();
         private int index;
         private float slider;
         private bool dragging;
         private bool swapping;
-        private Coroutine swapRoutine = new Coroutine();
-        private Wiggler wiggler = Wiggler.Create(0.4f, 4f);
+        private readonly Coroutine swapRoutine = new();
+        private readonly Wiggler wiggler = Wiggler.Create(0.4f, 4f);
         private Tween tween;
 
         public OuiJournalPoem(OuiJournal journal)
             : base(journal)
         {
-            this.PageTexture = "page";
-            this.swapRoutine.RemoveOnComplete = false;
+            PageTexture = "page";
+            swapRoutine.RemoveOnComplete = false;
             float num = 0.0f;
             foreach (string id in SaveData.Instance.Poem)
             {
                 string str = Dialog.Clean("poem_" + id).Replace("\n", " - ");
-                this.lines.Add(new OuiJournalPoem.PoemLine()
+                lines.Add(new OuiJournalPoem.PoemLine()
                 {
                     Text = str,
                     Index = num,
@@ -47,96 +46,116 @@ namespace Celeste
             }
         }
 
-        public static float GetY(float index) => (float) (120.0 + 44.0 * ((double) index + 0.5) + 4.0 * (double) index + (double) ((int) index / 4) * 16.0);
+        public static float GetY(float index)
+        {
+            return (float)(120.0 + (44.0 * ((double)index + 0.5)) + (4.0 * (double)index) + ((int)index / 4 * 16.0));
+        }
 
         public override void Redraw(VirtualRenderTarget buffer)
         {
             base.Redraw(buffer);
             Draw.SpriteBatch.Begin();
             ActiveFont.Draw(Dialog.Clean("journal_poem"), new Vector2(60f, 60f), new Vector2(0.0f, 0.5f), Vector2.One, Color.Black * 0.6f);
-            foreach (OuiJournalPoem.PoemLine line in this.lines)
+            foreach (OuiJournalPoem.PoemLine line in lines)
+            {
                 line.Render();
-            if (this.lines.Count > 0)
-                MTN.Journal[this.dragging ? "poemSlider" : "poemArrow"].DrawCentered(new Vector2(50f, OuiJournalPoem.GetY(this.slider)), Color.White, (float) (1.0 + 0.25 * (double) this.wiggler.Value));
+            }
+
+            if (lines.Count > 0)
+            {
+                MTN.Journal[dragging ? "poemSlider" : "poemArrow"].DrawCentered(new Vector2(50f, OuiJournalPoem.GetY(slider)), Color.White, (float)(1.0 + (0.25 * (double)wiggler.Value)));
+            }
+
             Draw.SpriteBatch.End();
         }
 
         private IEnumerator Swap(int a, int b)
         {
-            string str = SaveData.Instance.Poem[a];
-            SaveData.Instance.Poem[a] = SaveData.Instance.Poem[b];
-            SaveData.Instance.Poem[b] = str;
-            OuiJournalPoem.PoemLine poemA = this.lines[a];
-            OuiJournalPoem.PoemLine poemB = this.lines[b];
-            OuiJournalPoem.PoemLine line = this.lines[a];
-            this.lines[a] = this.lines[b];
-            this.lines[b] = line;
-            this.tween = Tween.Create(Tween.TweenMode.Oneshot, Ease.CubeInOut, 0.125f, true);
-            this.tween.OnUpdate = (Action<Tween>) (t =>
+            (SaveData.Instance.Poem[b], SaveData.Instance.Poem[a]) = (SaveData.Instance.Poem[a], SaveData.Instance.Poem[b]);
+            OuiJournalPoem.PoemLine poemA = lines[a];
+            OuiJournalPoem.PoemLine poemB = lines[b];
+            (lines[b], lines[a]) = (lines[a], lines[b]);
+            tween = Tween.Create(Tween.TweenMode.Oneshot, Ease.CubeInOut, 0.125f, true);
+            tween.OnUpdate = t =>
             {
-                poemA.Index = MathHelper.Lerp((float) a, (float) b, t.Eased);
-                poemB.Index = MathHelper.Lerp((float) b, (float) a, t.Eased);
-            });
-            this.tween.OnComplete = (Action<Tween>) (t => this.tween = (Tween) null);
-            yield return (object) this.tween.Wait();
-            this.swapping = false;
+                poemA.Index = MathHelper.Lerp(a, b, t.Eased);
+                poemB.Index = MathHelper.Lerp(b, a, t.Eased);
+            };
+            tween.OnComplete = t => tween = null;
+            yield return tween.Wait();
+            swapping = false;
         }
 
         public override void Update()
         {
-            if (this.lines.Count <= 0)
+            if (lines.Count <= 0)
+            {
                 return;
-            if (this.tween != null && this.tween.Active)
-                this.tween.Update();
-            if (Input.MenuDown.Pressed && this.index + 1 < this.lines.Count && !this.swapping)
-            {
-                if (this.dragging)
-                {
-                    Audio.Play("event:/ui/world_map/journal/heart_shift_down");
-                    this.swapRoutine.Replace(this.Swap(this.index, this.index + 1));
-                    this.swapping = true;
-                }
-                else
-                    Audio.Play("event:/ui/world_map/journal/heart_roll");
-                ++this.index;
             }
-            else if (Input.MenuUp.Pressed && this.index > 0 && !this.swapping)
+
+            if (tween != null && tween.Active)
             {
-                if (this.dragging)
+                tween.Update();
+            }
+
+            if (Input.MenuDown.Pressed && index + 1 < lines.Count && !swapping)
+            {
+                if (dragging)
                 {
-                    Audio.Play("event:/ui/world_map/journal/heart_shift_up");
-                    this.swapRoutine.Replace(this.Swap(this.index, this.index - 1));
-                    this.swapping = true;
+                    _ = Audio.Play("event:/ui/world_map/journal/heart_shift_down");
+                    swapRoutine.Replace(Swap(index, index + 1));
+                    swapping = true;
                 }
                 else
-                    Audio.Play("event:/ui/world_map/journal/heart_roll");
-                --this.index;
+                {
+                    _ = Audio.Play("event:/ui/world_map/journal/heart_roll");
+                }
+
+                ++index;
+            }
+            else if (Input.MenuUp.Pressed && index > 0 && !swapping)
+            {
+                if (dragging)
+                {
+                    _ = Audio.Play("event:/ui/world_map/journal/heart_shift_up");
+                    swapRoutine.Replace(Swap(index, index - 1));
+                    swapping = true;
+                }
+                else
+                {
+                    _ = Audio.Play("event:/ui/world_map/journal/heart_roll");
+                }
+
+                --index;
             }
             else if (Input.MenuConfirm.Pressed)
             {
-                this.Journal.PageTurningLocked = true;
-                Audio.Play("event:/ui/world_map/journal/heart_grab");
-                this.dragging = true;
-                this.wiggler.Start();
+                Journal.PageTurningLocked = true;
+                _ = Audio.Play("event:/ui/world_map/journal/heart_grab");
+                dragging = true;
+                wiggler.Start();
             }
-            else if (!Input.MenuConfirm.Check && this.dragging)
+            else if (!Input.MenuConfirm.Check && dragging)
             {
-                this.Journal.PageTurningLocked = false;
-                Audio.Play("event:/ui/world_map/journal/heart_release");
-                this.dragging = false;
-                this.wiggler.Start();
+                Journal.PageTurningLocked = false;
+                _ = Audio.Play("event:/ui/world_map/journal/heart_release");
+                dragging = false;
+                wiggler.Start();
             }
-            for (int index = 0; index < this.lines.Count; ++index)
+            for (int index = 0; index < lines.Count; ++index)
             {
-                OuiJournalPoem.PoemLine line = this.lines[index];
+                OuiJournalPoem.PoemLine line = lines[index];
                 line.HoveringEase = Calc.Approach(line.HoveringEase, this.index == index ? 1f : 0.0f, 8f * Engine.DeltaTime);
-                line.HoldingEase = Calc.Approach(line.HoldingEase, this.index != index || !this.dragging ? 0.0f : 1f, 8f * Engine.DeltaTime);
+                line.HoldingEase = Calc.Approach(line.HoldingEase, this.index != index || !dragging ? 0.0f : 1f, 8f * Engine.DeltaTime);
             }
-            this.slider = Calc.Approach(this.slider, (float) this.index, 16f * Engine.DeltaTime);
-            if (this.swapRoutine != null && this.swapRoutine.Active)
-                this.swapRoutine.Update();
-            this.wiggler.Update();
-            this.Redraw(this.Journal.CurrentPageBuffer);
+            slider = Calc.Approach(slider, index, 16f * Engine.DeltaTime);
+            if (swapRoutine != null && swapRoutine.Active)
+            {
+                swapRoutine.Update();
+            }
+
+            wiggler.Update();
+            Redraw(Journal.CurrentPageBuffer);
         }
 
         private class PoemLine
@@ -149,14 +168,14 @@ namespace Celeste
 
             public void Render()
             {
-                float x = (float) (100.0 + (double) Ease.CubeInOut(this.HoveringEase) * 20.0);
-                float y = OuiJournalPoem.GetY(this.Index);
+                float x = (float)(100.0 + ((double)Ease.CubeInOut(HoveringEase) * 20.0));
+                float y = OuiJournalPoem.GetY(Index);
                 Draw.Rect(x, y - 22f, 810f, 44f, Color.White * 0.25f);
-                Vector2 scale1 = Vector2.One * (float) (0.60000002384185791 + (double) this.HoldingEase * 0.40000000596046448);
-                MTN.Journal[this.Remix ? "heartgem1" : "heartgem0"].DrawCentered(new Vector2(x + 20f, y), Color.White, scale1);
-                Color color = Color.Black * (float) (0.699999988079071 + (double) this.HoveringEase * 0.30000001192092896);
-                Vector2 scale2 = Vector2.One * (float) (0.5 + (double) this.HoldingEase * 0.10000000149011612);
-                ActiveFont.Draw(this.Text, new Vector2(x + 60f, y), new Vector2(0.0f, 0.5f), scale2, color);
+                Vector2 scale1 = Vector2.One * (float)(0.60000002384185791 + (HoldingEase * 0.40000000596046448));
+                MTN.Journal[Remix ? "heartgem1" : "heartgem0"].DrawCentered(new Vector2(x + 20f, y), Color.White, scale1);
+                Color color = Color.Black * (float)(0.699999988079071 + (HoveringEase * 0.30000001192092896));
+                Vector2 scale2 = Vector2.One * (float)(0.5 + (HoldingEase * 0.10000000149011612));
+                ActiveFont.Draw(Text, new Vector2(x + 60f, y), new Vector2(0.0f, 0.5f), scale2, color);
             }
         }
     }

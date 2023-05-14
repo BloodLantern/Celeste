@@ -31,7 +31,7 @@ namespace Celeste
             level.PauseLock = true;
             level.Frozen = true;
             level.Flash(Color.White);
-            Audio.Play("event:/game/06_reflection/feather_bubble_get", (Scene as Level).Camera.Position + new Vector2(160f, 90f));
+            _ = Audio.Play("event:/game/06_reflection/feather_bubble_get", (Scene as Level).Camera.Position + new Vector2(160f, 90f));
             new FadeWipe(Scene, false, () => UnlockEverything(level)).Duration = 2f;
             RemoveSelf();
         }

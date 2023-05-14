@@ -12,27 +12,38 @@ namespace FMOD.Studio
 {
     public class VCA : HandleBase
     {
-        public RESULT getID(out Guid id) => VCA.FMOD_Studio_VCA_GetID(this.rawPtr, out id);
+        public RESULT getID(out Guid id)
+        {
+            return VCA.FMOD_Studio_VCA_GetID(rawPtr, out id);
+        }
 
         public RESULT getPath(out string path)
         {
-            path = (string) null;
+            path = null;
             byte[] numArray = new byte[256];
-            int retrieved = 0;
-            RESULT path1 = VCA.FMOD_Studio_VCA_GetPath(this.rawPtr, numArray, numArray.Length, out retrieved);
+            RESULT path1 = VCA.FMOD_Studio_VCA_GetPath(rawPtr, numArray, numArray.Length, out int retrieved);
             if (path1 == RESULT.ERR_TRUNCATED)
             {
                 numArray = new byte[retrieved];
-                path1 = VCA.FMOD_Studio_VCA_GetPath(this.rawPtr, numArray, numArray.Length, out retrieved);
+                path1 = VCA.FMOD_Studio_VCA_GetPath(rawPtr, numArray, numArray.Length, out retrieved);
             }
             if (path1 == RESULT.OK)
+            {
                 path = Encoding.UTF8.GetString(numArray, 0, retrieved - 1);
+            }
+
             return path1;
         }
 
-        public RESULT getVolume(out float volume, out float finalvolume) => VCA.FMOD_Studio_VCA_GetVolume(this.rawPtr, out volume, out finalvolume);
+        public RESULT getVolume(out float volume, out float finalvolume)
+        {
+            return VCA.FMOD_Studio_VCA_GetVolume(rawPtr, out volume, out finalvolume);
+        }
 
-        public RESULT setVolume(float volume) => VCA.FMOD_Studio_VCA_SetVolume(this.rawPtr, volume);
+        public RESULT setVolume(float volume)
+        {
+            return VCA.FMOD_Studio_VCA_SetVolume(rawPtr, volume);
+        }
 
         [DllImport("fmodstudio")]
         private static extern bool FMOD_Studio_VCA_IsValid(IntPtr vca);
@@ -61,6 +72,9 @@ namespace FMOD.Studio
         {
         }
 
-        protected override bool isValidInternal() => VCA.FMOD_Studio_VCA_IsValid(this.rawPtr);
+        protected override bool isValidInternal()
+        {
+            return VCA.FMOD_Studio_VCA_IsValid(rawPtr);
+        }
     }
 }

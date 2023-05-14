@@ -23,8 +23,8 @@ namespace Celeste
 
         public MEP(string key, float value)
         {
-            this.Key = key;
-            this.Value = value;
+            Key = key;
+            Value = value;
         }
     }
 }

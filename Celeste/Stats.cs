@@ -11,28 +11,38 @@ namespace Celeste
 {
     public static class Stats
     {
-        private static Dictionary<Stat, string> statToString = new Dictionary<Stat, string>();
+        private static readonly Dictionary<Stat, string> statToString = new();
         private static bool ready;
 
         public static void MakeRequest()
         {
             Stats.ready = SteamUserStats.RequestCurrentStats();
-            SteamUserStats.RequestGlobalStats(0);
+            _ = SteamUserStats.RequestGlobalStats(0);
         }
 
-        public static bool Has() => Stats.ready;
+        public static bool Has()
+        {
+            return Stats.ready;
+        }
 
         public static void Increment(Stat stat, int increment = 1)
         {
             if (!Stats.ready)
+            {
                 return;
-            string str = (string) null;
-            if (!Stats.statToString.TryGetValue(stat, out str))
+            }
+
+            if (!Stats.statToString.TryGetValue(stat, out string str))
+            {
                 Stats.statToString.Add(stat, str = stat.ToString());
-            int num;
-            if (!SteamUserStats.GetStat(str, out num))
+            }
+
+            if (!SteamUserStats.GetStat(str, out int num))
+            {
                 return;
-            SteamUserStats.SetStat(str, num + increment);
+            }
+
+            _ = SteamUserStats.SetStat(str, num + increment);
         }
 
         public static int Local(Stat stat)
@@ -40,10 +50,12 @@ namespace Celeste
             int num = 0;
             if (Stats.ready)
             {
-                string str = (string) null;
-                if (!Stats.statToString.TryGetValue(stat, out str))
+                if (!Stats.statToString.TryGetValue(stat, out string str))
+                {
                     Stats.statToString.Add(stat, str = stat.ToString());
-                SteamUserStats.GetStat(str, out num);
+                }
+
+                _ = SteamUserStats.GetStat(str, out num);
             }
             return num;
         }
@@ -53,10 +65,12 @@ namespace Celeste
             long num = 0;
             if (Stats.ready)
             {
-                string str = (string) null;
-                if (!Stats.statToString.TryGetValue(stat, out str))
+                if (!Stats.statToString.TryGetValue(stat, out string str))
+                {
                     Stats.statToString.Add(stat, str = stat.ToString());
-                SteamUserStats.GetGlobalStat(str, out num);
+                }
+
+                _ = SteamUserStats.GetGlobalStat(str, out num);
             }
             return num;
         }
@@ -64,10 +78,16 @@ namespace Celeste
         public static void Store()
         {
             if (!Stats.ready)
+            {
                 return;
-            SteamUserStats.StoreStats();
+            }
+
+            _ = SteamUserStats.StoreStats();
         }
 
-        public static string Name(Stat stat) => Dialog.Clean("STAT_" + stat.ToString());
+        public static string Name(Stat stat)
+        {
+            return Dialog.Clean("STAT_" + stat.ToString());
+        }
     }
 }

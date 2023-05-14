@@ -24,7 +24,9 @@ namespace Celeste
             base.Update();
             currentRumble = Calc.Approach(currentRumble, Strength, 2f * Engine.DeltaTime);
             if (currentRumble <= 0f)
+            {
                 return;
+            }
 
             Input.RumbleSpecific(currentRumble * MaxRumble, 0.05f);
         }

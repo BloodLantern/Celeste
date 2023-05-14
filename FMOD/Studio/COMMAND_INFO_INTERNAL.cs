@@ -19,16 +19,19 @@ namespace FMOD.Studio
         public uint instancehandle;
         public uint outputhandle;
 
-        public COMMAND_INFO createPublic() => new COMMAND_INFO()
+        public COMMAND_INFO createPublic()
         {
-            commandname = MarshallingHelper.stringFromNativeUtf8(this.commandname),
-            parentcommandindex = this.parentcommandindex,
-            framenumber = this.framenumber,
-            frametime = this.frametime,
-            instancetype = this.instancetype,
-            outputtype = this.outputtype,
-            instancehandle = this.instancehandle,
-            outputhandle = this.outputhandle
-        };
+            return new COMMAND_INFO()
+            {
+                commandname = MarshallingHelper.stringFromNativeUtf8(commandname),
+                parentcommandindex = parentcommandindex,
+                framenumber = framenumber,
+                frametime = frametime,
+                instancetype = instancetype,
+                outputtype = outputtype,
+                instancehandle = instancehandle,
+                outputhandle = outputhandle
+            };
+        }
     }
 }

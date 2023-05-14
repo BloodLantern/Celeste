@@ -31,7 +31,9 @@ namespace Celeste
                 {
                     char key = xml.AttrChar("copy");
                     if (!dictionary.ContainsKey(key))
+                    {
                         throw new Exception("Copied tilesets must be defined before the tilesets that copy them!");
+                    }
 
                     ReadInto(data, tileset, dictionary[key]);
                 }
@@ -40,8 +42,12 @@ namespace Celeste
                     string str1 = xml.Attr("ignores");
                     char[] chArray = new char[1] { ',' };
                     foreach (string str2 in str1.Split(chArray))
+                    {
                         if (str2.Length > 0)
+                        {
                             _ = data.Ignores.Add(str2[0]);
+                        }
+                    }
                 }
                 dictionary.Add(ch, xml);
                 lookup.Add(ch, data);
@@ -58,9 +64,13 @@ namespace Celeste
                     string str1 = xml1.Attr("mask");
                     Tiles tiles;
                     if (str1 == "center")
+                    {
                         tiles = data.Center;
+                    }
                     else if (str1 == "padding")
+                    {
                         tiles = data.Padded;
+                    }
                     else
                     {
                         Masked masked = new();
@@ -69,11 +79,17 @@ namespace Celeste
                         for (int index = 0; index < str1.Length; ++index)
                         {
                             if (str1[index] == '0')
+                            {
                                 masked.Mask[num++] = 0;
+                            }
                             else if (str1[index] == '1')
+                            {
                                 masked.Mask[num++] = 1;
+                            }
                             else if (str1[index] is 'x' or 'X')
+                            {
                                 masked.Mask[num++] = 2;
+                            }
                         }
                         data.Masked.Add(masked);
                     }
@@ -93,7 +109,9 @@ namespace Celeste
                         string str4 = xml1.Attr("sprites");
                         char[] chArray3 = new char[1] { ',' };
                         foreach (string str5 in str4.Split(chArray3))
+                        {
                             tiles.OverlapSprites.Add(str5);
+                        }
 
                         tiles.HasOverlays = true;
                     }
@@ -106,10 +124,14 @@ namespace Celeste
                 for (int index = 0; index < 9; ++index)
                 {
                     if (a.Mask[index] == 2)
+                    {
                         ++num1;
+                    }
 
                     if (b.Mask[index] == 2)
+                    {
                         ++num2;
+                    }
                 }
                 return num1 - num2;
             });
@@ -171,13 +193,20 @@ namespace Celeste
             AnimatedTiles animatedTiles = new(tilesX, tilesY, GFX.AnimatedTilesBank);
             Rectangle forceFill = Rectangle.Empty;
             if (forceSolid)
+            {
                 forceFill = new Rectangle(startX, startY, tilesX, tilesY);
+            }
 
             if (mapData != null)
+            {
                 for (int x1 = startX; x1 < startX + tilesX; x1 += 50)
+                {
                     for (int y1 = startY; y1 < startY + tilesY; y1 += 50)
+                    {
                         if (!mapData.AnyInSegmentAtTile(x1, y1))
+                        {
                             y1 = y1 / 50 * 50;
+                        }
                         else
                         {
                             int x2 = x1;
@@ -191,13 +220,20 @@ namespace Celeste
                                     {
                                         tileGrid.Tiles[x2 - startX, y2 - startY] = Calc.Random.Choose(tiles.Textures);
                                         if (tiles.HasOverlays)
+                                        {
                                             animatedTiles.Set(x2 - startX, y2 - startY, Calc.Random.Choose(tiles.OverlapSprites));
+                                        }
                                     }
                                 }
                             }
                         }
+                    }
+                }
+            }
             else
+            {
                 for (int x = startX; x < startX + tilesX; ++x)
+                {
                     for (int y = startY; y < startY + tilesY; ++y)
                     {
                         Tiles tiles = TileHandler(null, x, y, forceFill, forceID, behaviour);
@@ -205,9 +241,14 @@ namespace Celeste
                         {
                             tileGrid.Tiles[x - startX, y - startY] = Calc.Random.Choose(tiles.Textures);
                             if (tiles.HasOverlays)
+                            {
                                 animatedTiles.Set(x - startX, y - startY, Calc.Random.Choose(tiles.OverlapSprites));
+                            }
                         }
                     }
+                }
+            }
+
             return new Generated()
             {
                 TileGrid = tileGrid,
@@ -238,11 +279,15 @@ namespace Celeste
                 {
                     bool flag2 = CheckTile(set, mapData, x + index2, y + index1, forceFill, behaviour);
                     if (!flag2 && behaviour.EdgesIgnoreOutOfLevel && !CheckForSameLevel(x, y, x + index2, y + index1))
+                    {
                         flag2 = true;
+                    }
 
-                    adjacent[num++] = (byte) (flag2 ? 1 : 0);
+                    adjacent[num++] = (byte)(flag2 ? 1 : 0);
                     if (!flag2)
+                    {
                         flag1 = false;
+                    }
                 }
             }
             if (flag1)
@@ -321,16 +366,24 @@ namespace Celeste
             Behaviour behaviour)
         {
             if (forceFill.Contains(x, y))
+            {
                 return forceID;
+            }
 
             if (mapData == null)
+            {
                 return !behaviour.EdgesExtend ? '0' : forceID;
+            }
 
             if (x >= 0 && y >= 0 && x < mapData.Columns && y < mapData.Rows)
+            {
                 return mapData[x, y];
+            }
 
             if (!behaviour.EdgesExtend)
+            {
                 return '0';
+            }
 
             int x1 = Calc.Clamp(x, 0, mapData.Columns - 1);
             int y1 = Calc.Clamp(y, 0, mapData.Rows - 1);

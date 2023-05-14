@@ -30,41 +30,56 @@ namespace Monocle
         public SineWave(float frequency, float offset = 0.0f)
             : this()
         {
-            this.Frequency = frequency;
-            this.Counter = offset;
+            Frequency = frequency;
+            Counter = offset;
         }
 
         public override void Update()
         {
-            this.Counter += (float) (6.2831854820251465 * (double) this.Frequency * (double) this.Rate * (this.UseRawDeltaTime ? (double) Engine.RawDeltaTime : (double) Engine.DeltaTime));
-            if (this.OnUpdate == null)
+            Counter += (float)(6.2831854820251465 * Frequency * Rate * (UseRawDeltaTime ? (double)Engine.RawDeltaTime : (double)Engine.DeltaTime));
+            if (OnUpdate == null)
+            {
                 return;
-            this.OnUpdate(this.Value);
+            }
+
+            OnUpdate(Value);
         }
 
-        public float ValueOffset(float offset) => (float) Math.Sin((double) this.counter + (double) offset);
+        public float ValueOffset(float offset)
+        {
+            return (float)Math.Sin(counter + (double)offset);
+        }
 
         public SineWave Randomize()
         {
-            this.Counter = (float) ((double) Calc.Random.NextFloat() * 6.2831854820251465 * 2.0);
+            Counter = (float)((double)Calc.Random.NextFloat() * 6.2831854820251465 * 2.0);
             return this;
         }
 
-        public void Reset() => this.Counter = 0.0f;
+        public void Reset()
+        {
+            Counter = 0.0f;
+        }
 
-        public void StartUp() => this.Counter = 1.57079637f;
+        public void StartUp()
+        {
+            Counter = 1.57079637f;
+        }
 
-        public void StartDown() => this.Counter = 4.712389f;
+        public void StartDown()
+        {
+            Counter = 4.712389f;
+        }
 
         public float Counter
         {
-            get => this.counter;
+            get => counter;
             set
             {
-                this.counter = (float) (((double) value + 25.132741928100586) % 25.132741928100586);
-                this.Value = (float) Math.Sin((double) this.counter);
-                this.ValueOverTwo = (float) Math.Sin((double) this.counter / 2.0);
-                this.TwoValue = (float) Math.Sin((double) this.counter * 2.0);
+                counter = (float)(((double)value + 25.132741928100586) % 25.132741928100586);
+                Value = (float)Math.Sin(counter);
+                ValueOverTwo = (float)Math.Sin(counter / 2.0);
+                TwoValue = (float)Math.Sin(counter * 2.0);
             }
         }
     }

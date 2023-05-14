@@ -27,18 +27,23 @@ namespace Celeste
         {
             string extension = Path.GetExtension(filename);
             if (outdir != null)
+            {
                 _ = Path.Combine(outdir + Path.GetFileName(filename));
+            }
 
             _ = filename.Replace(extension, OutputFileExtension);
             XmlDocument xmlDocument = new();
             xmlDocument.Load(filename);
             XmlElement rootElement = null;
             foreach (object childNode in xmlDocument.ChildNodes)
+            {
                 if (childNode is XmlElement)
                 {
                     rootElement = childNode as XmlElement;
                     break;
                 }
+            }
+
             ToBinary(rootElement, outdir);
         }
 
@@ -54,7 +59,9 @@ namespace Celeste
             writer.Write(Path.GetFileNameWithoutExtension(outfilename));
             writer.Write(stringValue.Count);
             foreach (KeyValuePair<string, short> keyValuePair in stringValue)
+            {
                 writer.Write(keyValuePair.Key);
+            }
 
             WriteElement(writer, rootElement);
             writer.Flush();
@@ -64,21 +71,32 @@ namespace Celeste
         {
             AddLookupValue(element.Name);
             foreach (XmlAttribute attribute in (XmlNamedNodeMap)element.Attributes)
+            {
                 if (!IgnoreAttributes.Contains(attribute.Name))
                 {
                     AddLookupValue(attribute.Name);
                     if (ParseValue(attribute.Value, out byte type, out object _) && type == 5)
+                    {
                         AddLookupValue(attribute.Value);
+                    }
                 }
+            }
+
             foreach (object childNode in element.ChildNodes)
+            {
                 if (childNode is XmlElement)
+                {
                     CreateLookupTable(childNode as XmlElement);
+                }
+            }
         }
 
         private static void AddLookupValue(string name)
         {
             if (stringValue.ContainsKey(name))
+            {
                 return;
+            }
 
             stringValue.Add(name, stringCounter);
             ++stringCounter;
@@ -88,18 +106,31 @@ namespace Celeste
         {
             int num1 = 0;
             foreach (object childNode in element.ChildNodes)
+            {
                 if (childNode is XmlElement)
+                {
                     ++num1;
+                }
+            }
+
             int num2 = 0;
             foreach (XmlAttribute attribute in (XmlNamedNodeMap)element.Attributes)
+            {
                 if (!IgnoreAttributes.Contains(attribute.Name))
+                {
                     ++num2;
+                }
+            }
+
             if (element.InnerText.Length > 0 && num1 == 0)
+            {
                 ++num2;
+            }
 
             writer.Write(stringValue[element.Name]);
             writer.Write(num2);
             foreach (XmlAttribute attribute in (XmlNamedNodeMap)element.Attributes)
+            {
                 if (!IgnoreAttributes.Contains(attribute.Name))
                 {
                     _ = ParseValue(attribute.Value, out byte type, out object result);
@@ -129,6 +160,8 @@ namespace Celeste
                             continue;
                     }
                 }
+            }
+
             if (element.InnerText.Length > 0 && num1 == 0)
             {
                 writer.Write(stringValue[InnerTextAttributeName]);
@@ -147,8 +180,12 @@ namespace Celeste
             }
             writer.Write(num1);
             foreach (object childNode in element.ChildNodes)
+            {
                 if (childNode is XmlElement)
+                {
                     WriteElement(writer, childNode as XmlElement);
+                }
+            }
         }
 
         private static bool ParseValue(string value, out byte type, out object result)
@@ -160,39 +197,39 @@ namespace Celeste
             }
             else
                 if (byte.TryParse(value, out byte byteResult))
+            {
+                type = 1;
+                result = byteResult;
+            }
+            else
+            {
+                if (short.TryParse(value, out short shortResult))
                 {
-                    type = 1;
-                    result = byteResult;
+                    type = 2;
+                    result = shortResult;
                 }
                 else
                 {
-                    if (short.TryParse(value, out short shortResult))
+                    if (int.TryParse(value, out int intResult))
                     {
-                        type = 2;
-                        result = shortResult;
+                        type = 3;
+                        result = intResult;
                     }
                     else
                     {
-                        if (int.TryParse(value, out int intResult))
+                        if (float.TryParse(value, NumberStyles.Integer | NumberStyles.AllowDecimalPoint, CultureInfo.InvariantCulture, out float floatResult))
                         {
-                            type = 3;
-                            result = intResult;
+                            type = 4;
+                            result = floatResult;
                         }
                         else
                         {
-                            if (float.TryParse(value, NumberStyles.Integer | NumberStyles.AllowDecimalPoint, CultureInfo.InvariantCulture, out float floatResult))
-                            {
-                                type = 4;
-                                result = floatResult;
-                            }
-                            else
-                            {
-                                type = 5;
-                                result = value;
-                            }
+                            type = 5;
+                            result = value;
                         }
                     }
                 }
+            }
             return true;
         }
 
@@ -226,7 +263,9 @@ namespace Celeste
 
             byte valueCount = reader.ReadByte();
             if (valueCount > 0)
+            {
                 element.Attributes = new Dictionary<string, object>();
+            }
 
             for (int i = 0; i < valueCount; ++i)
             {
@@ -266,10 +305,14 @@ namespace Celeste
 
             short childCount = reader.ReadInt16();
             if (childCount > 0)
+            {
                 element.Children = new List<Element>();
+            }
 
             for (int i = 0; i < childCount; ++i)
+            {
                 element.Children.Add(ReadElement(reader));
+            }
 
             return element;
         }
@@ -289,7 +332,9 @@ namespace Celeste
             public string Attr(string name, string defaultValue = "")
             {
                 if (Attributes == null || !Attributes.TryGetValue(name, out object obj))
+                {
                     obj = defaultValue;
+                }
 
                 return obj.ToString();
             }
@@ -297,7 +342,9 @@ namespace Celeste
             public bool AttrBool(string name, bool defaultValue = false)
             {
                 if (Attributes == null || !Attributes.TryGetValue(name, out object obj))
+                {
                     obj = defaultValue;
+                }
 
                 return obj is bool flag ? flag : bool.Parse(obj.ToString());
             }
@@ -305,7 +352,9 @@ namespace Celeste
             public float AttrFloat(string name, float defaultValue = 0.0f)
             {
                 if (Attributes == null || !Attributes.TryGetValue(name, out object obj))
+                {
                     obj = defaultValue;
+                }
 
                 return obj is float num ? num : float.Parse(obj.ToString(), CultureInfo.InvariantCulture);
             }

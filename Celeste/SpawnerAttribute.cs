@@ -12,6 +12,9 @@ namespace Celeste
     {
         public string Name;
 
-        public SpawnerAttribute(string name = null) => this.Name = name;
+        public SpawnerAttribute(string name = null)
+        {
+            Name = name;
+        }
     }
 }

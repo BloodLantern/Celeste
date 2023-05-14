@@ -96,16 +96,24 @@ namespace Celeste
                 foreach (CassetteBlock cassetteBlock in group)
                 {
                     if (cassetteBlock.Left < num1)
+                    {
                         num1 = cassetteBlock.Left;
+                    }
 
                     if (cassetteBlock.Right > num2)
+                    {
                         num2 = cassetteBlock.Right;
+                    }
 
                     if (cassetteBlock.Bottom > y)
+                    {
                         y = cassetteBlock.Bottom;
+                    }
 
                     if (cassetteBlock.Top < num3)
+                    {
                         num3 = cassetteBlock.Top;
+                    }
                 }
                 groupOrigin = new Vector2((int)(num1 + ((num2 - num1) / 2)), (int)y);
                 wigglerScaler = new Vector2(Calc.ClampedMap(num2 - num1, 32f, 96f, 1f, 0.2f), Calc.ClampedMap(y - num3, 32f, 96f, 1f, 0.2f));
@@ -118,9 +126,15 @@ namespace Celeste
                 }
             }
             foreach (Component staticMover in staticMovers)
+            {
                 if (staticMover.Entity is Spikes entity)
+                {
                     entity.SetOrigins(groupOrigin);
+                }
+            }
+
             for (float left = Left; left < Right; left += 8f)
+            {
                 for (float top = Top; top < Bottom; top += 8f)
                 {
                     bool flag1 = CheckForSame(left - 8f, top);
@@ -130,52 +144,87 @@ namespace Celeste
                     if (flag1 & flag2 & flag3 & flag4)
                     {
                         if (!CheckForSame(left + 8f, top - 8f))
+                        {
                             SetImage(left, top, 3, 0);
+                        }
                         else if (!CheckForSame(left - 8f, top - 8f))
+                        {
                             SetImage(left, top, 3, 1);
+                        }
                         else if (!CheckForSame(left + 8f, top + 8f))
+                        {
                             SetImage(left, top, 3, 2);
+                        }
                         else if (!CheckForSame(left - 8f, top + 8f))
+                        {
                             SetImage(left, top, 3, 3);
+                        }
                         else
+                        {
                             SetImage(left, top, 1, 1);
+                        }
                     }
                     else if (((!(flag1 & flag2) ? 0 : (!flag3 ? 1 : 0)) & (flag4 ? 1 : 0)) != 0)
+                    {
                         SetImage(left, top, 1, 0);
+                    }
                     else if (flag1 & flag2 & flag3 && !flag4)
+                    {
                         SetImage(left, top, 1, 2);
+                    }
                     else if (((!flag1 ? 0 : (!flag2 ? 1 : 0)) & (flag3 ? 1 : 0) & (flag4 ? 1 : 0)) != 0)
+                    {
                         SetImage(left, top, 2, 1);
+                    }
                     else if (!flag1 & flag2 & flag3 & flag4)
+                    {
                         SetImage(left, top, 0, 1);
+                    }
                     else if (((!flag1 || flag2 ? 0 : (!flag3 ? 1 : 0)) & (flag4 ? 1 : 0)) != 0)
+                    {
                         SetImage(left, top, 2, 0);
+                    }
                     else if (((!(!flag1 & flag2) ? 0 : (!flag3 ? 1 : 0)) & (flag4 ? 1 : 0)) != 0)
+                    {
                         SetImage(left, top, 0, 0);
+                    }
                     else if (((!flag1 ? 0 : (!flag2 ? 1 : 0)) & (flag3 ? 1 : 0)) != 0 && !flag4)
+                    {
                         SetImage(left, top, 2, 2);
+                    }
                     else if (!flag1 & flag2 & flag3 && !flag4)
+                    {
                         SetImage(left, top, 0, 2);
+                    }
                 }
+            }
+
             UpdateVisualState();
         }
 
         private void FindInGroup(CassetteBlock block)
         {
             foreach (CassetteBlock entity in Scene.Tracker.GetEntities<CassetteBlock>())
+            {
                 if (entity != this && entity != block && entity.Index == Index && (entity.CollideRect(new Rectangle((int)block.X - 1, (int)block.Y, (int)block.Width + 2, (int)block.Height)) ? 1 : (entity.CollideRect(new Rectangle((int)block.X, (int)block.Y - 1, (int)block.Width, (int)block.Height + 2)) ? 1 : 0)) != 0 && !group.Contains(entity))
                 {
                     group.Add(entity);
                     FindInGroup(entity);
                     entity.group = group;
                 }
+            }
         }
 
         private bool CheckForSame(float x, float y)
         {
             foreach (CassetteBlock entity in Scene.Tracker.GetEntities<CassetteBlock>())
-                if (entity.Index == Index && entity.Collider.Collide(new Rectangle((int) x, (int) y, 8, 8)))
+            {
+                if (entity.Index == Index && entity.Collider.Collide(new Rectangle((int)x, (int)y, 8, 8)))
+                {
                     return true;
+                }
+            }
+
             return false;
         }
 
@@ -206,11 +255,14 @@ namespace Celeste
             {
                 bool flag = false;
                 foreach (CassetteBlock cassetteBlock in group)
+                {
                     if (cassetteBlock.BlockedCheck())
                     {
                         flag = true;
                         break;
                     }
+                }
+
                 if (!flag)
                 {
                     foreach (CassetteBlock cassetteBlock in group)
@@ -235,7 +287,9 @@ namespace Celeste
         {
             TheoCrystal actor1 = CollideFirst<TheoCrystal>();
             if (actor1 != null && !TryActorWiggleUp(actor1))
+            {
                 return true;
+            }
 
             Player actor2 = CollideFirst<Player>();
             return actor2 != null && !TryActorWiggleUp(actor2);
@@ -244,38 +298,58 @@ namespace Celeste
         private void UpdateVisualState()
         {
             if (!Collidable)
+            {
                 Depth = 8990;
+            }
             else
             {
                 Player entity = Scene.Tracker.GetEntity<Player>();
                 Depth = entity != null && entity.Top >= Bottom - 1.0 ? 10 : -10;
             }
             foreach (Component staticMover in staticMovers)
+            {
                 staticMover.Entity.Depth = Depth + 1;
+            }
 
             side.Depth = Depth + 5;
             side.Visible = blockHeight > 0;
             occluder.Visible = Collidable;
             foreach (Component component in solid)
+            {
                 component.Visible = Collidable;
+            }
 
             foreach (Component component in pressed)
+            {
                 component.Visible = !Collidable;
+            }
 
             if (!groupLeader)
+            {
                 return;
+            }
 
-            Vector2 vector2 = new(1 + wiggler.Value * 0.05f * wigglerScaler.X, 1 + wiggler.Value * 0.15f * wigglerScaler.Y);
+            Vector2 vector2 = new(1 + (wiggler.Value * 0.05f * wigglerScaler.X), 1 + (wiggler.Value * 0.15f * wigglerScaler.Y));
             foreach (CassetteBlock cassetteBlock in group)
             {
                 foreach (GraphicsComponent graphicsComponent in cassetteBlock.all)
+                {
                     graphicsComponent.Scale = vector2;
+                }
 
                 foreach (Component staticMover in cassetteBlock.staticMovers)
+                {
                     if (staticMover.Entity is Spikes entity)
+                    {
                         foreach (Component component in entity.Components)
+                        {
                             if (component is Image image)
+                            {
                                 image.Scale = vector2;
+                            }
+                        }
+                    }
+                }
             }
         }
 
@@ -284,7 +358,9 @@ namespace Celeste
             Activated = Collidable = activated;
             UpdateVisualState();
             if (activated)
+            {
                 EnableStaticMovers();
+            }
             else
             {
                 ShiftSize(2);
@@ -312,17 +388,25 @@ namespace Celeste
         private bool TryActorWiggleUp(Entity actor)
         {
             foreach (CassetteBlock cassetteBlock in group)
+            {
                 if (cassetteBlock != this && cassetteBlock.CollideCheck(actor, cassetteBlock.Position + (Vector2.UnitY * 4f)))
+                {
                     return false;
+                }
+            }
+
             bool collidable = Collidable;
             Collidable = true;
             for (int index = 1; index <= 4; ++index)
+            {
                 if (!actor.CollideCheck<Solid>(actor.Position - (Vector2.UnitY * index)))
                 {
                     actor.Position -= Vector2.UnitY * index;
                     Collidable = collidable;
                     return true;
                 }
+            }
+
             Collidable = collidable;
             return false;
         }

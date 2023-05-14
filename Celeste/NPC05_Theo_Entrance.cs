@@ -14,21 +14,25 @@ namespace Celeste
         public NPC05_Theo_Entrance(Vector2 position)
             : base(position)
         {
-            this.Add((Component) (this.Sprite = GFX.SpriteBank.Create("theo")));
-            this.IdleAnim = "idle";
-            this.MoveAnim = "walk";
-            this.Maxspeed = 48f;
-            this.Add((Component) (this.Light = new VertexLight(-Vector2.UnitY * 12f, Color.White, 1f, 32, 64)));
-            this.SetupTheoSpriteSounds();
+            Add(Sprite = GFX.SpriteBank.Create("theo"));
+            IdleAnim = "idle";
+            MoveAnim = "walk";
+            Maxspeed = 48f;
+            Add(Light = new VertexLight(-Vector2.UnitY * 12f, Color.White, 1f, 32, 64));
+            SetupTheoSpriteSounds();
         }
 
         public override void Added(Scene scene)
         {
             base.Added(scene);
-            if (this.Session.GetFlag("entrance"))
-                this.RemoveSelf();
+            if (Session.GetFlag("entrance"))
+            {
+                RemoveSelf();
+            }
             else
-                scene.Add((Entity) new CS05_Entrance((NPC) this));
+            {
+                scene.Add(new CS05_Entrance(this));
+            }
         }
     }
 }

@@ -791,19 +791,21 @@ namespace Celeste
         public const string ui_postgame_unlock_newchapter_icon = "event:/ui/postgame/unlock_newchapter_icon";
         public const string ui_postgame_unlock_bside = "event:/ui/postgame/unlock_bside";
         public const string ui_postgame_skip_all = "event:/new_content/ui/skip_all";
-        private static Dictionary<string, string> byHandle = new Dictionary<string, string>();
-        public static Dictionary<string, string> MadelineToBadelineSound = new Dictionary<string, string>();
+        private static readonly Dictionary<string, string> byHandle = new();
+        public static Dictionary<string, string> MadelineToBadelineSound = new();
 
         public static void Initialize()
         {
-            foreach (FieldInfo field in typeof (SFX).GetFields(BindingFlags.Static | BindingFlags.Public))
+            foreach (FieldInfo field in typeof(SFX).GetFields(BindingFlags.Static | BindingFlags.Public))
             {
-                if (field.FieldType == typeof (string))
+                if (field.FieldType == typeof(string))
                 {
-                    string key = field.GetValue((object) null).ToString();
+                    string key = field.GetValue(null).ToString();
                     SFX.byHandle.Add(field.Name, key);
                     if (key.StartsWith("event:/char/madeline/"))
+                    {
                         SFX.MadelineToBadelineSound.Add(key, key.Replace("madeline", "badeline"));
+                    }
                 }
             }
             SFX.MadelineToBadelineSound.Add("event:/game/general/assist_screenbottom", "event:/game/general/assist_screenbottom");
@@ -811,8 +813,7 @@ namespace Celeste
 
         public static string EventnameByHandle(string handle)
         {
-            string str = "";
-            SFX.byHandle.TryGetValue(handle, out str);
+            _ = SFX.byHandle.TryGetValue(handle, out string str);
             return str;
         }
     }

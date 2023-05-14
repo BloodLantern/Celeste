@@ -14,24 +14,24 @@ namespace Celeste
     public class Hahaha : Entity
     {
         private bool enabled;
-        private string ifSet;
+        private readonly string ifSet;
         private float timer;
         private int counter;
-        private List<Hahaha.Ha> has = new List<Hahaha.Ha>();
-        private bool autoTriggerLaughSfx;
+        private readonly List<Hahaha.Ha> has = new();
+        private readonly bool autoTriggerLaughSfx;
         private Vector2 autoTriggerLaughOrigin;
 
         public bool Enabled
         {
-            get => this.enabled;
+            get => enabled;
             set
             {
-                if (!this.enabled & value)
+                if (!enabled & value)
                 {
-                    this.timer = 0.0f;
-                    this.counter = 0;
+                    timer = 0.0f;
+                    counter = 0;
                 }
-                this.enabled = value;
+                enabled = value;
             }
         }
 
@@ -41,13 +41,16 @@ namespace Celeste
             bool triggerLaughSfx = false,
             Vector2? triggerLaughSfxOrigin = null)
         {
-            this.Depth = -10001;
-            this.Position = position;
+            Depth = -10001;
+            Position = position;
             this.ifSet = ifSet;
             if (!triggerLaughSfx)
+            {
                 return;
-            this.autoTriggerLaughSfx = triggerLaughSfx;
-            this.autoTriggerLaughOrigin = triggerLaughSfxOrigin.Value;
+            }
+
+            autoTriggerLaughSfx = triggerLaughSfx;
+            autoTriggerLaughOrigin = triggerLaughSfxOrigin.Value;
         }
 
         public Hahaha(EntityData data, Vector2 offset)
@@ -58,53 +61,63 @@ namespace Celeste
         public override void Added(Scene scene)
         {
             base.Added(scene);
-            if (string.IsNullOrEmpty(this.ifSet) || (this.Scene as Level).Session.GetFlag(this.ifSet))
+            if (string.IsNullOrEmpty(ifSet) || (Scene as Level).Session.GetFlag(ifSet))
+            {
                 return;
-            this.Enabled = false;
+            }
+
+            Enabled = false;
         }
 
         public override void Update()
         {
-            if (this.Enabled)
+            if (Enabled)
             {
-                this.timer -= Engine.DeltaTime;
-                if ((double) this.timer <= 0.0)
+                timer -= Engine.DeltaTime;
+                if (timer <= 0.0)
                 {
-                    this.has.Add(new Hahaha.Ha());
-                    ++this.counter;
-                    if (this.counter >= 3)
+                    has.Add(new Hahaha.Ha());
+                    ++counter;
+                    if (counter >= 3)
                     {
-                        this.counter = 0;
-                        this.timer = 1.5f;
+                        counter = 0;
+                        timer = 1.5f;
                     }
                     else
-                        this.timer = 0.6f;
+                    {
+                        timer = 0.6f;
+                    }
                 }
-                if (this.autoTriggerLaughSfx && this.Scene.OnInterval(0.4f))
-                    Audio.Play("event:/char/granny/laugh_oneha", this.autoTriggerLaughOrigin);
-            }
-            for (int index = this.has.Count - 1; index >= 0; --index)
-            {
-                if ((double) this.has[index].Percent > 1.0)
+                if (autoTriggerLaughSfx && Scene.OnInterval(0.4f))
                 {
-                    this.has.RemoveAt(index);
+                    _ = Audio.Play("event:/char/granny/laugh_oneha", autoTriggerLaughOrigin);
+                }
+            }
+            for (int index = has.Count - 1; index >= 0; --index)
+            {
+                if (has[index].Percent > 1.0)
+                {
+                    has.RemoveAt(index);
                 }
                 else
                 {
-                    this.has[index].Sprite.Update();
-                    this.has[index].Percent += Engine.DeltaTime / this.has[index].Duration;
+                    has[index].Sprite.Update();
+                    has[index].Percent += Engine.DeltaTime / has[index].Duration;
                 }
             }
-            if (!this.Enabled && !string.IsNullOrEmpty(this.ifSet) && (this.Scene as Level).Session.GetFlag(this.ifSet))
-                this.Enabled = true;
+            if (!Enabled && !string.IsNullOrEmpty(ifSet) && (Scene as Level).Session.GetFlag(ifSet))
+            {
+                Enabled = true;
+            }
+
             base.Update();
         }
 
         public override void Render()
         {
-            foreach (Hahaha.Ha ha in this.has)
+            foreach (Hahaha.Ha ha in has)
             {
-                ha.Sprite.Position = this.Position + new Vector2(ha.Percent * 60f, (float) (-Math.Sin((double) ha.Percent * 13.0) * 4.0 - 10.0 + (double) ha.Percent * -16.0));
+                ha.Sprite.Position = Position + new Vector2(ha.Percent * 60f, (float)((-Math.Sin(ha.Percent * 13.0) * 4.0) - 10.0 + (ha.Percent * -16.0)));
                 ha.Sprite.Render();
             }
         }
@@ -117,11 +130,11 @@ namespace Celeste
 
             public Ha()
             {
-                this.Sprite = new Sprite(GFX.Game, "characters/oldlady/");
-                this.Sprite.Add("normal", "ha", 0.15f, 0, 1, 0, 1, 0, 1, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9);
-                this.Sprite.Play("normal");
-                this.Sprite.JustifyOrigin(0.5f, 0.5f);
-                this.Duration = (float) this.Sprite.CurrentAnimationTotalFrames * 0.15f;
+                Sprite = new Sprite(GFX.Game, "characters/oldlady/");
+                Sprite.Add("normal", "ha", 0.15f, 0, 1, 0, 1, 0, 1, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9);
+                Sprite.Play("normal");
+                _ = Sprite.JustifyOrigin(0.5f, 0.5f);
+                Duration = Sprite.CurrentAnimationTotalFrames * 0.15f;
             }
         }
     }

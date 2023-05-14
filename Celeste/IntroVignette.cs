@@ -16,171 +16,192 @@ namespace Celeste
     public class IntroVignette : Scene
     {
         private const float SFXDuration = 18.683f;
-        private Session session;
+        private readonly Session session;
         private bool started;
         private float timer;
-        private string areaMusic;
+        private readonly string areaMusic;
         private float fade;
-        private EventInstance sfx;
+        private readonly EventInstance sfx;
         private TextMenu menu;
         private float pauseFade;
-        private HudRenderer hud;
+        private readonly HudRenderer hud;
         private bool exiting;
         private Coroutine textCoroutine;
-        private FancyText.Text text;
+        private readonly FancyText.Text text;
         private int textStart;
         private float textAlpha;
-        private HiresSnow snow;
+        private readonly HiresSnow snow;
 
-        public bool CanPause => this.menu == null;
+        public bool CanPause => menu == null;
 
         public IntroVignette(Session session, HiresSnow snow = null)
         {
             this.session = session;
-            this.areaMusic = session.Audio.Music.Event;
-            session.Audio.Music.Event = (string) null;
+            areaMusic = session.Audio.Music.Event;
+            session.Audio.Music.Event = null;
             session.Audio.Apply();
-            this.sfx = Audio.Play("event:/game/00_prologue/intro_vignette");
+            sfx = Audio.Play("event:/game/00_prologue/intro_vignette");
             if (snow == null)
             {
-                this.fade = 1f;
+                fade = 1f;
                 snow = new HiresSnow();
             }
-            this.Add((Monocle.Renderer) (this.hud = new HudRenderer()));
-            this.Add((Monocle.Renderer) (this.snow = snow));
-            this.RendererList.UpdateLists();
-            this.text = FancyText.Parse(Dialog.Get("CH0_INTRO"), 960, 8, 0.0f);
-            this.textCoroutine = new Coroutine(this.TextSequence());
+            Add(hud = new HudRenderer());
+            Add(this.snow = snow);
+            RendererList.UpdateLists();
+            text = FancyText.Parse(Dialog.Get("CH0_INTRO"), 960, 8, 0.0f);
+            textCoroutine = new Coroutine(TextSequence());
         }
 
         private IEnumerator TextSequence()
         {
-            yield return (object) 3f;
-            while (this.textStart < this.text.Count)
+            yield return 3f;
+            while (textStart < text.Count)
             {
-                this.textAlpha = 1f;
-                float fadeTimePerCharacter = 1f / (float) this.text.GetCharactersOnPage(this.textStart);
-                for (int i = this.textStart; i < this.text.Count && !(this.text[i] is FancyText.NewPage); ++i)
+                textAlpha = 1f;
+                float fadeTimePerCharacter = 1f / text.GetCharactersOnPage(textStart);
+                for (int i = textStart; i < text.Count && text[i] is not FancyText.NewPage; ++i)
                 {
-                    if (this.text[i] is FancyText.Char c)
+                    if (text[i] is FancyText.Char c)
                     {
-                        while ((double) (c.Fade += Engine.DeltaTime / fadeTimePerCharacter) < 1.0)
-                            yield return (object) null;
+                        while ((double)(c.Fade += Engine.DeltaTime / fadeTimePerCharacter) < 1.0)
+                        {
+                            yield return null;
+                        }
+
                         c.Fade = 1f;
-                        c = (FancyText.Char) null;
                     }
                 }
-                yield return (object) 2.5f;
-                while ((double) this.textAlpha > 0.0)
+                yield return 2.5f;
+                while (textAlpha > 0.0)
                 {
-                    this.textAlpha -= 1f * Engine.DeltaTime;
-                    yield return (object) null;
+                    textAlpha -= 1f * Engine.DeltaTime;
+                    yield return null;
                 }
-                this.textAlpha = 0.0f;
-                this.textStart = this.text.GetNextPageStart(this.textStart);
-                yield return (object) 0.5f;
+                textAlpha = 0.0f;
+                textStart = text.GetNextPageStart(textStart);
+                yield return 0.5f;
             }
-            this.textStart = int.MaxValue;
+            textStart = int.MaxValue;
         }
 
         public override void Update()
         {
-            if (this.menu == null)
+            if (menu == null)
             {
                 base.Update();
-                if (!this.exiting)
+                if (!exiting)
                 {
-                    if (this.textCoroutine != null && this.textCoroutine.Active)
-                        this.textCoroutine.Update();
-                    this.timer += Engine.DeltaTime;
-                    if ((double) this.timer >= 18.683000564575195 && !this.started)
-                        this.StartGame();
-                    if ((double) this.timer < 16.683000564575195 && this.menu == null && (Input.Pause.Pressed || Input.ESC.Pressed))
+                    if (textCoroutine != null && textCoroutine.Active)
+                    {
+                        textCoroutine.Update();
+                    }
+
+                    timer += Engine.DeltaTime;
+                    if (timer >= 18.683000564575195 && !started)
+                    {
+                        StartGame();
+                    }
+
+                    if (timer < 16.683000564575195 && menu == null && (Input.Pause.Pressed || Input.ESC.Pressed))
                     {
                         Input.Pause.ConsumeBuffer();
                         Input.ESC.ConsumeBuffer();
-                        this.OpenMenu();
+                        OpenMenu();
                     }
                 }
             }
-            else if (!this.exiting)
-                this.menu.Update();
-            this.pauseFade = Calc.Approach(this.pauseFade, this.menu != null ? 1f : 0.0f, Engine.DeltaTime * 8f);
-            this.hud.BackgroundFade = Calc.Approach(this.hud.BackgroundFade, this.menu != null ? 0.6f : 0.0f, Engine.DeltaTime * 3f);
-            this.fade = Calc.Approach(this.fade, 0.0f, Engine.DeltaTime);
+            else if (!exiting)
+            {
+                menu.Update();
+            }
+
+            pauseFade = Calc.Approach(pauseFade, menu != null ? 1f : 0.0f, Engine.DeltaTime * 8f);
+            hud.BackgroundFade = Calc.Approach(hud.BackgroundFade, menu != null ? 0.6f : 0.0f, Engine.DeltaTime * 3f);
+            fade = Calc.Approach(fade, 0.0f, Engine.DeltaTime);
         }
 
         public void OpenMenu()
         {
-            Audio.Play("event:/ui/game/pause");
-            Audio.Pause(this.sfx);
-            this.Add((Entity) (this.menu = new TextMenu()));
-            this.menu.Add(new TextMenu.Button(Dialog.Clean("intro_vignette_resume")).Pressed(new Action(this.CloseMenu)));
-            this.menu.Add(new TextMenu.Button(Dialog.Clean("intro_vignette_skip")).Pressed(new Action(this.StartGame)));
-            this.menu.Add(new TextMenu.Button(Dialog.Clean("intro_vignette_quit")).Pressed(new Action(this.ReturnToMap)));
-            this.menu.OnCancel = this.menu.OnESC = this.menu.OnPause = new Action(this.CloseMenu);
+            _ = Audio.Play("event:/ui/game/pause");
+            Audio.Pause(sfx);
+            Add(menu = new TextMenu());
+            _ = menu.Add(new TextMenu.Button(Dialog.Clean("intro_vignette_resume")).Pressed(new Action(CloseMenu)));
+            _ = menu.Add(new TextMenu.Button(Dialog.Clean("intro_vignette_skip")).Pressed(new Action(StartGame)));
+            _ = menu.Add(new TextMenu.Button(Dialog.Clean("intro_vignette_quit")).Pressed(new Action(ReturnToMap)));
+            menu.OnCancel = menu.OnESC = menu.OnPause = new Action(CloseMenu);
         }
 
         private void CloseMenu()
         {
-            Audio.Play("event:/ui/game/unpause");
-            Audio.Resume(this.sfx);
-            if (this.menu != null)
-                this.menu.RemoveSelf();
-            this.menu = (TextMenu) null;
+            _ = Audio.Play("event:/ui/game/unpause");
+            Audio.Resume(sfx);
+            menu?.RemoveSelf();
+            menu = null;
         }
 
         private void StartGame()
         {
-            this.textCoroutine = (Coroutine) null;
-            this.StopSfx();
-            this.session.Audio.Music.Event = this.areaMusic;
-            if (this.menu != null)
+            textCoroutine = null;
+            StopSfx();
+            session.Audio.Music.Event = areaMusic;
+            if (menu != null)
             {
-                this.menu.RemoveSelf();
-                this.menu = (TextMenu) null;
+                menu.RemoveSelf();
+                menu = null;
             }
-            new FadeWipe((Scene) this, false, (Action) (() => Engine.Scene = (Scene) new LevelLoader(this.session))).OnUpdate = (Action<float>) (f => this.textAlpha = Math.Min(this.textAlpha, 1f - f));
-            this.started = true;
-            this.exiting = true;
+            new FadeWipe(this, false, () => Engine.Scene = new LevelLoader(session)).OnUpdate = f => textAlpha = Math.Min(textAlpha, 1f - f);
+            started = true;
+            exiting = true;
         }
 
         private void ReturnToMap()
         {
-            this.StopSfx();
-            this.menu.RemoveSelf();
-            this.menu = (TextMenu) null;
-            this.exiting = true;
+            StopSfx();
+            menu.RemoveSelf();
+            menu = null;
+            exiting = true;
             bool toAreaQuit = SaveData.Instance.Areas[0].Modes[0].Completed && Celeste.PlayMode != Celeste.PlayModes.Event;
-            new FadeWipe((Scene) this, false, (Action) (() =>
+            new FadeWipe(this, false, () =>
             {
-                if (toAreaQuit)
-                    Engine.Scene = (Scene) new OverworldLoader(Overworld.StartMode.AreaQuit, this.snow);
-                else
-                    Engine.Scene = (Scene) new OverworldLoader(Overworld.StartMode.Titlescreen, this.snow);
-            })).OnUpdate = (Action<float>) (f => this.textAlpha = Math.Min(this.textAlpha, 1f - f));
-            this.RendererList.UpdateLists();
-            this.RendererList.MoveToFront((Monocle.Renderer) this.snow);
+                Engine.Scene = toAreaQuit
+                    ? new OverworldLoader(Overworld.StartMode.AreaQuit, snow)
+                    : (Scene)new OverworldLoader(Overworld.StartMode.Titlescreen, snow);
+            }).OnUpdate = f => textAlpha = Math.Min(textAlpha, 1f - f);
+            RendererList.UpdateLists();
+            RendererList.MoveToFront(snow);
         }
 
-        private void StopSfx() => Audio.Stop(this.sfx, false);
+        private void StopSfx()
+        {
+            Audio.Stop(sfx, false);
+        }
 
         public override void End()
         {
-            this.StopSfx();
+            StopSfx();
             base.End();
         }
 
         public override void Render()
         {
             base.Render();
-            if ((double) this.fade <= 0.0 && (double) this.textAlpha <= 0.0)
+            if (fade <= 0.0 && textAlpha <= 0.0)
+            {
                 return;
-            Draw.SpriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, SamplerState.LinearClamp, (DepthStencilState) null, RasterizerState.CullNone, (Effect) null, Engine.ScreenMatrix);
-            if ((double) this.fade > 0.0)
-                Draw.Rect(-1f, -1f, 1922f, 1082f, Color.Black * this.fade);
-            if (this.textStart < this.text.Nodes.Count && (double) this.textAlpha > 0.0)
-                this.text.Draw(new Vector2(1920f, 1080f) * 0.5f, new Vector2(0.5f, 0.5f), Vector2.One, this.textAlpha * (1f - this.pauseFade), this.textStart);
+            }
+
+            Draw.SpriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, SamplerState.LinearClamp, null, RasterizerState.CullNone, null, Engine.ScreenMatrix);
+            if (fade > 0.0)
+            {
+                Draw.Rect(-1f, -1f, 1922f, 1082f, Color.Black * fade);
+            }
+
+            if (textStart < text.Nodes.Count && textAlpha > 0.0)
+            {
+                text.Draw(new Vector2(1920f, 1080f) * 0.5f, new Vector2(0.5f, 0.5f), Vector2.One, textAlpha * (1f - pauseFade), textStart);
+            }
+
             Draw.SpriteBatch.End();
         }
     }

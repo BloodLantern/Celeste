@@ -31,14 +31,19 @@ namespace Monocle
             MInput.Mouse = new MInput.MouseData();
             MInput.GamePads = new MInput.GamePadData[4];
             for (int playerIndex = 0; playerIndex < 4; ++playerIndex)
+            {
                 MInput.GamePads[playerIndex] = new MInput.GamePadData(playerIndex);
+            }
+
             MInput.VirtualInputs = new List<VirtualInput>();
         }
 
         internal static void Shutdown()
         {
             foreach (MInput.GamePadData gamePad in MInput.GamePads)
+            {
                 gamePad.StopRumble();
+            }
         }
 
         internal static void Update()
@@ -66,17 +71,23 @@ namespace Monocle
                         flag1 = true;
                     }
                     if (MInput.GamePads[index].Attached)
+                    {
                         flag2 = true;
+                    }
                 }
-                if (!flag2 || !flag1 && MInput.Keyboard.HasAnyInput())
+                if (!flag2 || (!flag1 && MInput.Keyboard.HasAnyInput()))
+                {
                     MInput.ControllerHasFocus = false;
+                }
             }
             else
             {
                 MInput.Keyboard.UpdateNull();
                 MInput.Mouse.UpdateNull();
                 for (int index = 0; index < 4; ++index)
+                {
                     MInput.GamePads[index].UpdateNull();
+                }
             }
             MInput.UpdateVirtualInputs();
         }
@@ -86,21 +97,35 @@ namespace Monocle
             MInput.Keyboard.UpdateNull();
             MInput.Mouse.UpdateNull();
             for (int index = 0; index < 4; ++index)
+            {
                 MInput.GamePads[index].UpdateNull();
+            }
+
             MInput.UpdateVirtualInputs();
         }
 
         private static void UpdateVirtualInputs()
         {
             foreach (VirtualInput virtualInput in MInput.VirtualInputs)
+            {
                 virtualInput.Update();
+            }
         }
 
-        public static void RumbleFirst(float strength, float time) => MInput.GamePads[0].Rumble(strength, time);
+        public static void RumbleFirst(float strength, float time)
+        {
+            MInput.GamePads[0].Rumble(strength, time);
+        }
 
-        public static int Axis(bool negative, bool positive, int bothValue) => negative ? (positive ? bothValue : -1) : (positive ? 1 : 0);
+        public static int Axis(bool negative, bool positive, int bothValue)
+        {
+            return negative ? (positive ? bothValue : -1) : (positive ? 1 : 0);
+        }
 
-        public static int Axis(float axisValue, float deadzone) => (double) Math.Abs(axisValue) >= (double) deadzone ? Math.Sign(axisValue) : 0;
+        public static int Axis(float axisValue, float deadzone)
+        {
+            return (double)Math.Abs(axisValue) >= (double)deadzone ? Math.Sign(axisValue) : 0;
+        }
 
         public static int Axis(
             bool negative,
@@ -111,7 +136,10 @@ namespace Monocle
         {
             int num = MInput.Axis(axisValue, deadzone);
             if (num == 0)
+            {
                 num = MInput.Axis(negative, positive, bothValue);
+            }
+
             return num;
         }
 
@@ -126,40 +154,76 @@ namespace Monocle
 
             internal void Update()
             {
-                this.PreviousState = this.CurrentState;
-                this.CurrentState = Microsoft.Xna.Framework.Input.Keyboard.GetState();
+                PreviousState = CurrentState;
+                CurrentState = Microsoft.Xna.Framework.Input.Keyboard.GetState();
             }
 
             internal void UpdateNull()
             {
-                this.PreviousState = this.CurrentState;
-                this.CurrentState = new KeyboardState();
-                this.CurrentState.GetPressedKeys();
+                PreviousState = CurrentState;
+                CurrentState = new KeyboardState();
+                _ = CurrentState.GetPressedKeys();
             }
 
-            public bool HasAnyInput() => this.CurrentState.GetPressedKeys().Length != 0;
+            public bool HasAnyInput()
+            {
+                return CurrentState.GetPressedKeys().Length != 0;
+            }
 
-            public bool Check(Keys key) => !MInput.Disabled && key != Keys.None && this.CurrentState.IsKeyDown(key);
+            public bool Check(Keys key)
+            {
+                return !MInput.Disabled && key != Keys.None && CurrentState.IsKeyDown(key);
+            }
 
-            public bool Pressed(Keys key) => !MInput.Disabled && key != Keys.None && this.CurrentState.IsKeyDown(key) && !this.PreviousState.IsKeyDown(key);
+            public bool Pressed(Keys key)
+            {
+                return !MInput.Disabled && key != Keys.None && CurrentState.IsKeyDown(key) && !PreviousState.IsKeyDown(key);
+            }
 
-            public bool Released(Keys key) => !MInput.Disabled && key != Keys.None && !this.CurrentState.IsKeyDown(key) && this.PreviousState.IsKeyDown(key);
+            public bool Released(Keys key)
+            {
+                return !MInput.Disabled && key != Keys.None && !CurrentState.IsKeyDown(key) && PreviousState.IsKeyDown(key);
+            }
 
-            public bool Check(Keys keyA, Keys keyB) => this.Check(keyA) || this.Check(keyB);
+            public bool Check(Keys keyA, Keys keyB)
+            {
+                return Check(keyA) || Check(keyB);
+            }
 
-            public bool Pressed(Keys keyA, Keys keyB) => this.Pressed(keyA) || this.Pressed(keyB);
+            public bool Pressed(Keys keyA, Keys keyB)
+            {
+                return Pressed(keyA) || Pressed(keyB);
+            }
 
-            public bool Released(Keys keyA, Keys keyB) => this.Released(keyA) || this.Released(keyB);
+            public bool Released(Keys keyA, Keys keyB)
+            {
+                return Released(keyA) || Released(keyB);
+            }
 
-            public bool Check(Keys keyA, Keys keyB, Keys keyC) => this.Check(keyA) || this.Check(keyB) || this.Check(keyC);
+            public bool Check(Keys keyA, Keys keyB, Keys keyC)
+            {
+                return Check(keyA) || Check(keyB) || Check(keyC);
+            }
 
-            public bool Pressed(Keys keyA, Keys keyB, Keys keyC) => this.Pressed(keyA) || this.Pressed(keyB) || this.Pressed(keyC);
+            public bool Pressed(Keys keyA, Keys keyB, Keys keyC)
+            {
+                return Pressed(keyA) || Pressed(keyB) || Pressed(keyC);
+            }
 
-            public bool Released(Keys keyA, Keys keyB, Keys keyC) => this.Released(keyA) || this.Released(keyB) || this.Released(keyC);
+            public bool Released(Keys keyA, Keys keyB, Keys keyC)
+            {
+                return Released(keyA) || Released(keyB) || Released(keyC);
+            }
 
-            public int AxisCheck(Keys negative, Keys positive) => this.Check(negative) ? (this.Check(positive) ? 0 : -1) : (this.Check(positive) ? 1 : 0);
+            public int AxisCheck(Keys negative, Keys positive)
+            {
+                return Check(negative) ? (Check(positive) ? 0 : -1) : (Check(positive) ? 1 : 0);
+            }
 
-            public int AxisCheck(Keys negative, Keys positive, int both) => this.Check(negative) ? (this.Check(positive) ? both : -1) : (this.Check(positive) ? 1 : 0);
+            public int AxisCheck(Keys negative, Keys positive, int both)
+            {
+                return Check(negative) ? (Check(positive) ? both : -1) : (Check(positive) ? 1 : 0);
+            }
         }
 
         public class MouseData
@@ -169,65 +233,65 @@ namespace Monocle
 
             internal MouseData()
             {
-                this.PreviousState = new MouseState();
-                this.CurrentState = new MouseState();
+                PreviousState = new MouseState();
+                CurrentState = new MouseState();
             }
 
             internal void Update()
             {
-                this.PreviousState = this.CurrentState;
-                this.CurrentState = Microsoft.Xna.Framework.Input.Mouse.GetState();
+                PreviousState = CurrentState;
+                CurrentState = Microsoft.Xna.Framework.Input.Mouse.GetState();
             }
 
             internal void UpdateNull()
             {
-                this.PreviousState = this.CurrentState;
-                this.CurrentState = new MouseState();
+                PreviousState = CurrentState;
+                CurrentState = new MouseState();
             }
 
-            public bool CheckLeftButton => this.CurrentState.LeftButton == ButtonState.Pressed;
+            public bool CheckLeftButton => CurrentState.LeftButton == ButtonState.Pressed;
 
-            public bool CheckRightButton => this.CurrentState.RightButton == ButtonState.Pressed;
+            public bool CheckRightButton => CurrentState.RightButton == ButtonState.Pressed;
 
-            public bool CheckMiddleButton => this.CurrentState.MiddleButton == ButtonState.Pressed;
+            public bool CheckMiddleButton => CurrentState.MiddleButton == ButtonState.Pressed;
 
-            public bool PressedLeftButton => this.CurrentState.LeftButton == ButtonState.Pressed && this.PreviousState.LeftButton == ButtonState.Released;
+            public bool PressedLeftButton => CurrentState.LeftButton == ButtonState.Pressed && PreviousState.LeftButton == ButtonState.Released;
 
-            public bool PressedRightButton => this.CurrentState.RightButton == ButtonState.Pressed && this.PreviousState.RightButton == ButtonState.Released;
+            public bool PressedRightButton => CurrentState.RightButton == ButtonState.Pressed && PreviousState.RightButton == ButtonState.Released;
 
-            public bool PressedMiddleButton => this.CurrentState.MiddleButton == ButtonState.Pressed && this.PreviousState.MiddleButton == ButtonState.Released;
+            public bool PressedMiddleButton => CurrentState.MiddleButton == ButtonState.Pressed && PreviousState.MiddleButton == ButtonState.Released;
 
-            public bool ReleasedLeftButton => this.CurrentState.LeftButton == ButtonState.Released && this.PreviousState.LeftButton == ButtonState.Pressed;
+            public bool ReleasedLeftButton => CurrentState.LeftButton == ButtonState.Released && PreviousState.LeftButton == ButtonState.Pressed;
 
-            public bool ReleasedRightButton => this.CurrentState.RightButton == ButtonState.Released && this.PreviousState.RightButton == ButtonState.Pressed;
+            public bool ReleasedRightButton => CurrentState.RightButton == ButtonState.Released && PreviousState.RightButton == ButtonState.Pressed;
 
-            public bool ReleasedMiddleButton => this.CurrentState.MiddleButton == ButtonState.Released && this.PreviousState.MiddleButton == ButtonState.Pressed;
+            public bool ReleasedMiddleButton => CurrentState.MiddleButton == ButtonState.Released && PreviousState.MiddleButton == ButtonState.Pressed;
 
-            public int Wheel => this.CurrentState.ScrollWheelValue;
+            public int Wheel => CurrentState.ScrollWheelValue;
 
-            public int WheelDelta => this.CurrentState.ScrollWheelValue - this.PreviousState.ScrollWheelValue;
+            public int WheelDelta => CurrentState.ScrollWheelValue - PreviousState.ScrollWheelValue;
 
-            public bool WasMoved => this.CurrentState.X != this.PreviousState.X || this.CurrentState.Y != this.PreviousState.Y;
+            public bool WasMoved => CurrentState.X != PreviousState.X || CurrentState.Y != PreviousState.Y;
 
             public float X
             {
-                get => this.Position.X;
-                set => this.Position = new Vector2(value, this.Position.Y);
+                get => Position.X;
+                set => Position = new Vector2(value, Position.Y);
             }
 
             public float Y
             {
-                get => this.Position.Y;
-                set => this.Position = new Vector2(this.Position.X, value);
+                get => Position.Y;
+                set => Position = new Vector2(Position.X, value);
             }
 
             public Vector2 Position
             {
-                get => Vector2.Transform(new Vector2((float) this.CurrentState.X, (float) this.CurrentState.Y), Matrix.Invert(Engine.ScreenMatrix));
+                get => Vector2.Transform(new Vector2(CurrentState.X, CurrentState.Y), Matrix.Invert(Engine.ScreenMatrix));
                 set
                 {
                     Vector2 vector2 = Vector2.Transform(value, Engine.ScreenMatrix);
-                    Microsoft.Xna.Framework.Input.Mouse.SetPosition((int) Math.Round((double) vector2.X), (int) Math.Round((double) vector2.Y));
+                    Microsoft.Xna.Framework.Input.Mouse.SetPosition((int)Math.Round(vector2.X), (int)Math.Round(vector2.Y));
                 }
             }
         }
@@ -242,248 +306,385 @@ namespace Monocle
             private float rumbleStrength;
             private float rumbleTime;
 
-            internal GamePadData(int playerIndex) => this.PlayerIndex = (PlayerIndex) Calc.Clamp(playerIndex, 0, 3);
+            internal GamePadData(int playerIndex)
+            {
+                PlayerIndex = (PlayerIndex)Calc.Clamp(playerIndex, 0, 3);
+            }
 
             public bool HasAnyInput()
             {
-                if (!this.PreviousState.IsConnected && this.CurrentState.IsConnected || this.PreviousState.Buttons != this.CurrentState.Buttons || this.PreviousState.DPad != this.CurrentState.DPad || (double) this.CurrentState.Triggers.Left > 0.0099999997764825821 || (double) this.CurrentState.Triggers.Right > 0.0099999997764825821)
-                    return true;
-                Vector2 vector2 = this.CurrentState.ThumbSticks.Left;
-                if ((double) vector2.Length() <= 0.0099999997764825821)
+                if ((!PreviousState.IsConnected && CurrentState.IsConnected) || PreviousState.Buttons != CurrentState.Buttons || PreviousState.DPad != CurrentState.DPad || (double)CurrentState.Triggers.Left > 0.0099999997764825821 || (double)CurrentState.Triggers.Right > 0.0099999997764825821)
                 {
-                    vector2 = this.CurrentState.ThumbSticks.Right;
-                    if ((double) vector2.Length() <= 0.0099999997764825821)
+                    return true;
+                }
+
+                Vector2 vector2 = CurrentState.ThumbSticks.Left;
+                if ((double)vector2.Length() <= 0.0099999997764825821)
+                {
+                    vector2 = CurrentState.ThumbSticks.Right;
+                    if ((double)vector2.Length() <= 0.0099999997764825821)
+                    {
                         return false;
+                    }
                 }
                 return true;
             }
 
             public void Update()
             {
-                this.PreviousState = this.CurrentState;
-                this.CurrentState = GamePad.GetState(this.PlayerIndex);
-                if (!this.Attached && this.CurrentState.IsConnected)
+                PreviousState = CurrentState;
+                CurrentState = GamePad.GetState(PlayerIndex);
+                if (!Attached && CurrentState.IsConnected)
+                {
                     MInput.IsControllerFocused = true;
-                this.Attached = this.CurrentState.IsConnected;
-                if ((double) this.rumbleTime <= 0.0)
+                }
+
+                Attached = CurrentState.IsConnected;
+                if (rumbleTime <= 0.0)
+                {
                     return;
-                this.rumbleTime -= Engine.DeltaTime;
-                if ((double) this.rumbleTime > 0.0)
+                }
+
+                rumbleTime -= Engine.DeltaTime;
+                if (rumbleTime > 0.0)
+                {
                     return;
-                GamePad.SetVibration(this.PlayerIndex, 0.0f, 0.0f);
+                }
+
+                _ = GamePad.SetVibration(PlayerIndex, 0.0f, 0.0f);
             }
 
             public void UpdateNull()
             {
-                this.PreviousState = this.CurrentState;
-                this.CurrentState = new GamePadState();
-                this.Attached = GamePad.GetState(this.PlayerIndex).IsConnected;
-                if ((double) this.rumbleTime > 0.0)
-                    this.rumbleTime -= Engine.DeltaTime;
-                GamePad.SetVibration(this.PlayerIndex, 0.0f, 0.0f);
+                PreviousState = CurrentState;
+                CurrentState = new GamePadState();
+                Attached = GamePad.GetState(PlayerIndex).IsConnected;
+                if (rumbleTime > 0.0)
+                {
+                    rumbleTime -= Engine.DeltaTime;
+                }
+
+                _ = GamePad.SetVibration(PlayerIndex, 0.0f, 0.0f);
             }
 
             public void Rumble(float strength, float time)
             {
-                if ((double) this.rumbleTime > 0.0 && (double) strength <= (double) this.rumbleStrength && ((double) strength != (double) this.rumbleStrength || (double) time <= (double) this.rumbleTime))
+                if (rumbleTime > 0.0 && (double)strength <= rumbleStrength && ((double)strength != rumbleStrength || (double)time <= rumbleTime))
+                {
                     return;
-                GamePad.SetVibration(this.PlayerIndex, strength, strength);
-                this.rumbleStrength = strength;
-                this.rumbleTime = time;
+                }
+
+                _ = GamePad.SetVibration(PlayerIndex, strength, strength);
+                rumbleStrength = strength;
+                rumbleTime = time;
             }
 
             public void StopRumble()
             {
-                GamePad.SetVibration(this.PlayerIndex, 0.0f, 0.0f);
-                this.rumbleTime = 0.0f;
+                _ = GamePad.SetVibration(PlayerIndex, 0.0f, 0.0f);
+                rumbleTime = 0.0f;
             }
 
-            public bool Check(Buttons button) => !MInput.Disabled && this.CurrentState.IsButtonDown(button);
+            public bool Check(Buttons button)
+            {
+                return !MInput.Disabled && CurrentState.IsButtonDown(button);
+            }
 
-            public bool Pressed(Buttons button) => !MInput.Disabled && this.CurrentState.IsButtonDown(button) && this.PreviousState.IsButtonUp(button);
+            public bool Pressed(Buttons button)
+            {
+                return !MInput.Disabled && CurrentState.IsButtonDown(button) && PreviousState.IsButtonUp(button);
+            }
 
-            public bool Released(Buttons button) => !MInput.Disabled && this.CurrentState.IsButtonUp(button) && this.PreviousState.IsButtonDown(button);
+            public bool Released(Buttons button)
+            {
+                return !MInput.Disabled && CurrentState.IsButtonUp(button) && PreviousState.IsButtonDown(button);
+            }
 
-            public bool Check(Buttons buttonA, Buttons buttonB) => this.Check(buttonA) || this.Check(buttonB);
+            public bool Check(Buttons buttonA, Buttons buttonB)
+            {
+                return Check(buttonA) || Check(buttonB);
+            }
 
-            public bool Pressed(Buttons buttonA, Buttons buttonB) => this.Pressed(buttonA) || this.Pressed(buttonB);
+            public bool Pressed(Buttons buttonA, Buttons buttonB)
+            {
+                return Pressed(buttonA) || Pressed(buttonB);
+            }
 
-            public bool Released(Buttons buttonA, Buttons buttonB) => this.Released(buttonA) || this.Released(buttonB);
+            public bool Released(Buttons buttonA, Buttons buttonB)
+            {
+                return Released(buttonA) || Released(buttonB);
+            }
 
-            public bool Check(Buttons buttonA, Buttons buttonB, Buttons buttonC) => this.Check(buttonA) || this.Check(buttonB) || this.Check(buttonC);
+            public bool Check(Buttons buttonA, Buttons buttonB, Buttons buttonC)
+            {
+                return Check(buttonA) || Check(buttonB) || Check(buttonC);
+            }
 
-            public bool Pressed(Buttons buttonA, Buttons buttonB, Buttons buttonC) => this.Pressed(buttonA) || this.Pressed(buttonB) || this.Check(buttonC);
+            public bool Pressed(Buttons buttonA, Buttons buttonB, Buttons buttonC)
+            {
+                return Pressed(buttonA) || Pressed(buttonB) || Check(buttonC);
+            }
 
-            public bool Released(Buttons buttonA, Buttons buttonB, Buttons buttonC) => this.Released(buttonA) || this.Released(buttonB) || this.Check(buttonC);
+            public bool Released(Buttons buttonA, Buttons buttonB, Buttons buttonC)
+            {
+                return Released(buttonA) || Released(buttonB) || Check(buttonC);
+            }
 
             public Vector2 GetLeftStick()
             {
-                Vector2 left = this.CurrentState.ThumbSticks.Left;
+                Vector2 left = CurrentState.ThumbSticks.Left;
                 left.Y = -left.Y;
                 return left;
             }
 
             public Vector2 GetLeftStick(float deadzone)
             {
-                Vector2 leftStick = this.CurrentState.ThumbSticks.Left;
-                if ((double) leftStick.LengthSquared() < (double) deadzone * (double) deadzone)
+                Vector2 leftStick = CurrentState.ThumbSticks.Left;
+                if ((double)leftStick.LengthSquared() < (double)deadzone * (double)deadzone)
+                {
                     leftStick = Vector2.Zero;
+                }
                 else
+                {
                     leftStick.Y = -leftStick.Y;
+                }
+
                 return leftStick;
             }
 
             public Vector2 GetRightStick()
             {
-                Vector2 right = this.CurrentState.ThumbSticks.Right;
+                Vector2 right = CurrentState.ThumbSticks.Right;
                 right.Y = -right.Y;
                 return right;
             }
 
             public Vector2 GetRightStick(float deadzone)
             {
-                Vector2 rightStick = this.CurrentState.ThumbSticks.Right;
-                if ((double) rightStick.LengthSquared() < (double) deadzone * (double) deadzone)
+                Vector2 rightStick = CurrentState.ThumbSticks.Right;
+                if ((double)rightStick.LengthSquared() < (double)deadzone * (double)deadzone)
+                {
                     rightStick = Vector2.Zero;
+                }
                 else
+                {
                     rightStick.Y = -rightStick.Y;
+                }
+
                 return rightStick;
             }
 
-            public bool LeftStickLeftCheck(float deadzone) => (double) this.CurrentState.ThumbSticks.Left.X <= -(double) deadzone;
+            public bool LeftStickLeftCheck(float deadzone)
+            {
+                return CurrentState.ThumbSticks.Left.X <= -(double)deadzone;
+            }
 
-            public bool LeftStickLeftPressed(float deadzone) => (double) this.CurrentState.ThumbSticks.Left.X <= -(double) deadzone && (double) this.PreviousState.ThumbSticks.Left.X > -(double) deadzone;
+            public bool LeftStickLeftPressed(float deadzone)
+            {
+                return CurrentState.ThumbSticks.Left.X <= -(double)deadzone && PreviousState.ThumbSticks.Left.X > -(double)deadzone;
+            }
 
-            public bool LeftStickLeftReleased(float deadzone) => (double) this.CurrentState.ThumbSticks.Left.X > -(double) deadzone && (double) this.PreviousState.ThumbSticks.Left.X <= -(double) deadzone;
+            public bool LeftStickLeftReleased(float deadzone)
+            {
+                return CurrentState.ThumbSticks.Left.X > -(double)deadzone && PreviousState.ThumbSticks.Left.X <= -(double)deadzone;
+            }
 
-            public bool LeftStickRightCheck(float deadzone) => (double) this.CurrentState.ThumbSticks.Left.X >= (double) deadzone;
+            public bool LeftStickRightCheck(float deadzone)
+            {
+                return CurrentState.ThumbSticks.Left.X >= (double)deadzone;
+            }
 
-            public bool LeftStickRightPressed(float deadzone) => (double) this.CurrentState.ThumbSticks.Left.X >= (double) deadzone && (double) this.PreviousState.ThumbSticks.Left.X < (double) deadzone;
+            public bool LeftStickRightPressed(float deadzone)
+            {
+                return CurrentState.ThumbSticks.Left.X >= (double)deadzone && PreviousState.ThumbSticks.Left.X < (double)deadzone;
+            }
 
-            public bool LeftStickRightReleased(float deadzone) => (double) this.CurrentState.ThumbSticks.Left.X < (double) deadzone && (double) this.PreviousState.ThumbSticks.Left.X >= (double) deadzone;
+            public bool LeftStickRightReleased(float deadzone)
+            {
+                return CurrentState.ThumbSticks.Left.X < (double)deadzone && PreviousState.ThumbSticks.Left.X >= (double)deadzone;
+            }
 
-            public bool LeftStickDownCheck(float deadzone) => (double) this.CurrentState.ThumbSticks.Left.Y <= -(double) deadzone;
+            public bool LeftStickDownCheck(float deadzone)
+            {
+                return CurrentState.ThumbSticks.Left.Y <= -(double)deadzone;
+            }
 
-            public bool LeftStickDownPressed(float deadzone) => (double) this.CurrentState.ThumbSticks.Left.Y <= -(double) deadzone && (double) this.PreviousState.ThumbSticks.Left.Y > -(double) deadzone;
+            public bool LeftStickDownPressed(float deadzone)
+            {
+                return CurrentState.ThumbSticks.Left.Y <= -(double)deadzone && PreviousState.ThumbSticks.Left.Y > -(double)deadzone;
+            }
 
-            public bool LeftStickDownReleased(float deadzone) => (double) this.CurrentState.ThumbSticks.Left.Y > -(double) deadzone && (double) this.PreviousState.ThumbSticks.Left.Y <= -(double) deadzone;
+            public bool LeftStickDownReleased(float deadzone)
+            {
+                return CurrentState.ThumbSticks.Left.Y > -(double)deadzone && PreviousState.ThumbSticks.Left.Y <= -(double)deadzone;
+            }
 
-            public bool LeftStickUpCheck(float deadzone) => (double) this.CurrentState.ThumbSticks.Left.Y >= (double) deadzone;
+            public bool LeftStickUpCheck(float deadzone)
+            {
+                return CurrentState.ThumbSticks.Left.Y >= (double)deadzone;
+            }
 
-            public bool LeftStickUpPressed(float deadzone) => (double) this.CurrentState.ThumbSticks.Left.Y >= (double) deadzone && (double) this.PreviousState.ThumbSticks.Left.Y < (double) deadzone;
+            public bool LeftStickUpPressed(float deadzone)
+            {
+                return CurrentState.ThumbSticks.Left.Y >= (double)deadzone && PreviousState.ThumbSticks.Left.Y < (double)deadzone;
+            }
 
-            public bool LeftStickUpReleased(float deadzone) => (double) this.CurrentState.ThumbSticks.Left.Y < (double) deadzone && (double) this.PreviousState.ThumbSticks.Left.Y >= (double) deadzone;
+            public bool LeftStickUpReleased(float deadzone)
+            {
+                return CurrentState.ThumbSticks.Left.Y < (double)deadzone && PreviousState.ThumbSticks.Left.Y >= (double)deadzone;
+            }
 
             public float LeftStickHorizontal(float deadzone)
             {
-                float x = this.CurrentState.ThumbSticks.Left.X;
-                return (double) Math.Abs(x) < (double) deadzone ? 0.0f : x;
+                float x = CurrentState.ThumbSticks.Left.X;
+                return (double)Math.Abs(x) < (double)deadzone ? 0.0f : x;
             }
 
             public float LeftStickVertical(float deadzone)
             {
-                float y = this.CurrentState.ThumbSticks.Left.Y;
-                return (double) Math.Abs(y) < (double) deadzone ? 0.0f : -y;
+                float y = CurrentState.ThumbSticks.Left.Y;
+                return (double)Math.Abs(y) < (double)deadzone ? 0.0f : -y;
             }
 
-            public bool RightStickLeftCheck(float deadzone) => (double) this.CurrentState.ThumbSticks.Right.X <= -(double) deadzone;
+            public bool RightStickLeftCheck(float deadzone)
+            {
+                return CurrentState.ThumbSticks.Right.X <= -(double)deadzone;
+            }
 
-            public bool RightStickLeftPressed(float deadzone) => (double) this.CurrentState.ThumbSticks.Right.X <= -(double) deadzone && (double) this.PreviousState.ThumbSticks.Right.X > -(double) deadzone;
+            public bool RightStickLeftPressed(float deadzone)
+            {
+                return CurrentState.ThumbSticks.Right.X <= -(double)deadzone && PreviousState.ThumbSticks.Right.X > -(double)deadzone;
+            }
 
-            public bool RightStickLeftReleased(float deadzone) => (double) this.CurrentState.ThumbSticks.Right.X > -(double) deadzone && (double) this.PreviousState.ThumbSticks.Right.X <= -(double) deadzone;
+            public bool RightStickLeftReleased(float deadzone)
+            {
+                return CurrentState.ThumbSticks.Right.X > -(double)deadzone && PreviousState.ThumbSticks.Right.X <= -(double)deadzone;
+            }
 
-            public bool RightStickRightCheck(float deadzone) => (double) this.CurrentState.ThumbSticks.Right.X >= (double) deadzone;
+            public bool RightStickRightCheck(float deadzone)
+            {
+                return CurrentState.ThumbSticks.Right.X >= (double)deadzone;
+            }
 
-            public bool RightStickRightPressed(float deadzone) => (double) this.CurrentState.ThumbSticks.Right.X >= (double) deadzone && (double) this.PreviousState.ThumbSticks.Right.X < (double) deadzone;
+            public bool RightStickRightPressed(float deadzone)
+            {
+                return CurrentState.ThumbSticks.Right.X >= (double)deadzone && PreviousState.ThumbSticks.Right.X < (double)deadzone;
+            }
 
-            public bool RightStickRightReleased(float deadzone) => (double) this.CurrentState.ThumbSticks.Right.X < (double) deadzone && (double) this.PreviousState.ThumbSticks.Right.X >= (double) deadzone;
+            public bool RightStickRightReleased(float deadzone)
+            {
+                return CurrentState.ThumbSticks.Right.X < (double)deadzone && PreviousState.ThumbSticks.Right.X >= (double)deadzone;
+            }
 
-            public bool RightStickDownCheck(float deadzone) => (double) this.CurrentState.ThumbSticks.Right.Y <= -(double) deadzone;
+            public bool RightStickDownCheck(float deadzone)
+            {
+                return CurrentState.ThumbSticks.Right.Y <= -(double)deadzone;
+            }
 
-            public bool RightStickDownPressed(float deadzone) => (double) this.CurrentState.ThumbSticks.Right.Y <= -(double) deadzone && (double) this.PreviousState.ThumbSticks.Right.Y > -(double) deadzone;
+            public bool RightStickDownPressed(float deadzone)
+            {
+                return CurrentState.ThumbSticks.Right.Y <= -(double)deadzone && PreviousState.ThumbSticks.Right.Y > -(double)deadzone;
+            }
 
-            public bool RightStickDownReleased(float deadzone) => (double) this.CurrentState.ThumbSticks.Right.Y > -(double) deadzone && (double) this.PreviousState.ThumbSticks.Right.Y <= -(double) deadzone;
+            public bool RightStickDownReleased(float deadzone)
+            {
+                return CurrentState.ThumbSticks.Right.Y > -(double)deadzone && PreviousState.ThumbSticks.Right.Y <= -(double)deadzone;
+            }
 
-            public bool RightStickUpCheck(float deadzone) => (double) this.CurrentState.ThumbSticks.Right.Y >= (double) deadzone;
+            public bool RightStickUpCheck(float deadzone)
+            {
+                return CurrentState.ThumbSticks.Right.Y >= (double)deadzone;
+            }
 
-            public bool RightStickUpPressed(float deadzone) => (double) this.CurrentState.ThumbSticks.Right.Y >= (double) deadzone && (double) this.PreviousState.ThumbSticks.Right.Y < (double) deadzone;
+            public bool RightStickUpPressed(float deadzone)
+            {
+                return CurrentState.ThumbSticks.Right.Y >= (double)deadzone && PreviousState.ThumbSticks.Right.Y < (double)deadzone;
+            }
 
-            public bool RightStickUpReleased(float deadzone) => (double) this.CurrentState.ThumbSticks.Right.Y < (double) deadzone && (double) this.PreviousState.ThumbSticks.Right.Y >= (double) deadzone;
+            public bool RightStickUpReleased(float deadzone)
+            {
+                return CurrentState.ThumbSticks.Right.Y < (double)deadzone && PreviousState.ThumbSticks.Right.Y >= (double)deadzone;
+            }
 
             public float RightStickHorizontal(float deadzone)
             {
-                float x = this.CurrentState.ThumbSticks.Right.X;
-                return (double) Math.Abs(x) < (double) deadzone ? 0.0f : x;
+                float x = CurrentState.ThumbSticks.Right.X;
+                return (double)Math.Abs(x) < (double)deadzone ? 0.0f : x;
             }
 
             public float RightStickVertical(float deadzone)
             {
-                float y = this.CurrentState.ThumbSticks.Right.Y;
-                return (double) Math.Abs(y) < (double) deadzone ? 0.0f : -y;
+                float y = CurrentState.ThumbSticks.Right.Y;
+                return (double)Math.Abs(y) < (double)deadzone ? 0.0f : -y;
             }
 
-            public int DPadHorizontal
+            public int DPadHorizontal => CurrentState.DPad.Right == ButtonState.Pressed ? 1 : CurrentState.DPad.Left != ButtonState.Pressed ? 0 : -1;
+
+            public int DPadVertical => CurrentState.DPad.Down == ButtonState.Pressed ? 1 : CurrentState.DPad.Up != ButtonState.Pressed ? 0 : -1;
+
+            public Vector2 DPad => new(DPadHorizontal, DPadVertical);
+
+            public bool DPadLeftCheck => CurrentState.DPad.Left == ButtonState.Pressed;
+
+            public bool DPadLeftPressed => CurrentState.DPad.Left == ButtonState.Pressed && PreviousState.DPad.Left == ButtonState.Released;
+
+            public bool DPadLeftReleased => CurrentState.DPad.Left == ButtonState.Released && PreviousState.DPad.Left == ButtonState.Pressed;
+
+            public bool DPadRightCheck => CurrentState.DPad.Right == ButtonState.Pressed;
+
+            public bool DPadRightPressed => CurrentState.DPad.Right == ButtonState.Pressed && PreviousState.DPad.Right == ButtonState.Released;
+
+            public bool DPadRightReleased => CurrentState.DPad.Right == ButtonState.Released && PreviousState.DPad.Right == ButtonState.Pressed;
+
+            public bool DPadUpCheck => CurrentState.DPad.Up == ButtonState.Pressed;
+
+            public bool DPadUpPressed => CurrentState.DPad.Up == ButtonState.Pressed && PreviousState.DPad.Up == ButtonState.Released;
+
+            public bool DPadUpReleased => CurrentState.DPad.Up == ButtonState.Released && PreviousState.DPad.Up == ButtonState.Pressed;
+
+            public bool DPadDownCheck => CurrentState.DPad.Down == ButtonState.Pressed;
+
+            public bool DPadDownPressed => CurrentState.DPad.Down == ButtonState.Pressed && PreviousState.DPad.Down == ButtonState.Released;
+
+            public bool DPadDownReleased => CurrentState.DPad.Down == ButtonState.Released && PreviousState.DPad.Down == ButtonState.Pressed;
+
+            public bool LeftTriggerCheck(float threshold)
             {
-                get
-                {
-                    if (this.CurrentState.DPad.Right == ButtonState.Pressed)
-                        return 1;
-                    return this.CurrentState.DPad.Left != ButtonState.Pressed ? 0 : -1;
-                }
+                return !MInput.Disabled && (double)CurrentState.Triggers.Left >= (double)threshold;
             }
 
-            public int DPadVertical
+            public bool LeftTriggerPressed(float threshold)
             {
-                get
-                {
-                    if (this.CurrentState.DPad.Down == ButtonState.Pressed)
-                        return 1;
-                    return this.CurrentState.DPad.Up != ButtonState.Pressed ? 0 : -1;
-                }
+                return !MInput.Disabled && (double)CurrentState.Triggers.Left >= (double)threshold && (double)PreviousState.Triggers.Left < (double)threshold;
             }
 
-            public Vector2 DPad => new Vector2((float) this.DPadHorizontal, (float) this.DPadVertical);
+            public bool LeftTriggerReleased(float threshold)
+            {
+                return !MInput.Disabled && (double)CurrentState.Triggers.Left < (double)threshold && (double)PreviousState.Triggers.Left >= (double)threshold;
+            }
 
-            public bool DPadLeftCheck => this.CurrentState.DPad.Left == ButtonState.Pressed;
+            public bool RightTriggerCheck(float threshold)
+            {
+                return !MInput.Disabled && (double)CurrentState.Triggers.Right >= (double)threshold;
+            }
 
-            public bool DPadLeftPressed => this.CurrentState.DPad.Left == ButtonState.Pressed && this.PreviousState.DPad.Left == ButtonState.Released;
+            public bool RightTriggerPressed(float threshold)
+            {
+                return !MInput.Disabled && (double)CurrentState.Triggers.Right >= (double)threshold && (double)PreviousState.Triggers.Right < (double)threshold;
+            }
 
-            public bool DPadLeftReleased => this.CurrentState.DPad.Left == ButtonState.Released && this.PreviousState.DPad.Left == ButtonState.Pressed;
-
-            public bool DPadRightCheck => this.CurrentState.DPad.Right == ButtonState.Pressed;
-
-            public bool DPadRightPressed => this.CurrentState.DPad.Right == ButtonState.Pressed && this.PreviousState.DPad.Right == ButtonState.Released;
-
-            public bool DPadRightReleased => this.CurrentState.DPad.Right == ButtonState.Released && this.PreviousState.DPad.Right == ButtonState.Pressed;
-
-            public bool DPadUpCheck => this.CurrentState.DPad.Up == ButtonState.Pressed;
-
-            public bool DPadUpPressed => this.CurrentState.DPad.Up == ButtonState.Pressed && this.PreviousState.DPad.Up == ButtonState.Released;
-
-            public bool DPadUpReleased => this.CurrentState.DPad.Up == ButtonState.Released && this.PreviousState.DPad.Up == ButtonState.Pressed;
-
-            public bool DPadDownCheck => this.CurrentState.DPad.Down == ButtonState.Pressed;
-
-            public bool DPadDownPressed => this.CurrentState.DPad.Down == ButtonState.Pressed && this.PreviousState.DPad.Down == ButtonState.Released;
-
-            public bool DPadDownReleased => this.CurrentState.DPad.Down == ButtonState.Released && this.PreviousState.DPad.Down == ButtonState.Pressed;
-
-            public bool LeftTriggerCheck(float threshold) => !MInput.Disabled && (double) this.CurrentState.Triggers.Left >= (double) threshold;
-
-            public bool LeftTriggerPressed(float threshold) => !MInput.Disabled && (double) this.CurrentState.Triggers.Left >= (double) threshold && (double) this.PreviousState.Triggers.Left < (double) threshold;
-
-            public bool LeftTriggerReleased(float threshold) => !MInput.Disabled && (double) this.CurrentState.Triggers.Left < (double) threshold && (double) this.PreviousState.Triggers.Left >= (double) threshold;
-
-            public bool RightTriggerCheck(float threshold) => !MInput.Disabled && (double) this.CurrentState.Triggers.Right >= (double) threshold;
-
-            public bool RightTriggerPressed(float threshold) => !MInput.Disabled && (double) this.CurrentState.Triggers.Right >= (double) threshold && (double) this.PreviousState.Triggers.Right < (double) threshold;
-
-            public bool RightTriggerReleased(float threshold) => !MInput.Disabled && (double) this.CurrentState.Triggers.Right < (double) threshold && (double) this.PreviousState.Triggers.Right >= (double) threshold;
+            public bool RightTriggerReleased(float threshold)
+            {
+                return !MInput.Disabled && (double)CurrentState.Triggers.Right < (double)threshold && (double)PreviousState.Triggers.Right >= (double)threshold;
+            }
 
             public float Axis(Buttons button, float threshold)
             {
                 if (MInput.Disabled)
+                {
                     return 0.0f;
+                }
+
                 switch (button)
                 {
                     case Buttons.DPadUp:
@@ -500,48 +701,81 @@ namespace Monocle
                     case Buttons.B:
                     case Buttons.X:
                     case Buttons.Y:
-                        if (this.Check(button))
+                        if (Check(button))
+                        {
                             return 1f;
+                        }
+
                         break;
                     case Buttons.LeftThumbstickLeft:
-                        if ((double) this.CurrentState.ThumbSticks.Left.X <= -(double) threshold)
-                            return -this.CurrentState.ThumbSticks.Left.X;
+                        if (CurrentState.ThumbSticks.Left.X <= -(double)threshold)
+                        {
+                            return -CurrentState.ThumbSticks.Left.X;
+                        }
+
                         break;
                     case Buttons.RightTrigger:
-                        if ((double) this.CurrentState.Triggers.Right >= (double) threshold)
-                            return this.CurrentState.Triggers.Right;
+                        if ((double)CurrentState.Triggers.Right >= (double)threshold)
+                        {
+                            return CurrentState.Triggers.Right;
+                        }
+
                         break;
                     case Buttons.LeftTrigger:
-                        if ((double) this.CurrentState.Triggers.Left >= (double) threshold)
-                            return this.CurrentState.Triggers.Left;
+                        if ((double)CurrentState.Triggers.Left >= (double)threshold)
+                        {
+                            return CurrentState.Triggers.Left;
+                        }
+
                         break;
                     case Buttons.RightThumbstickUp:
-                        if ((double) this.CurrentState.ThumbSticks.Right.Y >= (double) threshold)
-                            return this.CurrentState.ThumbSticks.Right.Y;
+                        if (CurrentState.ThumbSticks.Right.Y >= (double)threshold)
+                        {
+                            return CurrentState.ThumbSticks.Right.Y;
+                        }
+
                         break;
                     case Buttons.RightThumbstickDown:
-                        if ((double) this.CurrentState.ThumbSticks.Right.Y <= -(double) threshold)
-                            return -this.CurrentState.ThumbSticks.Right.Y;
+                        if (CurrentState.ThumbSticks.Right.Y <= -(double)threshold)
+                        {
+                            return -CurrentState.ThumbSticks.Right.Y;
+                        }
+
                         break;
                     case Buttons.RightThumbstickRight:
-                        if ((double) this.CurrentState.ThumbSticks.Right.X >= (double) threshold)
-                            return this.CurrentState.ThumbSticks.Right.X;
+                        if (CurrentState.ThumbSticks.Right.X >= (double)threshold)
+                        {
+                            return CurrentState.ThumbSticks.Right.X;
+                        }
+
                         break;
                     case Buttons.RightThumbstickLeft:
-                        if ((double) this.CurrentState.ThumbSticks.Right.X <= -(double) threshold)
-                            return -this.CurrentState.ThumbSticks.Right.X;
+                        if (CurrentState.ThumbSticks.Right.X <= -(double)threshold)
+                        {
+                            return -CurrentState.ThumbSticks.Right.X;
+                        }
+
                         break;
                     case Buttons.LeftThumbstickUp:
-                        if ((double) this.CurrentState.ThumbSticks.Left.Y >= (double) threshold)
-                            return this.CurrentState.ThumbSticks.Left.Y;
+                        if (CurrentState.ThumbSticks.Left.Y >= (double)threshold)
+                        {
+                            return CurrentState.ThumbSticks.Left.Y;
+                        }
+
                         break;
                     case Buttons.LeftThumbstickDown:
-                        if ((double) this.CurrentState.ThumbSticks.Left.Y <= -(double) threshold)
-                            return -this.CurrentState.ThumbSticks.Left.Y;
+                        if (CurrentState.ThumbSticks.Left.Y <= -(double)threshold)
+                        {
+                            return -CurrentState.ThumbSticks.Left.Y;
+                        }
+
                         break;
                     case Buttons.LeftThumbstickRight:
-                        if ((double) this.CurrentState.ThumbSticks.Left.X >= (double) threshold)
-                            return this.CurrentState.ThumbSticks.Left.X;
+                        if (CurrentState.ThumbSticks.Left.X >= (double)threshold)
+                        {
+                            return CurrentState.ThumbSticks.Left.X;
+                        }
+
                         break;
                 }
                 return 0.0f;
@@ -550,7 +784,10 @@ namespace Monocle
             public bool Check(Buttons button, float threshold)
             {
                 if (MInput.Disabled)
+                {
                     return false;
+                }
+
                 switch (button)
                 {
                     case Buttons.DPadUp:
@@ -567,48 +804,81 @@ namespace Monocle
                     case Buttons.B:
                     case Buttons.X:
                     case Buttons.Y:
-                        if (this.Check(button))
+                        if (Check(button))
+                        {
                             return true;
+                        }
+
                         break;
                     case Buttons.LeftThumbstickLeft:
-                        if (this.LeftStickLeftCheck(threshold))
+                        if (LeftStickLeftCheck(threshold))
+                        {
                             return true;
+                        }
+
                         break;
                     case Buttons.RightTrigger:
-                        if (this.RightTriggerCheck(threshold))
+                        if (RightTriggerCheck(threshold))
+                        {
                             return true;
+                        }
+
                         break;
                     case Buttons.LeftTrigger:
-                        if (this.LeftTriggerCheck(threshold))
+                        if (LeftTriggerCheck(threshold))
+                        {
                             return true;
+                        }
+
                         break;
                     case Buttons.RightThumbstickUp:
-                        if (this.RightStickUpCheck(threshold))
+                        if (RightStickUpCheck(threshold))
+                        {
                             return true;
+                        }
+
                         break;
                     case Buttons.RightThumbstickDown:
-                        if (this.RightStickDownCheck(threshold))
+                        if (RightStickDownCheck(threshold))
+                        {
                             return true;
+                        }
+
                         break;
                     case Buttons.RightThumbstickRight:
-                        if (this.RightStickRightCheck(threshold))
+                        if (RightStickRightCheck(threshold))
+                        {
                             return true;
+                        }
+
                         break;
                     case Buttons.RightThumbstickLeft:
-                        if (this.RightStickLeftCheck(threshold))
+                        if (RightStickLeftCheck(threshold))
+                        {
                             return true;
+                        }
+
                         break;
                     case Buttons.LeftThumbstickUp:
-                        if (this.LeftStickUpCheck(threshold))
+                        if (LeftStickUpCheck(threshold))
+                        {
                             return true;
+                        }
+
                         break;
                     case Buttons.LeftThumbstickDown:
-                        if (this.LeftStickDownCheck(threshold))
+                        if (LeftStickDownCheck(threshold))
+                        {
                             return true;
+                        }
+
                         break;
                     case Buttons.LeftThumbstickRight:
-                        if (this.LeftStickRightCheck(threshold))
+                        if (LeftStickRightCheck(threshold))
+                        {
                             return true;
+                        }
+
                         break;
                 }
                 return false;
@@ -617,7 +887,10 @@ namespace Monocle
             public bool Pressed(Buttons button, float threshold)
             {
                 if (MInput.Disabled)
+                {
                     return false;
+                }
+
                 switch (button)
                 {
                     case Buttons.DPadUp:
@@ -634,48 +907,81 @@ namespace Monocle
                     case Buttons.B:
                     case Buttons.X:
                     case Buttons.Y:
-                        if (this.Pressed(button))
+                        if (Pressed(button))
+                        {
                             return true;
+                        }
+
                         break;
                     case Buttons.LeftThumbstickLeft:
-                        if (this.LeftStickLeftPressed(threshold))
+                        if (LeftStickLeftPressed(threshold))
+                        {
                             return true;
+                        }
+
                         break;
                     case Buttons.RightTrigger:
-                        if (this.RightTriggerPressed(threshold))
+                        if (RightTriggerPressed(threshold))
+                        {
                             return true;
+                        }
+
                         break;
                     case Buttons.LeftTrigger:
-                        if (this.LeftTriggerPressed(threshold))
+                        if (LeftTriggerPressed(threshold))
+                        {
                             return true;
+                        }
+
                         break;
                     case Buttons.RightThumbstickUp:
-                        if (this.RightStickUpPressed(threshold))
+                        if (RightStickUpPressed(threshold))
+                        {
                             return true;
+                        }
+
                         break;
                     case Buttons.RightThumbstickDown:
-                        if (this.RightStickDownPressed(threshold))
+                        if (RightStickDownPressed(threshold))
+                        {
                             return true;
+                        }
+
                         break;
                     case Buttons.RightThumbstickRight:
-                        if (this.RightStickRightPressed(threshold))
+                        if (RightStickRightPressed(threshold))
+                        {
                             return true;
+                        }
+
                         break;
                     case Buttons.RightThumbstickLeft:
-                        if (this.RightStickLeftPressed(threshold))
+                        if (RightStickLeftPressed(threshold))
+                        {
                             return true;
+                        }
+
                         break;
                     case Buttons.LeftThumbstickUp:
-                        if (this.LeftStickUpPressed(threshold))
+                        if (LeftStickUpPressed(threshold))
+                        {
                             return true;
+                        }
+
                         break;
                     case Buttons.LeftThumbstickDown:
-                        if (this.LeftStickDownPressed(threshold))
+                        if (LeftStickDownPressed(threshold))
+                        {
                             return true;
+                        }
+
                         break;
                     case Buttons.LeftThumbstickRight:
-                        if (this.LeftStickRightPressed(threshold))
+                        if (LeftStickRightPressed(threshold))
+                        {
                             return true;
+                        }
+
                         break;
                 }
                 return false;
@@ -684,7 +990,10 @@ namespace Monocle
             public bool Released(Buttons button, float threshold)
             {
                 if (MInput.Disabled)
+                {
                     return false;
+                }
+
                 switch (button)
                 {
                     case Buttons.DPadUp:
@@ -701,48 +1010,81 @@ namespace Monocle
                     case Buttons.B:
                     case Buttons.X:
                     case Buttons.Y:
-                        if (this.Released(button))
+                        if (Released(button))
+                        {
                             return true;
+                        }
+
                         break;
                     case Buttons.LeftThumbstickLeft:
-                        if (this.LeftStickLeftReleased(threshold))
+                        if (LeftStickLeftReleased(threshold))
+                        {
                             return true;
+                        }
+
                         break;
                     case Buttons.RightTrigger:
-                        if (this.RightTriggerReleased(threshold))
+                        if (RightTriggerReleased(threshold))
+                        {
                             return true;
+                        }
+
                         break;
                     case Buttons.LeftTrigger:
-                        if (this.LeftTriggerReleased(threshold))
+                        if (LeftTriggerReleased(threshold))
+                        {
                             return true;
+                        }
+
                         break;
                     case Buttons.RightThumbstickUp:
-                        if (this.RightStickUpReleased(threshold))
+                        if (RightStickUpReleased(threshold))
+                        {
                             return true;
+                        }
+
                         break;
                     case Buttons.RightThumbstickDown:
-                        if (this.RightStickDownReleased(threshold))
+                        if (RightStickDownReleased(threshold))
+                        {
                             return true;
+                        }
+
                         break;
                     case Buttons.RightThumbstickRight:
-                        if (this.RightStickRightReleased(threshold))
+                        if (RightStickRightReleased(threshold))
+                        {
                             return true;
+                        }
+
                         break;
                     case Buttons.RightThumbstickLeft:
-                        if (this.RightStickLeftReleased(threshold))
+                        if (RightStickLeftReleased(threshold))
+                        {
                             return true;
+                        }
+
                         break;
                     case Buttons.LeftThumbstickUp:
-                        if (this.LeftStickUpReleased(threshold))
+                        if (LeftStickUpReleased(threshold))
+                        {
                             return true;
+                        }
+
                         break;
                     case Buttons.LeftThumbstickDown:
-                        if (this.LeftStickDownReleased(threshold))
+                        if (LeftStickDownReleased(threshold))
+                        {
                             return true;
+                        }
+
                         break;
                     case Buttons.LeftThumbstickRight:
-                        if (this.LeftStickRightReleased(threshold))
+                        if (LeftStickRightReleased(threshold))
+                        {
                             return true;
+                        }
+
                         break;
                 }
                 return false;

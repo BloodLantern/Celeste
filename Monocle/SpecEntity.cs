@@ -24,14 +24,17 @@ namespace Monocle
         public override void Added(Scene scene)
         {
             base.Added(scene);
-            if (!(this.Scene is T))
+            if (Scene is not T)
+            {
                 return;
-            this.SpecScene = this.Scene as T;
+            }
+
+            SpecScene = Scene as T;
         }
 
         public override void Removed(Scene scene)
         {
-            this.SpecScene = default (T);
+            SpecScene = default;
             base.Removed(scene);
         }
     }

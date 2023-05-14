@@ -47,7 +47,9 @@ namespace Monocle
                 for (int index2 = -1; index2 < 2; ++index2)
                 {
                     if (index1 != 0 || index2 != 0)
-                        Draw.SpriteBatch.DrawString(this.Font, this.DrawText, this.RenderPosition + new Vector2((float) (index1 * this.OutlineOffset), (float) (index2 * this.OutlineOffset)), this.OutlineColor, this.Rotation, this.Origin, this.Scale, this.Effects, 0.0f);
+                    {
+                        Draw.SpriteBatch.DrawString(Font, DrawText, RenderPosition + new Vector2(index1 * OutlineOffset, index2 * OutlineOffset), OutlineColor, Rotation, Origin, Scale, Effects, 0.0f);
+                    }
                 }
             }
             base.Render();

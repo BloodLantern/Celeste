@@ -72,7 +72,7 @@ namespace Celeste
                 MTexture mtexture = streams[i].Texture = Calc.Random.Choose(atlasSubtextures);
                 streams[i].Percent = Calc.Random.NextFloat();
                 streams[i].Speed = Calc.Random.Range(0.2f, 0.4f);
-                streams[i].Normal = Calc.AngleToVector(Calc.Random.NextFloat() * (float) (Math.PI * 2), 1f);
+                streams[i].Normal = Calc.AngleToVector(Calc.Random.NextFloat() * (float)(Math.PI * 2), 1f);
                 streams[i].Color = Calc.Random.Next(colorsMild.Length);
                 streamVerts[index1].TextureCoordinate = new Vector2(mtexture.LeftUV, mtexture.TopUV);
                 streamVerts[index1 + 1].TextureCoordinate = new Vector2(mtexture.RightUV, mtexture.TopUV);
@@ -87,7 +87,7 @@ namespace Celeste
             {
                 MTexture mtexture = streams[index4].Texture = Calc.Random.Choose(atlasSubtextures);
                 spirals[index4].Percent = Calc.Random.NextFloat();
-                spirals[index4].Offset = Calc.Random.NextFloat((float) (Math.PI * 2));
+                spirals[index4].Offset = Calc.Random.NextFloat((float)(Math.PI * 2));
                 spirals[index4].Color = Calc.Random.Next(colorsMild.Length);
                 for (int index5 = 0; index5 < SPIRAL_SEGMENTS; ++index5)
                 {
@@ -105,7 +105,7 @@ namespace Celeste
             for (int index6 = 0; index6 < 220; ++index6)
             {
                 particles[index6].Percent = Calc.Random.NextFloat();
-                particles[index6].Normal = Calc.AngleToVector(Calc.Random.NextFloat() * (float) (Math.PI * 2), 1f);
+                particles[index6].Normal = Calc.AngleToVector(Calc.Random.NextFloat() * (float)(Math.PI * 2), 1f);
                 particles[index6].Color = Calc.Random.Next(colorsMild.Length);
             }
             center = new Vector2(320f, 180f) / 2f;
@@ -118,21 +118,21 @@ namespace Celeste
         public void SnapStrength(Level level, Strengths strength)
         {
             this.strength = strength;
-            StrengthMultiplier = 1f + (float) strength;
-            level.Session.SetCounter(STRENGTH_FLAG, (int) strength);
+            StrengthMultiplier = 1f + (float)strength;
+            level.Session.SetCounter(STRENGTH_FLAG, (int)strength);
         }
 
         public void NextStrength(Level level, Strengths strength)
         {
             this.strength = strength;
-            level.Session.SetCounter(STRENGTH_FLAG, (int) strength);
+            level.Session.SetCounter(STRENGTH_FLAG, (int)strength);
         }
 
-        public int StreamCount => (int) MathHelper.Lerp(STREAM_MIN_COUNT, STREAM_MAX_COUNT, (StrengthMultiplier - 1) / 3);
+        public int StreamCount => (int)MathHelper.Lerp(STREAM_MIN_COUNT, STREAM_MAX_COUNT, (StrengthMultiplier - 1) / 3);
 
-        public int ParticleCount => (int) MathHelper.Lerp(PARTICLE_MIN_COUNT, PARTICLE_MAX_COUNT, (StrengthMultiplier - 1) / 3);
+        public int ParticleCount => (int)MathHelper.Lerp(PARTICLE_MIN_COUNT, PARTICLE_MAX_COUNT, (StrengthMultiplier - 1) / 3);
 
-        public int SpiralCount => (int) MathHelper.Lerp(SPIRAL_MIN_COUNT, SPIRAL_MAX_COUNT, (StrengthMultiplier - 1) / 3);
+        public int SpiralCount => (int)MathHelper.Lerp(SPIRAL_MIN_COUNT, SPIRAL_MAX_COUNT, (StrengthMultiplier - 1) / 3);
 
         public override void Update(Scene scene)
         {
@@ -141,15 +141,20 @@ namespace Celeste
             {
                 int counter = (scene as Level).Session.GetCounter(STRENGTH_FLAG);
                 if (counter >= 0)
+                {
                     SnapStrength(scene as Level, (Strengths)counter);
+                }
 
                 checkedFlag = true;
             }
             if (!Visible)
+            {
                 return;
+            }
 
             StrengthMultiplier = Calc.Approach(StrengthMultiplier, 1f + (float)strength, Engine.DeltaTime * 0.1f);
             if (scene.OnInterval(0.05f))
+            {
                 for (int colorMild = 0; colorMild < colorsMild.Length; ++colorMild)
                 {
                     colorsLerp[colorMild] = Color.Lerp(colorsMild[colorMild], colorsWild[colorMild], (StrengthMultiplier - 1) / 3);
@@ -159,7 +164,9 @@ namespace Celeste
                         colorsLerpTransparent[colorMild, i] = Color.Lerp(colorsLerp[colorMild], Color.Transparent, i / 19f) * FadeAlphaMultiplier;
                     }
                 }
-            float num1 = 1 + (StrengthMultiplier - 1) * 0.7f;
+            }
+
+            float num1 = 1 + ((StrengthMultiplier - 1) * 0.7f);
             int streamCount = StreamCount;
             int v1 = 0;
             for (int i = 0; i < streamCount; ++i)
@@ -167,12 +174,12 @@ namespace Celeste
                 streams[i].Percent += streams[i].Speed * Engine.DeltaTime * num1 * Direction;
                 if (streams[i].Percent >= 1 && Direction > 0)
                 {
-                    streams[i].Normal = Calc.AngleToVector(Calc.Random.NextFloat() * (float) (Math.PI * 2), 1f);
+                    streams[i].Normal = Calc.AngleToVector(Calc.Random.NextFloat() * (float)(Math.PI * 2), 1f);
                     --streams[i].Percent;
                 }
                 else if (streams[i].Percent < 0 && Direction < 0)
                 {
-                    streams[i].Normal = Calc.AngleToVector(Calc.Random.NextFloat() * (float) (Math.PI * 2), 1f);
+                    streams[i].Normal = Calc.AngleToVector(Calc.Random.NextFloat() * (float)(Math.PI * 2), 1f);
                     ++streams[i].Percent;
                 }
                 float percent = streams[i].Percent;
@@ -182,14 +189,14 @@ namespace Celeste
                 Vector2 vector2_1 = normal.Perpendicular();
                 Vector2 vector2_2 = (normal * 16f) + (normal * (1f - num2) * 200f);
                 float num4 = (1 - num2) * 8;
-                Color color1 = colorsLerpBlack[streams[i].Color, (int) (num2 * 0.6f * 19)];
-                Vector2 vector2_3 = normal * 16f + normal * (1f - num3) * 280f;
+                Color color1 = colorsLerpBlack[streams[i].Color, (int)(num2 * 0.6f * 19)];
+                Vector2 vector2_3 = (normal * 16f) + (normal * (1f - num3) * 280f);
                 float num5 = (1 - num3) * 8;
-                Color color2 = colorsLerpBlack[streams[i].Color, (int) (num3 * 0.6f * 19)];
-                Vector2 a = vector2_2 - vector2_1 * num4;
-                Vector2 b = vector2_2 + vector2_1 * num4;
-                Vector2 c = vector2_3 + vector2_1 * num5;
-                Vector2 d = vector2_3 - vector2_1 * num5;
+                Color color2 = colorsLerpBlack[streams[i].Color, (int)(num3 * 0.6f * 19)];
+                Vector2 a = vector2_2 - (vector2_1 * num4);
+                Vector2 b = vector2_2 + (vector2_1 * num4);
+                Vector2 c = vector2_3 + (vector2_1 * num5);
+                Vector2 d = vector2_3 - (vector2_1 * num5);
                 AssignVertColors(streamVerts, v1, ref color1, ref color1, ref color2, ref color2);
                 AssignVertPosition(streamVerts, v1, ref a, ref b, ref c, ref d);
                 v1 += 6;
@@ -201,16 +208,16 @@ namespace Celeste
                 particles[particle].Percent += Engine.DeltaTime * particleStrength * Direction;
                 if (particles[particle].Percent >= 1.0 && Direction > 0.0)
                 {
-                    particles[particle].Normal = Calc.AngleToVector(Calc.Random.NextFloat() * (float) (Math.PI * 2), 1f);
+                    particles[particle].Normal = Calc.AngleToVector(Calc.Random.NextFloat() * (float)(Math.PI * 2), 1f);
                     --particles[particle].Percent;
                 }
                 else if (particles[particle].Percent < 0.0 && Direction < 0.0)
                 {
-                    particles[particle].Normal = Calc.AngleToVector(Calc.Random.NextFloat() * (float) (Math.PI * 2), 1f);
+                    particles[particle].Normal = Calc.AngleToVector(Calc.Random.NextFloat() * (float)(Math.PI * 2), 1f);
                     ++particles[particle].Percent;
                 }
             }
-            float num7 = 0.2f + (StrengthMultiplier - 1) * 0.1f;
+            float num7 = 0.2f + ((StrengthMultiplier - 1) * 0.1f);
             int spiralCount = SpiralCount;
             Color color3 = Color.Lerp(Color.Lerp(bgColorOuterMild, bgColorOuterWild, (StrengthMultiplier - 1) / 3), Color.White, 0.1f) * 0.8f;
             int v2 = 0;
@@ -219,12 +226,12 @@ namespace Celeste
                 spirals[spiral].Percent += streams[spiral].Speed * Engine.DeltaTime * num7 * Direction;
                 if (spirals[spiral].Percent >= 1 && Direction > 0)
                 {
-                    spirals[spiral].Offset = Calc.Random.NextFloat((float) (Math.PI * 2));
+                    spirals[spiral].Offset = Calc.Random.NextFloat((float)(Math.PI * 2));
                     --spirals[spiral].Percent;
                 }
                 else if (spirals[spiral].Percent < 0 && Direction < 0)
                 {
-                    spirals[spiral].Offset = Calc.Random.NextFloat((float) (Math.PI * 2));
+                    spirals[spiral].Offset = Calc.Random.NextFloat((float)(Math.PI * 2));
                     ++spirals[spiral].Percent;
                 }
                 float percent = spirals[spiral].Percent;
@@ -235,29 +242,31 @@ namespace Celeste
                 {
                     float num10 = 1f - MathHelper.Lerp(num8, num9, i / SPIRAL_SEGMENTS);
                     float num11 = 1f - MathHelper.Lerp(num8, num9, (i + 1) / SPIRAL_SEGMENTS);
-                    Vector2 vector1 = Calc.AngleToVector(num10 * (BG_STEPS + (i * 0.2f)) + offset, 1f);
+                    Vector2 vector1 = Calc.AngleToVector((num10 * (BG_STEPS + (i * 0.2f))) + offset, 1f);
                     Vector2 vector2_4 = vector1 * num10 * 200f;
-                    float num12 = num10 * (4 + StrengthMultiplier * 4);
-                    Vector2 vector2 = Calc.AngleToVector(num11 * (BG_STEPS + (i + 1) * 0.2f) + offset, 1f);
+                    float num12 = num10 * (4 + (StrengthMultiplier * 4));
+                    Vector2 vector2 = Calc.AngleToVector((num11 * (BG_STEPS + ((i + 1) * 0.2f))) + offset, 1f);
                     Vector2 vector2_5 = vector2 * num11 * 200f;
-                    float num13 = num11 * (4 + StrengthMultiplier * 4);
+                    float num13 = num11 * (4 + (StrengthMultiplier * 4));
                     Color color4 = Color.Lerp(color3, Color.Black, (1 - num10) * 0.5f);
                     Color color5 = Color.Lerp(color3, Color.Black, (1 - num11) * 0.5f);
-                    Vector2 a = vector2_4 + vector1 * num12;
-                    Vector2 b = vector2_5 + vector2 * num13;
-                    Vector2 c = vector2_5 - vector2 * num13;
-                    Vector2 d = vector2_4 - vector1 * num12;
+                    Vector2 a = vector2_4 + (vector1 * num12);
+                    Vector2 b = vector2_5 + (vector2 * num13);
+                    Vector2 c = vector2_5 - (vector2 * num13);
+                    Vector2 d = vector2_4 - (vector1 * num12);
                     AssignVertColors(spiralVerts, v2, ref color4, ref color5, ref color5, ref color4);
                     AssignVertPosition(spiralVerts, v2, ref a, ref b, ref c, ref d);
                     v2 += 6;
                 }
             }
             Vector2 wind = (scene as Level).Wind;
-            float idk = (float) Math.Pow(0.001f, Engine.DeltaTime);
+            float idk = (float)Math.Pow(0.001f, Engine.DeltaTime);
             center += ((new Vector2(320f, 180f) / 2f) + (wind * 0.15f) + CenterOffset - center) * (1f - idk);
             offset += ((-wind * 0.25f) + OffsetOffset - offset) * (1f - idk);
             if (scene.OnInterval(0.025f))
-                shake = Calc.AngleToVector(Calc.Random.NextFloat((float) (Math.PI * 2)), 2 * (StrengthMultiplier - 1));
+            {
+                shake = Calc.AngleToVector(Calc.Random.NextFloat((float)(Math.PI * 2)), 2 * (StrengthMultiplier - 1));
+            }
 
             spinTime += (2f + StrengthMultiplier) * Engine.DeltaTime;
         }
@@ -297,18 +306,20 @@ namespace Celeste
         public override void BeforeRender(Scene scene)
         {
             if (buffer == null || buffer.IsDisposed)
+            {
                 buffer = VirtualContent.CreateRenderTarget("Black Hole", Celeste.GameWidth, Celeste.GameHeight);
+            }
 
             Engine.Graphics.GraphicsDevice.SetRenderTarget((RenderTarget2D)buffer);
             Engine.Graphics.GraphicsDevice.Clear(bgColorInner);
             Draw.SpriteBatch.Begin();
-            Color color1 = Color.Lerp(bgColorOuterMild, bgColorOuterWild, ((StrengthMultiplier - 1) / 3));
+            Color color1 = Color.Lerp(bgColorOuterMild, bgColorOuterWild, (StrengthMultiplier - 1) / 3);
             for (int i = 0; i < colorSteps; ++i)
             {
-                float num = (1 - spinTime) * 0.5f + i / colorSteps;
+                float num = ((1 - spinTime) * 0.5f) + (i / colorSteps);
                 Color color2 = Color.Lerp(bgColorInner, color1, Ease.SineOut(num));
                 float scale = Calc.ClampedMap(num, 0.0f, 1f, 0.1f, 4f);
-                float rotation = (float) (Math.PI * 2) * num;
+                float rotation = (float)(Math.PI * 2) * num;
                 bgTexture.DrawCentered(center + (offset * num) + (shake * (1f - num)), color2, scale, rotation);
             }
             Draw.SpriteBatch.End();
@@ -328,8 +339,8 @@ namespace Celeste
             {
                 float val = Ease.CubeIn(Calc.Clamp(particles[index].Percent, 0, 1));
                 Vector2 vector2_1 = center + (particles[index].Normal * Calc.ClampedMap(val, 1f, 0f, 8f, 220f));
-                Color color3 = colorsLerpTransparent[particles[index].Color, (int) val * 19];
-                float num = 1 + (1 - val) * 1.5f;
+                Color color3 = colorsLerpTransparent[particles[index].Color, (int)val * 19];
+                float num = 1 + ((1 - val) * 1.5f);
                 Vector2 vector2_2 = new Vector2(num, num) / 2f;
                 Draw.Rect(vector2_1 - vector2_2, num, num, color3);
             }
@@ -339,7 +350,9 @@ namespace Celeste
         public override void Ended(Scene scene)
         {
             if (buffer == null)
+            {
                 return;
+            }
 
             buffer.Dispose();
             buffer = null;
@@ -348,7 +361,9 @@ namespace Celeste
         public override void Render(Scene scene)
         {
             if (buffer == null || buffer.IsDisposed)
+            {
                 return;
+            }
 
             Vector2 vector2 = new Vector2(buffer.Width, buffer.Height) / 2f;
             Draw.SpriteBatch.Draw((RenderTarget2D)buffer, vector2, new Rectangle?(buffer.Bounds), Color.White * FadeAlphaMultiplier * Alpha, 0.0f, vector2, Scale, SpriteEffects.None, 0.0f);

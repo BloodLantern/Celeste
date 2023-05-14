@@ -18,55 +18,61 @@ namespace Celeste
         public NPC03_Oshiro_Lobby(Vector2 position)
             : base(position)
         {
-            this.Add((Component) (this.Sprite = (Sprite) new OshiroSprite(-1)));
-            this.Sprite.Visible = false;
+            Add(Sprite = new OshiroSprite(-1));
+            Sprite.Visible = false;
             MTexture mtexture = GFX.Gui["hover/resort"];
             if (GFX.Gui.Has("hover/resort_" + Settings.Instance.Language))
+            {
                 mtexture = GFX.Gui["hover/resort_" + Settings.Instance.Language];
-            this.Add((Component) (this.Talker = new TalkComponent(new Rectangle(-30, -16, 42, 32), new Vector2(-12f, -24f), new Action<Player>(this.OnTalk), new TalkComponent.HoverDisplay()
+            }
+
+            Add(Talker = new TalkComponent(new Rectangle(-30, -16, 42, 32), new Vector2(-12f, -24f), new Action<Player>(OnTalk), new TalkComponent.HoverDisplay()
             {
                 Texture = mtexture,
                 InputPosition = new Vector2(0.0f, -75f),
                 SfxIn = "event:/ui/game/hotspot_note_in",
                 SfxOut = "event:/ui/game/hotspot_note_out"
-            })));
-            this.Talker.PlayerMustBeFacing = false;
-            this.MoveAnim = "move";
-            this.IdleAnim = "idle";
-            this.Depth = 9001;
+            }));
+            Talker.PlayerMustBeFacing = false;
+            MoveAnim = "move";
+            IdleAnim = "idle";
+            Depth = 9001;
         }
 
         public override void Added(Scene scene)
         {
             base.Added(scene);
-            if (this.Session.GetFlag("oshiro_resort_talked_1"))
+            if (Session.GetFlag("oshiro_resort_talked_1"))
             {
-                this.Session.Audio.Music.Event = "event:/music/lvl3/explore";
-                this.Session.Audio.Music.Progress = 1;
-                this.Session.Audio.Apply();
-                this.RemoveSelf();
+                Session.Audio.Music.Event = "event:/music/lvl3/explore";
+                Session.Audio.Music.Progress = 1;
+                Session.Audio.Apply();
+                RemoveSelf();
             }
             else
             {
-                this.Session.Audio.Music.Event = (string) null;
-                this.Session.Audio.Apply();
+                Session.Audio.Music.Event = null;
+                Session.Audio.Apply();
             }
-            scene.Add((Entity) new OshiroLobbyBell(new Vector2(this.X - 14f, this.Y)));
-            this.startX = this.Position.X;
+            scene.Add(new OshiroLobbyBell(new Vector2(X - 14f, Y)));
+            startX = Position.X;
         }
 
         private void OnTalk(Player player)
         {
-            this.Scene.Add((Entity) new CS03_OshiroLobby(player, (NPC) this));
-            this.Talker.Enabled = false;
+            Scene.Add(new CS03_OshiroLobby(player, this));
+            Talker.Enabled = false;
         }
 
         public override void Update()
         {
             base.Update();
-            if ((double) this.X < (double) this.startX + 12.0)
+            if ((double)X < startX + 12.0)
+            {
                 return;
-            this.Depth = 1000;
+            }
+
+            Depth = 1000;
         }
     }
 }

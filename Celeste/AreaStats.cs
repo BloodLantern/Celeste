@@ -141,17 +141,25 @@ namespace Celeste
         public void CleanCheckpoints()
         {
             foreach (AreaMode index in Enum.GetValues(typeof(AreaMode)))
-                if ((AreaMode) AreaData.Get(ID).Mode.Length > index)
+            {
+                if ((AreaMode)AreaData.Get(ID).Mode.Length > index)
                 {
-                    AreaModeStats mode = Modes[(int) index];
-                    ModeProperties modeProperties = AreaData.Get(ID).Mode[(int) index];
+                    AreaModeStats mode = Modes[(int)index];
+                    ModeProperties modeProperties = AreaData.Get(ID).Mode[(int)index];
                     HashSet<string> stringSet = new(mode.Checkpoints);
                     mode.Checkpoints.Clear();
                     if (modeProperties != null && modeProperties.Checkpoints != null)
+                    {
                         foreach (CheckpointData checkpoint in modeProperties.Checkpoints)
+                        {
                             if (stringSet.Contains(checkpoint.Level))
+                            {
                                 _ = mode.Checkpoints.Add(checkpoint.Level);
+                            }
+                        }
+                    }
                 }
+            }
         }
     }
 }

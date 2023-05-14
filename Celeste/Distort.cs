@@ -63,17 +63,17 @@ namespace Celeste
         public static void Render(Texture2D source, Texture2D map, bool hasDistortion)
         {
             Effect fxDistort = GFX.FxDistort;
-            if (fxDistort != null && (((double) Distort.anxiety > 0.0 ? 1 : ((double) Distort.gamerate < 1.0 ? 1 : 0)) | (hasDistortion ? 1 : 0)) != 0)
+            if (fxDistort != null && ((anxiety > 0.0 ? 1 : (gamerate < 1.0 ? 1 : 0)) | (hasDistortion ? 1 : 0)) != 0)
             {
-                fxDistort.CurrentTechnique = (double) Distort.anxiety > 0.0 || (double) Distort.gamerate < 1.0 ? fxDistort.Techniques[nameof (Distort)] : fxDistort.Techniques["Displace"];
-                Engine.Graphics.GraphicsDevice.Textures[1] = (Texture) map;
+                fxDistort.CurrentTechnique = anxiety > 0.0 || gamerate < 1.0 ? fxDistort.Techniques[nameof(Distort)] : fxDistort.Techniques["Displace"];
+                Engine.Graphics.GraphicsDevice.Textures[1] = map;
                 Draw.SpriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, SamplerState.PointClamp, DepthStencilState.Default, RasterizerState.CullNone, fxDistort);
                 Draw.SpriteBatch.Draw(source, Vector2.Zero, Color.White);
                 Draw.SpriteBatch.End();
             }
             else
             {
-                Draw.SpriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, SamplerState.PointClamp, DepthStencilState.Default, RasterizerState.CullNone, (Effect) null);
+                Draw.SpriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, SamplerState.PointClamp, DepthStencilState.Default, RasterizerState.CullNone, null);
                 Draw.SpriteBatch.Draw(source, Vector2.Zero, Color.White);
                 Draw.SpriteBatch.End();
             }

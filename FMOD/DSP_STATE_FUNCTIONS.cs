@@ -8,19 +8,19 @@ using System;
 
 namespace FMOD
 {
-    public struct DSP_STATE_FUNCTIONS
+    public readonly struct DSP_STATE_FUNCTIONS
     {
-        private DSP_ALLOC_FUNC alloc;
-        private DSP_REALLOC_FUNC realloc;
-        private DSP_FREE_FUNC free;
-        private DSP_GETSAMPLERATE_FUNC getsamplerate;
-        private DSP_GETBLOCKSIZE_FUNC getblocksize;
-        private IntPtr dft;
-        private IntPtr pan;
-        private DSP_GETSPEAKERMODE_FUNC getspeakermode;
-        private DSP_GETCLOCK_FUNC getclock;
-        private DSP_GETLISTENERATTRIBUTES_FUNC getlistenerattributes;
-        private DSP_LOG_FUNC log;
-        private DSP_GETUSERDATA_FUNC getuserdata;
+        private readonly DSP_ALLOC_FUNC alloc;
+        private readonly DSP_REALLOC_FUNC realloc;
+        private readonly DSP_FREE_FUNC free;
+        private readonly DSP_GETSAMPLERATE_FUNC getsamplerate;
+        private readonly DSP_GETBLOCKSIZE_FUNC getblocksize;
+        private readonly IntPtr dft;
+        private readonly IntPtr pan;
+        private readonly DSP_GETSPEAKERMODE_FUNC getspeakermode;
+        private readonly DSP_GETCLOCK_FUNC getclock;
+        private readonly DSP_GETLISTENERATTRIBUTES_FUNC getlistenerattributes;
+        private readonly DSP_LOG_FUNC log;
+        private readonly DSP_GETUSERDATA_FUNC getuserdata;
     }
 }

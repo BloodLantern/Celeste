@@ -13,54 +13,115 @@ namespace FMOD
     {
         public RESULT getSystemObject(out FMOD.System system)
         {
-            system = (FMOD.System) null;
-            IntPtr system1;
-            int systemObject = (int) ChannelControl.FMOD_ChannelGroup_GetSystemObject(this.rawPtr, out system1);
+            int systemObject = (int)ChannelControl.FMOD_ChannelGroup_GetSystemObject(rawPtr, out IntPtr system1);
             system = new FMOD.System(system1);
-            return (RESULT) systemObject;
+            return (RESULT)systemObject;
         }
 
-        public RESULT stop() => ChannelControl.FMOD_ChannelGroup_Stop(this.rawPtr);
+        public RESULT stop()
+        {
+            return ChannelControl.FMOD_ChannelGroup_Stop(rawPtr);
+        }
 
-        public RESULT setPaused(bool paused) => ChannelControl.FMOD_ChannelGroup_SetPaused(this.rawPtr, paused);
+        public RESULT setPaused(bool paused)
+        {
+            return ChannelControl.FMOD_ChannelGroup_SetPaused(rawPtr, paused);
+        }
 
-        public RESULT getPaused(out bool paused) => ChannelControl.FMOD_ChannelGroup_GetPaused(this.rawPtr, out paused);
+        public RESULT getPaused(out bool paused)
+        {
+            return ChannelControl.FMOD_ChannelGroup_GetPaused(rawPtr, out paused);
+        }
 
-        public RESULT setVolume(float volume) => ChannelControl.FMOD_ChannelGroup_SetVolume(this.rawPtr, volume);
+        public RESULT setVolume(float volume)
+        {
+            return ChannelControl.FMOD_ChannelGroup_SetVolume(rawPtr, volume);
+        }
 
-        public RESULT getVolume(out float volume) => ChannelControl.FMOD_ChannelGroup_GetVolume(this.rawPtr, out volume);
+        public RESULT getVolume(out float volume)
+        {
+            return ChannelControl.FMOD_ChannelGroup_GetVolume(rawPtr, out volume);
+        }
 
-        public RESULT setVolumeRamp(bool ramp) => ChannelControl.FMOD_ChannelGroup_SetVolumeRamp(this.rawPtr, ramp);
+        public RESULT setVolumeRamp(bool ramp)
+        {
+            return ChannelControl.FMOD_ChannelGroup_SetVolumeRamp(rawPtr, ramp);
+        }
 
-        public RESULT getVolumeRamp(out bool ramp) => ChannelControl.FMOD_ChannelGroup_GetVolumeRamp(this.rawPtr, out ramp);
+        public RESULT getVolumeRamp(out bool ramp)
+        {
+            return ChannelControl.FMOD_ChannelGroup_GetVolumeRamp(rawPtr, out ramp);
+        }
 
-        public RESULT getAudibility(out float audibility) => ChannelControl.FMOD_ChannelGroup_GetAudibility(this.rawPtr, out audibility);
+        public RESULT getAudibility(out float audibility)
+        {
+            return ChannelControl.FMOD_ChannelGroup_GetAudibility(rawPtr, out audibility);
+        }
 
-        public RESULT setPitch(float pitch) => ChannelControl.FMOD_ChannelGroup_SetPitch(this.rawPtr, pitch);
+        public RESULT setPitch(float pitch)
+        {
+            return ChannelControl.FMOD_ChannelGroup_SetPitch(rawPtr, pitch);
+        }
 
-        public RESULT getPitch(out float pitch) => ChannelControl.FMOD_ChannelGroup_GetPitch(this.rawPtr, out pitch);
+        public RESULT getPitch(out float pitch)
+        {
+            return ChannelControl.FMOD_ChannelGroup_GetPitch(rawPtr, out pitch);
+        }
 
-        public RESULT setMute(bool mute) => ChannelControl.FMOD_ChannelGroup_SetMute(this.rawPtr, mute);
+        public RESULT setMute(bool mute)
+        {
+            return ChannelControl.FMOD_ChannelGroup_SetMute(rawPtr, mute);
+        }
 
-        public RESULT getMute(out bool mute) => ChannelControl.FMOD_ChannelGroup_GetMute(this.rawPtr, out mute);
+        public RESULT getMute(out bool mute)
+        {
+            return ChannelControl.FMOD_ChannelGroup_GetMute(rawPtr, out mute);
+        }
 
-        public RESULT setReverbProperties(int instance, float wet) => ChannelControl.FMOD_ChannelGroup_SetReverbProperties(this.rawPtr, instance, wet);
+        public RESULT setReverbProperties(int instance, float wet)
+        {
+            return ChannelControl.FMOD_ChannelGroup_SetReverbProperties(rawPtr, instance, wet);
+        }
 
-        public RESULT getReverbProperties(int instance, out float wet) => ChannelControl.FMOD_ChannelGroup_GetReverbProperties(this.rawPtr, instance, out wet);
+        public RESULT getReverbProperties(int instance, out float wet)
+        {
+            return ChannelControl.FMOD_ChannelGroup_GetReverbProperties(rawPtr, instance, out wet);
+        }
 
-        public RESULT setLowPassGain(float gain) => ChannelControl.FMOD_ChannelGroup_SetLowPassGain(this.rawPtr, gain);
+        public RESULT setLowPassGain(float gain)
+        {
+            return ChannelControl.FMOD_ChannelGroup_SetLowPassGain(rawPtr, gain);
+        }
 
-        public RESULT getLowPassGain(out float gain) => ChannelControl.FMOD_ChannelGroup_GetLowPassGain(this.rawPtr, out gain);
+        public RESULT getLowPassGain(out float gain)
+        {
+            return ChannelControl.FMOD_ChannelGroup_GetLowPassGain(rawPtr, out gain);
+        }
 
-        public RESULT setMode(MODE mode) => ChannelControl.FMOD_ChannelGroup_SetMode(this.rawPtr, mode);
+        public RESULT setMode(MODE mode)
+        {
+            return ChannelControl.FMOD_ChannelGroup_SetMode(rawPtr, mode);
+        }
 
-        public RESULT getMode(out MODE mode) => ChannelControl.FMOD_ChannelGroup_GetMode(this.rawPtr, out mode);
+        public RESULT getMode(out MODE mode)
+        {
+            return ChannelControl.FMOD_ChannelGroup_GetMode(rawPtr, out mode);
+        }
 
-        public RESULT setCallback(CHANNEL_CALLBACK callback) => ChannelControl.FMOD_ChannelGroup_SetCallback(this.rawPtr, callback);
+        public RESULT setCallback(CHANNEL_CALLBACK callback)
+        {
+            return ChannelControl.FMOD_ChannelGroup_SetCallback(rawPtr, callback);
+        }
 
-        public RESULT isPlaying(out bool isplaying) => ChannelControl.FMOD_ChannelGroup_IsPlaying(this.rawPtr, out isplaying);
+        public RESULT isPlaying(out bool isplaying)
+        {
+            return ChannelControl.FMOD_ChannelGroup_IsPlaying(rawPtr, out isplaying);
+        }
 
-        public RESULT setPan(float pan) => ChannelControl.FMOD_ChannelGroup_SetPan(this.rawPtr, pan);
+        public RESULT setPan(float pan)
+        {
+            return ChannelControl.FMOD_ChannelGroup_SetPan(rawPtr, pan);
+        }
 
         public RESULT setMixLevelsOutput(
             float frontleft,
@@ -72,10 +133,13 @@ namespace FMOD
             float backleft,
             float backright)
         {
-            return ChannelControl.FMOD_ChannelGroup_SetMixLevelsOutput(this.rawPtr, frontleft, frontright, center, lfe, surroundleft, surroundright, backleft, backright);
+            return ChannelControl.FMOD_ChannelGroup_SetMixLevelsOutput(rawPtr, frontleft, frontright, center, lfe, surroundleft, surroundright, backleft, backright);
         }
 
-        public RESULT setMixLevelsInput(float[] levels, int numlevels) => ChannelControl.FMOD_ChannelGroup_SetMixLevelsInput(this.rawPtr, levels, numlevels);
+        public RESULT setMixLevelsInput(float[] levels, int numlevels)
+        {
+            return ChannelControl.FMOD_ChannelGroup_SetMixLevelsInput(rawPtr, levels, numlevels);
+        }
 
         public RESULT setMixMatrix(
             float[] matrix,
@@ -83,7 +147,7 @@ namespace FMOD
             int inchannels,
             int inchannel_hop = 0)
         {
-            return ChannelControl.FMOD_ChannelGroup_SetMixMatrix(this.rawPtr, matrix, outchannels, inchannels, inchannel_hop);
+            return ChannelControl.FMOD_ChannelGroup_SetMixMatrix(rawPtr, matrix, outchannels, inchannels, inchannel_hop);
         }
 
         public RESULT getMixMatrix(
@@ -92,68 +156,108 @@ namespace FMOD
             out int inchannels,
             int inchannel_hop = 0)
         {
-            return ChannelControl.FMOD_ChannelGroup_GetMixMatrix(this.rawPtr, matrix, out outchannels, out inchannels, inchannel_hop);
+            return ChannelControl.FMOD_ChannelGroup_GetMixMatrix(rawPtr, matrix, out outchannels, out inchannels, inchannel_hop);
         }
 
-        public RESULT getDSPClock(out ulong dspclock, out ulong parentclock) => ChannelControl.FMOD_ChannelGroup_GetDSPClock(this.rawPtr, out dspclock, out parentclock);
+        public RESULT getDSPClock(out ulong dspclock, out ulong parentclock)
+        {
+            return ChannelControl.FMOD_ChannelGroup_GetDSPClock(rawPtr, out dspclock, out parentclock);
+        }
 
-        public RESULT setDelay(ulong dspclock_start, ulong dspclock_end, bool stopchannels = true) => ChannelControl.FMOD_ChannelGroup_SetDelay(this.rawPtr, dspclock_start, dspclock_end, stopchannels);
+        public RESULT setDelay(ulong dspclock_start, ulong dspclock_end, bool stopchannels = true)
+        {
+            return ChannelControl.FMOD_ChannelGroup_SetDelay(rawPtr, dspclock_start, dspclock_end, stopchannels);
+        }
 
         public RESULT getDelay(
             out ulong dspclock_start,
             out ulong dspclock_end,
             out bool stopchannels)
         {
-            return ChannelControl.FMOD_ChannelGroup_GetDelay(this.rawPtr, out dspclock_start, out dspclock_end, out stopchannels);
+            return ChannelControl.FMOD_ChannelGroup_GetDelay(rawPtr, out dspclock_start, out dspclock_end, out stopchannels);
         }
 
-        public RESULT addFadePoint(ulong dspclock, float volume) => ChannelControl.FMOD_ChannelGroup_AddFadePoint(this.rawPtr, dspclock, volume);
+        public RESULT addFadePoint(ulong dspclock, float volume)
+        {
+            return ChannelControl.FMOD_ChannelGroup_AddFadePoint(rawPtr, dspclock, volume);
+        }
 
-        public RESULT setFadePointRamp(ulong dspclock, float volume) => ChannelControl.FMOD_ChannelGroup_SetFadePointRamp(this.rawPtr, dspclock, volume);
+        public RESULT setFadePointRamp(ulong dspclock, float volume)
+        {
+            return ChannelControl.FMOD_ChannelGroup_SetFadePointRamp(rawPtr, dspclock, volume);
+        }
 
-        public RESULT removeFadePoints(ulong dspclock_start, ulong dspclock_end) => ChannelControl.FMOD_ChannelGroup_RemoveFadePoints(this.rawPtr, dspclock_start, dspclock_end);
+        public RESULT removeFadePoints(ulong dspclock_start, ulong dspclock_end)
+        {
+            return ChannelControl.FMOD_ChannelGroup_RemoveFadePoints(rawPtr, dspclock_start, dspclock_end);
+        }
 
         public RESULT getFadePoints(
             ref uint numpoints,
             ulong[] point_dspclock,
             float[] point_volume)
         {
-            return ChannelControl.FMOD_ChannelGroup_GetFadePoints(this.rawPtr, ref numpoints, point_dspclock, point_volume);
+            return ChannelControl.FMOD_ChannelGroup_GetFadePoints(rawPtr, ref numpoints, point_dspclock, point_volume);
         }
 
         public RESULT getDSP(int index, out DSP dsp)
         {
-            dsp = (DSP) null;
-            IntPtr dsp1;
-            int dsp2 = (int) ChannelControl.FMOD_ChannelGroup_GetDSP(this.rawPtr, index, out dsp1);
+            int dsp2 = (int)ChannelControl.FMOD_ChannelGroup_GetDSP(rawPtr, index, out IntPtr dsp1);
             dsp = new DSP(dsp1);
-            return (RESULT) dsp2;
+            return (RESULT)dsp2;
         }
 
-        public RESULT addDSP(int index, DSP dsp) => ChannelControl.FMOD_ChannelGroup_AddDSP(this.rawPtr, index, dsp.getRaw());
+        public RESULT addDSP(int index, DSP dsp)
+        {
+            return ChannelControl.FMOD_ChannelGroup_AddDSP(rawPtr, index, dsp.getRaw());
+        }
 
-        public RESULT removeDSP(DSP dsp) => ChannelControl.FMOD_ChannelGroup_RemoveDSP(this.rawPtr, dsp.getRaw());
+        public RESULT removeDSP(DSP dsp)
+        {
+            return ChannelControl.FMOD_ChannelGroup_RemoveDSP(rawPtr, dsp.getRaw());
+        }
 
-        public RESULT getNumDSPs(out int numdsps) => ChannelControl.FMOD_ChannelGroup_GetNumDSPs(this.rawPtr, out numdsps);
+        public RESULT getNumDSPs(out int numdsps)
+        {
+            return ChannelControl.FMOD_ChannelGroup_GetNumDSPs(rawPtr, out numdsps);
+        }
 
-        public RESULT setDSPIndex(DSP dsp, int index) => ChannelControl.FMOD_ChannelGroup_SetDSPIndex(this.rawPtr, dsp.getRaw(), index);
+        public RESULT setDSPIndex(DSP dsp, int index)
+        {
+            return ChannelControl.FMOD_ChannelGroup_SetDSPIndex(rawPtr, dsp.getRaw(), index);
+        }
 
-        public RESULT getDSPIndex(DSP dsp, out int index) => ChannelControl.FMOD_ChannelGroup_GetDSPIndex(this.rawPtr, dsp.getRaw(), out index);
+        public RESULT getDSPIndex(DSP dsp, out int index)
+        {
+            return ChannelControl.FMOD_ChannelGroup_GetDSPIndex(rawPtr, dsp.getRaw(), out index);
+        }
 
-        public RESULT set3DAttributes(ref VECTOR pos, ref VECTOR vel, ref VECTOR alt_pan_pos) => ChannelControl.FMOD_ChannelGroup_Set3DAttributes(this.rawPtr, ref pos, ref vel, ref alt_pan_pos);
+        public RESULT set3DAttributes(ref VECTOR pos, ref VECTOR vel, ref VECTOR alt_pan_pos)
+        {
+            return ChannelControl.FMOD_ChannelGroup_Set3DAttributes(rawPtr, ref pos, ref vel, ref alt_pan_pos);
+        }
 
-        public RESULT get3DAttributes(out VECTOR pos, out VECTOR vel, out VECTOR alt_pan_pos) => ChannelControl.FMOD_ChannelGroup_Get3DAttributes(this.rawPtr, out pos, out vel, out alt_pan_pos);
+        public RESULT get3DAttributes(out VECTOR pos, out VECTOR vel, out VECTOR alt_pan_pos)
+        {
+            return ChannelControl.FMOD_ChannelGroup_Get3DAttributes(rawPtr, out pos, out vel, out alt_pan_pos);
+        }
 
-        public RESULT set3DMinMaxDistance(float mindistance, float maxdistance) => ChannelControl.FMOD_ChannelGroup_Set3DMinMaxDistance(this.rawPtr, mindistance, maxdistance);
+        public RESULT set3DMinMaxDistance(float mindistance, float maxdistance)
+        {
+            return ChannelControl.FMOD_ChannelGroup_Set3DMinMaxDistance(rawPtr, mindistance, maxdistance);
+        }
 
-        public RESULT get3DMinMaxDistance(out float mindistance, out float maxdistance) => ChannelControl.FMOD_ChannelGroup_Get3DMinMaxDistance(this.rawPtr, out mindistance, out maxdistance);
+        public RESULT get3DMinMaxDistance(out float mindistance, out float maxdistance)
+        {
+            return ChannelControl.FMOD_ChannelGroup_Get3DMinMaxDistance(rawPtr, out mindistance, out maxdistance);
+        }
 
         public RESULT set3DConeSettings(
             float insideconeangle,
             float outsideconeangle,
             float outsidevolume)
         {
-            return ChannelControl.FMOD_ChannelGroup_Set3DConeSettings(this.rawPtr, insideconeangle, outsideconeangle, outsidevolume);
+            return ChannelControl.FMOD_ChannelGroup_Set3DConeSettings(rawPtr, insideconeangle, outsideconeangle, outsidevolume);
         }
 
         public RESULT get3DConeSettings(
@@ -161,46 +265,91 @@ namespace FMOD
             out float outsideconeangle,
             out float outsidevolume)
         {
-            return ChannelControl.FMOD_ChannelGroup_Get3DConeSettings(this.rawPtr, out insideconeangle, out outsideconeangle, out outsidevolume);
+            return ChannelControl.FMOD_ChannelGroup_Get3DConeSettings(rawPtr, out insideconeangle, out outsideconeangle, out outsidevolume);
         }
 
-        public RESULT set3DConeOrientation(ref VECTOR orientation) => ChannelControl.FMOD_ChannelGroup_Set3DConeOrientation(this.rawPtr, ref orientation);
+        public RESULT set3DConeOrientation(ref VECTOR orientation)
+        {
+            return ChannelControl.FMOD_ChannelGroup_Set3DConeOrientation(rawPtr, ref orientation);
+        }
 
-        public RESULT get3DConeOrientation(out VECTOR orientation) => ChannelControl.FMOD_ChannelGroup_Get3DConeOrientation(this.rawPtr, out orientation);
+        public RESULT get3DConeOrientation(out VECTOR orientation)
+        {
+            return ChannelControl.FMOD_ChannelGroup_Get3DConeOrientation(rawPtr, out orientation);
+        }
 
-        public RESULT set3DCustomRolloff(ref VECTOR points, int numpoints) => ChannelControl.FMOD_ChannelGroup_Set3DCustomRolloff(this.rawPtr, ref points, numpoints);
+        public RESULT set3DCustomRolloff(ref VECTOR points, int numpoints)
+        {
+            return ChannelControl.FMOD_ChannelGroup_Set3DCustomRolloff(rawPtr, ref points, numpoints);
+        }
 
-        public RESULT get3DCustomRolloff(out IntPtr points, out int numpoints) => ChannelControl.FMOD_ChannelGroup_Get3DCustomRolloff(this.rawPtr, out points, out numpoints);
+        public RESULT get3DCustomRolloff(out IntPtr points, out int numpoints)
+        {
+            return ChannelControl.FMOD_ChannelGroup_Get3DCustomRolloff(rawPtr, out points, out numpoints);
+        }
 
-        public RESULT set3DOcclusion(float directocclusion, float reverbocclusion) => ChannelControl.FMOD_ChannelGroup_Set3DOcclusion(this.rawPtr, directocclusion, reverbocclusion);
+        public RESULT set3DOcclusion(float directocclusion, float reverbocclusion)
+        {
+            return ChannelControl.FMOD_ChannelGroup_Set3DOcclusion(rawPtr, directocclusion, reverbocclusion);
+        }
 
-        public RESULT get3DOcclusion(out float directocclusion, out float reverbocclusion) => ChannelControl.FMOD_ChannelGroup_Get3DOcclusion(this.rawPtr, out directocclusion, out reverbocclusion);
+        public RESULT get3DOcclusion(out float directocclusion, out float reverbocclusion)
+        {
+            return ChannelControl.FMOD_ChannelGroup_Get3DOcclusion(rawPtr, out directocclusion, out reverbocclusion);
+        }
 
-        public RESULT set3DSpread(float angle) => ChannelControl.FMOD_ChannelGroup_Set3DSpread(this.rawPtr, angle);
+        public RESULT set3DSpread(float angle)
+        {
+            return ChannelControl.FMOD_ChannelGroup_Set3DSpread(rawPtr, angle);
+        }
 
-        public RESULT get3DSpread(out float angle) => ChannelControl.FMOD_ChannelGroup_Get3DSpread(this.rawPtr, out angle);
+        public RESULT get3DSpread(out float angle)
+        {
+            return ChannelControl.FMOD_ChannelGroup_Get3DSpread(rawPtr, out angle);
+        }
 
-        public RESULT set3DLevel(float level) => ChannelControl.FMOD_ChannelGroup_Set3DLevel(this.rawPtr, level);
+        public RESULT set3DLevel(float level)
+        {
+            return ChannelControl.FMOD_ChannelGroup_Set3DLevel(rawPtr, level);
+        }
 
-        public RESULT get3DLevel(out float level) => ChannelControl.FMOD_ChannelGroup_Get3DLevel(this.rawPtr, out level);
+        public RESULT get3DLevel(out float level)
+        {
+            return ChannelControl.FMOD_ChannelGroup_Get3DLevel(rawPtr, out level);
+        }
 
-        public RESULT set3DDopplerLevel(float level) => ChannelControl.FMOD_ChannelGroup_Set3DDopplerLevel(this.rawPtr, level);
+        public RESULT set3DDopplerLevel(float level)
+        {
+            return ChannelControl.FMOD_ChannelGroup_Set3DDopplerLevel(rawPtr, level);
+        }
 
-        public RESULT get3DDopplerLevel(out float level) => ChannelControl.FMOD_ChannelGroup_Get3DDopplerLevel(this.rawPtr, out level);
+        public RESULT get3DDopplerLevel(out float level)
+        {
+            return ChannelControl.FMOD_ChannelGroup_Get3DDopplerLevel(rawPtr, out level);
+        }
 
-        public RESULT set3DDistanceFilter(bool custom, float customLevel, float centerFreq) => ChannelControl.FMOD_ChannelGroup_Set3DDistanceFilter(this.rawPtr, custom, customLevel, centerFreq);
+        public RESULT set3DDistanceFilter(bool custom, float customLevel, float centerFreq)
+        {
+            return ChannelControl.FMOD_ChannelGroup_Set3DDistanceFilter(rawPtr, custom, customLevel, centerFreq);
+        }
 
         public RESULT get3DDistanceFilter(
             out bool custom,
             out float customLevel,
             out float centerFreq)
         {
-            return ChannelControl.FMOD_ChannelGroup_Get3DDistanceFilter(this.rawPtr, out custom, out customLevel, out centerFreq);
+            return ChannelControl.FMOD_ChannelGroup_Get3DDistanceFilter(rawPtr, out custom, out customLevel, out centerFreq);
         }
 
-        public RESULT setUserData(IntPtr userdata) => ChannelControl.FMOD_ChannelGroup_SetUserData(this.rawPtr, userdata);
+        public RESULT setUserData(IntPtr userdata)
+        {
+            return ChannelControl.FMOD_ChannelGroup_SetUserData(rawPtr, userdata);
+        }
 
-        public RESULT getUserData(out IntPtr userdata) => ChannelControl.FMOD_ChannelGroup_GetUserData(this.rawPtr, out userdata);
+        public RESULT getUserData(out IntPtr userdata)
+        {
+            return ChannelControl.FMOD_ChannelGroup_GetUserData(rawPtr, out userdata);
+        }
 
         [DllImport("fmod")]
         private static extern RESULT FMOD_ChannelGroup_Stop(IntPtr channelgroup);

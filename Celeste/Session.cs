@@ -74,7 +74,7 @@ namespace Celeste
         [NonSerialized]
         public bool JustStarted;
 
-        public MapData MapData => AreaData.Areas[Area.ID].Mode[(int) Area.Mode].MapData;
+        public MapData MapData => AreaData.Areas[Area.ID].Mode[(int)Area.Mode].MapData;
 
         private Session()
         {
@@ -108,37 +108,37 @@ namespace Celeste
                 if (checkpointAudioState != null)
                 {
                     if (checkpointAudioState.Music != null)
+                    {
                         Audio.Music = checkpointAudioState.Music.Clone();
+                    }
+
                     if (checkpointAudioState.Ambience != null)
+                    {
                         Audio.Ambience = checkpointAudioState.Ambience.Clone();
+                    }
                 }
                 string checkpointColorGrading = AreaData.GetCheckpointColorGrading(area, checkpoint);
                 if (checkpointColorGrading != null)
+                {
                     ColorGrade = checkpointColorGrading;
+                }
+
                 CheckpointData checkpoint1 = AreaData.GetCheckpoint(area, checkpoint);
                 if (checkpoint1 != null && checkpoint1.Flags != null)
                 {
                     foreach (string flag in checkpoint1.Flags)
+                    {
                         SetFlag(flag);
+                    }
                 }
             }
-            if (oldStats != null)
-                OldStats = oldStats;
-            else
-                OldStats = SaveData.Instance.Areas[Area.ID].Clone();
+            OldStats = oldStats ?? SaveData.Instance.Areas[Area.ID].Clone();
         }
 
         public LevelData LevelData => MapData.Get(Level);
 
-        public bool FullClear
-        {
-            get
-            {
-                if (Area.Mode != AreaMode.Normal || !Cassette || !HeartGem || Strawberries.Count < MapData.DetectedStrawberries)
-                    return false;
-                return Area.ID != 7 || HasAllSummitGems;
-            }
-        }
+        public bool FullClear => Area.Mode == AreaMode.Normal && Cassette && HeartGem && Strawberries.Count >= MapData.DetectedStrawberries
+&& (Area.ID != 7 || HasAllSummitGems);
 
         public bool ShouldAdvance => Area.Mode == AreaMode.Normal && !OldStats.Modes[0].Completed && Area.ID < SaveData.Instance.MaxArea;
 
@@ -152,12 +152,17 @@ namespace Celeste
             {
                 session.Level = intoLevel;
                 if (intoLevel != MapData.StartLevel().Name)
+                {
                     session.StartedFromBeginning = false;
+                }
             }
             return session;
         }
 
-        public void UpdateLevelStartDashes() => DashesAtLevelStart = Dashes;
+        public void UpdateLevelStartDashes()
+        {
+            DashesAtLevelStart = Dashes;
+        }
 
         public bool HasAllSummitGems
         {
@@ -166,22 +171,27 @@ namespace Celeste
                 for (int index = 0; index < SummitGems.Length; ++index)
                 {
                     if (!SummitGems[index])
+                    {
                         return false;
+                    }
                 }
                 return true;
             }
         }
 
-        public Vector2 GetSpawnPoint(Vector2 from) => LevelData.Spawns.ClosestTo(from);
+        public Vector2 GetSpawnPoint(Vector2 from)
+        {
+            return LevelData.Spawns.ClosestTo(from);
+        }
 
-        public bool GetFlag(string flag) => Flags.Contains(flag);
+        public bool GetFlag(string flag)
+        {
+            return Flags.Contains(flag);
+        }
 
         public void SetFlag(string flag, bool setTo = true)
         {
-            if (setTo)
-                Flags.Add(flag);
-            else
-                Flags.Remove(flag);
+            _ = setTo ? Flags.Add(flag) : Flags.Remove(flag);
         }
 
         public int GetCounter(string counter)
@@ -189,7 +199,9 @@ namespace Celeste
             for (int index = 0; index < Counters.Count; ++index)
             {
                 if (Counters[index].Key.Equals(counter))
+                {
                     return Counters[index].Value;
+                }
             }
             return 0;
         }
@@ -228,7 +240,10 @@ namespace Celeste
             });
         }
 
-        public bool GetLevelFlag(string level) => LevelFlags.Contains(level);
+        public bool GetLevelFlag(string level)
+        {
+            return LevelFlags.Contains(level);
+        }
 
         [Serializable]
         public class Counter

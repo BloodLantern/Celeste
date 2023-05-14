@@ -16,14 +16,16 @@ namespace Monocle
     public class Atlas
     {
         public List<VirtualTexture> Sources;
-        private Dictionary<string, MTexture> textures = new Dictionary<string, MTexture>((IEqualityComparer<string>) StringComparer.OrdinalIgnoreCase);
-        private Dictionary<string, List<MTexture>> orderedTexturesCache = new Dictionary<string, List<MTexture>>();
-        private Dictionary<string, string> links = new Dictionary<string, string>();
+        private readonly Dictionary<string, MTexture> textures = new(StringComparer.OrdinalIgnoreCase);
+        private readonly Dictionary<string, List<MTexture>> orderedTexturesCache = new();
+        private readonly Dictionary<string, string> links = new();
 
         public static Atlas FromAtlas(string path, Atlas.AtlasDataFormat format)
         {
-            Atlas atlas = new Atlas();
-            atlas.Sources = new List<VirtualTexture>();
+            Atlas atlas = new()
+            {
+                Sources = new List<VirtualTexture>()
+            };
             Atlas.ReadAtlasData(atlas, path, format);
             return atlas;
         }
@@ -36,41 +38,43 @@ namespace Monocle
                     XmlElement xml1 = Calc.LoadContentXML(path)["TextureAtlas"];
                     string path2_1 = xml1.Attr("imagePath", "");
                     VirtualTexture texture1 = VirtualContent.CreateTexture(Path.Combine(Path.GetDirectoryName(path), path2_1));
-                    MTexture parent1 = new MTexture(texture1);
+                    MTexture parent1 = new(texture1);
                     atlas.Sources.Add(texture1);
                     IEnumerator enumerator1 = xml1.GetElementsByTagName("SubTexture").GetEnumerator();
                     try
                     {
                         while (enumerator1.MoveNext())
                         {
-                            XmlElement current = (XmlElement) enumerator1.Current;
+                            XmlElement current = (XmlElement)enumerator1.Current;
                             string str = current.Attr("name");
                             Rectangle clipRect = current.Rect();
-                            atlas.textures[str] = !current.HasAttr("frameX") ? new MTexture(parent1, str, clipRect) : new MTexture(parent1, str, clipRect, new Vector2((float) -current.AttrInt("frameX"), (float) -current.AttrInt("frameY")), current.AttrInt("frameWidth"), current.AttrInt("frameHeight"));
+                            atlas.textures[str] = !current.HasAttr("frameX") ? new MTexture(parent1, str, clipRect) : new MTexture(parent1, str, clipRect, new Vector2(-current.AttrInt("frameX"), -current.AttrInt("frameY")), current.AttrInt("frameWidth"), current.AttrInt("frameHeight"));
                         }
                         break;
                     }
                     finally
                     {
                         if (enumerator1 is IDisposable disposable)
+                        {
                             disposable.Dispose();
+                        }
                     }
                 case Atlas.AtlasDataFormat.CrunchXml:
-                    IEnumerator enumerator2 = Calc.LoadContentXML(path)[nameof (atlas)].GetEnumerator();
+                    IEnumerator enumerator2 = Calc.LoadContentXML(path)[nameof(atlas)].GetEnumerator();
                     try
                     {
                         while (enumerator2.MoveNext())
                         {
-                            XmlElement current = (XmlElement) enumerator2.Current;
+                            XmlElement current = (XmlElement)enumerator2.Current;
                             string str1 = current.Attr("n", "");
                             VirtualTexture texture2 = VirtualContent.CreateTexture(Path.Combine(Path.GetDirectoryName(path), str1 + ".png"));
-                            MTexture parent2 = new MTexture(texture2);
+                            MTexture parent2 = new(texture2);
                             atlas.Sources.Add(texture2);
-                            foreach (XmlElement xml2 in (XmlNode) current)
+                            foreach (XmlElement xml2 in (XmlNode)current)
                             {
                                 string str2 = xml2.Attr("n");
-                                Rectangle clipRect = new Rectangle(xml2.AttrInt("x"), xml2.AttrInt("y"), xml2.AttrInt("w"), xml2.AttrInt("h"));
-                                atlas.textures[str2] = !xml2.HasAttr("fx") ? new MTexture(parent2, str2, clipRect) : new MTexture(parent2, str2, clipRect, new Vector2((float) -xml2.AttrInt("fx"), (float) -xml2.AttrInt("fy")), xml2.AttrInt("fw"), xml2.AttrInt("fh"));
+                                Rectangle clipRect = new(xml2.AttrInt("x"), xml2.AttrInt("y"), xml2.AttrInt("w"), xml2.AttrInt("h"));
+                                atlas.textures[str2] = !xml2.HasAttr("fx") ? new MTexture(parent2, str2, clipRect) : new MTexture(parent2, str2, clipRect, new Vector2(-xml2.AttrInt("fx"), -xml2.AttrInt("fy")), xml2.AttrInt("fw"), xml2.AttrInt("fh"));
                             }
                         }
                         break;
@@ -78,21 +82,23 @@ namespace Monocle
                     finally
                     {
                         if (enumerator2 is IDisposable disposable)
+                        {
                             disposable.Dispose();
+                        }
                     }
                 case Atlas.AtlasDataFormat.CrunchBinary:
                     using (FileStream input = File.OpenRead(Path.Combine(Engine.ContentDirectory, path)))
                     {
-                        BinaryReader stream = new BinaryReader((Stream) input);
+                        BinaryReader stream = new(input);
                         short num1 = stream.ReadInt16();
-                        for (int index1 = 0; index1 < (int) num1; ++index1)
+                        for (int index1 = 0; index1 < num1; ++index1)
                         {
                             string str3 = stream.ReadNullTerminatedString();
                             VirtualTexture texture3 = VirtualContent.CreateTexture(Path.Combine(Path.GetDirectoryName(path), str3 + ".png"));
                             atlas.Sources.Add(texture3);
-                            MTexture parent3 = new MTexture(texture3);
+                            MTexture parent3 = new(texture3);
                             short num2 = stream.ReadInt16();
-                            for (int index2 = 0; index2 < (int) num2; ++index2)
+                            for (int index2 = 0; index2 < num2; ++index2)
                             {
                                 string str4 = stream.ReadNullTerminatedString();
                                 short x = stream.ReadInt16();
@@ -103,7 +109,7 @@ namespace Monocle
                                 short num4 = stream.ReadInt16();
                                 short width2 = stream.ReadInt16();
                                 short height2 = stream.ReadInt16();
-                                atlas.textures[str4] = new MTexture(parent3, str4, new Rectangle((int) x, (int) y, (int) width1, (int) height1), new Vector2((float) -num3, (float) -num4), (int) width2, (int) height2);
+                                atlas.textures[str4] = new MTexture(parent3, str4, new Rectangle(x, y, width1, height1), new Vector2(-num3, -num4), width2, height2);
                             }
                         }
                         break;
@@ -119,27 +125,27 @@ namespace Monocle
                 case Atlas.AtlasDataFormat.CrunchBinaryNoAtlas:
                     using (FileStream input = File.OpenRead(Path.Combine(Engine.ContentDirectory, path + ".bin")))
                     {
-                        BinaryReader stream = new BinaryReader((Stream) input);
+                        BinaryReader stream = new(input);
                         short num5 = stream.ReadInt16();
-                        for (int index3 = 0; index3 < (int) num5; ++index3)
+                        for (int index3 = 0; index3 < num5; ++index3)
                         {
                             string path2_2 = stream.ReadNullTerminatedString();
                             string path1 = Path.Combine(Path.GetDirectoryName(path), path2_2);
                             short num6 = stream.ReadInt16();
-                            for (int index4 = 0; index4 < (int) num6; ++index4)
+                            for (int index4 = 0; index4 < num6; ++index4)
                             {
                                 string key = stream.ReadNullTerminatedString();
-                                int num7 = (int) stream.ReadInt16();
-                                int num8 = (int) stream.ReadInt16();
-                                int num9 = (int) stream.ReadInt16();
-                                int num10 = (int) stream.ReadInt16();
+                                _ = (int)stream.ReadInt16();
+                                _ = (int)stream.ReadInt16();
+                                _ = (int)stream.ReadInt16();
+                                _ = (int)stream.ReadInt16();
                                 short num11 = stream.ReadInt16();
                                 short num12 = stream.ReadInt16();
                                 short frameWidth = stream.ReadInt16();
                                 short frameHeight = stream.ReadInt16();
                                 VirtualTexture texture4 = VirtualContent.CreateTexture(Path.Combine(path1, key + ".png"));
                                 atlas.Sources.Add(texture4);
-                                atlas.textures[key] = new MTexture(texture4, new Vector2((float) -num11, (float) -num12), (int) frameWidth, (int) frameHeight);
+                                atlas.textures[key] = new MTexture(texture4, new Vector2(-num11, -num12), frameWidth, frameHeight);
                             }
                         }
                         break;
@@ -147,19 +153,19 @@ namespace Monocle
                 case Atlas.AtlasDataFormat.Packer:
                     using (FileStream input = File.OpenRead(Path.Combine(Engine.ContentDirectory, path + ".meta")))
                     {
-                        BinaryReader binaryReader = new BinaryReader((Stream) input);
-                        binaryReader.ReadInt32();
-                        binaryReader.ReadString();
-                        binaryReader.ReadInt32();
+                        BinaryReader binaryReader = new(input);
+                        _ = binaryReader.ReadInt32();
+                        _ = binaryReader.ReadString();
+                        _ = binaryReader.ReadInt32();
                         short num13 = binaryReader.ReadInt16();
-                        for (int index5 = 0; index5 < (int) num13; ++index5)
+                        for (int index5 = 0; index5 < num13; ++index5)
                         {
                             string str5 = binaryReader.ReadString();
                             VirtualTexture texture5 = VirtualContent.CreateTexture(Path.Combine(Path.GetDirectoryName(path), str5 + ".data"));
                             atlas.Sources.Add(texture5);
-                            MTexture parent4 = new MTexture(texture5);
+                            MTexture parent4 = new(texture5);
                             short num14 = binaryReader.ReadInt16();
-                            for (int index6 = 0; index6 < (int) num14; ++index6)
+                            for (int index6 = 0; index6 < num14; ++index6)
                             {
                                 string str6 = binaryReader.ReadString().Replace('\\', '/');
                                 short x = binaryReader.ReadInt16();
@@ -170,13 +176,16 @@ namespace Monocle
                                 short num16 = binaryReader.ReadInt16();
                                 short width4 = binaryReader.ReadInt16();
                                 short height4 = binaryReader.ReadInt16();
-                                atlas.textures[str6] = new MTexture(parent4, str6, new Rectangle((int) x, (int) y, (int) width3, (int) height3), new Vector2((float) -num15, (float) -num16), (int) width4, (int) height4);
+                                atlas.textures[str6] = new MTexture(parent4, str6, new Rectangle(x, y, width3, height3), new Vector2(-num15, -num16), width4, height4);
                             }
                         }
                         if (input.Position >= input.Length || !(binaryReader.ReadString() == "LINKS"))
+                        {
                             break;
+                        }
+
                         short num17 = binaryReader.ReadInt16();
-                        for (int index = 0; index < (int) num17; ++index)
+                        for (int index = 0; index < num17; ++index)
                         {
                             string key = binaryReader.ReadString();
                             string str = binaryReader.ReadString();
@@ -187,37 +196,42 @@ namespace Monocle
                 case Atlas.AtlasDataFormat.PackerNoAtlas:
                     using (FileStream input = File.OpenRead(Path.Combine(Engine.ContentDirectory, path + ".meta")))
                     {
-                        BinaryReader binaryReader = new BinaryReader((Stream) input);
-                        binaryReader.ReadInt32();
-                        binaryReader.ReadString();
-                        binaryReader.ReadInt32();
+                        BinaryReader binaryReader = new(input);
+                        _ = binaryReader.ReadInt32();
+                        _ = binaryReader.ReadString();
+                        _ = binaryReader.ReadInt32();
                         short num18 = binaryReader.ReadInt16();
-                        for (int index7 = 0; index7 < (int) num18; ++index7)
+                        for (int index7 = 0; index7 < num18; ++index7)
                         {
                             string path2_3 = binaryReader.ReadString();
                             string path1 = Path.Combine(Path.GetDirectoryName(path), path2_3);
                             short num19 = binaryReader.ReadInt16();
-                            for (int index8 = 0; index8 < (int) num19; ++index8)
+                            for (int index8 = 0; index8 < num19; ++index8)
                             {
                                 string key = binaryReader.ReadString().Replace('\\', '/');
-                                int num20 = (int) binaryReader.ReadInt16();
-                                int num21 = (int) binaryReader.ReadInt16();
-                                int num22 = (int) binaryReader.ReadInt16();
-                                int num23 = (int) binaryReader.ReadInt16();
+                                _ = (int)binaryReader.ReadInt16();
+                                _ = (int)binaryReader.ReadInt16();
+                                _ = (int)binaryReader.ReadInt16();
+                                _ = (int)binaryReader.ReadInt16();
                                 short num24 = binaryReader.ReadInt16();
                                 short num25 = binaryReader.ReadInt16();
                                 short frameWidth = binaryReader.ReadInt16();
                                 short frameHeight = binaryReader.ReadInt16();
                                 VirtualTexture texture6 = VirtualContent.CreateTexture(Path.Combine(path1, key + ".data"));
                                 atlas.Sources.Add(texture6);
-                                atlas.textures[key] = new MTexture(texture6, new Vector2((float) -num24, (float) -num25), (int) frameWidth, (int) frameHeight);
-                                atlas.textures[key].AtlasPath = key;
+                                atlas.textures[key] = new MTexture(texture6, new Vector2(-num24, -num25), frameWidth, frameHeight)
+                                {
+                                    AtlasPath = key
+                                };
                             }
                         }
                         if (input.Position >= input.Length || !(binaryReader.ReadString() == "LINKS"))
+                        {
                             break;
+                        }
+
                         short num26 = binaryReader.ReadInt16();
-                        for (int index = 0; index < (int) num26; ++index)
+                        for (int index = 0; index < num26; ++index)
                         {
                             string key = binaryReader.ReadString();
                             string str = binaryReader.ReadString();
@@ -235,10 +249,15 @@ namespace Monocle
             string[] dataPath,
             Atlas.AtlasDataFormat format)
         {
-            Atlas atlas = new Atlas();
-            atlas.Sources = new List<VirtualTexture>();
+            Atlas atlas = new()
+            {
+                Sources = new List<VirtualTexture>()
+            };
             for (int index = 0; index < dataPath.Length; ++index)
+            {
                 Atlas.ReadAtlasData(atlas, Path.Combine(rootPath, dataPath[index]), format);
+            }
+
             return atlas;
         }
 
@@ -247,8 +266,10 @@ namespace Monocle
             string filename,
             Atlas.AtlasDataFormat format)
         {
-            Atlas atlas = new Atlas();
-            atlas.Sources = new List<VirtualTexture>();
+            Atlas atlas = new()
+            {
+                Sources = new List<VirtualTexture>()
+            };
             int num = 0;
             while (true)
             {
@@ -259,15 +280,19 @@ namespace Monocle
                     ++num;
                 }
                 else
+                {
                     break;
+                }
             }
             return atlas;
         }
 
         public static Atlas FromDirectory(string path)
         {
-            Atlas atlas = new Atlas();
-            atlas.Sources = new List<VirtualTexture>();
+            Atlas atlas = new()
+            {
+                Sources = new List<VirtualTexture>()
+            };
             string contentDirectory = Engine.ContentDirectory;
             int length1 = contentDirectory.Length;
             string path1 = Path.Combine(contentDirectory, path);
@@ -275,7 +300,7 @@ namespace Monocle
             foreach (string file in Directory.GetFiles(path1, "*", SearchOption.AllDirectories))
             {
                 string extension = Path.GetExtension(file);
-                if (!(extension != ".png") || !(extension != ".xnb"))
+                if (extension is ".png" or ".xnb")
                 {
                     VirtualTexture texture = VirtualContent.CreateTexture(file.Substring(length1 + 1));
                     atlas.Sources.Add(texture);
@@ -289,72 +314,86 @@ namespace Monocle
 
         public MTexture this[string id]
         {
-            get => this.textures[id];
-            set => this.textures[id] = value;
+            get => textures[id];
+            set => textures[id] = value;
         }
 
-        public bool Has(string id) => this.textures.ContainsKey(id);
+        public bool Has(string id)
+        {
+            return textures.ContainsKey(id);
+        }
 
-        public MTexture GetOrDefault(string id, MTexture defaultTexture) => string.IsNullOrEmpty(id) || !this.Has(id) ? defaultTexture : this.textures[id];
+        public MTexture GetOrDefault(string id, MTexture defaultTexture)
+        {
+            return string.IsNullOrEmpty(id) || !Has(id) ? defaultTexture : textures[id];
+        }
 
         public List<MTexture> GetAtlasSubtextures(string key)
         {
-            List<MTexture> atlasSubtextures;
-            if (!this.orderedTexturesCache.TryGetValue(key, out atlasSubtextures))
+            if (!orderedTexturesCache.TryGetValue(key, out List<MTexture> atlasSubtextures))
             {
                 atlasSubtextures = new List<MTexture>();
                 int index = 0;
                 while (true)
                 {
-                    MTexture subtextureFromAtlasAt = this.GetAtlasSubtextureFromAtlasAt(key, index);
+                    MTexture subtextureFromAtlasAt = GetAtlasSubtextureFromAtlasAt(key, index);
                     if (subtextureFromAtlasAt != null)
                     {
                         atlasSubtextures.Add(subtextureFromAtlasAt);
                         ++index;
                     }
                     else
+                    {
                         break;
+                    }
                 }
-                this.orderedTexturesCache.Add(key, atlasSubtextures);
+                orderedTexturesCache.Add(key, atlasSubtextures);
             }
             return atlasSubtextures;
         }
 
-        private MTexture GetAtlasSubtextureFromCacheAt(string key, int index) => this.orderedTexturesCache[key][index];
+        private MTexture GetAtlasSubtextureFromCacheAt(string key, int index)
+        {
+            return orderedTexturesCache[key][index];
+        }
 
         private MTexture GetAtlasSubtextureFromAtlasAt(string key, int index)
         {
-            if (index == 0 && this.textures.ContainsKey(key))
-                return this.textures[key];
+            if (index == 0 && textures.ContainsKey(key))
+            {
+                return textures[key];
+            }
+
             string str = index.ToString();
             for (int length = str.Length; str.Length < length + 6; str = "0" + str)
             {
-                MTexture subtextureFromAtlasAt;
-                if (this.textures.TryGetValue(key + str, out subtextureFromAtlasAt))
+                if (textures.TryGetValue(key + str, out MTexture subtextureFromAtlasAt))
+                {
                     return subtextureFromAtlasAt;
+                }
             }
-            return (MTexture) null;
+            return null;
         }
 
         public MTexture GetAtlasSubtexturesAt(string key, int index)
         {
-            List<MTexture> mtextureList;
-            return this.orderedTexturesCache.TryGetValue(key, out mtextureList) ? mtextureList[index] : this.GetAtlasSubtextureFromAtlasAt(key, index);
+            return orderedTexturesCache.TryGetValue(key, out List<MTexture> mtextureList) ? mtextureList[index] : GetAtlasSubtextureFromAtlasAt(key, index);
         }
 
         public MTexture GetLinkedTexture(string key)
         {
-            string key1;
-            MTexture mtexture;
-            return key != null && this.links.TryGetValue(key, out key1) && this.textures.TryGetValue(key1, out mtexture) ? mtexture : (MTexture) null;
+            return key != null && links.TryGetValue(key, out string key1) && textures.TryGetValue(key1, out MTexture mtexture) ? mtexture : null;
         }
 
         public void Dispose()
         {
-            foreach (VirtualAsset source in this.Sources)
+            foreach (VirtualAsset source in Sources)
+            {
                 source.Dispose();
-            this.Sources.Clear();
-            this.textures.Clear();
+            }
+
+            Sources.Clear();
+            textures.Clear();
         }
 
         public enum AtlasDataFormat

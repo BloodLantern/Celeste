@@ -72,7 +72,10 @@ namespace Celeste
         {
             base.Added(scene);
             if (!onlyOnce)
+            {
                 return;
+            }
+
             _ = (Scene as Level).Session.DoNotLoad.Add(ID);
         }
 
@@ -80,11 +83,15 @@ namespace Celeste
         {
             base.Awake(scene);
             if (!onlyIfLeft)
+            {
                 return;
+            }
 
             Player entity = Scene.Tracker.GetEntity<Player>();
             if (entity == null || entity.X <= X)
+            {
                 return;
+            }
 
             RemoveSelf();
         }
@@ -130,8 +137,12 @@ namespace Celeste
             if ((Scene as Level).Transitioning)
             {
                 foreach (Component component in (Entity)this)
+                {
                     if (component is SoundSource soundSource)
+                    {
                         soundSource.UpdateSfxPosition();
+                    }
+                }
             }
             else
             {
@@ -139,16 +150,22 @@ namespace Celeste
                 int num1 = Math.Sign(X - target.X);
                 speed += (target - Position).SafeNormalize() * 800f * Engine.DeltaTime;
                 if (speed.Length() > maxspeed)
+                {
                     speed = speed.SafeNormalize(maxspeed);
+                }
 
                 Position += speed * Engine.DeltaTime;
                 int num2 = Math.Sign(X - target.X);
                 if (num1 != num2)
+                {
                     speed.X *= 0.75f;
+                }
 
                 sprite.Rotation = 1.57079637f + Calc.AngleLerp(speed.Angle(), Calc.Angle(Position, target), 0.5f);
                 if ((lastTrail - Position).Length() <= 32)
+                {
                     return;
+                }
 
                 TrailManager.Add(this, trailColor);
                 lastTrail = Position;

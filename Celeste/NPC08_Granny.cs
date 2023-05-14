@@ -14,13 +14,13 @@ namespace Celeste
         public NPC08_Granny(EntityData data, Vector2 position)
             : base(data.Position + position)
         {
-            this.Add((Component) (this.Sprite = GFX.SpriteBank.Create("granny")));
-            this.Sprite.Scale.X = -1f;
-            this.Sprite.Play("idle");
-            this.IdleAnim = "idle";
-            this.MoveAnim = "walk";
-            this.Maxspeed = 30f;
-            this.Depth = -10;
+            Add(Sprite = GFX.SpriteBank.Create("granny"));
+            Sprite.Scale.X = -1f;
+            Sprite.Play("idle");
+            IdleAnim = "idle";
+            MoveAnim = "walk";
+            Maxspeed = 30f;
+            Depth = -10;
         }
     }
 }

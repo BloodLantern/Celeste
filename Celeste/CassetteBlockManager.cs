@@ -31,7 +31,9 @@ namespace Celeste
                 OnOutBegin = () =>
                 {
                     if (!SceneAs<Level>().HasCassetteBlocks)
+                    {
                         RemoveSelf();
+                    }
                     else
                     {
                         maxBeat = SceneAs<Level>().CassetteBlockBeats;
@@ -76,7 +78,9 @@ namespace Celeste
         {
             base.SceneEnd(scene);
             if (isLevelMusic)
+            {
                 return;
+            }
 
             Audio.Stop(snapshot);
             Audio.Stop(sfx);
@@ -86,7 +90,9 @@ namespace Celeste
         {
             base.Update();
             if (isLevelMusic)
+            {
                 sfx = Audio.CurrentMusicEventInstance;
+            }
 
             if (sfx == null && !isLevelMusic)
             {
@@ -94,14 +100,18 @@ namespace Celeste
                 _ = Audio.Play("event:/game/general/cassette_block_switch_2");
             }
             else
+            {
                 AdvanceMusic(Engine.DeltaTime * tempoMult);
+            }
         }
 
         public void AdvanceMusic(float time)
         {
             beatTimer += time;
             if (beatTimer < 1f / 6f)
+            {
                 return;
+            }
 
             beatTimer -= 1f / 6f;
             ++beatIndex;
@@ -112,14 +122,20 @@ namespace Celeste
                 currentIndex %= maxBeat;
                 SetActiveIndex(currentIndex);
                 if (!isLevelMusic)
+                {
                     _ = Audio.Play("event:/game/general/cassette_block_switch_2");
+                }
 
                 Input.Rumble(RumbleStrength.Medium, RumbleLength.Short);
             }
             else if ((beatIndex + 1) % 8 == 0)
+            {
                 SetWillActivate((currentIndex + 1) % maxBeat);
+            }
             else if ((beatIndex + 4) % 8 == 0 && !isLevelMusic)
+            {
                 _ = Audio.Play("event:/game/general/cassette_block_switch_1");
+            }
 
             if (leadBeats > 0)
             {
@@ -128,27 +144,35 @@ namespace Celeste
                 {
                     beatIndex = 0;
                     if (!isLevelMusic)
-                        _ = (int) sfx.start();
+                    {
+                        _ = (int)sfx.start();
+                    }
                 }
             }
             if (leadBeats > 0)
+            {
                 return;
+            }
 
-            _ = (int) sfx.setParameterValue("sixteenth_note", GetSixteenthNote());
+            _ = (int)sfx.setParameterValue("sixteenth_note", GetSixteenthNote());
         }
 
         public int GetSixteenthNote()
         {
-            return (beatIndex + beatIndexOffset) % 256 + 1;
+            return ((beatIndex + beatIndexOffset) % 256) + 1;
         }
 
         public void StopBlocks()
         {
             foreach (CassetteBlock entity in Scene.Tracker.GetEntities<CassetteBlock>())
+            {
                 entity.Finish();
+            }
 
             if (isLevelMusic)
+            {
                 return;
+            }
 
             Audio.Stop(sfx);
         }
@@ -156,7 +180,9 @@ namespace Celeste
         public void Finish()
         {
             if (!isLevelMusic)
+            {
                 Audio.Stop(snapshot);
+            }
 
             RemoveSelf();
         }
@@ -172,21 +198,31 @@ namespace Celeste
         private void SilentUpdateBlocks()
         {
             foreach (CassetteBlock entity in Scene.Tracker.GetEntities<CassetteBlock>())
+            {
                 if (entity.ID.Level == SceneAs<Level>().Session.Level)
+                {
                     entity.SetActivatedSilently(entity.Index == currentIndex);
+                }
+            }
         }
 
         public void SetActiveIndex(int index)
         {
             foreach (CassetteBlock entity in Scene.Tracker.GetEntities<CassetteBlock>())
+            {
                 entity.Activated = entity.Index == index;
+            }
         }
 
         public void SetWillActivate(int index)
         {
             foreach (CassetteBlock entity in Scene.Tracker.GetEntities<CassetteBlock>())
+            {
                 if (entity.Index == index || entity.Activated)
+                {
                     entity.WillToggle();
+                }
+            }
         }
     }
 }

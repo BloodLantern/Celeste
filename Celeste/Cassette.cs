@@ -52,7 +52,9 @@ namespace Celeste
             Add(hover = new SineWave(0.5f));
             hover.OnUpdate = f => sprite.Y = light.Y = bloom.Y = f * 2f;
             if (!IsGhost)
+            {
                 return;
+            }
 
             sprite.Color = Color.White * 0.8f;
         }
@@ -73,7 +75,9 @@ namespace Celeste
         {
             base.Update();
             if (collecting || !Scene.OnInterval(0.1f))
+            {
                 return;
+            }
 
             SceneAs<Level>().Particles.Emit(P_Shine, 1, Center, new Vector2(12f, 10f));
         }
@@ -81,7 +85,9 @@ namespace Celeste
         private void OnPlayer(Player player)
         {
             if (collected)
+            {
                 return;
+            }
 
             player?.RefillStamina();
             _ = Audio.Play("event:/game/general/cassette_get", Position);
@@ -142,7 +148,9 @@ namespace Celeste
             cassette.Scene.Add(message);
             yield return message.EaseIn();
             while (!Input.MenuConfirm.Pressed)
+            {
                 yield return null;
+            }
 
             Audio.SetParameter(cassette.remixSfx, "end", 1f);
             yield return message.EaseOut();
@@ -160,7 +168,9 @@ namespace Celeste
                 player.StartCassetteFly(cassette.nodes[1], cassette.nodes[0]);
             }
             foreach (SandwichLava sandwichLava in level.Entities.FindAll<SandwichLava>())
+            {
                 sandwichLava.Leave();
+            }
 
             level.Frozen = false;
             yield return 0.25f;
@@ -180,7 +190,7 @@ namespace Celeste
             public override void Added(Scene scene)
             {
                 base.Added(scene);
-                Tag = (int) Tags.HUD | (int) Tags.PauseUpdate;
+                Tag = (int)Tags.HUD | (int)Tags.PauseUpdate;
                 text = ActiveFont.FontSize.AutoNewline(Dialog.Clean("UI_REMIX_UNLOCKED"), 900);
                 Depth = -10000;
             }
@@ -190,7 +200,9 @@ namespace Celeste
                 UnlockedBSide unlockedBside = this;
                 _ = unlockedBside.Scene;
                 while ((unlockedBside.alpha += Engine.DeltaTime / 0.5f) < 1)
+                {
                     yield return null;
+                }
 
                 unlockedBside.alpha = 1f;
                 yield return 1.5f;
@@ -202,7 +214,9 @@ namespace Celeste
                 UnlockedBSide unlockedBside = this;
                 unlockedBside.waitForKeyPress = false;
                 while ((unlockedBside.alpha -= Engine.DeltaTime / 0.5f) > 0)
+                {
                     yield return null;
+                }
 
                 unlockedBside.alpha = 0f;
                 unlockedBside.RemoveSelf();
@@ -223,7 +237,9 @@ namespace Celeste
                 GFX.Gui["collectables/cassette"].DrawJustified(vector2_1 - vector2_2 + new Vector2(0f, 32f), new Vector2(0.5f, 1f), Color.White * num);
                 ActiveFont.Draw(text, vector2_1 + vector2_2, new Vector2(0.5f, 0f), Vector2.One, Color.White * num);
                 if (!waitForKeyPress)
+                {
                     return;
+                }
 
                 GFX.Gui["textboxbutton"].DrawCentered(new Vector2(1824f, 984 + (timer % 1 < 0.25f ? 6 : 0)));
             }

@@ -29,7 +29,9 @@ namespace Celeste
         {
             base.Update();
             if (!trail || !Scene.OnInterval(0.04f))
+            {
                 return;
+            }
 
             SceneAs<Level>().ParticlesBG.Emit(P_Trail, 2, Position, Vector2.One * 3f);
         }
@@ -38,7 +40,9 @@ namespace Celeste
         {
             Sprite.Play("spin");
             if (hasStarted)
+            {
                 _ = Audio.Play("event:/game/05_mirror_temple/bladespinner_spin", Position);
+            }
 
             hasStarted = true;
             trail = true;

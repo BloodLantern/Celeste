@@ -11,107 +11,124 @@ namespace Monocle
 {
     public class ParticleSystem : Entity
     {
-        private Particle[] particles;
+        private readonly Particle[] particles;
         private int nextSlot;
 
         public ParticleSystem(int depth, int maxParticles)
         {
-            this.particles = new Particle[maxParticles];
-            this.Depth = depth;
+            particles = new Particle[maxParticles];
+            Depth = depth;
         }
 
         public void Clear()
         {
-            for (int index = 0; index < this.particles.Length; ++index)
-                this.particles[index].Active = false;
+            for (int index = 0; index < particles.Length; ++index)
+            {
+                particles[index].Active = false;
+            }
         }
 
         public void ClearRect(Rectangle rect, bool inside)
         {
-            for (int index = 0; index < this.particles.Length; ++index)
+            for (int index = 0; index < particles.Length; ++index)
             {
-                Vector2 position = this.particles[index].Position;
-                if (((double) position.X <= (double) rect.Left || (double) position.Y <= (double) rect.Top || (double) position.X >= (double) rect.Right ? 0 : ((double) position.Y < (double) rect.Bottom ? 1 : 0)) == (inside ? 1 : 0))
-                    this.particles[index].Active = false;
+                Vector2 position = particles[index].Position;
+                if ((position.X <= (double)rect.Left || position.Y <= (double)rect.Top || position.X >= (double)rect.Right ? 0 : (position.Y < (double)rect.Bottom ? 1 : 0)) == (inside ? 1 : 0))
+                {
+                    particles[index].Active = false;
+                }
             }
         }
 
         public override void Update()
         {
-            for (int index = 0; index < this.particles.Length; ++index)
+            for (int index = 0; index < particles.Length; ++index)
             {
-                if (this.particles[index].Active)
-                    this.particles[index].Update();
+                if (particles[index].Active)
+                {
+                    particles[index].Update();
+                }
             }
         }
 
         public override void Render()
         {
-            foreach (Particle particle in this.particles)
+            foreach (Particle particle in particles)
             {
                 if (particle.Active)
+                {
                     particle.Render();
+                }
             }
         }
 
         public void Render(float alpha)
         {
-            foreach (Particle particle in this.particles)
+            foreach (Particle particle in particles)
             {
                 if (particle.Active)
+                {
                     particle.Render(alpha);
+                }
             }
         }
 
         public void Simulate(float duration, float interval, Action<ParticleSystem> emitter)
         {
             float num1 = 0.016f;
-            for (float num2 = 0.0f; (double) num2 < (double) duration; num2 += num1)
+            for (float num2 = 0.0f; (double)num2 < (double)duration; num2 += num1)
             {
-                if ((int) (((double) num2 - (double) num1) / (double) interval) < (int) ((double) num2 / (double) interval))
-                    emitter(this);
-                for (int index = 0; index < this.particles.Length; ++index)
+                if ((int)(((double)num2 - (double)num1) / (double)interval) < (int)((double)num2 / (double)interval))
                 {
-                    if (this.particles[index].Active)
-                        this.particles[index].Update(new float?(num1));
+                    emitter(this);
+                }
+
+                for (int index = 0; index < particles.Length; ++index)
+                {
+                    if (particles[index].Active)
+                    {
+                        particles[index].Update(new float?(num1));
+                    }
                 }
             }
         }
 
         public void Add(Particle particle)
         {
-            this.particles[this.nextSlot] = particle;
-            this.nextSlot = (this.nextSlot + 1) % this.particles.Length;
+            particles[nextSlot] = particle;
+            nextSlot = (nextSlot + 1) % particles.Length;
         }
 
         public void Emit(ParticleType type, Vector2 position)
         {
-            type.Create(ref this.particles[this.nextSlot], position);
-            this.nextSlot = (this.nextSlot + 1) % this.particles.Length;
+            _ = type.Create(ref particles[nextSlot], position);
+            nextSlot = (nextSlot + 1) % particles.Length;
         }
 
         public void Emit(ParticleType type, Vector2 position, float direction)
         {
-            type.Create(ref this.particles[this.nextSlot], position, direction);
-            this.nextSlot = (this.nextSlot + 1) % this.particles.Length;
+            _ = type.Create(ref particles[nextSlot], position, direction);
+            nextSlot = (nextSlot + 1) % particles.Length;
         }
 
         public void Emit(ParticleType type, Vector2 position, Color color)
         {
-            type.Create(ref this.particles[this.nextSlot], position, color);
-            this.nextSlot = (this.nextSlot + 1) % this.particles.Length;
+            _ = type.Create(ref particles[nextSlot], position, color);
+            nextSlot = (nextSlot + 1) % particles.Length;
         }
 
         public void Emit(ParticleType type, Vector2 position, Color color, float direction)
         {
-            type.Create(ref this.particles[this.nextSlot], position, color, direction);
-            this.nextSlot = (this.nextSlot + 1) % this.particles.Length;
+            _ = type.Create(ref particles[nextSlot], position, color, direction);
+            nextSlot = (nextSlot + 1) % particles.Length;
         }
 
         public void Emit(ParticleType type, int amount, Vector2 position, Vector2 positionRange)
         {
             for (int index = 0; index < amount; ++index)
-                this.Emit(type, Calc.Random.Range(position - positionRange, position + positionRange));
+            {
+                Emit(type, Calc.Random.Range(position - positionRange, position + positionRange));
+            }
         }
 
         public void Emit(
@@ -122,7 +139,9 @@ namespace Monocle
             float direction)
         {
             for (int index = 0; index < amount; ++index)
-                this.Emit(type, Calc.Random.Range(position - positionRange, position + positionRange), direction);
+            {
+                Emit(type, Calc.Random.Range(position - positionRange, position + positionRange), direction);
+            }
         }
 
         public void Emit(
@@ -133,7 +152,9 @@ namespace Monocle
             Color color)
         {
             for (int index = 0; index < amount; ++index)
-                this.Emit(type, Calc.Random.Range(position - positionRange, position + positionRange), color);
+            {
+                Emit(type, Calc.Random.Range(position - positionRange, position + positionRange), color);
+            }
         }
 
         public void Emit(
@@ -145,7 +166,9 @@ namespace Monocle
             float direction)
         {
             for (int index = 0; index < amount; ++index)
-                this.Emit(type, Calc.Random.Range(position - positionRange, position + positionRange), color, direction);
+            {
+                Emit(type, Calc.Random.Range(position - positionRange, position + positionRange), color, direction);
+            }
         }
 
         public void Emit(
@@ -158,8 +181,8 @@ namespace Monocle
         {
             for (int index = 0; index < amount; ++index)
             {
-                type.Create(ref this.particles[this.nextSlot], track, Calc.Random.Range(position - positionRange, position + positionRange), direction, type.Color);
-                this.nextSlot = (this.nextSlot + 1) % this.particles.Length;
+                _ = type.Create(ref particles[nextSlot], track, Calc.Random.Range(position - positionRange, position + positionRange), direction, type.Color);
+                nextSlot = (nextSlot + 1) % particles.Length;
             }
         }
     }

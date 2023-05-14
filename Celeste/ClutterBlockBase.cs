@@ -32,9 +32,13 @@ namespace Celeste
             this.enabled = enabled;
             color = enabled ? enabledColor : disabledColor;
             if (enabled)
+            {
                 Add(occluder = new LightOcclude());
+            }
             else
+            {
                 Collidable = false;
+            }
 
             switch (blockColor)
             {
@@ -56,7 +60,9 @@ namespace Celeste
             color = disabledColor;
             enabled = false;
             if (occluder == null)
+            {
                 return;
+            }
 
             Remove(occluder);
             occluder = null;

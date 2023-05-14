@@ -21,15 +21,15 @@ namespace Celeste
         private bool playerHasDreamDash;
         private Vector2? node;
         private LightOcclude occlude;
-        private MTexture[] particleTextures;
+        private readonly MTexture[] particleTextures;
         private DreamBlock.DreamParticle[] particles;
         private float whiteFill;
         private float whiteHeight = 1f;
         private Vector2 shake;
         private float animTimer;
         private Shaker shaker;
-        private bool fastMoving;
-        private bool oneUse;
+        private readonly bool fastMoving;
+        private readonly bool oneUse;
         private float wobbleFrom = Calc.Random.NextFloat(6.28318548f);
         private float wobbleTo = Calc.Random.NextFloat(6.28318548f);
         private float wobbleEase;
@@ -44,14 +44,17 @@ namespace Celeste
             bool below)
             : base(position, width, height, true)
         {
-            this.Depth = -11000;
+            Depth = -11000;
             this.node = node;
             this.fastMoving = fastMoving;
             this.oneUse = oneUse;
             if (below)
-                this.Depth = 5000;
-            this.SurfaceSoundIndex = 11;
-            this.particleTextures = new MTexture[4]
+            {
+                Depth = 5000;
+            }
+
+            SurfaceSoundIndex = 11;
+            particleTextures = new MTexture[4]
             {
                 GFX.Game["objects/dreamblock/particles"].GetSubtexture(14, 0, 7, 7),
                 GFX.Game["objects/dreamblock/particles"].GetSubtexture(7, 0, 7, 7),
@@ -61,57 +64,67 @@ namespace Celeste
         }
 
         public DreamBlock(EntityData data, Vector2 offset)
-            : this(data.Position + offset, (float) data.Width, (float) data.Height, data.FirstNodeNullable(new Vector2?(offset)), data.Bool(nameof (fastMoving)), data.Bool(nameof (oneUse)), data.Bool("below"))
+            : this(data.Position + offset, data.Width, data.Height, data.FirstNodeNullable(new Vector2?(offset)), data.Bool(nameof(fastMoving)), data.Bool(nameof(oneUse)), data.Bool("below"))
         {
         }
 
         public override void Added(Scene scene)
         {
             base.Added(scene);
-            this.playerHasDreamDash = this.SceneAs<Level>().Session.Inventory.DreamDash;
-            if (this.playerHasDreamDash && this.node.HasValue)
+            playerHasDreamDash = SceneAs<Level>().Session.Inventory.DreamDash;
+            if (playerHasDreamDash && node.HasValue)
             {
-                Vector2 start = this.Position;
-                Vector2 end = this.node.Value;
+                Vector2 start = Position;
+                Vector2 end = node.Value;
                 float duration = Vector2.Distance(start, end) / 12f;
-                if (this.fastMoving)
-                    duration /= 3f;
-                Tween tween = Tween.Create(Tween.TweenMode.YoyoLooping, Ease.SineInOut, duration, true);
-                tween.OnUpdate = (Action<Tween>) (t =>
+                if (fastMoving)
                 {
-                    if (this.Collidable)
-                        this.MoveTo(Vector2.Lerp(start, end, t.Eased));
+                    duration /= 3f;
+                }
+
+                Tween tween = Tween.Create(Tween.TweenMode.YoyoLooping, Ease.SineInOut, duration, true);
+                tween.OnUpdate = t =>
+                {
+                    if (Collidable)
+                    {
+                        MoveTo(Vector2.Lerp(start, end, t.Eased));
+                    }
                     else
-                        this.MoveToNaive(Vector2.Lerp(start, end, t.Eased));
-                });
-                this.Add((Component) tween);
+                    {
+                        MoveToNaive(Vector2.Lerp(start, end, t.Eased));
+                    }
+                };
+                Add(tween);
             }
-            if (!this.playerHasDreamDash)
-                this.Add((Component) (this.occlude = new LightOcclude()));
-            this.Setup();
+            if (!playerHasDreamDash)
+            {
+                Add(occlude = new LightOcclude());
+            }
+
+            Setup();
         }
 
         public void Setup()
         {
-            this.particles = new DreamBlock.DreamParticle[(int) ((double) this.Width / 8.0 * ((double) this.Height / 8.0) * 0.699999988079071)];
-            for (int index = 0; index < this.particles.Length; ++index)
+            particles = new DreamBlock.DreamParticle[(int)((double)Width / 8.0 * ((double)Height / 8.0) * 0.699999988079071)];
+            for (int index = 0; index < particles.Length; ++index)
             {
-                this.particles[index].Position = new Vector2(Calc.Random.NextFloat(this.Width), Calc.Random.NextFloat(this.Height));
-                this.particles[index].Layer = Calc.Random.Choose<int>(0, 1, 1, 2, 2, 2);
-                this.particles[index].TimeOffset = Calc.Random.NextFloat();
-                this.particles[index].Color = Color.LightGray * (float) (0.5 + (double) this.particles[index].Layer / 2.0 * 0.5);
-                if (this.playerHasDreamDash)
+                particles[index].Position = new Vector2(Calc.Random.NextFloat(Width), Calc.Random.NextFloat(Height));
+                particles[index].Layer = Calc.Random.Choose<int>(0, 1, 1, 2, 2, 2);
+                particles[index].TimeOffset = Calc.Random.NextFloat();
+                particles[index].Color = Color.LightGray * (float)(0.5 + (particles[index].Layer / 2.0 * 0.5));
+                if (playerHasDreamDash)
                 {
-                    switch (this.particles[index].Layer)
+                    switch (particles[index].Layer)
                     {
                         case 0:
-                            this.particles[index].Color = Calc.Random.Choose<Color>(Calc.HexToColor("FFEF11"), Calc.HexToColor("FF00D0"), Calc.HexToColor("08a310"));
+                            particles[index].Color = Calc.Random.Choose<Color>(Calc.HexToColor("FFEF11"), Calc.HexToColor("FF00D0"), Calc.HexToColor("08a310"));
                             continue;
                         case 1:
-                            this.particles[index].Color = Calc.Random.Choose<Color>(Calc.HexToColor("5fcde4"), Calc.HexToColor("7fb25e"), Calc.HexToColor("E0564C"));
+                            particles[index].Color = Calc.Random.Choose<Color>(Calc.HexToColor("5fcde4"), Calc.HexToColor("7fb25e"), Calc.HexToColor("E0564C"));
                             continue;
                         case 2:
-                            this.particles[index].Color = Calc.Random.Choose<Color>(Calc.HexToColor("5b6ee1"), Calc.HexToColor("CC3B3B"), Calc.HexToColor("7daa64"));
+                            particles[index].Color = Calc.Random.Choose<Color>(Calc.HexToColor("5b6ee1"), Calc.HexToColor("CC3B3B"), Calc.HexToColor("7daa64"));
                             continue;
                         default:
                             continue;
@@ -124,119 +137,150 @@ namespace Celeste
         {
             Dust.Burst(player.Position, player.Speed.Angle(), 16);
             Vector2 vector2 = Vector2.Zero;
-            if (this.CollideCheck((Entity) player, this.Position + Vector2.UnitX * 4f))
+            if (CollideCheck(player, Position + (Vector2.UnitX * 4f)))
+            {
                 vector2 = Vector2.UnitX;
-            else if (this.CollideCheck((Entity) player, this.Position - Vector2.UnitX * 4f))
+            }
+            else if (CollideCheck(player, Position - (Vector2.UnitX * 4f)))
+            {
                 vector2 = -Vector2.UnitX;
-            else if (this.CollideCheck((Entity) player, this.Position + Vector2.UnitY * 4f))
+            }
+            else if (CollideCheck(player, Position + (Vector2.UnitY * 4f)))
+            {
                 vector2 = Vector2.UnitY;
-            else if (this.CollideCheck((Entity) player, this.Position - Vector2.UnitY * 4f))
+            }
+            else if (CollideCheck(player, Position - (Vector2.UnitY * 4f)))
+            {
                 vector2 = -Vector2.UnitY;
-            int num = vector2 != Vector2.Zero ? 1 : 0;
-            if (!this.oneUse)
+            }
+
+            _ = vector2 != Vector2.Zero ? 1 : 0;
+            if (!oneUse)
+            {
                 return;
-            this.OneUseDestroy();
+            }
+
+            OneUseDestroy();
         }
 
         private void OneUseDestroy()
         {
-            this.Collidable = this.Visible = false;
-            this.DisableStaticMovers();
-            this.RemoveSelf();
+            Collidable = Visible = false;
+            DisableStaticMovers();
+            RemoveSelf();
         }
 
         public override void Update()
         {
             base.Update();
-            if (!this.playerHasDreamDash)
-                return;
-            this.animTimer += 6f * Engine.DeltaTime;
-            this.wobbleEase += Engine.DeltaTime * 2f;
-            if ((double) this.wobbleEase > 1.0)
+            if (!playerHasDreamDash)
             {
-                this.wobbleEase = 0.0f;
-                this.wobbleFrom = this.wobbleTo;
-                this.wobbleTo = Calc.Random.NextFloat(6.28318548f);
+                return;
             }
-            this.SurfaceSoundIndex = 12;
+
+            animTimer += 6f * Engine.DeltaTime;
+            wobbleEase += Engine.DeltaTime * 2f;
+            if (wobbleEase > 1.0)
+            {
+                wobbleEase = 0.0f;
+                wobbleFrom = wobbleTo;
+                wobbleTo = Calc.Random.NextFloat(6.28318548f);
+            }
+            SurfaceSoundIndex = 12;
         }
 
         public bool BlockedCheck()
         {
-            TheoCrystal actor1 = this.CollideFirst<TheoCrystal>();
-            if (actor1 != null && !this.TryActorWiggleUp((Entity) actor1))
+            TheoCrystal actor1 = CollideFirst<TheoCrystal>();
+            if (actor1 != null && !TryActorWiggleUp(actor1))
+            {
                 return true;
-            Player actor2 = this.CollideFirst<Player>();
-            return actor2 != null && !this.TryActorWiggleUp((Entity) actor2);
+            }
+
+            Player actor2 = CollideFirst<Player>();
+            return actor2 != null && !TryActorWiggleUp(actor2);
         }
 
         private bool TryActorWiggleUp(Entity actor)
         {
-            bool collidable = this.Collidable;
-            this.Collidable = true;
+            bool collidable = Collidable;
+            Collidable = true;
             for (int index = 1; index <= 4; ++index)
             {
-                if (!actor.CollideCheck<Solid>(actor.Position - Vector2.UnitY * (float) index))
+                if (!actor.CollideCheck<Solid>(actor.Position - (Vector2.UnitY * index)))
                 {
-                    actor.Position -= Vector2.UnitY * (float) index;
-                    this.Collidable = collidable;
+                    actor.Position -= Vector2.UnitY * index;
+                    Collidable = collidable;
                     return true;
                 }
             }
-            this.Collidable = collidable;
+            Collidable = collidable;
             return false;
         }
 
         public override void Render()
         {
-            Camera camera = this.SceneAs<Level>().Camera;
-            if ((double) this.Right < (double) camera.Left || (double) this.Left > (double) camera.Right || (double) this.Bottom < (double) camera.Top || (double) this.Top > (double) camera.Bottom)
-                return;
-            Draw.Rect(this.shake.X + this.X, this.shake.Y + this.Y, this.Width, this.Height, this.playerHasDreamDash ? DreamBlock.activeBackColor : DreamBlock.disabledBackColor);
-            Vector2 position = this.SceneAs<Level>().Camera.Position;
-            for (int index = 0; index < this.particles.Length; ++index)
+            Camera camera = SceneAs<Level>().Camera;
+            if ((double)Right < (double)camera.Left || (double)Left > (double)camera.Right || (double)Bottom < (double)camera.Top || (double)Top > (double)camera.Bottom)
             {
-                int layer = this.particles[index].Layer;
-                Vector2 vector2 = this.PutInside(this.particles[index].Position + position * (float) (0.30000001192092896 + 0.25 * (double) layer));
-                Color color = this.particles[index].Color;
-                MTexture particleTexture;
-                switch (layer)
-                {
-                    case 0:
-                        particleTexture = this.particleTextures[3 - (int) (((double) this.particles[index].TimeOffset * 4.0 + (double) this.animTimer) % 4.0)];
-                        break;
-                    case 1:
-                        particleTexture = this.particleTextures[1 + (int) (((double) this.particles[index].TimeOffset * 2.0 + (double) this.animTimer) % 2.0)];
-                        break;
-                    default:
-                        particleTexture = this.particleTextures[2];
-                        break;
-                }
-                if ((double) vector2.X >= (double) this.X + 2.0 && (double) vector2.Y >= (double) this.Y + 2.0 && (double) vector2.X < (double) this.Right - 2.0 && (double) vector2.Y < (double) this.Bottom - 2.0)
-                    particleTexture.DrawCentered(vector2 + this.shake, color);
+                return;
             }
-            if ((double) this.whiteFill > 0.0)
-                Draw.Rect(this.X + this.shake.X, this.Y + this.shake.Y, this.Width, this.Height * this.whiteHeight, Color.White * this.whiteFill);
-            this.WobbleLine(this.shake + new Vector2(this.X, this.Y), this.shake + new Vector2(this.X + this.Width, this.Y), 0.0f);
-            this.WobbleLine(this.shake + new Vector2(this.X + this.Width, this.Y), this.shake + new Vector2(this.X + this.Width, this.Y + this.Height), 0.7f);
-            this.WobbleLine(this.shake + new Vector2(this.X + this.Width, this.Y + this.Height), this.shake + new Vector2(this.X, this.Y + this.Height), 1.5f);
-            this.WobbleLine(this.shake + new Vector2(this.X, this.Y + this.Height), this.shake + new Vector2(this.X, this.Y), 2.5f);
-            Draw.Rect(this.shake + new Vector2(this.X, this.Y), 2f, 2f, this.playerHasDreamDash ? DreamBlock.activeLineColor : DreamBlock.disabledLineColor);
-            Draw.Rect(this.shake + new Vector2((float) ((double) this.X + (double) this.Width - 2.0), this.Y), 2f, 2f, this.playerHasDreamDash ? DreamBlock.activeLineColor : DreamBlock.disabledLineColor);
-            Draw.Rect(this.shake + new Vector2(this.X, (float) ((double) this.Y + (double) this.Height - 2.0)), 2f, 2f, this.playerHasDreamDash ? DreamBlock.activeLineColor : DreamBlock.disabledLineColor);
-            Draw.Rect(this.shake + new Vector2((float) ((double) this.X + (double) this.Width - 2.0), (float) ((double) this.Y + (double) this.Height - 2.0)), 2f, 2f, this.playerHasDreamDash ? DreamBlock.activeLineColor : DreamBlock.disabledLineColor);
+
+            Draw.Rect(shake.X + X, shake.Y + Y, Width, Height, playerHasDreamDash ? DreamBlock.activeBackColor : DreamBlock.disabledBackColor);
+            Vector2 position = SceneAs<Level>().Camera.Position;
+            for (int index = 0; index < particles.Length; ++index)
+            {
+                int layer = particles[index].Layer;
+                Vector2 vector2 = PutInside(particles[index].Position + (position * (float)(0.30000001192092896 + (0.25 * layer))));
+                Color color = particles[index].Color;
+                MTexture particleTexture = layer switch
+                {
+                    0 => particleTextures[3 - (int)(((particles[index].TimeOffset * 4.0) + animTimer) % 4.0)],
+                    1 => particleTextures[1 + (int)(((particles[index].TimeOffset * 2.0) + animTimer) % 2.0)],
+                    _ => particleTextures[2],
+                };
+                if (vector2.X >= (double)X + 2.0 && vector2.Y >= (double)Y + 2.0 && vector2.X < (double)Right - 2.0 && vector2.Y < (double)Bottom - 2.0)
+                {
+                    particleTexture.DrawCentered(vector2 + shake, color);
+                }
+            }
+            if (whiteFill > 0.0)
+            {
+                Draw.Rect(X + shake.X, Y + shake.Y, Width, Height * whiteHeight, Color.White * whiteFill);
+            }
+
+            WobbleLine(shake + new Vector2(X, Y), shake + new Vector2(X + Width, Y), 0.0f);
+            WobbleLine(shake + new Vector2(X + Width, Y), shake + new Vector2(X + Width, Y + Height), 0.7f);
+            WobbleLine(shake + new Vector2(X + Width, Y + Height), shake + new Vector2(X, Y + Height), 1.5f);
+            WobbleLine(shake + new Vector2(X, Y + Height), shake + new Vector2(X, Y), 2.5f);
+            Draw.Rect(shake + new Vector2(X, Y), 2f, 2f, playerHasDreamDash ? DreamBlock.activeLineColor : DreamBlock.disabledLineColor);
+            Draw.Rect(shake + new Vector2((float)((double)X + (double)Width - 2.0), Y), 2f, 2f, playerHasDreamDash ? DreamBlock.activeLineColor : DreamBlock.disabledLineColor);
+            Draw.Rect(shake + new Vector2(X, (float)((double)Y + (double)Height - 2.0)), 2f, 2f, playerHasDreamDash ? DreamBlock.activeLineColor : DreamBlock.disabledLineColor);
+            Draw.Rect(shake + new Vector2((float)((double)X + (double)Width - 2.0), (float)((double)Y + (double)Height - 2.0)), 2f, 2f, playerHasDreamDash ? DreamBlock.activeLineColor : DreamBlock.disabledLineColor);
         }
 
         private Vector2 PutInside(Vector2 pos)
         {
-            while ((double) pos.X < (double) this.X)
-                pos.X += this.Width;
-            while ((double) pos.X > (double) this.X + (double) this.Width)
-                pos.X -= this.Width;
-            while ((double) pos.Y < (double) this.Y)
-                pos.Y += this.Height;
-            while ((double) pos.Y > (double) this.Y + (double) this.Height)
-                pos.Y -= this.Height;
+            while (pos.X < (double)X)
+            {
+                pos.X += Width;
+            }
+
+            while (pos.X > (double)X + (double)Width)
+            {
+                pos.X -= Width;
+            }
+
+            while (pos.Y < (double)Y)
+            {
+                pos.Y += Height;
+            }
+
+            while (pos.Y > (double)Y + (double)Height)
+            {
+                pos.Y -= Height;
+            }
+
             return pos;
         }
 
@@ -244,100 +288,120 @@ namespace Celeste
         {
             float num1 = (to - from).Length();
             Vector2 vector2_1 = Vector2.Normalize(to - from);
-            Vector2 vector2_2 = new Vector2(vector2_1.Y, -vector2_1.X);
-            Color color1 = this.playerHasDreamDash ? DreamBlock.activeLineColor : DreamBlock.disabledLineColor;
-            Color color2 = this.playerHasDreamDash ? DreamBlock.activeBackColor : DreamBlock.disabledBackColor;
-            if ((double) this.whiteFill > 0.0)
+            Vector2 vector2_2 = new(vector2_1.Y, -vector2_1.X);
+            Color color1 = playerHasDreamDash ? DreamBlock.activeLineColor : DreamBlock.disabledLineColor;
+            Color color2 = playerHasDreamDash ? DreamBlock.activeBackColor : DreamBlock.disabledBackColor;
+            if (whiteFill > 0.0)
             {
-                color1 = Color.Lerp(color1, Color.White, this.whiteFill);
-                color2 = Color.Lerp(color2, Color.White, this.whiteFill);
+                color1 = Color.Lerp(color1, Color.White, whiteFill);
+                color2 = Color.Lerp(color2, Color.White, whiteFill);
             }
             float num2 = 0.0f;
             int val1 = 16;
-            for (int index = 2; (double) index < (double) num1 - 2.0; index += val1)
+            for (int index = 2; index < (double)num1 - 2.0; index += val1)
             {
-                float num3 = this.Lerp(this.LineAmplitude(this.wobbleFrom + offset, (float) index), this.LineAmplitude(this.wobbleTo + offset, (float) index), this.wobbleEase);
-                if ((double) (index + val1) >= (double) num1)
+                float num3 = Lerp(LineAmplitude(wobbleFrom + offset, index), LineAmplitude(wobbleTo + offset, index), wobbleEase);
+                if (index + val1 >= (double)num1)
+                {
                     num3 = 0.0f;
-                float num4 = Math.Min((float) val1, num1 - 2f - (float) index);
-                Vector2 start = from + vector2_1 * (float) index + vector2_2 * num2;
-                Vector2 end = from + vector2_1 * ((float) index + num4) + vector2_2 * num3;
+                }
+
+                float num4 = Math.Min(val1, num1 - 2f - index);
+                Vector2 start = from + (vector2_1 * index) + (vector2_2 * num2);
+                Vector2 end = from + (vector2_1 * (index + num4)) + (vector2_2 * num3);
                 Draw.Line(start - vector2_2, end - vector2_2, color2);
-                Draw.Line(start - vector2_2 * 2f, end - vector2_2 * 2f, color2);
+                Draw.Line(start - (vector2_2 * 2f), end - (vector2_2 * 2f), color2);
                 Draw.Line(start, end, color1);
                 num2 = num3;
             }
         }
 
-        private float LineAmplitude(float seed, float index) => (float) (Math.Sin((double) seed + (double) index / 16.0 + Math.Sin((double) seed * 2.0 + (double) index / 32.0) * 6.2831854820251465) + 1.0) * 1.5f;
+        private float LineAmplitude(float seed, float index)
+        {
+            return (float)(Math.Sin((double)seed + ((double)index / 16.0) + (Math.Sin(((double)seed * 2.0) + ((double)index / 32.0)) * 6.2831854820251465)) + 1.0) * 1.5f;
+        }
 
-        private float Lerp(float a, float b, float percent) => a + (b - a) * percent;
+        private float Lerp(float a, float b, float percent)
+        {
+            return a + ((b - a) * percent);
+        }
 
         public IEnumerator Activate()
         {
             DreamBlock dreamBlock = this;
             Level level = dreamBlock.SceneAs<Level>();
-            yield return (object) 1f;
+            yield return 1f;
             Input.Rumble(RumbleStrength.Light, RumbleLength.Long);
             // ISSUE: reference to a compiler-generated method
-            dreamBlock.Add(this.shaker = new Shaker(true, delegate (Vector2 t)
+            dreamBlock.Add(shaker = new Shaker(true, delegate (Vector2 t)
             {
-                    this.shake = t;
+                shake = t;
             }));
             dreamBlock.shaker.Interval = 0.02f;
             dreamBlock.shaker.On = true;
             float p;
-            for (p = 0.0f; (double) p < 1.0; p += Engine.DeltaTime)
+            for (p = 0.0f; (double)p < 1.0; p += Engine.DeltaTime)
             {
                 dreamBlock.whiteFill = Ease.CubeIn(p);
-                yield return (object) null;
+                yield return null;
             }
             dreamBlock.shaker.On = false;
-            yield return (object) 0.5f;
+            yield return 0.5f;
             dreamBlock.ActivateNoRoutine();
             dreamBlock.whiteHeight = 1f;
             dreamBlock.whiteFill = 1f;
-            for (p = 1f; (double) p > 0.0; p -= Engine.DeltaTime * 0.5f)
+            for (p = 1f; (double)p > 0.0; p -= Engine.DeltaTime * 0.5f)
             {
                 dreamBlock.whiteHeight = p;
                 if (level.OnInterval(0.1f))
                 {
-                    for (int index = 0; (double) index < (double) dreamBlock.Width; index += 4)
-                        level.ParticlesFG.Emit(Strawberry.P_WingsBurst, new Vector2(dreamBlock.X + (float) index, (float) ((double) dreamBlock.Y + (double) dreamBlock.Height * (double) dreamBlock.whiteHeight + 1.0)));
+                    for (int index = 0; index < (double)dreamBlock.Width; index += 4)
+                    {
+                        level.ParticlesFG.Emit(Strawberry.P_WingsBurst, new Vector2(dreamBlock.X + index, (float)((double)dreamBlock.Y + ((double)dreamBlock.Height * dreamBlock.whiteHeight) + 1.0)));
+                    }
                 }
                 if (level.OnInterval(0.1f))
+                {
                     level.Shake();
+                }
+
                 Input.Rumble(RumbleStrength.Strong, RumbleLength.Short);
-                yield return (object) null;
+                yield return null;
             }
-            while ((double) dreamBlock.whiteFill > 0.0)
+            while (dreamBlock.whiteFill > 0.0)
             {
                 dreamBlock.whiteFill -= Engine.DeltaTime * 3f;
-                yield return (object) null;
+                yield return null;
             }
         }
 
         public void ActivateNoRoutine()
         {
-            if (!this.playerHasDreamDash)
+            if (!playerHasDreamDash)
             {
-                this.playerHasDreamDash = true;
-                this.Setup();
-                this.Remove((Component) this.occlude);
+                playerHasDreamDash = true;
+                Setup();
+                Remove(occlude);
             }
-            this.whiteHeight = 0.0f;
-            this.whiteFill = 0.0f;
-            if (this.shaker == null)
+            whiteHeight = 0.0f;
+            whiteFill = 0.0f;
+            if (shaker == null)
+            {
                 return;
-            this.shaker.On = false;
+            }
+
+            shaker.On = false;
         }
 
         public void FootstepRipple(Vector2 position)
         {
-            if (!this.playerHasDreamDash)
+            if (!playerHasDreamDash)
+            {
                 return;
-            DisplacementRenderer.Burst burst = (this.Scene as Level).Displacement.AddBurst(position, 0.5f, 0.0f, 40f);
-            burst.WorldClipCollider = this.Collider;
+            }
+
+            DisplacementRenderer.Burst burst = (Scene as Level).Displacement.AddBurst(position, 0.5f, 0.0f, 40f);
+            burst.WorldClipCollider = Collider;
             burst.WorldClipPadding = 1;
         }
 

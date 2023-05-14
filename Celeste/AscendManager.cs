@@ -181,12 +181,18 @@ namespace Celeste
                     MountainWipe mountainWipe;
                     _ = new MountainWipe(Scene, true);
                 }
-                else if (index >= 0 && index <= 4)
+                else if (index is >= 0 and <= 4)
+                {
                     AreaData.Get(index + 1).DoScreenWipe(Scene, true);
+                }
                 else if (index == 5)
+                {
                     AreaData.Get(7).DoScreenWipe(Scene, true);
+                }
                 else if (index >= 9)
+                {
                     AreaData.Get(10).DoScreenWipe(Scene, true);
+                }
 
                 ScreenWipe.WipeColor = Color.Black;
             }
@@ -209,13 +215,19 @@ namespace Celeste
             SetSnowAlpha(1 - fade);
             SetBloom(fade * 0.1f);
             if (!Dark)
+            {
                 return;
+            }
 
             foreach (Parallax parallax in level.Background.GetEach<Parallax>())
+            {
                 parallax.CameraOffset.Y -= 25f * target;
+            }
 
             foreach (Parallax parallax in level.Foreground.GetEach<Parallax>())
+            {
                 parallax.Alpha = 1 - fade;
+            }
         }
 
         private void SetBloom(float add)
@@ -227,15 +239,21 @@ namespace Celeste
         {
             Snow snow = level.Foreground.Get<Snow>();
             if (snow != null)
+            {
                 snow.Alpha = value;
+            }
 
             RainFG rainFg = level.Foreground.Get<RainFG>();
             if (rainFg != null)
+            {
                 rainFg.Alpha = value;
+            }
 
             WindSnowFG windSnowFg = level.Foreground.Get<WindSnowFG>();
             if (windSnowFg == null)
+            {
                 return;
+            }
 
             windSnowFg.Alpha = value;
         }
@@ -275,7 +293,7 @@ namespace Celeste
                 alphaColors = new Color[colors.Length];
                 for (int i = 0; i < particles.Length; ++i)
                 {
-                    float x = 160 + Calc.Random.Range(24f, 144f) * Calc.Random.Choose(-1, 1);
+                    float x = 160 + (Calc.Random.Range(24f, 144f) * Calc.Random.Choose(-1, 1));
                     float y = Calc.Random.NextFloat(436f);
                     float num = Calc.ClampedMap(Math.Abs(x - 160f), 0.0f, 160f, 0.25f) * Calc.Random.Range(600f, 2000f);
                     particles[i] = new Particle()
@@ -302,7 +320,9 @@ namespace Celeste
                 float num = Ease.SineInOut((manager != null ? manager.fade : 1f) * Alpha);
                 Vector2 position1 = (Scene as Level).Camera.Position;
                 for (int i = 0; i < colors.Length; ++i)
+                {
                     alphaColors[i] = colors[i] * num;
+                }
 
                 for (int i = 0; i < particles.Length; ++i)
                 {
@@ -350,12 +370,14 @@ namespace Celeste
                 Depth = -1000000;
                 textures = GFX.Game.GetAtlasSubtextures("scenery/launch/cloud");
                 for (int i = 0; i < particles.Length; ++i)
+                {
                     particles[i] = new Particle()
                     {
                         Position = new Vector2(Calc.Random.NextFloat(320f), Calc.Random.NextFloat(900f)),
                         Speed = Calc.Random.Range(400, 800),
                         Index = Calc.Random.Next(textures.Count)
                     };
+                }
             }
 
             public override void Update()
@@ -402,7 +424,9 @@ namespace Celeste
             public override void Render()
             {
                 if (Fade <= 0.0)
+                {
                     return;
+                }
 
                 Vector2 position = (Scene as Level).Camera.Position;
                 Draw.Rect(position.X - 10f, position.Y - 10f, 340f, 200f, (manager.Dark ? Color.Black : Color.White) * Fade);

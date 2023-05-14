@@ -18,7 +18,10 @@ namespace Celeste
 
         public static Effect Effect => GFX.FxColorGrading;
 
-        public static void Set(MTexture grade) => ColorGrade.Set(grade, grade, 0.0f);
+        public static void Set(MTexture grade)
+        {
+            ColorGrade.Set(grade, grade, 0.0f);
+        }
 
         public static void Set(MTexture fromTex, MTexture toTex, float p)
         {
@@ -33,22 +36,22 @@ namespace Celeste
                 ColorGrade.to = toTex;
             }
             ColorGrade.percent = Calc.Clamp(p, 0.0f, 1f);
-            if (ColorGrade.from == ColorGrade.to || (double) ColorGrade.percent <= 0.0)
+            if (ColorGrade.from == ColorGrade.to || percent <= 0.0)
             {
                 ColorGrade.Effect.CurrentTechnique = ColorGrade.Effect.Techniques["ColorGradeSingle"];
-                Engine.Graphics.GraphicsDevice.Textures[1] = (Texture) ColorGrade.from.Texture.Texture;
+                Engine.Graphics.GraphicsDevice.Textures[1] = from.Texture.Texture;
             }
-            else if ((double) ColorGrade.percent >= 1.0)
+            else if (percent >= 1.0)
             {
                 ColorGrade.Effect.CurrentTechnique = ColorGrade.Effect.Techniques["ColorGradeSingle"];
-                Engine.Graphics.GraphicsDevice.Textures[1] = (Texture) ColorGrade.to.Texture.Texture;
+                Engine.Graphics.GraphicsDevice.Textures[1] = to.Texture.Texture;
             }
             else
             {
-                ColorGrade.Effect.CurrentTechnique = ColorGrade.Effect.Techniques[nameof (ColorGrade)];
+                ColorGrade.Effect.CurrentTechnique = ColorGrade.Effect.Techniques[nameof(ColorGrade)];
                 ColorGrade.Effect.Parameters["percent"].SetValue(ColorGrade.percent);
-                Engine.Graphics.GraphicsDevice.Textures[1] = (Texture) ColorGrade.from.Texture.Texture;
-                Engine.Graphics.GraphicsDevice.Textures[2] = (Texture) ColorGrade.to.Texture.Texture;
+                Engine.Graphics.GraphicsDevice.Textures[1] = from.Texture.Texture;
+                Engine.Graphics.GraphicsDevice.Textures[2] = to.Texture.Texture;
             }
         }
 

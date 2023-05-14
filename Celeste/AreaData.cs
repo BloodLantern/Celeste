@@ -61,7 +61,7 @@ namespace Celeste
 
         public static ModeProperties GetMode(int id, AreaMode mode = AreaMode.Normal)
         {
-            return Areas[id].Mode[(int) mode];
+            return Areas[id].Mode[(int)mode];
         }
 
         public static void Load()
@@ -219,7 +219,9 @@ namespace Celeste
             oldSite.OnLevelBegin = level =>
             {
                 if (level.Session.Area.Mode != AreaMode.Normal)
+                {
                     return;
+                }
 
                 level.Add(new OldSiteChaseMusicHandler());
             };
@@ -423,7 +425,9 @@ namespace Celeste
             {
                 level.Add(new SeekerEffectsController());
                 if (level.Session.Area.Mode != AreaMode.Normal)
+                {
                     return;
+                }
 
                 level.Add(new TempleEndingMusicHandler());
             };
@@ -749,9 +753,15 @@ namespace Celeste
                 Areas[index].ID = index;
                 Areas[index].Mode[0].MapData = new MapData(new AreaKey(index));
                 if (!Areas[index].Interlude)
-                    for (AreaMode mode = AreaMode.Normal; (int) mode < length; ++mode)
+                {
+                    for (AreaMode mode = AreaMode.Normal; (int)mode < length; ++mode)
+                    {
                         if (Areas[index].HasMode(mode))
-                            Areas[index].Mode[(int) mode].MapData = new MapData(new AreaKey(index, mode));
+                        {
+                            Areas[index].Mode[(int)mode].MapData = new MapData(new AreaKey(index, mode));
+                        }
+                    }
+                }
             }
             ReloadMountainViews();
         }
@@ -773,7 +783,9 @@ namespace Celeste
                     Vector3 target3 = xml["Zoom"].AttrVector3("target");
                     Areas[index].MountainZoom = new MountainCamera(pos3, target3);
                     if (xml["Cursor"] != null)
+                    {
                         Areas[index].MountainCursor = xml["Cursor"].AttrVector3("position");
+                    }
 
                     Areas[index].MountainState = xml.AttrInt("state", 0);
                 }
@@ -783,21 +795,33 @@ namespace Celeste
         public static bool IsPoemRemix(string id)
         {
             foreach (AreaData area in Areas)
+            {
                 if (area.Mode.Length > 1
-                    && area.Mode[(int) AreaMode.Normal] != null
+                    && area.Mode[(int)AreaMode.Normal] != null
                     && !string.IsNullOrEmpty(area.Mode[(int)AreaMode.Normal].PoemID)
-                    && area.Mode[(int) AreaMode.Normal].PoemID.Equals(id, StringComparison.OrdinalIgnoreCase))
+                    && area.Mode[(int)AreaMode.Normal].PoemID.Equals(id, StringComparison.OrdinalIgnoreCase))
+                {
                     return true;
+                }
+            }
+
             return false;
         }
 
         public static int GetCheckpointID(AreaKey area, string level)
         {
-            CheckpointData[] checkpoints = Areas[area.ID].Mode[(int) area.Mode].Checkpoints;
+            CheckpointData[] checkpoints = Areas[area.ID].Mode[(int)area.Mode].Checkpoints;
             if (checkpoints != null)
+            {
                 for (int checkpointId = 0; checkpointId < checkpoints.Length; ++checkpointId)
+                {
                     if (checkpoints[checkpointId].Level.Equals(level))
+                    {
                         return checkpointId;
+                    }
+                }
+            }
+
             return -1;
         }
 
@@ -805,16 +829,25 @@ namespace Celeste
         {
             CheckpointData[] checkpoints = Areas[area.ID].Mode[(int)area.Mode].Checkpoints;
             if (level != null && checkpoints != null)
+            {
                 foreach (CheckpointData checkpoint in checkpoints)
+                {
                     if (checkpoint.Level.Equals(level))
+                    {
                         return checkpoint;
+                    }
+                }
+            }
+
             return null;
         }
 
         public static string GetCheckpointName(AreaKey area, string level)
         {
             if (string.IsNullOrEmpty(level))
+            {
                 return "START";
+            }
 
             CheckpointData checkpoint = GetCheckpoint(area, level);
             return checkpoint != null ? Dialog.Clean(checkpoint.Name) : null;
@@ -823,7 +856,7 @@ namespace Celeste
         public static PlayerInventory GetCheckpointInventory(AreaKey area, string level)
         {
             CheckpointData checkpoint = GetCheckpoint(area, level);
-            return checkpoint != null && checkpoint.Inventory.HasValue ? checkpoint.Inventory.Value : Areas[area.ID].Mode[(int) area.Mode].Inventory;
+            return checkpoint != null && checkpoint.Inventory.HasValue ? checkpoint.Inventory.Value : Areas[area.ID].Mode[(int)area.Mode].Inventory;
         }
 
         public static bool GetCheckpointDreaming(AreaKey area, string level)
@@ -878,14 +911,18 @@ namespace Celeste
         public void DoScreenWipe(Scene scene, bool wipeIn, Action onComplete = null)
         {
             if (Wipe == null)
+            {
                 _ = new WindWipe(scene, wipeIn, onComplete);
+            }
             else
+            {
                 Wipe(scene, wipeIn, onComplete);
+            }
         }
 
         public bool HasMode(AreaMode mode)
         {
-            return (AreaMode) Mode.Length > mode && Mode[(int) mode] != null && Mode[(int) mode].Path != null;
+            return (AreaMode)Mode.Length > mode && Mode[(int)mode] != null && Mode[(int)mode].Path != null;
         }
     }
 }

@@ -83,19 +83,23 @@ namespace Celeste
         {
             Level scene = Scene as Level;
             if (scene.FrozenOrPaused || scene.RetryPlayerCorpse != null || Scale <= 0)
+            {
                 return;
+            }
 
             Vector2 vector2_1 = Entity.Position + Position - SceneAs<Level>().Camera.Position.Floor();
             if (SaveData.Instance != null && SaveData.Instance.Assists.MirrorMode)
+            {
                 vector2_1.X = 320f - vector2_1.X;
+            }
 
             vector2_1.X *= 6f;
             vector2_1.Y *= 6f;
             float lineHeight = ActiveFont.LineHeight;
             float width1 = (Math.Max(controlsWidth, infoWidth) + 64f) * Scale;
-            float height = (infoHeight + lineHeight + 32);
+            float height = infoHeight + lineHeight + 32;
             float x1 = vector2_1.X - (width1 / 2);
-            float y = (vector2_1.Y - height - 32);
+            float y = vector2_1.Y - height - 32;
             Draw.Rect(x1 - 6, y - 6f, width1 + 12f, height + 12f, lineColor);
             Draw.Rect(x1, y, width1, height, bgColor);
             for (int i = 0; i <= 36; i++)
@@ -103,16 +107,24 @@ namespace Celeste
                 float width2 = (73 - (i * 2)) * Scale;
                 Draw.Rect(vector2_1.X - (width2 / 2f), y + height + i, width2, 1f, lineColor);
                 if (width2 > 12)
-                    Draw.Rect((vector2_1.X - (width2 / 2) + 6), y + height + i, width2 - 12f, 1f, bgColor);
+                {
+                    Draw.Rect(vector2_1.X - (width2 / 2) + 6, y + height + i, width2 - 12f, 1f, bgColor);
+                }
             }
             if (width1 <= 3)
+            {
                 return;
+            }
 
             Vector2 position = new(vector2_1.X, y + 16f);
             if (info is string sInfo)
+            {
                 ActiveFont.Draw(sInfo, position, new Vector2(0.5f, 0.0f), new Vector2(Scale, 1f), textColor);
+            }
             else if (info is MTexture texture)
+            {
                 texture.DrawJustified(position, new Vector2(0.5f, 0.0f), Color.White, new Vector2(Scale, 1f));
+            }
 
             position.Y += infoHeight + (lineHeight * 0.5f);
             Vector2 vector2_2 = new(-controlsWidth / 2, 0.0f);
@@ -128,7 +140,9 @@ namespace Celeste
                         continue;
                     case Vector2 direction:
                         if (SaveData.Instance != null && SaveData.Instance.Assists.MirrorMode)
+                        {
                             direction.X = -direction.X;
+                        }
 
                         MTexture mtexture2 = Input.GuiDirection(direction);
                         vector2_2.X += buttonPadding;

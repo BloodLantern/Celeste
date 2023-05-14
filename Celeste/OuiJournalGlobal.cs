@@ -12,16 +12,16 @@ namespace Celeste
 {
     public class OuiJournalGlobal : OuiJournalPage
     {
-        private OuiJournalPage.Table table;
+        private readonly OuiJournalPage.Table table;
 
         public OuiJournalGlobal(OuiJournal journal)
             : base(journal)
         {
-            this.PageTexture = "page";
-            this.table = new OuiJournalPage.Table().AddColumn((OuiJournalPage.Cell) new OuiJournalPage.TextCell("", new Vector2(1f, 0.5f), 1f, this.TextColor, 700f)).AddColumn((OuiJournalPage.Cell) new OuiJournalPage.TextCell(Dialog.Clean("STATS_TITLE"), new Vector2(0.5f, 0.5f), 1f, this.TextColor, 48f, true)).AddColumn((OuiJournalPage.Cell) new OuiJournalPage.TextCell("", new Vector2(1f, 0.5f), 0.7f, this.TextColor, 700f));
-            foreach (Stat stat in Enum.GetValues(typeof (Stat)))
+            PageTexture = "page";
+            table = new OuiJournalPage.Table().AddColumn(new OuiJournalPage.TextCell("", new Vector2(1f, 0.5f), 1f, TextColor, 700f)).AddColumn(new OuiJournalPage.TextCell(Dialog.Clean("STATS_TITLE"), new Vector2(0.5f, 0.5f), 1f, TextColor, 48f, true)).AddColumn(new OuiJournalPage.TextCell("", new Vector2(1f, 0.5f), 0.7f, TextColor, 700f));
+            foreach (Stat stat in Enum.GetValues(typeof(Stat)))
             {
-                if (SaveData.Instance.CheatMode || SaveData.Instance.DebugMode || (stat != Stat.GOLDBERRIES || SaveData.Instance.TotalHeartGems >= 16) && (stat != Stat.PICO_BERRIES && stat != Stat.PICO_COMPLETES && stat != Stat.PICO_DEATHS || Settings.Instance.Pico8OnMainMenu))
+                if (SaveData.Instance.CheatMode || SaveData.Instance.DebugMode || ((stat != Stat.GOLDBERRIES || SaveData.Instance.TotalHeartGems >= 16) && ((stat != Stat.PICO_BERRIES && stat != Stat.PICO_COMPLETES && stat != Stat.PICO_DEATHS) || Settings.Instance.Pico8OnMainMenu)))
                 {
                     string str = Stats.Global(stat).ToString();
                     string text1 = Stats.Name(stat);
@@ -34,10 +34,10 @@ namespace Celeste
                         --index;
                         ++num;
                     }
-                    OuiJournalPage.Row row = this.table.AddRow();
-                    row.Add((OuiJournalPage.Cell) new OuiJournalPage.TextCell(text1, new Vector2(1f, 0.5f), 0.7f, this.TextColor));
-                    row.Add((OuiJournalPage.Cell) null);
-                    row.Add((OuiJournalPage.Cell) new OuiJournalPage.TextCell(text2, new Vector2(0.0f, 0.5f), 0.8f, this.TextColor));
+                    OuiJournalPage.Row row = table.AddRow();
+                    _ = row.Add(new OuiJournalPage.TextCell(text1, new Vector2(1f, 0.5f), 0.7f, TextColor));
+                    _ = row.Add(null);
+                    _ = row.Add(new OuiJournalPage.TextCell(text2, new Vector2(0.0f, 0.5f), 0.8f, TextColor));
                 }
             }
         }
@@ -46,7 +46,7 @@ namespace Celeste
         {
             base.Redraw(buffer);
             Draw.SpriteBatch.Begin();
-            this.table.Render(new Vector2(60f, 20f));
+            table.Render(new Vector2(60f, 20f));
             Draw.SpriteBatch.End();
         }
     }

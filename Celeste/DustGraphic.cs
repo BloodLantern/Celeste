@@ -17,46 +17,46 @@ namespace Celeste
     {
         public Vector2 Position;
         public float Scale = 1f;
-        private MTexture center;
+        private readonly MTexture center;
         public Action OnEstablish;
-        private List<DustGraphic.Node> nodes = new List<DustGraphic.Node>();
-        public List<DustGraphic.Node> LeftNodes = new List<DustGraphic.Node>();
-        public List<DustGraphic.Node> RightNodes = new List<DustGraphic.Node>();
-        public List<DustGraphic.Node> TopNodes = new List<DustGraphic.Node>();
-        public List<DustGraphic.Node> BottomNodes = new List<DustGraphic.Node>();
+        private readonly List<DustGraphic.Node> nodes = new();
+        public List<DustGraphic.Node> LeftNodes = new();
+        public List<DustGraphic.Node> RightNodes = new();
+        public List<DustGraphic.Node> TopNodes = new();
+        public List<DustGraphic.Node> BottomNodes = new();
         public Vector2 EyeTargetDirection;
         public Vector2 EyeDirection;
         public int EyeFlip = 1;
-        private bool eyesExist;
-        private int eyeTextureIndex;
+        private readonly bool eyesExist;
+        private readonly int eyeTextureIndex;
         private MTexture eyeTexture;
         private Vector2 eyeLookRange;
         private bool eyesMoveByRotation;
-        private bool autoControlEyes;
-        private bool eyesFollowPlayer;
+        private readonly bool autoControlEyes;
+        private readonly bool eyesFollowPlayer;
         private Coroutine blink;
         private bool leftEyeVisible = true;
         private bool rightEyeVisible = true;
         private DustGraphic.Eyeballs eyes;
         private float timer;
-        private float offset;
-        private bool ignoreSolids;
-        private bool autoExpandDust;
+        private readonly float offset;
+        private readonly bool ignoreSolids;
+        private readonly bool autoExpandDust;
         private float shakeTimer;
         private Vector2 shakeValue;
-        private int randomSeed;
+        private readonly int randomSeed;
 
         public bool Estableshed { get; private set; }
 
-        public Vector2 RenderPosition => this.Entity.Position + this.Position + this.shakeValue;
+        public Vector2 RenderPosition => Entity.Position + Position + shakeValue;
 
         private bool InView
         {
             get
             {
-                Camera camera = (this.Scene as Level).Camera;
-                Vector2 position = this.Entity.Position;
-                return (double) position.X + 16.0 >= (double) camera.Left && (double) position.Y + 16.0 >= (double) camera.Top && (double) position.X - 16.0 <= (double) camera.Right && (double) position.Y - 16.0 <= (double) camera.Bottom;
+                Camera camera = (Scene as Level).Camera;
+                Vector2 position = Entity.Position;
+                return position.X + 16.0 >= (double)camera.Left && position.Y + 16.0 >= (double)camera.Top && position.X - 16.0 <= (double)camera.Right && position.Y - 16.0 <= (double)camera.Bottom;
             }
         }
 
@@ -66,217 +66,278 @@ namespace Celeste
             this.ignoreSolids = ignoreSolids;
             this.autoControlEyes = autoControlEyes;
             this.autoExpandDust = autoExpandDust;
-            this.center = Calc.Random.Choose<MTexture>(GFX.Game.GetAtlasSubtextures("danger/dustcreature/center"));
-            this.offset = Calc.Random.NextFloat() * 4f;
-            this.timer = Calc.Random.NextFloat();
-            this.EyeTargetDirection = this.EyeDirection = Calc.AngleToVector(Calc.Random.NextFloat(6.28318548f), 1f);
-            this.eyeTextureIndex = Calc.Random.Next(128);
-            this.eyesExist = true;
+            center = Calc.Random.Choose<MTexture>(GFX.Game.GetAtlasSubtextures("danger/dustcreature/center"));
+            offset = Calc.Random.NextFloat() * 4f;
+            timer = Calc.Random.NextFloat();
+            EyeTargetDirection = EyeDirection = Calc.AngleToVector(Calc.Random.NextFloat(6.28318548f), 1f);
+            eyeTextureIndex = Calc.Random.Next(128);
+            eyesExist = true;
             if (autoControlEyes)
             {
-                this.eyesExist = Calc.Random.Chance(0.5f);
-                this.eyesFollowPlayer = Calc.Random.Chance(0.3f);
+                eyesExist = Calc.Random.Chance(0.5f);
+                eyesFollowPlayer = Calc.Random.Chance(0.3f);
             }
-            this.randomSeed = Calc.Random.Next();
+            randomSeed = Calc.Random.Next();
         }
 
         public override void Added(Entity entity)
         {
             base.Added(entity);
-            entity.Add((Component) new TransitionListener()
+            entity.Add(new TransitionListener()
             {
-                OnIn = (Action<float>) (f => this.AddDustNodesIfInCamera())
+                OnIn = f => AddDustNodesIfInCamera()
             });
-            entity.Add((Component) new DustEdge(new Action(((Component) this).Render)));
+            entity.Add(new DustEdge(new Action(Render)));
         }
 
         public override void Update()
         {
-            this.timer += Engine.DeltaTime * 0.6f;
-            bool inView = this.InView;
-            if ((double) this.shakeTimer > 0.0)
+            timer += Engine.DeltaTime * 0.6f;
+            bool inView = InView;
+            if (shakeTimer > 0.0)
             {
-                this.shakeTimer -= Engine.DeltaTime;
-                if ((double) this.shakeTimer <= 0.0)
-                    this.shakeValue = Vector2.Zero;
-                else if (this.Scene.OnInterval(0.05f))
-                    this.shakeValue = Calc.Random.ShakeVector();
-            }
-            if (this.eyesExist)
-            {
-                if (this.EyeDirection != this.EyeTargetDirection & inView)
+                shakeTimer -= Engine.DeltaTime;
+                if (shakeTimer <= 0.0)
                 {
-                    if (!this.eyesMoveByRotation)
+                    shakeValue = Vector2.Zero;
+                }
+                else if (Scene.OnInterval(0.05f))
+                {
+                    shakeValue = Calc.Random.ShakeVector();
+                }
+            }
+            if (eyesExist)
+            {
+                if (EyeDirection != EyeTargetDirection & inView)
+                {
+                    if (!eyesMoveByRotation)
                     {
-                        this.EyeDirection = Calc.Approach(this.EyeDirection, this.EyeTargetDirection, 12f * Engine.DeltaTime);
+                        EyeDirection = Calc.Approach(EyeDirection, EyeTargetDirection, 12f * Engine.DeltaTime);
                     }
                     else
                     {
-                        float val = this.EyeDirection.Angle();
-                        float target = this.EyeTargetDirection.Angle();
+                        float val = EyeDirection.Angle();
+                        float target = EyeTargetDirection.Angle();
                         float angleRadians = Calc.AngleApproach(val, target, 8f * Engine.DeltaTime);
-                        this.EyeDirection = (double) angleRadians != (double) target ? Calc.AngleToVector(angleRadians, 1f) : this.EyeTargetDirection;
+                        EyeDirection = (double)angleRadians != (double)target ? Calc.AngleToVector(angleRadians, 1f) : EyeTargetDirection;
                     }
                 }
-                if (this.eyesFollowPlayer & inView)
+                if (eyesFollowPlayer & inView)
                 {
-                    Player entity = this.Entity.Scene.Tracker.GetEntity<Player>();
+                    Player entity = Entity.Scene.Tracker.GetEntity<Player>();
                     if (entity != null)
                     {
-                        Vector2 vector = (entity.Position - this.Entity.Position).SafeNormalize();
-                        if (this.eyesMoveByRotation)
+                        Vector2 vector = (entity.Position - Entity.Position).SafeNormalize();
+                        if (eyesMoveByRotation)
                         {
                             float target = vector.Angle();
-                            this.EyeTargetDirection = Calc.AngleToVector(Calc.AngleApproach(this.eyeLookRange.Angle(), target, 0.7853982f), 1f);
+                            EyeTargetDirection = Calc.AngleToVector(Calc.AngleApproach(eyeLookRange.Angle(), target, 0.7853982f), 1f);
                         }
                         else
-                            this.EyeTargetDirection = vector;
+                        {
+                            EyeTargetDirection = vector;
+                        }
                     }
                 }
-                if (this.blink != null)
-                    this.blink.Update();
+                blink?.Update();
             }
-            if (this.nodes.Count <= 0 && this.Entity.Scene != null && !this.Estableshed)
+            if (nodes.Count <= 0 && Entity.Scene != null && !Estableshed)
             {
-                this.AddDustNodesIfInCamera();
+                AddDustNodesIfInCamera();
             }
             else
             {
-                foreach (DustGraphic.Node node in this.nodes)
+                foreach (DustGraphic.Node node in nodes)
+                {
                     node.Rotation += Engine.DeltaTime * 0.5f;
+                }
             }
         }
 
         public void OnHitPlayer()
         {
             if (SaveData.Instance.Assists.Invincible)
+            {
                 return;
-            this.shakeTimer = 0.6f;
-            if (!this.eyesExist)
+            }
+
+            shakeTimer = 0.6f;
+            if (!eyesExist)
+            {
                 return;
-            this.blink = (Coroutine) null;
-            this.leftEyeVisible = true;
-            this.rightEyeVisible = true;
-            this.eyeTexture = GFX.Game["danger/dustcreature/deadEyes"];
+            }
+
+            blink = null;
+            leftEyeVisible = true;
+            rightEyeVisible = true;
+            eyeTexture = GFX.Game["danger/dustcreature/deadEyes"];
         }
 
         public void AddDustNodesIfInCamera()
         {
-            if (this.nodes.Count > 0 || !this.InView || DustEdges.DustGraphicEstabledCounter > 25 || this.Estableshed)
+            if (nodes.Count > 0 || !InView || DustEdges.DustGraphicEstabledCounter > 25 || Estableshed)
+            {
                 return;
-            Calc.PushRandom(this.randomSeed);
-            int x = (int) this.Entity.X;
-            int y = (int) this.Entity.Y;
+            }
+
+            Calc.PushRandom(randomSeed);
+            int x = (int)Entity.X;
+            int y = (int)Entity.Y;
             Vector2 vector2 = new Vector2(1f, 1f).SafeNormalize();
-            this.AddNode(new Vector2(-vector2.X, -vector2.Y), this.ignoreSolids || !this.Entity.Scene.CollideCheck<Solid>(new Rectangle(x - 8, y - 8, 8, 8)));
-            this.AddNode(new Vector2(vector2.X, -vector2.Y), this.ignoreSolids || !this.Entity.Scene.CollideCheck<Solid>(new Rectangle(x, y - 8, 8, 8)));
-            this.AddNode(new Vector2(-vector2.X, vector2.Y), this.ignoreSolids || !this.Entity.Scene.CollideCheck<Solid>(new Rectangle(x - 8, y, 8, 8)));
-            this.AddNode(new Vector2(vector2.X, vector2.Y), this.ignoreSolids || !this.Entity.Scene.CollideCheck<Solid>(new Rectangle(x, y, 8, 8)));
-            if (this.nodes[0].Enabled || this.nodes[2].Enabled)
-                --this.Position.X;
-            if (this.nodes[1].Enabled || this.nodes[3].Enabled)
-                ++this.Position.X;
-            if (this.nodes[0].Enabled || this.nodes[1].Enabled)
-                --this.Position.Y;
-            if (this.nodes[2].Enabled || this.nodes[3].Enabled)
-                ++this.Position.Y;
+            AddNode(new Vector2(-vector2.X, -vector2.Y), ignoreSolids || !Entity.Scene.CollideCheck<Solid>(new Rectangle(x - 8, y - 8, 8, 8)));
+            AddNode(new Vector2(vector2.X, -vector2.Y), ignoreSolids || !Entity.Scene.CollideCheck<Solid>(new Rectangle(x, y - 8, 8, 8)));
+            AddNode(new Vector2(-vector2.X, vector2.Y), ignoreSolids || !Entity.Scene.CollideCheck<Solid>(new Rectangle(x - 8, y, 8, 8)));
+            AddNode(new Vector2(vector2.X, vector2.Y), ignoreSolids || !Entity.Scene.CollideCheck<Solid>(new Rectangle(x, y, 8, 8)));
+            if (nodes[0].Enabled || nodes[2].Enabled)
+            {
+                --Position.X;
+            }
+
+            if (nodes[1].Enabled || nodes[3].Enabled)
+            {
+                ++Position.X;
+            }
+
+            if (nodes[0].Enabled || nodes[1].Enabled)
+            {
+                --Position.Y;
+            }
+
+            if (nodes[2].Enabled || nodes[3].Enabled)
+            {
+                ++Position.Y;
+            }
+
             int num = 0;
-            foreach (DustGraphic.Node node in this.nodes)
+            foreach (DustGraphic.Node node in nodes)
             {
                 if (node.Enabled)
-                    ++num;
-            }
-            this.eyesMoveByRotation = num < 4;
-            if (this.autoControlEyes && this.eyesExist && this.eyesMoveByRotation)
-            {
-                this.eyeLookRange = Vector2.Zero;
-                if (this.nodes[0].Enabled)
-                    this.eyeLookRange += new Vector2(-1f, -1f).SafeNormalize();
-                if (this.nodes[1].Enabled)
-                    this.eyeLookRange += new Vector2(1f, -1f).SafeNormalize();
-                if (this.nodes[2].Enabled)
-                    this.eyeLookRange += new Vector2(-1f, 1f).SafeNormalize();
-                if (this.nodes[3].Enabled)
-                    this.eyeLookRange += new Vector2(1f, 1f).SafeNormalize();
-                if (num > 0 && (double) this.eyeLookRange.Length() > 0.0)
                 {
-                    this.eyeLookRange /= (float) num;
-                    this.eyeLookRange = this.eyeLookRange.SafeNormalize();
+                    ++num;
                 }
-                this.EyeTargetDirection = this.EyeDirection = this.eyeLookRange;
             }
-            if (this.eyesExist)
+            eyesMoveByRotation = num < 4;
+            if (autoControlEyes && eyesExist && eyesMoveByRotation)
             {
-                this.blink = new Coroutine(this.BlinkRoutine());
-                List<MTexture> atlasSubtextures = GFX.Game.GetAtlasSubtextures(DustStyles.Get(this.Scene).EyeTextures);
-                this.eyeTexture = atlasSubtextures[this.eyeTextureIndex % atlasSubtextures.Count];
-                this.Entity.Scene.Add((Entity) (this.eyes = new DustGraphic.Eyeballs(this)));
+                eyeLookRange = Vector2.Zero;
+                if (nodes[0].Enabled)
+                {
+                    eyeLookRange += new Vector2(-1f, -1f).SafeNormalize();
+                }
+
+                if (nodes[1].Enabled)
+                {
+                    eyeLookRange += new Vector2(1f, -1f).SafeNormalize();
+                }
+
+                if (nodes[2].Enabled)
+                {
+                    eyeLookRange += new Vector2(-1f, 1f).SafeNormalize();
+                }
+
+                if (nodes[3].Enabled)
+                {
+                    eyeLookRange += new Vector2(1f, 1f).SafeNormalize();
+                }
+
+                if (num > 0 && (double)eyeLookRange.Length() > 0.0)
+                {
+                    eyeLookRange /= num;
+                    eyeLookRange = eyeLookRange.SafeNormalize();
+                }
+                EyeTargetDirection = EyeDirection = eyeLookRange;
+            }
+            if (eyesExist)
+            {
+                blink = new Coroutine(BlinkRoutine());
+                List<MTexture> atlasSubtextures = GFX.Game.GetAtlasSubtextures(DustStyles.Get(Scene).EyeTextures);
+                eyeTexture = atlasSubtextures[eyeTextureIndex % atlasSubtextures.Count];
+                Entity.Scene.Add(eyes = new DustGraphic.Eyeballs(this));
             }
             ++DustEdges.DustGraphicEstabledCounter;
-            this.Estableshed = true;
-            if (this.OnEstablish != null)
-                this.OnEstablish();
+            Estableshed = true;
+            OnEstablish?.Invoke();
             Calc.PopRandom();
         }
 
         private void AddNode(Vector2 angle, bool enabled)
         {
-            Vector2 vector2 = new Vector2(1f, 1f);
-            if (this.autoExpandDust)
+            Vector2 vector2 = new(1f, 1f);
+            if (autoExpandDust)
             {
                 int num1 = Math.Sign(angle.X);
                 int num2 = Math.Sign(angle.Y);
-                this.Entity.Collidable = false;
-                if (this.Scene.CollideCheck<Solid>(new Rectangle((int) ((double) this.Entity.X - 4.0 + (double) (num1 * 16)), (int) ((double) this.Entity.Y - 4.0 + (double) (num2 * 4)), 8, 8)) || this.Scene.CollideCheck<DustStaticSpinner>(new Rectangle((int) ((double) this.Entity.X - 4.0 + (double) (num1 * 16)), (int) ((double) this.Entity.Y - 4.0 + (double) (num2 * 4)), 8, 8)))
+                Entity.Collidable = false;
+                if (Scene.CollideCheck<Solid>(new Rectangle((int)((double)Entity.X - 4.0 + (num1 * 16)), (int)((double)Entity.Y - 4.0 + (num2 * 4)), 8, 8)) || Scene.CollideCheck<DustStaticSpinner>(new Rectangle((int)((double)Entity.X - 4.0 + (num1 * 16)), (int)((double)Entity.Y - 4.0 + (num2 * 4)), 8, 8)))
+                {
                     vector2.X = 5f;
-                if (this.Scene.CollideCheck<Solid>(new Rectangle((int) ((double) this.Entity.X - 4.0 + (double) (num1 * 4)), (int) ((double) this.Entity.Y - 4.0 + (double) (num2 * 16)), 8, 8)) || this.Scene.CollideCheck<DustStaticSpinner>(new Rectangle((int) ((double) this.Entity.X - 4.0 + (double) (num1 * 4)), (int) ((double) this.Entity.Y - 4.0 + (double) (num2 * 16)), 8, 8)))
+                }
+
+                if (Scene.CollideCheck<Solid>(new Rectangle((int)((double)Entity.X - 4.0 + (num1 * 4)), (int)((double)Entity.Y - 4.0 + (num2 * 16)), 8, 8)) || Scene.CollideCheck<DustStaticSpinner>(new Rectangle((int)((double)Entity.X - 4.0 + (num1 * 4)), (int)((double)Entity.Y - 4.0 + (num2 * 16)), 8, 8)))
+                {
                     vector2.Y = 5f;
-                this.Entity.Collidable = true;
+                }
+
+                Entity.Collidable = true;
             }
-            DustGraphic.Node node = new DustGraphic.Node();
-            node.Base = Calc.Random.Choose<MTexture>(GFX.Game.GetAtlasSubtextures("danger/dustcreature/base"));
-            node.Overlay = Calc.Random.Choose<MTexture>(GFX.Game.GetAtlasSubtextures("danger/dustcreature/overlay"));
-            node.Rotation = Calc.Random.NextFloat(6.28318548f);
-            node.Angle = angle * vector2;
-            node.Enabled = enabled;
-            this.nodes.Add(node);
-            if ((double) angle.X < 0.0)
-                this.LeftNodes.Add(node);
+            DustGraphic.Node node = new()
+            {
+                Base = Calc.Random.Choose<MTexture>(GFX.Game.GetAtlasSubtextures("danger/dustcreature/base")),
+                Overlay = Calc.Random.Choose<MTexture>(GFX.Game.GetAtlasSubtextures("danger/dustcreature/overlay")),
+                Rotation = Calc.Random.NextFloat(6.28318548f),
+                Angle = angle * vector2,
+                Enabled = enabled
+            };
+            nodes.Add(node);
+            if (angle.X < 0.0)
+            {
+                LeftNodes.Add(node);
+            }
             else
-                this.RightNodes.Add(node);
-            if ((double) angle.Y < 0.0)
-                this.TopNodes.Add(node);
+            {
+                RightNodes.Add(node);
+            }
+
+            if (angle.Y < 0.0)
+            {
+                TopNodes.Add(node);
+            }
             else
-                this.BottomNodes.Add(node);
+            {
+                BottomNodes.Add(node);
+            }
         }
 
         private IEnumerator BlinkRoutine()
         {
             while (true)
             {
-                yield return (object) (float) (2.0 + (double) Calc.Random.NextFloat(1.5f));
-                this.leftEyeVisible = false;
-                yield return (object) (float) (0.019999999552965164 + (double) Calc.Random.NextFloat(0.05f));
-                this.rightEyeVisible = false;
-                yield return (object) 0.25f;
-                this.leftEyeVisible = this.rightEyeVisible = true;
+                yield return (float)(2.0 + (double)Calc.Random.NextFloat(1.5f));
+                leftEyeVisible = false;
+                yield return (float)(0.019999999552965164 + (double)Calc.Random.NextFloat(0.05f));
+                rightEyeVisible = false;
+                yield return 0.25f;
+                leftEyeVisible = rightEyeVisible = true;
             }
         }
 
         public override void Render()
         {
-            if (!this.InView)
+            if (!InView)
+            {
                 return;
-            Vector2 renderPosition = this.RenderPosition;
-            foreach (DustGraphic.Node node in this.nodes)
+            }
+
+            Vector2 renderPosition = RenderPosition;
+            foreach (DustGraphic.Node node in nodes)
             {
                 if (node.Enabled)
                 {
-                    node.Base.DrawCentered(renderPosition + node.Angle * this.Scale, Color.White, this.Scale, node.Rotation);
-                    node.Overlay.DrawCentered(renderPosition + node.Angle * this.Scale, Color.White, this.Scale, -node.Rotation);
+                    node.Base.DrawCentered(renderPosition + (node.Angle * Scale), Color.White, Scale, node.Rotation);
+                    node.Overlay.DrawCentered(renderPosition + (node.Angle * Scale), Color.White, Scale, -node.Rotation);
                 }
             }
-            this.center.DrawCentered(renderPosition, Color.White, this.Scale, this.timer);
+            center.DrawCentered(renderPosition, Color.White, Scale, timer);
         }
 
         public class Node
@@ -295,34 +356,46 @@ namespace Celeste
 
             public Eyeballs(DustGraphic dust)
             {
-                this.Dust = dust;
-                this.Depth = this.Dust.Entity.Depth - 1;
+                Dust = dust;
+                Depth = Dust.Entity.Depth - 1;
             }
 
             public override void Added(Scene scene)
             {
                 base.Added(scene);
-                this.Color = DustStyles.Get(scene).EyeColor;
+                Color = DustStyles.Get(scene).EyeColor;
             }
 
             public override void Update()
             {
                 base.Update();
-                if (this.Dust.Entity != null && this.Dust.Scene != null)
+                if (Dust.Entity != null && Dust.Scene != null)
+                {
                     return;
-                this.RemoveSelf();
+                }
+
+                RemoveSelf();
             }
 
             public override void Render()
             {
-                if (!this.Dust.Visible || !this.Dust.Entity.Visible)
+                if (!Dust.Visible || !Dust.Entity.Visible)
+                {
                     return;
-                Vector2 vector2 = new Vector2(-this.Dust.EyeDirection.Y, this.Dust.EyeDirection.X).SafeNormalize();
-                if (this.Dust.leftEyeVisible)
-                    this.Dust.eyeTexture.DrawCentered(this.Dust.RenderPosition + (this.Dust.EyeDirection * 5f + vector2 * 3f) * this.Dust.Scale, this.Color, this.Dust.Scale);
-                if (!this.Dust.rightEyeVisible)
+                }
+
+                Vector2 vector2 = new Vector2(-Dust.EyeDirection.Y, Dust.EyeDirection.X).SafeNormalize();
+                if (Dust.leftEyeVisible)
+                {
+                    Dust.eyeTexture.DrawCentered(Dust.RenderPosition + (((Dust.EyeDirection * 5f) + (vector2 * 3f)) * Dust.Scale), Color, Dust.Scale);
+                }
+
+                if (!Dust.rightEyeVisible)
+                {
                     return;
-                this.Dust.eyeTexture.DrawCentered(this.Dust.RenderPosition + (this.Dust.EyeDirection * 5f - vector2 * 3f) * this.Dust.Scale, this.Color, this.Dust.Scale);
+                }
+
+                Dust.eyeTexture.DrawCentered(Dust.RenderPosition + (((Dust.EyeDirection * 5f) - (vector2 * 3f)) * Dust.Scale), Color, Dust.Scale);
             }
         }
     }

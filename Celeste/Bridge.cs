@@ -80,12 +80,16 @@ namespace Celeste
             base.Update();
             Player entity = level.Tracker.GetEntity<Player>();
             if (entity == null || entity.Dead)
+            {
                 _ = collapseSfx.Stop();
+            }
 
             if (!canCollapse)
             {
                 if (entity == null || entity.X < X + 112f)
+                {
                     return;
+                }
 
                 _ = Audio.SetMusic("event:/music/lvl0/bridge");
                 _ = collapseSfx.Play("event:/game/00_prologue/bridge_rumble_loop");
@@ -101,7 +105,9 @@ namespace Celeste
             else if (tiles.Count > 0)
             {
                 if (entity == null)
+                {
                     return;
+                }
 
                 if (canEndCollapseA && entity.X > X + width - 216f)
                 {
@@ -125,7 +131,9 @@ namespace Celeste
                 {
                     collapseTimer -= Engine.DeltaTime;
                     if (tiles.Count < 5 || entity.X < tiles[4].X)
+                    {
                         return;
+                    }
 
                     int index = 0;
                     tiles[index].Fall();
@@ -141,7 +149,9 @@ namespace Celeste
             else
             {
                 if (ending)
+                {
                     return;
+                }
 
                 ending = true;
                 StopCollapseLoop();

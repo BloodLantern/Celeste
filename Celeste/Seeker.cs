@@ -38,40 +38,40 @@ namespace Celeste
         private const float BounceSpeed = 200f;
         private const float SightDistSq = 25600f;
         private const float ExplodeRadius = 40f;
-        private Hitbox physicsHitbox;
-        private Hitbox breakWallsHitbox;
-        private Hitbox attackHitbox;
-        private Hitbox bounceHitbox;
-        private Monocle.Circle pushRadius;
-        private Monocle.Circle breakWallsRadius;
-        private StateMachine State;
+        private readonly Hitbox physicsHitbox;
+        private readonly Hitbox breakWallsHitbox;
+        private readonly Hitbox attackHitbox;
+        private readonly Hitbox bounceHitbox;
+        private readonly Monocle.Circle pushRadius;
+        private readonly Monocle.Circle breakWallsRadius;
+        private readonly StateMachine State;
         private Vector2 lastSpottedAt;
         private Vector2 lastPathTo;
         private bool spotted;
         private bool canSeePlayer;
-        private Collision onCollideH;
-        private Collision onCollideV;
+        private readonly Collision onCollideH;
+        private readonly Collision onCollideV;
         private Random random;
         private Vector2 lastPosition;
-        private Shaker shaker;
-        private Wiggler scaleWiggler;
+        private readonly Shaker shaker;
+        private readonly Wiggler scaleWiggler;
         private bool lastPathFound;
         private List<Vector2> path;
         private int pathIndex;
-        private Vector2[] patrolPoints;
-        private SineWave idleSineX;
-        private SineWave idleSineY;
+        private readonly Vector2[] patrolPoints;
+        private readonly SineWave idleSineX;
+        private readonly SineWave idleSineY;
         public VertexLight Light;
         private bool dead;
-        private SoundSource boopedSfx;
-        private SoundSource aggroSfx;
-        private SoundSource reviveSfx;
-        private Sprite sprite;
+        private readonly SoundSource boopedSfx;
+        private readonly SoundSource aggroSfx;
+        private readonly SoundSource reviveSfx;
+        private readonly Sprite sprite;
         private int facing = 1;
         private int spriteFacing = 1;
         private string nextSprite;
-        private HoldableCollider theo;
-        private HashSet<string> flipAnimations = new HashSet<string>()
+        private readonly HoldableCollider theo;
+        private readonly HashSet<string> flipAnimations = new()
         {
             "flipMouth",
             "flipEyes",
@@ -84,7 +84,7 @@ namespace Celeste
         private const float PatrolSpeed = 25f;
         private const int PatrolChoices = 3;
         private const float PatrolWaitTime = 0.4f;
-        private static Seeker.PatrolPoint[] patrolChoices = new Seeker.PatrolPoint[3];
+        private static readonly Seeker.PatrolPoint[] patrolChoices = new Seeker.PatrolPoint[3];
         private float patrolWaitTimer;
         private const float SpottedTargetSpeed = 60f;
         private const float SpottedFarSpeed = 90f;
@@ -114,72 +114,81 @@ namespace Celeste
         public Seeker(Vector2 position, Vector2[] patrolPoints)
             : base(position)
         {
-            this.Depth = -200;
+            Depth = -200;
             this.patrolPoints = patrolPoints;
-            this.lastPosition = position;
-            this.Collider = (Collider) (this.physicsHitbox = new Hitbox(6f, 6f, -3f, -3f));
-            this.breakWallsHitbox = new Hitbox(6f, 14f, -3f, -7f);
-            this.attackHitbox = new Hitbox(12f, 8f, -6f, -2f);
-            this.bounceHitbox = new Hitbox(16f, 6f, -8f, -8f);
-            this.pushRadius = new Monocle.Circle(40f);
-            this.breakWallsRadius = new Monocle.Circle(16f);
-            this.Add((Component) new PlayerCollider(new Action<Player>(this.OnAttackPlayer), (Collider) this.attackHitbox));
-            this.Add((Component) new PlayerCollider(new Action<Player>(this.OnBouncePlayer), (Collider) this.bounceHitbox));
-            this.Add((Component) (this.shaker = new Shaker(false)));
-            this.Add((Component) (this.State = new StateMachine()));
-            this.State.SetCallbacks(0, new Func<int>(this.IdleUpdate), new Func<IEnumerator>(this.IdleCoroutine));
-            this.State.SetCallbacks(1, new Func<int>(this.PatrolUpdate), begin: new Action(this.PatrolBegin));
-            this.State.SetCallbacks(2, new Func<int>(this.SpottedUpdate), new Func<IEnumerator>(this.SpottedCoroutine), new Action(this.SpottedBegin));
-            this.State.SetCallbacks(3, new Func<int>(this.AttackUpdate), new Func<IEnumerator>(this.AttackCoroutine), new Action(this.AttackBegin));
-            this.State.SetCallbacks(4, new Func<int>(this.StunnedUpdate), new Func<IEnumerator>(this.StunnedCoroutine));
-            this.State.SetCallbacks(5, new Func<int>(this.SkiddingUpdate), new Func<IEnumerator>(this.SkiddingCoroutine), new Action(this.SkiddingBegin), new Action(this.SkiddingEnd));
-            this.State.SetCallbacks(6, new Func<int>(this.RegenerateUpdate), new Func<IEnumerator>(this.RegenerateCoroutine), new Action(this.RegenerateBegin), new Action(this.RegenerateEnd));
-            this.State.SetCallbacks(7, (Func<int>) null, new Func<IEnumerator>(this.ReturnedCoroutine));
-            this.onCollideH = new Collision(this.OnCollideH);
-            this.onCollideV = new Collision(this.OnCollideV);
-            this.Add((Component) (this.idleSineX = new SineWave(0.5f)));
-            this.Add((Component) (this.idleSineY = new SineWave(0.7f)));
-            this.Add((Component) (this.Light = new VertexLight(Color.White, 1f, 32, 64)));
-            this.Add((Component) (this.theo = new HoldableCollider(new Action<Holdable>(this.OnHoldable), (Collider) this.attackHitbox)));
-            this.Add((Component) new MirrorReflection());
-            this.path = new List<Vector2>();
-            this.IgnoreJumpThrus = true;
-            this.Add((Component) (this.sprite = GFX.SpriteBank.Create("seeker")));
-            this.sprite.OnLastFrame = (Action<string>) (f =>
+            lastPosition = position;
+            Collider = physicsHitbox = new Hitbox(6f, 6f, -3f, -3f);
+            breakWallsHitbox = new Hitbox(6f, 14f, -3f, -7f);
+            attackHitbox = new Hitbox(12f, 8f, -6f, -2f);
+            bounceHitbox = new Hitbox(16f, 6f, -8f, -8f);
+            pushRadius = new Monocle.Circle(40f);
+            breakWallsRadius = new Monocle.Circle(16f);
+            Add(new PlayerCollider(new Action<Player>(OnAttackPlayer), attackHitbox));
+            Add(new PlayerCollider(new Action<Player>(OnBouncePlayer), bounceHitbox));
+            Add(shaker = new Shaker(false));
+            Add(State = new StateMachine());
+            State.SetCallbacks(0, new Func<int>(IdleUpdate), new Func<IEnumerator>(IdleCoroutine));
+            State.SetCallbacks(1, new Func<int>(PatrolUpdate), begin: new Action(PatrolBegin));
+            State.SetCallbacks(2, new Func<int>(SpottedUpdate), new Func<IEnumerator>(SpottedCoroutine), new Action(SpottedBegin));
+            State.SetCallbacks(3, new Func<int>(AttackUpdate), new Func<IEnumerator>(AttackCoroutine), new Action(AttackBegin));
+            State.SetCallbacks(4, new Func<int>(StunnedUpdate), new Func<IEnumerator>(StunnedCoroutine));
+            State.SetCallbacks(5, new Func<int>(SkiddingUpdate), new Func<IEnumerator>(SkiddingCoroutine), new Action(SkiddingBegin), new Action(SkiddingEnd));
+            State.SetCallbacks(6, new Func<int>(RegenerateUpdate), new Func<IEnumerator>(RegenerateCoroutine), new Action(RegenerateBegin), new Action(RegenerateEnd));
+            State.SetCallbacks(7, null, new Func<IEnumerator>(ReturnedCoroutine));
+            onCollideH = new Collision(OnCollideH);
+            onCollideV = new Collision(OnCollideV);
+            Add(idleSineX = new SineWave(0.5f));
+            Add(idleSineY = new SineWave(0.7f));
+            Add(Light = new VertexLight(Color.White, 1f, 32, 64));
+            Add(theo = new HoldableCollider(new Action<Holdable>(OnHoldable), attackHitbox));
+            Add(new MirrorReflection());
+            path = new List<Vector2>();
+            IgnoreJumpThrus = true;
+            Add(sprite = GFX.SpriteBank.Create("seeker"));
+            sprite.OnLastFrame = f =>
             {
-                if (!this.flipAnimations.Contains(f) || this.spriteFacing == this.facing)
-                    return;
-                this.spriteFacing = this.facing;
-                if (this.nextSprite == null)
-                    return;
-                this.sprite.Play(this.nextSprite);
-                this.nextSprite = (string) null;
-            });
-            this.sprite.OnChange = (Action<string, string>) ((last, next) =>
-            {
-                this.nextSprite = (string) null;
-                this.sprite.OnLastFrame(last);
-            });
-            this.SquishCallback = (Collision) (d =>
-            {
-                if (this.dead || this.TrySquishWiggle(d))
-                    return;
-                Entity entity = new Entity(this.Position);
-                entity.Add((Component) new DeathEffect(Color.HotPink, new Vector2?(this.Center - this.Position))
+                if (!flipAnimations.Contains(f) || spriteFacing == facing)
                 {
-                    OnEnd = (Action) (() => entity.RemoveSelf())
+                    return;
+                }
+
+                spriteFacing = facing;
+                if (nextSprite == null)
+                {
+                    return;
+                }
+
+                sprite.Play(nextSprite);
+                nextSprite = null;
+            };
+            sprite.OnChange = (last, next) =>
+            {
+                nextSprite = null;
+                sprite.OnLastFrame(last);
+            };
+            SquishCallback = d =>
+            {
+                if (dead || TrySquishWiggle(d))
+                {
+                    return;
+                }
+
+                Entity entity = new(Position);
+                entity.Add(new DeathEffect(Color.HotPink, new Vector2?(Center - Position))
+                {
+                    OnEnd = () => entity.RemoveSelf()
                 });
                 entity.Depth = -1000000;
-                this.Scene.Add(entity);
-                Audio.Play("event:/game/05_mirror_temple/seeker_death", this.Position);
-                this.RemoveSelf();
-                this.dead = true;
-            });
-            this.scaleWiggler = Wiggler.Create(0.8f, 2f);
-            this.Add((Component) this.scaleWiggler);
-            this.Add((Component) (this.boopedSfx = new SoundSource()));
-            this.Add((Component) (this.aggroSfx = new SoundSource()));
-            this.Add((Component) (this.reviveSfx = new SoundSource()));
+                Scene.Add(entity);
+                _ = Audio.Play("event:/game/05_mirror_temple/seeker_death", Position);
+                RemoveSelf();
+                dead = true;
+            };
+            scaleWiggler = Wiggler.Create(0.8f, 2f);
+            Add(scaleWiggler);
+            Add(boopedSfx = new SoundSource());
+            Add(aggroSfx = new SoundSource());
+            Add(reviveSfx = new SoundSource());
         }
 
         public Seeker(EntityData data, Vector2 offset)
@@ -190,346 +199,412 @@ namespace Celeste
         public override void Added(Scene scene)
         {
             base.Added(scene);
-            this.random = new Random(this.SceneAs<Level>().Session.LevelData.LoadSeed);
+            random = new Random(SceneAs<Level>().Session.LevelData.LoadSeed);
         }
 
         public override void Awake(Scene scene)
         {
             base.Awake(scene);
-            Player entity = this.Scene.Tracker.GetEntity<Player>();
-            if (entity == null || (double) this.X == (double) entity.X)
-                this.SnapFacing(1f);
-            else
-                this.SnapFacing((float) Math.Sign(entity.X - this.X));
-        }
-
-        public override bool IsRiding(JumpThru jumpThru) => false;
-
-        public override bool IsRiding(Solid solid) => false;
-
-        public bool Attacking => this.State.State == 3 && !this.attackWindUp;
-
-        public bool Spotted => this.State.State == 3 || this.State.State == 2;
-
-        public bool Regenerating => this.State.State == 6;
-
-        private void OnAttackPlayer(Player player)
-        {
-            if (this.State.State != 4)
+            Player entity = Scene.Tracker.GetEntity<Player>();
+            if (entity == null || (double)X == (double)entity.X)
             {
-                player.Die((player.Center - this.Position).SafeNormalize());
+                SnapFacing(1f);
             }
             else
             {
-                Collider collider = this.Collider;
-                this.Collider = (Collider) this.bounceHitbox;
-                player.PointBounce(this.Center);
-                this.Speed = (this.Center - player.Center).SafeNormalize(100f);
-                this.scaleWiggler.Start();
-                this.Collider = collider;
+                SnapFacing(Math.Sign(entity.X - X));
+            }
+        }
+
+        public override bool IsRiding(JumpThru jumpThru)
+        {
+            return false;
+        }
+
+        public override bool IsRiding(Solid solid)
+        {
+            return false;
+        }
+
+        public bool Attacking => State.State == 3 && !attackWindUp;
+
+        public bool Spotted => State.State is 3 or 2;
+
+        public bool Regenerating => State.State == 6;
+
+        private void OnAttackPlayer(Player player)
+        {
+            if (State.State != 4)
+            {
+                _ = player.Die((player.Center - Position).SafeNormalize());
+            }
+            else
+            {
+                Collider collider = Collider;
+                Collider = bounceHitbox;
+                player.PointBounce(Center);
+                Speed = (Center - player.Center).SafeNormalize(100f);
+                scaleWiggler.Start();
+                Collider = collider;
             }
         }
 
         private void OnBouncePlayer(Player player)
         {
-            Collider collider = this.Collider;
-            this.Collider = (Collider) this.attackHitbox;
-            if (this.CollideCheck((Entity) player))
+            Collider collider = Collider;
+            Collider = attackHitbox;
+            if (CollideCheck(player))
             {
-                this.OnAttackPlayer(player);
+                OnAttackPlayer(player);
             }
             else
             {
-                player.Bounce(this.Top);
-                this.GotBouncedOn((Entity) player);
+                player.Bounce(Top);
+                GotBouncedOn(player);
             }
-            this.Collider = collider;
+            Collider = collider;
         }
 
         private void GotBouncedOn(Entity entity)
         {
             Celeste.Freeze(0.15f);
-            this.Speed = (this.Center - entity.Center).SafeNormalize(200f);
-            this.State.State = 6;
-            this.sprite.Scale = new Vector2(1.4f, 0.6f);
-            this.SceneAs<Level>().Particles.Emit(Seeker.P_Stomp, 8, this.Center - Vector2.UnitY * 5f, new Vector2(6f, 3f));
+            Speed = (Center - entity.Center).SafeNormalize(200f);
+            State.State = 6;
+            sprite.Scale = new Vector2(1.4f, 0.6f);
+            SceneAs<Level>().Particles.Emit(Seeker.P_Stomp, 8, Center - (Vector2.UnitY * 5f), new Vector2(6f, 3f));
         }
 
-        public void HitSpring() => this.Speed.Y = -150f;
+        public void HitSpring()
+        {
+            Speed.Y = -150f;
+        }
 
         private bool CanSeePlayer(Player player)
         {
-            if (player == null || this.State.State != 2 && !this.SceneAs<Level>().InsideCamera(this.Center) && (double) Vector2.DistanceSquared(this.Center, player.Center) > 25600.0)
+            if (player == null || (State.State != 2 && !SceneAs<Level>().InsideCamera(Center) && (double)Vector2.DistanceSquared(Center, player.Center) > 25600.0))
+            {
                 return false;
-            Vector2 vector2 = (player.Center - this.Center).Perpendicular().SafeNormalize(2f);
-            return !this.Scene.CollideCheck<Solid>(this.Center + vector2, player.Center + vector2) && !this.Scene.CollideCheck<Solid>(this.Center - vector2, player.Center - vector2);
+            }
+
+            Vector2 vector2 = (player.Center - Center).Perpendicular().SafeNormalize(2f);
+            return !Scene.CollideCheck<Solid>(Center + vector2, player.Center + vector2) && !Scene.CollideCheck<Solid>(Center - vector2, player.Center - vector2);
         }
 
         public override void Update()
         {
-            this.Light.Alpha = Calc.Approach(this.Light.Alpha, 1f, Engine.DeltaTime * 2f);
-            foreach (Entity entity in this.Scene.Tracker.GetEntities<SeekerBarrier>())
-                entity.Collidable = true;
-            this.sprite.Scale.X = Calc.Approach(this.sprite.Scale.X, 1f, 2f * Engine.DeltaTime);
-            this.sprite.Scale.Y = Calc.Approach(this.sprite.Scale.Y, 1f, 2f * Engine.DeltaTime);
-            if (this.State.State == 6)
+            Light.Alpha = Calc.Approach(Light.Alpha, 1f, Engine.DeltaTime * 2f);
+            foreach (Entity entity in Scene.Tracker.GetEntities<SeekerBarrier>())
             {
-                this.canSeePlayer = false;
+                entity.Collidable = true;
+            }
+
+            sprite.Scale.X = Calc.Approach(sprite.Scale.X, 1f, 2f * Engine.DeltaTime);
+            sprite.Scale.Y = Calc.Approach(sprite.Scale.Y, 1f, 2f * Engine.DeltaTime);
+            if (State.State == 6)
+            {
+                canSeePlayer = false;
             }
             else
             {
-                Player entity = this.Scene.Tracker.GetEntity<Player>();
-                this.canSeePlayer = this.CanSeePlayer(entity);
-                if (this.canSeePlayer)
+                Player entity = Scene.Tracker.GetEntity<Player>();
+                canSeePlayer = CanSeePlayer(entity);
+                if (canSeePlayer)
                 {
-                    this.spotted = true;
-                    this.lastSpottedAt = entity.Center;
+                    spotted = true;
+                    lastSpottedAt = entity.Center;
                 }
             }
-            if (this.lastPathTo != this.lastSpottedAt)
+            if (lastPathTo != lastSpottedAt)
             {
-                this.lastPathTo = this.lastSpottedAt;
-                this.pathIndex = 0;
-                this.lastPathFound = this.SceneAs<Level>().Pathfinder.Find(ref this.path, this.Center, this.FollowTarget);
+                lastPathTo = lastSpottedAt;
+                pathIndex = 0;
+                lastPathFound = SceneAs<Level>().Pathfinder.Find(ref path, Center, FollowTarget);
             }
             base.Update();
-            this.lastPosition = this.Position;
-            this.MoveH(this.Speed.X * Engine.DeltaTime, this.onCollideH);
-            this.MoveV(this.Speed.Y * Engine.DeltaTime, this.onCollideV);
-            Level level = this.SceneAs<Level>();
-            double left1 = (double) this.Left;
+            lastPosition = Position;
+            _ = MoveH(Speed.X * Engine.DeltaTime, onCollideH);
+            _ = MoveV(Speed.Y * Engine.DeltaTime, onCollideV);
+            Level level = SceneAs<Level>();
+            double left1 = (double)Left;
             Rectangle bounds = level.Bounds;
-            double left2 = (double) bounds.Left;
-            if (left1 < left2 && (double) this.Speed.X < 0.0)
+            double left2 = bounds.Left;
+            if (left1 < left2 && Speed.X < 0.0)
             {
                 bounds = level.Bounds;
-                this.Left = (float) bounds.Left;
-                this.onCollideH(CollisionData.Empty);
+                Left = bounds.Left;
+                onCollideH(CollisionData.Empty);
             }
             else
             {
-                double right1 = (double) this.Right;
+                double right1 = (double)Right;
                 bounds = level.Bounds;
-                double right2 = (double) bounds.Right;
-                if (right1 > right2 && (double) this.Speed.X > 0.0)
+                double right2 = bounds.Right;
+                if (right1 > right2 && Speed.X > 0.0)
                 {
                     bounds = level.Bounds;
-                    this.Right = (float) bounds.Right;
-                    this.onCollideH(CollisionData.Empty);
+                    Right = bounds.Right;
+                    onCollideH(CollisionData.Empty);
                 }
             }
-            double top = (double) this.Top;
+            double top = (double)Top;
             bounds = level.Bounds;
-            double num = (double) (bounds.Top - 8);
-            if (top < num && (double) this.Speed.Y < 0.0)
+            double num = bounds.Top - 8;
+            if (top < num && Speed.Y < 0.0)
             {
                 bounds = level.Bounds;
-                this.Top = (float) (bounds.Top - 8);
-                this.onCollideV(CollisionData.Empty);
+                Top = bounds.Top - 8;
+                onCollideV(CollisionData.Empty);
             }
             else
             {
-                double bottom1 = (double) this.Bottom;
+                double bottom1 = (double)Bottom;
                 bounds = level.Bounds;
-                double bottom2 = (double) bounds.Bottom;
-                if (bottom1 > bottom2 && (double) this.Speed.Y > 0.0)
+                double bottom2 = bounds.Bottom;
+                if (bottom1 > bottom2 && Speed.Y > 0.0)
                 {
                     bounds = level.Bounds;
-                    this.Bottom = (float) bounds.Bottom;
-                    this.onCollideV(CollisionData.Empty);
+                    Bottom = bounds.Bottom;
+                    onCollideV(CollisionData.Empty);
                 }
             }
-            foreach (SeekerCollider component in this.Scene.Tracker.GetComponents<SeekerCollider>())
+            foreach (SeekerCollider component in Scene.Tracker.GetComponents<SeekerCollider>())
+            {
                 component.Check(this);
-            if (this.State.State == 3 && (double) this.Speed.X > 0.0)
-            {
-                this.bounceHitbox.Width = 16f;
-                this.bounceHitbox.Position.X = -10f;
             }
-            else if (this.State.State == 3 && (double) this.Speed.Y < 0.0)
+
+            if (State.State == 3 && Speed.X > 0.0)
             {
-                this.bounceHitbox.Width = 16f;
-                this.bounceHitbox.Position.X = -6f;
+                bounceHitbox.Width = 16f;
+                bounceHitbox.Position.X = -10f;
+            }
+            else if (State.State == 3 && Speed.Y < 0.0)
+            {
+                bounceHitbox.Width = 16f;
+                bounceHitbox.Position.X = -6f;
             }
             else
             {
-                this.bounceHitbox.Width = 12f;
-                this.bounceHitbox.Position.X = -6f;
+                bounceHitbox.Width = 12f;
+                bounceHitbox.Position.X = -6f;
             }
-            foreach (Entity entity in this.Scene.Tracker.GetEntities<SeekerBarrier>())
+            foreach (Entity entity in Scene.Tracker.GetEntities<SeekerBarrier>())
+            {
                 entity.Collidable = false;
+            }
         }
 
         private void TurnFacing(float dir, string gotoSprite = null)
         {
-            if ((double) dir != 0.0)
-                this.facing = Math.Sign(dir);
-            if (this.spriteFacing != this.facing)
+            if ((double)dir != 0.0)
             {
-                if (this.State.State == 5)
-                    this.sprite.Play("skid");
-                else if (this.State.State == 3 || this.State.State == 2)
-                    this.sprite.Play("flipMouth");
+                facing = Math.Sign(dir);
+            }
+
+            if (spriteFacing != facing)
+            {
+                if (State.State == 5)
+                {
+                    sprite.Play("skid");
+                }
+                else if (State.State is 3 or 2)
+                {
+                    sprite.Play("flipMouth");
+                }
                 else
-                    this.sprite.Play("flipEyes");
-                this.nextSprite = gotoSprite;
+                {
+                    sprite.Play("flipEyes");
+                }
+
+                nextSprite = gotoSprite;
             }
             else
             {
                 if (gotoSprite == null)
+                {
                     return;
-                this.sprite.Play(gotoSprite);
+                }
+
+                sprite.Play(gotoSprite);
             }
         }
 
         private void SnapFacing(float dir)
         {
-            if ((double) dir == 0.0)
+            if ((double)dir == 0.0)
+            {
                 return;
-            this.spriteFacing = this.facing = Math.Sign(dir);
+            }
+
+            spriteFacing = facing = Math.Sign(dir);
         }
 
         private void OnHoldable(Holdable holdable)
         {
-            if (this.State.State != 6 && holdable.Dangerous(this.theo))
+            if (State.State != 6 && holdable.Dangerous(theo))
             {
                 holdable.HitSeeker(this);
-                this.State.State = 4;
-                this.Speed = (this.Center - holdable.Entity.Center).SafeNormalize(120f);
-                this.scaleWiggler.Start();
+                State.State = 4;
+                Speed = (Center - holdable.Entity.Center).SafeNormalize(120f);
+                scaleWiggler.Start();
             }
             else
             {
-                if (this.State.State != 3 && this.State.State != 5 || !holdable.IsHeld)
+                if ((State.State != 3 && State.State != 5) || !holdable.IsHeld)
+                {
                     return;
-                holdable.Swat(this.theo, Math.Sign(this.Speed.X));
-                this.State.State = 4;
-                this.Speed = (this.Center - holdable.Entity.Center).SafeNormalize(120f);
-                this.scaleWiggler.Start();
+                }
+
+                holdable.Swat(theo, Math.Sign(Speed.X));
+                State.State = 4;
+                Speed = (Center - holdable.Entity.Center).SafeNormalize(120f);
+                scaleWiggler.Start();
             }
         }
 
         public override void Render()
         {
-            Vector2 position = this.Position;
-            this.Position = this.Position + this.shaker.Value;
+            Vector2 position = Position;
+            Position += shaker.Value;
             Vector2 scale = this.sprite.Scale;
             Sprite sprite = this.sprite;
-            sprite.Scale = sprite.Scale * (float) (1.0 - 0.30000001192092896 * (double) this.scaleWiggler.Value);
-            this.sprite.Scale.X *= (float) this.spriteFacing;
+            sprite.Scale *= (float)(1.0 - (0.30000001192092896 * (double)scaleWiggler.Value));
+            this.sprite.Scale.X *= spriteFacing;
             base.Render();
-            this.Position = position;
+            Position = position;
             this.sprite.Scale = scale;
         }
 
         public override void DebugRender(Camera camera)
         {
-            Collider collider = this.Collider;
-            this.Collider = (Collider) this.attackHitbox;
-            this.attackHitbox.Render(camera, Color.Red);
-            this.Collider = (Collider) this.bounceHitbox;
-            this.bounceHitbox.Render(camera, Color.Aqua);
-            this.Collider = collider;
+            Collider collider = Collider;
+            Collider = attackHitbox;
+            attackHitbox.Render(camera, Color.Red);
+            Collider = bounceHitbox;
+            bounceHitbox.Render(camera, Color.Aqua);
+            Collider = collider;
         }
 
         private void SlammedIntoWall(CollisionData data)
         {
             float direction;
             float x;
-            if ((double) data.Direction.X > 0.0)
+            if (data.Direction.X > 0.0)
             {
                 direction = 3.14159274f;
-                x = this.Right;
+                x = Right;
             }
             else
             {
                 direction = 0.0f;
-                x = this.Left;
+                x = Left;
             }
-            this.SceneAs<Level>().Particles.Emit(Seeker.P_HitWall, 12, new Vector2(x, this.Y), Vector2.UnitY * 4f, direction);
+            SceneAs<Level>().Particles.Emit(Seeker.P_HitWall, 12, new Vector2(x, Y), Vector2.UnitY * 4f, direction);
             if (data.Hit is DashSwitch)
             {
-                int num = (int) (data.Hit as DashSwitch).OnDashCollide((Player) null, Vector2.UnitX * (float) Math.Sign(this.Speed.X));
+                _ = (int)(data.Hit as DashSwitch).OnDashCollide(null, Vector2.UnitX * Math.Sign(Speed.X));
             }
-            this.Collider = (Collider) this.breakWallsHitbox;
-            foreach (TempleCrackedBlock entity in this.Scene.Tracker.GetEntities<TempleCrackedBlock>())
+            Collider = breakWallsHitbox;
+            foreach (TempleCrackedBlock entity in Scene.Tracker.GetEntities<TempleCrackedBlock>())
             {
-                if (this.CollideCheck((Entity) entity, this.Position + Vector2.UnitX * (float) Math.Sign(this.Speed.X)))
-                    entity.Break(this.Center);
+                if (CollideCheck(entity, Position + (Vector2.UnitX * Math.Sign(Speed.X))))
+                {
+                    entity.Break(Center);
+                }
             }
-            this.Collider = (Collider) this.physicsHitbox;
-            this.SceneAs<Level>().DirectionalShake(Vector2.UnitX * (float) Math.Sign(this.Speed.X));
+            Collider = physicsHitbox;
+            SceneAs<Level>().DirectionalShake(Vector2.UnitX * Math.Sign(Speed.X));
             Input.Rumble(RumbleStrength.Medium, RumbleLength.Medium);
-            this.Speed.X = (float) Math.Sign(this.Speed.X) * -100f;
-            this.Speed.Y *= 0.4f;
-            this.sprite.Scale.X = 0.6f;
-            this.sprite.Scale.Y = 1.4f;
-            this.shaker.ShakeFor(0.5f, false);
-            this.scaleWiggler.Start();
-            this.State.State = 4;
+            Speed.X = Math.Sign(Speed.X) * -100f;
+            Speed.Y *= 0.4f;
+            sprite.Scale.X = 0.6f;
+            sprite.Scale.Y = 1.4f;
+            _ = shaker.ShakeFor(0.5f, false);
+            scaleWiggler.Start();
+            State.State = 4;
             if (data.Hit is SeekerBarrier)
             {
                 (data.Hit as SeekerBarrier).OnReflectSeeker();
-                Audio.Play("event:/game/05_mirror_temple/seeker_hit_lightwall", this.Position);
+                _ = Audio.Play("event:/game/05_mirror_temple/seeker_hit_lightwall", Position);
             }
             else
-                Audio.Play("event:/game/05_mirror_temple/seeker_hit_normal", this.Position);
+            {
+                _ = Audio.Play("event:/game/05_mirror_temple/seeker_hit_normal", Position);
+            }
         }
 
         private void OnCollideH(CollisionData data)
         {
-            if (this.State.State == 3 && data.Hit != null)
+            if (State.State == 3 && data.Hit != null)
             {
-                int x = Math.Sign(this.Speed.X);
-                if (!this.CollideCheck<Solid>(this.Position + new Vector2((float) x, 4f)) && !this.MoveVExact(4) || !this.CollideCheck<Solid>(this.Position + new Vector2((float) x, -4f)) && !this.MoveVExact(-4))
+                int x = Math.Sign(Speed.X);
+                if ((!CollideCheck<Solid>(Position + new Vector2(x, 4f)) && !MoveVExact(4)) || (!CollideCheck<Solid>(Position + new Vector2(x, -4f)) && !MoveVExact(-4)))
+                {
                     return;
+                }
             }
-            if ((this.State.State == 3 || this.State.State == 5) && (double) Math.Abs(this.Speed.X) >= 100.0)
-                this.SlammedIntoWall(data);
+            if ((State.State == 3 || State.State == 5) && (double)Math.Abs(Speed.X) >= 100.0)
+            {
+                SlammedIntoWall(data);
+            }
             else
-                this.Speed.X *= -0.2f;
+            {
+                Speed.X *= -0.2f;
+            }
         }
 
         private void OnCollideV(CollisionData data)
         {
-            if (this.State.State == 3)
-                this.Speed.Y *= -0.6f;
+            if (State.State == 3)
+            {
+                Speed.Y *= -0.6f;
+            }
             else
-                this.Speed.Y *= -0.2f;
+            {
+                Speed.Y *= -0.2f;
+            }
         }
 
-        private Vector2 FollowTarget => this.lastSpottedAt - Vector2.UnitY * 2f;
+        private Vector2 FollowTarget => lastSpottedAt - (Vector2.UnitY * 2f);
 
         private void CreateTrail()
         {
             Vector2 scale = this.sprite.Scale;
             Sprite sprite = this.sprite;
-            sprite.Scale = sprite.Scale * (float) (1.0 - 0.30000001192092896 * (double) this.scaleWiggler.Value);
-            this.sprite.Scale.X *= (float) this.spriteFacing;
-            TrailManager.Add((Entity) this, Seeker.TrailColor, 0.5f);
+            sprite.Scale *= (float)(1.0 - (0.30000001192092896 * (double)scaleWiggler.Value));
+            this.sprite.Scale.X *= spriteFacing;
+            TrailManager.Add(this, Seeker.TrailColor, 0.5f);
             this.sprite.Scale = scale;
         }
 
         private int IdleUpdate()
         {
-            if (this.canSeePlayer)
-                return 2;
-            Vector2 target = Vector2.Zero;
-            if (this.spotted && (double) Vector2.DistanceSquared(this.Center, this.FollowTarget) > 64.0)
+            if (canSeePlayer)
             {
-                float speedMagnitude = this.GetSpeedMagnitude(50f);
-                target = !this.lastPathFound ? (this.FollowTarget - this.Center).SafeNormalize(speedMagnitude) : this.GetPathSpeed(speedMagnitude);
+                return 2;
+            }
+
+            Vector2 target = Vector2.Zero;
+            if (spotted && (double)Vector2.DistanceSquared(Center, FollowTarget) > 64.0)
+            {
+                float speedMagnitude = GetSpeedMagnitude(50f);
+                target = !lastPathFound ? (FollowTarget - Center).SafeNormalize(speedMagnitude) : GetPathSpeed(speedMagnitude);
             }
             if (target == Vector2.Zero)
             {
-                target.X = this.idleSineX.Value * 6f;
-                target.Y = this.idleSineY.Value * 6f;
+                target.X = idleSineX.Value * 6f;
+                target.Y = idleSineY.Value * 6f;
             }
-            this.Speed = Calc.Approach(this.Speed, target, 200f * Engine.DeltaTime);
-            if ((double) this.Speed.LengthSquared() > 400.0)
-                this.TurnFacing(this.Speed.X);
-            if (this.spriteFacing == this.facing)
-                this.sprite.Play("idle");
+            Speed = Calc.Approach(Speed, target, 200f * Engine.DeltaTime);
+            if ((double)Speed.LengthSquared() > 400.0)
+            {
+                TurnFacing(Speed.X);
+            }
+
+            if (spriteFacing == facing)
+            {
+                sprite.Play("idle");
+            }
+
             return 0;
         }
 
@@ -538,74 +613,103 @@ namespace Celeste
             Seeker seeker = this;
             if (seeker.patrolPoints != null && seeker.patrolPoints.Length != 0 && seeker.spotted)
             {
-                while ((double) Vector2.DistanceSquared(seeker.Center, seeker.FollowTarget) > 64.0)
-                    yield return (object) null;
-                yield return (object) 0.3f;
+                while ((double)Vector2.DistanceSquared(seeker.Center, seeker.FollowTarget) > 64.0)
+                {
+                    yield return null;
+                }
+
+                yield return 0.3f;
                 seeker.State.State = 1;
             }
         }
 
         private Vector2 GetPathSpeed(float magnitude)
         {
-            if (this.pathIndex >= this.path.Count)
+            if (pathIndex >= path.Count)
+            {
                 return Vector2.Zero;
-            if ((double) Vector2.DistanceSquared(this.Center, this.path[this.pathIndex]) >= 36.0)
-                return (this.path[this.pathIndex] - this.Center).SafeNormalize(magnitude);
-            ++this.pathIndex;
-            return this.GetPathSpeed(magnitude);
+            }
+
+            if ((double)Vector2.DistanceSquared(Center, path[pathIndex]) >= 36.0)
+            {
+                return (path[pathIndex] - Center).SafeNormalize(magnitude);
+            }
+
+            ++pathIndex;
+            return GetPathSpeed(magnitude);
         }
 
         private float GetSpeedMagnitude(float baseMagnitude)
         {
-            Player entity = this.Scene.Tracker.GetEntity<Player>();
-            if (entity == null)
-                return baseMagnitude;
-            return (double) Vector2.DistanceSquared(this.Center, entity.Center) > 12544.0 ? baseMagnitude * 3f : baseMagnitude * 1.5f;
+            Player entity = Scene.Tracker.GetEntity<Player>();
+            return entity == null
+                ? baseMagnitude
+                : (double)Vector2.DistanceSquared(Center, entity.Center) > 12544.0 ? baseMagnitude * 3f : baseMagnitude * 1.5f;
         }
 
         private void PatrolBegin()
         {
-            this.State.State = this.ChoosePatrolTarget();
-            this.patrolWaitTimer = 0.0f;
+            State.State = ChoosePatrolTarget();
+            patrolWaitTimer = 0.0f;
         }
 
         private int PatrolUpdate()
         {
-            if (this.canSeePlayer)
-                return 2;
-            if ((double) this.patrolWaitTimer > 0.0)
+            if (canSeePlayer)
             {
-                this.patrolWaitTimer -= Engine.DeltaTime;
-                if ((double) this.patrolWaitTimer <= 0.0)
-                    return this.ChoosePatrolTarget();
+                return 2;
             }
-            else if ((double) Vector2.DistanceSquared(this.Center, this.lastSpottedAt) < 144.0)
-                this.patrolWaitTimer = 0.4f;
-            float speedMagnitude = this.GetSpeedMagnitude(25f);
-            this.Speed = Calc.Approach(this.Speed, !this.lastPathFound ? (this.FollowTarget - this.Center).SafeNormalize(speedMagnitude) : this.GetPathSpeed(speedMagnitude), 600f * Engine.DeltaTime);
-            if ((double) this.Speed.LengthSquared() > 100.0)
-                this.TurnFacing(this.Speed.X);
-            if (this.spriteFacing == this.facing)
-                this.sprite.Play("search");
+
+            if (patrolWaitTimer > 0.0)
+            {
+                patrolWaitTimer -= Engine.DeltaTime;
+                if (patrolWaitTimer <= 0.0)
+                {
+                    return ChoosePatrolTarget();
+                }
+            }
+            else if ((double)Vector2.DistanceSquared(Center, lastSpottedAt) < 144.0)
+            {
+                patrolWaitTimer = 0.4f;
+            }
+
+            float speedMagnitude = GetSpeedMagnitude(25f);
+            Speed = Calc.Approach(Speed, !lastPathFound ? (FollowTarget - Center).SafeNormalize(speedMagnitude) : GetPathSpeed(speedMagnitude), 600f * Engine.DeltaTime);
+            if ((double)Speed.LengthSquared() > 100.0)
+            {
+                TurnFacing(Speed.X);
+            }
+
+            if (spriteFacing == facing)
+            {
+                sprite.Play("search");
+            }
+
             return 1;
         }
 
         private int ChoosePatrolTarget()
         {
-            Player entity = this.Scene.Tracker.GetEntity<Player>();
+            Player entity = Scene.Tracker.GetEntity<Player>();
             if (entity == null)
-                return 0;
-            for (int index = 0; index < 3; ++index)
-                Seeker.patrolChoices[index].Distance = 0.0f;
-            int val2 = 0;
-            foreach (Vector2 patrolPoint in this.patrolPoints)
             {
-                if ((double) Vector2.DistanceSquared(this.Center, patrolPoint) >= 576.0)
+                return 0;
+            }
+
+            for (int index = 0; index < 3; ++index)
+            {
+                Seeker.patrolChoices[index].Distance = 0.0f;
+            }
+
+            int val2 = 0;
+            foreach (Vector2 patrolPoint in patrolPoints)
+            {
+                if ((double)Vector2.DistanceSquared(Center, patrolPoint) >= 576.0)
                 {
                     float num = Vector2.DistanceSquared(patrolPoint, entity.Center);
                     for (int index1 = 0; index1 < 3; ++index1)
                     {
-                        if ((double) num < (double) Seeker.patrolChoices[index1].Distance || (double) Seeker.patrolChoices[index1].Distance <= 0.0)
+                        if ((double)num < patrolChoices[index1].Distance || patrolChoices[index1].Distance <= 0.0)
                         {
                             ++val2;
                             for (int index2 = 2; index2 > index1; --index2)
@@ -621,95 +725,127 @@ namespace Celeste
                 }
             }
             if (val2 <= 0)
+            {
                 return 0;
-            this.lastSpottedAt = Seeker.patrolChoices[this.random.Next(Math.Min(3, val2))].Point;
-            this.lastPathTo = this.lastSpottedAt;
-            this.pathIndex = 0;
-            this.lastPathFound = this.SceneAs<Level>().Pathfinder.Find(ref this.path, this.Center, this.FollowTarget);
+            }
+
+            lastSpottedAt = Seeker.patrolChoices[random.Next(Math.Min(3, val2))].Point;
+            lastPathTo = lastSpottedAt;
+            pathIndex = 0;
+            lastPathFound = SceneAs<Level>().Pathfinder.Find(ref path, Center, FollowTarget);
             return 1;
         }
 
         private void SpottedBegin()
         {
-            this.aggroSfx.Play("event:/game/05_mirror_temple/seeker_aggro");
-            Player entity = this.Scene.Tracker.GetEntity<Player>();
+            _ = aggroSfx.Play("event:/game/05_mirror_temple/seeker_aggro");
+            Player entity = Scene.Tracker.GetEntity<Player>();
             if (entity != null)
-                this.TurnFacing(entity.X - this.X, "spot");
-            this.spottedLosePlayerTimer = 0.6f;
-            this.spottedTurnDelay = 1f;
+            {
+                TurnFacing(entity.X - X, "spot");
+            }
+
+            spottedLosePlayerTimer = 0.6f;
+            spottedTurnDelay = 1f;
         }
 
         private int SpottedUpdate()
         {
-            if (!this.canSeePlayer)
+            if (!canSeePlayer)
             {
-                this.spottedLosePlayerTimer -= Engine.DeltaTime;
-                if ((double) this.spottedLosePlayerTimer < 0.0)
+                spottedLosePlayerTimer -= Engine.DeltaTime;
+                if (spottedLosePlayerTimer < 0.0)
+                {
                     return 0;
+                }
             }
             else
-                this.spottedLosePlayerTimer = 0.6f;
-            float speedMagnitude = this.GetSpeedMagnitude(60f);
-            Vector2 vector2_1 = !this.lastPathFound ? (this.FollowTarget - this.Center).SafeNormalize(speedMagnitude) : this.GetPathSpeed(speedMagnitude);
-            if ((double) Vector2.DistanceSquared(this.Center, this.FollowTarget) < 2500.0 && (double) this.Y < (double) this.FollowTarget.Y)
+            {
+                spottedLosePlayerTimer = 0.6f;
+            }
+
+            float speedMagnitude = GetSpeedMagnitude(60f);
+            Vector2 vector2_1 = !lastPathFound ? (FollowTarget - Center).SafeNormalize(speedMagnitude) : GetPathSpeed(speedMagnitude);
+            if ((double)Vector2.DistanceSquared(Center, FollowTarget) < 2500.0 && (double)Y < FollowTarget.Y)
             {
                 float num = vector2_1.Angle();
-                if ((double) this.Y < (double) this.FollowTarget.Y - 2.0)
+                if ((double)Y < FollowTarget.Y - 2.0)
+                {
                     num = Calc.AngleLerp(num, 1.57079637f, 0.5f);
-                else if ((double) this.Y > (double) this.FollowTarget.Y + 2.0)
+                }
+                else if ((double)Y > FollowTarget.Y + 2.0)
+                {
                     num = Calc.AngleLerp(num, -1.57079637f, 0.5f);
+                }
+
                 vector2_1 = Calc.AngleToVector(num, 60f);
-                Vector2 vector2_2 = Vector2.UnitX * (float) Math.Sign(this.X - this.lastSpottedAt.X) * 48f;
-                if ((double) Math.Abs(this.X - this.lastSpottedAt.X) < 36.0 && !this.CollideCheck<Solid>(this.Position + vector2_2) && !this.CollideCheck<Solid>(this.lastSpottedAt + vector2_2))
-                    vector2_1.X = (float) (Math.Sign(this.X - this.lastSpottedAt.X) * 60);
+                Vector2 vector2_2 = Vector2.UnitX * Math.Sign(X - lastSpottedAt.X) * 48f;
+                if ((double)Math.Abs(X - lastSpottedAt.X) < 36.0 && !CollideCheck<Solid>(Position + vector2_2) && !CollideCheck<Solid>(lastSpottedAt + vector2_2))
+                {
+                    vector2_1.X = Math.Sign(X - lastSpottedAt.X) * 60;
+                }
             }
-            this.Speed = Calc.Approach(this.Speed, vector2_1, 600f * Engine.DeltaTime);
-            this.spottedTurnDelay -= Engine.DeltaTime;
-            if ((double) this.spottedTurnDelay <= 0.0)
-                this.TurnFacing(this.Speed.X, "spotted");
+            Speed = Calc.Approach(Speed, vector2_1, 600f * Engine.DeltaTime);
+            spottedTurnDelay -= Engine.DeltaTime;
+            if (spottedTurnDelay <= 0.0)
+            {
+                TurnFacing(Speed.X, "spotted");
+            }
+
             return 2;
         }
 
         private IEnumerator SpottedCoroutine()
         {
-            yield return (object) 0.2f;
-            while (!this.CanAttack())
-                yield return (object) null;
-            this.State.State = 3;
+            yield return 0.2f;
+            while (!CanAttack())
+            {
+                yield return null;
+            }
+
+            State.State = 3;
         }
 
         private bool CanAttack()
         {
-            if ((double) Math.Abs(this.Y - this.lastSpottedAt.Y) > 24.0 || (double) Math.Abs(this.X - this.lastSpottedAt.X) < 16.0)
+            if ((double)Math.Abs(Y - lastSpottedAt.Y) > 24.0 || (double)Math.Abs(X - lastSpottedAt.X) < 16.0)
+            {
                 return false;
-            Vector2 vector2 = (this.FollowTarget - this.Center).SafeNormalize();
-            return (double) Vector2.Dot(-Vector2.UnitY, vector2) <= 0.5 && (double) Vector2.Dot(Vector2.UnitY, vector2) <= 0.5 && !this.CollideCheck<Solid>(this.Position + Vector2.UnitX * (float) Math.Sign(this.lastSpottedAt.X - this.X) * 24f);
+            }
+
+            Vector2 vector2 = (FollowTarget - Center).SafeNormalize();
+            return (double)Vector2.Dot(-Vector2.UnitY, vector2) <= 0.5 && (double)Vector2.Dot(Vector2.UnitY, vector2) <= 0.5 && !CollideCheck<Solid>(Position + (Vector2.UnitX * Math.Sign(lastSpottedAt.X - X) * 24f));
         }
 
         private void AttackBegin()
         {
-            Audio.Play("event:/game/05_mirror_temple/seeker_dash", this.Position);
-            this.attackWindUp = true;
-            this.attackSpeed = -60f;
-            this.Speed = (this.FollowTarget - this.Center).SafeNormalize(-60f);
+            _ = Audio.Play("event:/game/05_mirror_temple/seeker_dash", Position);
+            attackWindUp = true;
+            attackSpeed = -60f;
+            Speed = (FollowTarget - Center).SafeNormalize(-60f);
         }
 
         private int AttackUpdate()
         {
-            if (!this.attackWindUp)
+            if (!attackWindUp)
             {
-                Vector2 vector1 = (this.FollowTarget - this.Center).SafeNormalize();
-                if ((double) Vector2.Dot(this.Speed.SafeNormalize(), vector1) < 0.40000000596046448)
-                    return 5;
-                this.attackSpeed = Calc.Approach(this.attackSpeed, 260f, 300f * Engine.DeltaTime);
-                this.Speed = this.Speed.RotateTowards(vector1.Angle(), 7f * (float) Math.PI / 36f * Engine.DeltaTime).SafeNormalize(this.attackSpeed);
-                if (this.Scene.OnInterval(0.04f))
+                Vector2 vector1 = (FollowTarget - Center).SafeNormalize();
+                if ((double)Vector2.Dot(Speed.SafeNormalize(), vector1) < 0.40000000596046448)
                 {
-                    Vector2 vector2 = (-this.Speed).SafeNormalize();
-                    this.SceneAs<Level>().Particles.Emit(Seeker.P_Attack, 2, this.Position + vector2 * 4f, Vector2.One * 4f, vector2.Angle());
+                    return 5;
                 }
-                if (this.Scene.OnInterval(0.06f))
-                    this.CreateTrail();
+
+                attackSpeed = Calc.Approach(attackSpeed, 260f, 300f * Engine.DeltaTime);
+                Speed = Speed.RotateTowards(vector1.Angle(), 7f * (float)Math.PI / 36f * Engine.DeltaTime).SafeNormalize(attackSpeed);
+                if (Scene.OnInterval(0.04f))
+                {
+                    Vector2 vector2 = (-Speed).SafeNormalize();
+                    SceneAs<Level>().Particles.Emit(Seeker.P_Attack, 2, Position + (vector2 * 4f), Vector2.One * 4f, vector2.Angle());
+                }
+                if (Scene.OnInterval(0.06f))
+                {
+                    CreateTrail();
+                }
             }
             return 3;
         }
@@ -717,112 +853,123 @@ namespace Celeste
         // ISSUE: reference to a compiler-generated field
         private IEnumerator AttackCoroutine()
         {
-                this.TurnFacing(this.lastSpottedAt.X - base.X, "windUp");
-                yield return 0.3f;
-                this.attackWindUp = false;
-                this.attackSpeed = 180f;
-                this.Speed = (this.lastSpottedAt - Vector2.UnitY * 2f - base.Center).SafeNormalize(180f);
-                this.SnapFacing(this.Speed.X);
-                yield break;
+            TurnFacing(lastSpottedAt.X - base.X, "windUp");
+            yield return 0.3f;
+            attackWindUp = false;
+            attackSpeed = 180f;
+            Speed = (lastSpottedAt - (Vector2.UnitY * 2f) - base.Center).SafeNormalize(180f);
+            SnapFacing(Speed.X);
+            yield break;
         }
 
         private int StunnedUpdate()
         {
-            this.Speed = Calc.Approach(this.Speed, Vector2.Zero, 150f * Engine.DeltaTime);
+            Speed = Calc.Approach(Speed, Vector2.Zero, 150f * Engine.DeltaTime);
             return 4;
         }
 
         private IEnumerator StunnedCoroutine()
         {
-            yield return (object) 0.8f;
-            this.State.State = 0;
+            yield return 0.8f;
+            State.State = 0;
         }
 
         private void SkiddingBegin()
         {
-            Audio.Play("event:/game/05_mirror_temple/seeker_dash_turn", this.Position);
-            this.strongSkid = false;
-            this.TurnFacing((float) -this.facing);
+            _ = Audio.Play("event:/game/05_mirror_temple/seeker_dash_turn", Position);
+            strongSkid = false;
+            TurnFacing(-facing);
         }
 
         private int SkiddingUpdate()
         {
-            this.Speed = Calc.Approach(this.Speed, Vector2.Zero, (this.strongSkid ? 400f : 200f) * Engine.DeltaTime);
-            if ((double) this.Speed.LengthSquared() >= 400.0)
-                return 5;
-            return this.canSeePlayer ? 2 : 0;
+            Speed = Calc.Approach(Speed, Vector2.Zero, (strongSkid ? 400f : 200f) * Engine.DeltaTime);
+            return (double)Speed.LengthSquared() >= 400.0 ? 5 : canSeePlayer ? 2 : 0;
         }
 
         private IEnumerator SkiddingCoroutine()
         {
-            yield return (object) 0.08f;
-            this.strongSkid = true;
+            yield return 0.08f;
+            strongSkid = true;
         }
 
-        private void SkiddingEnd() => this.spriteFacing = this.facing;
+        private void SkiddingEnd()
+        {
+            spriteFacing = facing;
+        }
 
         private void RegenerateBegin()
         {
-            Audio.Play("event:/game/general/thing_booped", this.Position);
-            this.boopedSfx.Play("event:/game/05_mirror_temple/seeker_booped");
-            this.sprite.Play("takeHit");
-            this.Collidable = false;
-            this.State.Locked = true;
-            this.Light.StartRadius = 16f;
-            this.Light.EndRadius = 32f;
+            _ = Audio.Play("event:/game/general/thing_booped", Position);
+            _ = boopedSfx.Play("event:/game/05_mirror_temple/seeker_booped");
+            sprite.Play("takeHit");
+            Collidable = false;
+            State.Locked = true;
+            Light.StartRadius = 16f;
+            Light.EndRadius = 32f;
         }
 
         private void RegenerateEnd()
         {
-            this.reviveSfx.Play("event:/game/05_mirror_temple/seeker_revive");
-            this.Collidable = true;
-            this.Light.StartRadius = 32f;
-            this.Light.EndRadius = 64f;
+            _ = reviveSfx.Play("event:/game/05_mirror_temple/seeker_revive");
+            Collidable = true;
+            Light.StartRadius = 32f;
+            Light.EndRadius = 64f;
         }
 
         private int RegenerateUpdate()
         {
-            this.Speed.X = Calc.Approach(this.Speed.X, 0.0f, 150f * Engine.DeltaTime);
-            this.Speed = Calc.Approach(this.Speed, Vector2.Zero, 150f * Engine.DeltaTime);
+            Speed.X = Calc.Approach(Speed.X, 0.0f, 150f * Engine.DeltaTime);
+            Speed = Calc.Approach(Speed, Vector2.Zero, 150f * Engine.DeltaTime);
             return 6;
         }
 
         private IEnumerator RegenerateCoroutine()
         {
             Seeker seeker = this;
-            yield return (object) 1f;
+            yield return 1f;
             seeker.shaker.On = true;
-            yield return (object) 0.2f;
+            yield return 0.2f;
             seeker.sprite.Play("pulse");
-            yield return (object) 0.5f;
+            yield return 0.5f;
             seeker.sprite.Play("recover");
             Seeker.RecoverBlast.Spawn(seeker.Position);
-            yield return (object) 0.15f;
-            seeker.Collider = (Collider) seeker.pushRadius;
+            yield return 0.15f;
+            seeker.Collider = seeker.pushRadius;
             Player player = seeker.CollideFirst<Player>();
             if (player != null && !seeker.Scene.CollideCheck<Solid>(seeker.Position, player.Center))
-                player.ExplodeLaunch(seeker.Position);
+            {
+                _ = player.ExplodeLaunch(seeker.Position);
+            }
+
             TheoCrystal theoCrystal = seeker.CollideFirst<TheoCrystal>();
             if (theoCrystal != null && !seeker.Scene.CollideCheck<Solid>(seeker.Position, theoCrystal.Center))
+            {
                 theoCrystal.ExplodeLaunch(seeker.Position);
+            }
+
             foreach (TempleCrackedBlock entity in seeker.Scene.Tracker.GetEntities<TempleCrackedBlock>())
             {
-                if (seeker.CollideCheck((Entity) entity))
+                if (seeker.CollideCheck(entity))
+                {
                     entity.Break(seeker.Position);
+                }
             }
             foreach (TouchSwitch entity in seeker.Scene.Tracker.GetEntities<TouchSwitch>())
             {
-                if (seeker.CollideCheck((Entity) entity))
+                if (seeker.CollideCheck(entity))
+                {
                     entity.TurnOn();
+                }
             }
-            seeker.Collider = (Collider) seeker.physicsHitbox;
+            seeker.Collider = seeker.physicsHitbox;
             Level level = seeker.SceneAs<Level>();
-            level.Displacement.AddBurst(seeker.Position, 0.4f, 12f, 36f, 0.5f);
-            level.Displacement.AddBurst(seeker.Position, 0.4f, 24f, 48f, 0.5f);
-            level.Displacement.AddBurst(seeker.Position, 0.4f, 36f, 60f, 0.5f);
-            for (float direction = 0.0f; (double) direction < 6.2831854820251465; direction += 0.17453292f)
+            _ = level.Displacement.AddBurst(seeker.Position, 0.4f, 12f, 36f, 0.5f);
+            _ = level.Displacement.AddBurst(seeker.Position, 0.4f, 24f, 48f, 0.5f);
+            _ = level.Displacement.AddBurst(seeker.Position, 0.4f, 36f, 60f, 0.5f);
+            for (float direction = 0.0f; (double)direction < 6.2831854820251465; direction += 0.17453292f)
             {
-                Vector2 position = seeker.Center + Calc.AngleToVector(direction + Calc.Random.Range(-1f * (float) Math.PI / 90f, (float) Math.PI / 90f), (float) Calc.Random.Range(12, 18));
+                Vector2 position = seeker.Center + Calc.AngleToVector(direction + Calc.Random.Range(-1f * (float)Math.PI / 90f, (float)Math.PI / 90f), Calc.Random.Range(12, 18));
                 level.Particles.Emit(Seeker.P_Regen, position, direction);
             }
             seeker.shaker.On = false;
@@ -832,8 +979,8 @@ namespace Celeste
 
         private IEnumerator ReturnedCoroutine()
         {
-            yield return (object) 0.3f;
-            this.State.State = 0;
+            yield return 0.3f;
+            State.State = 0;
         }
 
         private struct PatrolPoint
@@ -850,20 +997,20 @@ namespace Celeste
             public override void Added(Scene scene)
             {
                 base.Added(scene);
-                this.Depth = -199;
-                if (this.sprite == null)
+                Depth = -199;
+                if (sprite == null)
                 {
-                    this.Add((Component) (this.sprite = GFX.SpriteBank.Create("seekerShockWave")));
-                    this.sprite.OnLastFrame = (Action<string>) (a => this.RemoveSelf());
+                    Add(sprite = GFX.SpriteBank.Create("seekerShockWave"));
+                    sprite.OnLastFrame = a => RemoveSelf();
                 }
-                this.sprite.Play("shockwave", true);
+                sprite.Play("shockwave", true);
             }
 
             public static void Spawn(Vector2 position)
             {
                 Seeker.RecoverBlast recoverBlast = Engine.Pooler.Create<Seeker.RecoverBlast>();
                 recoverBlast.Position = position;
-                Engine.Scene.Add((Entity) recoverBlast);
+                Engine.Scene.Add(recoverBlast);
             }
         }
     }

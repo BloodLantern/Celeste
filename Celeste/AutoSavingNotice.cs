@@ -44,7 +44,9 @@ namespace Celeste
                 }
             }
             if (scene.OnInterval(1f))
+            {
                 wiggler.Start();
+            }
 
             bool flag = ForceClose || (!Display && timer >= 1.0);
             ease = Calc.Approach(ease, !flag ? 1f : 0.0f, Engine.DeltaTime);
@@ -53,7 +55,9 @@ namespace Celeste
             wiggler.Update();
             icon.Update();
             if (!flag || string.IsNullOrEmpty(icon.CurrentAnimationID) || !icon.CurrentAnimationID.Equals("idle"))
+            {
                 return;
+            }
 
             icon.Play("end");
         }

@@ -23,7 +23,7 @@ namespace Celeste
         public static VirtualRenderTarget Lightning;
         public static VirtualRenderTarget TempA;
         public static VirtualRenderTarget TempB;
-        private static List<VirtualRenderTarget> all = new List<VirtualRenderTarget>();
+        private static readonly List<VirtualRenderTarget> all = new();
 
         public static void Create()
         {
@@ -44,7 +44,7 @@ namespace Celeste
 
         private static VirtualRenderTarget Create(int width, int height)
         {
-            VirtualRenderTarget renderTarget = VirtualContent.CreateRenderTarget("gameplay-buffer-" + (object) GameplayBuffers.all.Count, width, height);
+            VirtualRenderTarget renderTarget = VirtualContent.CreateRenderTarget("gameplay-buffer-" + all.Count, width, height);
             GameplayBuffers.all.Add(renderTarget);
             return renderTarget;
         }
@@ -52,7 +52,10 @@ namespace Celeste
         public static void Unload()
         {
             foreach (VirtualAsset virtualAsset in GameplayBuffers.all)
+            {
                 virtualAsset.Dispose();
+            }
+
             GameplayBuffers.all.Clear();
         }
     }

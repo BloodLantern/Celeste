@@ -18,10 +18,10 @@ namespace Monocle
 
         public TagExcludeRenderer(int excludeTag)
         {
-            this.ExcludeTag = excludeTag;
-            this.BlendState = BlendState.AlphaBlend;
-            this.SamplerState = SamplerState.LinearClamp;
-            this.Camera = new Camera();
+            ExcludeTag = excludeTag;
+            BlendState = BlendState.AlphaBlend;
+            SamplerState = SamplerState.LinearClamp;
+            Camera = new Camera();
         }
 
         public override void BeforeRender(Scene scene)
@@ -30,18 +30,22 @@ namespace Monocle
 
         public override void Render(Scene scene)
         {
-            Draw.SpriteBatch.Begin(SpriteSortMode.Deferred, this.BlendState, this.SamplerState, DepthStencilState.None, RasterizerState.CullNone, this.Effect, this.Camera.Matrix * Engine.ScreenMatrix);
+            Draw.SpriteBatch.Begin(SpriteSortMode.Deferred, BlendState, SamplerState, DepthStencilState.None, RasterizerState.CullNone, Effect, Camera.Matrix * Engine.ScreenMatrix);
             foreach (Entity entity in scene.Entities)
             {
-                if (entity.Visible && (entity.Tag & this.ExcludeTag) == 0)
+                if (entity.Visible && (entity.Tag & ExcludeTag) == 0)
+                {
                     entity.Render();
+                }
             }
             if (Engine.Commands.Open)
             {
                 foreach (Entity entity in scene.Entities)
                 {
-                    if ((entity.Tag & this.ExcludeTag) == 0)
-                        entity.DebugRender(this.Camera);
+                    if ((entity.Tag & ExcludeTag) == 0)
+                    {
+                        entity.DebugRender(Camera);
+                    }
                 }
             }
             Draw.SpriteBatch.End();

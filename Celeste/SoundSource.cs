@@ -23,20 +23,21 @@ namespace Celeste
 
         public bool Playing { get; private set; }
 
-        public bool Is3D => this.is3D;
+        public bool Is3D => is3D;
 
-        public bool IsOneshot => this.isOneshot;
+        public bool IsOneshot => isOneshot;
 
         public bool InstancePlaying
         {
             get
             {
-                if ((HandleBase) this.instance != (HandleBase) null)
+                if (instance != null)
                 {
-                    PLAYBACK_STATE state;
-                    int playbackState = (int) this.instance.getPlaybackState(out state);
-                    if (state == PLAYBACK_STATE.PLAYING || state == PLAYBACK_STATE.STARTING || state == PLAYBACK_STATE.SUSTAINING)
+                    _ = (int)instance.getPlaybackState(out PLAYBACK_STATE state);
+                    if (state is PLAYBACK_STATE.PLAYING or PLAYBACK_STATE.STARTING or PLAYBACK_STATE.SUSTAINING)
+                    {
                         return true;
+                    }
                 }
                 return false;
             }
@@ -50,81 +51,84 @@ namespace Celeste
         public SoundSource(string path)
             : this()
         {
-            this.Play(path);
+            _ = Play(path);
         }
 
         public SoundSource(Vector2 offset, string path)
             : this()
         {
-            this.Position = offset;
-            this.Play(path);
+            Position = offset;
+            _ = Play(path);
         }
 
         public override void Added(Entity entity)
         {
             base.Added(entity);
-            this.UpdateSfxPosition();
+            UpdateSfxPosition();
         }
 
         public SoundSource Play(string path, string param = null, float value = 0.0f)
         {
-            this.Stop();
-            this.EventName = path;
+            _ = Stop();
+            EventName = path;
             EventDescription eventDescription = Audio.GetEventDescription(path);
-            if ((HandleBase) eventDescription != (HandleBase) null)
+            if (eventDescription != null)
             {
-                int instance = (int) eventDescription.createInstance(out this.instance);
-                int num1 = (int) eventDescription.is3D(out this.is3D);
-                int num2 = (int) eventDescription.isOneshot(out this.isOneshot);
+                _ = (int)eventDescription.createInstance(out instance);
+                _ = (int)eventDescription.is3D(out is3D);
+                _ = (int)eventDescription.isOneshot(out isOneshot);
             }
-            if ((HandleBase) this.instance != (HandleBase) null)
+            if (instance != null)
             {
-                if (this.is3D)
+                if (is3D)
                 {
-                    Vector2 position = this.Position;
-                    if (this.Entity != null)
-                        position += this.Entity.Position;
-                    Audio.Position(this.instance, position);
+                    Vector2 position = Position;
+                    if (Entity != null)
+                    {
+                        position += Entity.Position;
+                    }
+
+                    Audio.Position(instance, position);
                 }
                 if (param != null)
                 {
-                    int num3 = (int) this.instance.setParameterValue(param, value);
+                    _ = (int)instance.setParameterValue(param, value);
                 }
-                int num4 = (int) this.instance.start();
-                this.Playing = true;
+
+                _ = (int)instance.start();
+                Playing = true;
             }
             return this;
         }
 
         public SoundSource Param(string param, float value)
         {
-            if ((HandleBase) this.instance != (HandleBase) null)
+            if (instance != null)
             {
-                int num = (int) this.instance.setParameterValue(param, value);
+                _ = (int)instance.setParameterValue(param, value);
             }
             return this;
         }
 
         public SoundSource Pause()
         {
-            if ((HandleBase) this.instance != (HandleBase) null)
+            if (instance != null)
             {
-                int num = (int) this.instance.setPaused(true);
+                _ = (int)instance.setPaused(true);
             }
-            this.Playing = false;
+            Playing = false;
             return this;
         }
 
         public SoundSource Resume()
         {
-            if ((HandleBase) this.instance != (HandleBase) null)
+            if (instance != null)
             {
-                bool paused1;
-                int paused2 = (int) this.instance.getPaused(out paused1);
+                _ = (int)instance.getPaused(out bool paused1);
                 if (paused1)
                 {
-                    int num = (int) this.instance.setPaused(false);
-                    this.Playing = true;
+                    _ = (int)instance.setPaused(false);
+                    Playing = true;
                 }
             }
             return this;
@@ -132,64 +136,84 @@ namespace Celeste
 
         public SoundSource Stop(bool allowFadeout = true)
         {
-            Audio.Stop(this.instance, allowFadeout);
-            this.instance = (EventInstance) null;
-            this.Playing = false;
+            Audio.Stop(instance, allowFadeout);
+            instance = null;
+            Playing = false;
             return this;
         }
 
         public void UpdateSfxPosition()
         {
-            if (!this.is3D || !((HandleBase) this.instance != (HandleBase) null))
+            if (!is3D || !(instance != null))
+            {
                 return;
-            Vector2 position = this.Position;
-            if (this.Entity != null)
-                position += this.Entity.Position;
-            Audio.Position(this.instance, position);
+            }
+
+            Vector2 position = Position;
+            if (Entity != null)
+            {
+                position += Entity.Position;
+            }
+
+            Audio.Position(instance, position);
         }
 
         public override void Update()
         {
-            this.UpdateSfxPosition();
-            if (!this.isOneshot || !((HandleBase) this.instance != (HandleBase) null))
+            UpdateSfxPosition();
+            if (!isOneshot || !(instance != null))
+            {
                 return;
-            PLAYBACK_STATE state;
-            int playbackState = (int) this.instance.getPlaybackState(out state);
+            }
+
+            _ = (int)instance.getPlaybackState(out PLAYBACK_STATE state);
             if (state != PLAYBACK_STATE.STOPPED)
+            {
                 return;
-            int num = (int) this.instance.release();
-            this.instance = (EventInstance) null;
-            this.Playing = false;
-            if (!this.RemoveOnOneshotEnd)
+            }
+
+            _ = (int)instance.release();
+            instance = null;
+            Playing = false;
+            if (!RemoveOnOneshotEnd)
+            {
                 return;
-            this.RemoveSelf();
+            }
+
+            RemoveSelf();
         }
 
         public override void EntityRemoved(Scene scene)
         {
             base.EntityRemoved(scene);
-            this.Stop();
+            _ = Stop();
         }
 
         public override void Removed(Entity entity)
         {
             base.Removed(entity);
-            this.Stop();
+            _ = Stop();
         }
 
         public override void SceneEnd(Scene scene)
         {
             base.SceneEnd(scene);
-            this.Stop(false);
+            _ = Stop(false);
         }
 
         public override void DebugRender(Camera camera)
         {
-            Vector2 position = this.Position;
-            if (this.Entity != null)
-                position += this.Entity.Position;
-            if ((HandleBase) this.instance != (HandleBase) null && this.Playing)
-                Draw.Circle(position, (float) (4.0 + (double) this.Scene.RawTimeActive * 2.0 % 1.0 * 16.0), Color.BlueViolet, 16);
+            Vector2 position = Position;
+            if (Entity != null)
+            {
+                position += Entity.Position;
+            }
+
+            if (instance != null && Playing)
+            {
+                Draw.Circle(position, (float)(4.0 + (Scene.RawTimeActive * 2.0 % 1.0 * 16.0)), Color.BlueViolet, 16);
+            }
+
             Draw.HollowRect(position.X - 2f, position.Y - 2f, 4f, 4f, Color.BlueViolet);
         }
     }

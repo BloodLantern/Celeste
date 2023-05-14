@@ -73,7 +73,7 @@ namespace Celeste
         {
             this.rumbler = rumbler;
             this.winnable = winnable;
-            Tag = (int) Tags.HUD;
+            Tag = (int)Tags.HUD;
             Depth = 100;
             Add(featherSprite = GFX.GuiSpriteBank.Create(nameof(feather)));
             featherSprite.Position = screenCenter + (Vector2.UnitY * (feather - 128f));
@@ -96,7 +96,9 @@ namespace Celeste
             {
                 yield return null;
                 if (p > 1f)
+                {
                     p = 1f;
+                }
 
                 bgAlpha = p * BGFadeStart;
             }
@@ -110,7 +112,9 @@ namespace Celeste
                 yield return ShowText(5);
             }
             else
+            {
                 yield return FadeGameIn();
+            }
 
             Add(new Coroutine(FadeBoxIn()));
             float activeBounds = Bounds;
@@ -143,78 +147,104 @@ namespace Celeste
                 if (!winnable && losing)
                 {
                     if (Calc.BetweenInterval(losingTimer * 10f, StablizeLossRate))
+                    {
                         flag = !flag;
+                    }
 
-                    activeBounds = Bounds - Ease.CubeIn(losingTimer) * 200f;
+                    activeBounds = Bounds - (Ease.CubeIn(losingTimer) * 200f);
                 }
                 if (flag)
                 {
                     if (feather > -activeBounds)
+                    {
                         speed -= Gravity * Engine.DeltaTime;
+                    }
 
                     particleSpeed -= 2800f * Engine.DeltaTime;
                 }
                 else
                 {
                     if (feather < activeBounds)
+                    {
                         speed += Acceleration * Engine.DeltaTime;
+                    }
 
                     particleSpeed += 2800f * Engine.DeltaTime;
                 }
                 speed = Calc.Clamp(speed, -Maxspeed, Maxspeed);
                 if (feather > activeBounds && speedMultiplier == 0f && speed > 0f)
+                {
                     speed = 0f;
+                }
 
                 if (feather < activeBounds && speedMultiplier == 0f && speed < 0f)
+                {
                     speed = 0f;
+                }
 
                 particleSpeed = Calc.Clamp(particleSpeed, -1600f, 120f);
                 speedMultiplier = Calc.Approach(speedMultiplier, (feather < -activeBounds && speed < 0f) || (feather > activeBounds && speed > 0f) ? 0f : 1f, Engine.DeltaTime * 4f);
-                currentTargetBounds = Calc.Approach(currentTargetBounds, (TargetBoundsAtStart + (-60f * t)), Engine.DeltaTime * 16f);
+                currentTargetBounds = Calc.Approach(currentTargetBounds, TargetBoundsAtStart + (-60f * t), Engine.DeltaTime * 16f);
                 feather += speed * speedMultiplier * Engine.DeltaTime;
                 if (boxEnabled)
                 {
-                    currentTargetCenter = (-sine.Value * TargetSineAmplitude) * MathHelper.Lerp(1f, 0f, Ease.CubeIn(t));
+                    currentTargetCenter = -sine.Value * TargetSineAmplitude * MathHelper.Lerp(1f, 0f, Ease.CubeIn(t));
                     float num1 = currentTargetCenter - currentTargetBounds;
                     float num2 = currentTargetCenter + currentTargetBounds;
                     if (feather > num1 && feather < num2)
                     {
                         insideTargetTimer += Engine.DeltaTime;
                         if (insideTargetTimer > StablizeIncreaseDelay)
+                        {
                             stablizedTimer += Engine.DeltaTime;
+                        }
 
                         if (rumbler != null)
-                            rumbler.Strength = (0.3f * (1f - t));
+                        {
+                            rumbler.Strength = 0.3f * (1f - t);
+                        }
                     }
                     else
                     {
                         if (insideTargetTimer > StablizeIncreaseDelay)
+                        {
                             stablizedTimer = Math.Max(0f, stablizedTimer - StablizeLossPenalty);
+                        }
 
                         if (stablizedTimer > 0f)
+                        {
                             stablizedTimer -= StablizeLossRate * Engine.DeltaTime;
+                        }
 
                         insideTargetTimer = 0f;
                         if (rumbler != null)
-                            rumbler.Strength = (0.5f * (1f - t));
+                        {
+                            rumbler.Strength = 0.5f * (1f - t);
+                        }
                     }
                 }
                 else if (rumbler != null)
+                {
                     rumbler.Strength = 0.2f;
+                }
 
-                float target = (BGFadeStart + (Math.Min(1f, t / 0.8f) * 0.35f));
+                float target = BGFadeStart + (Math.Min(1f, t / 0.8f) * 0.35f);
                 bgAlpha = Calc.Approach(bgAlpha, target, Engine.DeltaTime);
                 featherSprite.Position = screenCenter + (Vector2.UnitY * (feather - 128f));
                 featherSprite.Play(insideTargetTimer > 0f || !boxEnabled ? "hover" : "flutter");
                 particleAlpha = Calc.Approach(particleAlpha, 1f, Engine.DeltaTime);
                 if (!winnable && stablizedTimer > 12f)
+                {
                     losing = true;
+                }
 
                 if (losing)
                 {
                     losingTimer += Engine.DeltaTime / LoseDuration;
                     if (losingTimer > 1f)
+                    {
                         break;
+                    }
                 }
                 yield return null;
             }
@@ -224,9 +254,11 @@ namespace Celeste
                 while (Pausing)
                 {
                     if (rumbler != null)
+                    {
                         rumbler.Strength = Calc.Approach(rumbler.Strength, 1f, 2f * Engine.DeltaTime);
+                    }
 
-                    featherSprite.Position += (screenCenter - featherSprite.Position) * (1f - (float) Math.Pow(0.01f, Engine.DeltaTime));
+                    featherSprite.Position += (screenCenter - featherSprite.Position) * (1f - (float)Math.Pow(0.01f, Engine.DeltaTime));
                     boxAlpha -= Engine.DeltaTime * 10f;
                     particleAlpha = boxAlpha;
                     yield return null;
@@ -252,13 +284,17 @@ namespace Celeste
                 particleAlpha = 0f;
                 yield return 2f;
                 for (; featherAlpha > 0f; featherAlpha -= Engine.DeltaTime)
+                {
                     yield return null;
+                }
 
                 yield return 1f;
             }
             Completed = true;
             for (; bgAlpha > 0f; bgAlpha -= Engine.DeltaTime * (winnable ? 1f : 10f))
+            {
                 yield return null;
+            }
 
             RemoveSelf();
         }
@@ -270,7 +306,9 @@ namespace Celeste
             yield return 0.1f;
             yield return FadeTextTo(1f);
             while (!Input.MenuConfirm.Pressed)
+            {
                 yield return null;
+            }
 
             yield return FadeTextTo(0f);
         }
@@ -287,10 +325,12 @@ namespace Celeste
 
         private IEnumerator FadeBoxIn()
         {
-            BreathingMinigame breathingMinigame = this;
-            yield return (winnable ? LoseDuration : 2f);
+            _ = this;
+            yield return winnable ? LoseDuration : 2f;
             while (Math.Abs(feather) > 300f)
+            {
                 yield return null;
+            }
 
             boxEnabled = true;
             Add(sine = new SineWave(0.12f));
@@ -318,7 +358,7 @@ namespace Celeste
 
         private IEnumerator PopFeather()
         {
-            BreathingMinigame breathingMinigame = this;
+            _ = this;
             _ = Audio.Play("event:/game/06_reflection/badeline_feather_slice");
             Input.Rumble(RumbleStrength.Strong, RumbleLength.Medium);
             if (rumbler != null)
@@ -338,8 +378,8 @@ namespace Celeste
             float p;
             for (p = 0f; p < 1f; p += Engine.DeltaTime * 8f)
             {
-                featherSlice.Scale.X = (0.25f + Calc.YoYo(p) * 0.75f) * 8f;
-                featherSlice.Scale.Y = (0.5f + (1f - Calc.YoYo(p)) * 0.5f) * 8f;
+                featherSlice.Scale.X = (0.25f + (Calc.YoYo(p) * 0.75f)) * 8f;
+                featherSlice.Scale.Y = (0.5f + ((1f - Calc.YoYo(p)) * 0.5f)) * 8f;
                 featherSlice.Position = featherSprite.Position + Vector2.Lerp(new Vector2(128f, sbyte.MinValue), new Vector2(sbyte.MinValue, 128f), p);
                 yield return null;
             }
@@ -363,15 +403,19 @@ namespace Celeste
         public override void Update()
         {
             timer += Engine.DeltaTime;
-            trailSpeed = Calc.Approach(trailSpeed, speed, (Engine.DeltaTime * Maxspeed * 8f));
+            trailSpeed = Calc.Approach(trailSpeed, speed, Engine.DeltaTime * Maxspeed * 8f);
             if (featherWave != null)
-                featherSprite.Rotation = ((featherWave.Value * 0.25f) + 0.1f);
+            {
+                featherSprite.Rotation = (featherWave.Value * 0.25f) + 0.1f;
+            }
 
             for (int index = 0; index < particles.Length; ++index)
             {
                 particles[index].Position.Y += particles[index].Speed * particleSpeed * Engine.DeltaTime;
                 if (particleSpeed > -400f)
-                    particles[index].Position.X += (particleSpeed + 400f) * (float) Math.Sin(particles[index].Sin) * 0.1f * Engine.DeltaTime;
+                {
+                    particles[index].Position.X += (particleSpeed + 400f) * (float)Math.Sin(particles[index].Sin) * 0.1f * Engine.DeltaTime;
+                }
 
                 particles[index].Sin += Engine.DeltaTime;
                 if (particles[index].Position.Y is < sbyte.MinValue or > 1208f)
@@ -404,10 +448,14 @@ namespace Celeste
             }
             featherSprite.Color = Color.White * featherAlpha;
             if (featherSprite.Visible)
+            {
                 featherSprite.Render();
+            }
 
             if (featherSlice != null && featherSlice.Visible)
+            {
                 featherSlice.Render();
+            }
 
             if (featherHalfLeft != null && featherHalfLeft.Visible)
             {
@@ -446,19 +494,27 @@ namespace Celeste
             }
             Vector2 vector2_1 = new(1f, 1f);
             if (particleSpeed < 0f)
-                vector2_1 = new Vector2(Math.Min(1f, (1f / (-particleSpeed * 0.004f))), Math.Max(1f, (1f * -particleSpeed * 0.004f)));
+            {
+                vector2_1 = new Vector2(Math.Min(1f, 1f / (-particleSpeed * 0.004f)), Math.Max(1f, 1f * -particleSpeed * 0.004f));
+            }
 
             for (int index = 0; index < particles.Length; ++index)
+            {
                 particleTexture.DrawCentered(particles[index].Position, Color.White * (0.5f * particleAlpha), particles[index].Scale * vector2_1);
+            }
 
             if (!string.IsNullOrEmpty(text) && textAlpha > 0f)
+            {
                 ActiveFont.Draw(text, new Vector2(960f, 920f), new Vector2(0.5f, 0.5f), Vector2.One, Color.White * textAlpha);
+            }
 
             if (string.IsNullOrEmpty(text) || textAlpha < 1f)
+            {
                 return;
+            }
 
             Vector2 vector2_2 = ActiveFont.Measure(text);
-            Vector2 position = new Vector2((((1920f + vector2_2.X) / 2f) + 40f), (920f + (vector2_2.Y / 2f) - 16f)) + new Vector2(0f, timer % 1f < 0.25f ? 6f : 0f);
+            Vector2 position = new Vector2(((1920f + vector2_2.X) / 2f) + 40f, 920f + (vector2_2.Y / 2f) - 16f) + new Vector2(0f, timer % 1f < 0.25f ? 6f : 0f);
             GFX.Gui["textboxbutton"].DrawCentered(position);
         }
 
@@ -477,7 +533,9 @@ namespace Celeste
         private void Dispose()
         {
             if (featherBuffer == null || featherBuffer.IsDisposed)
+            {
                 return;
+            }
 
             featherBuffer.Dispose();
             featherBuffer = null;
@@ -501,7 +559,7 @@ namespace Celeste
                 Position = new Vector2(Calc.Random.NextFloat() * 1920f, Calc.Random.NextFloat() * 1080f);
                 Scale = Calc.Map(val, 0f, 1f, 0.05f, 0.8f);
                 Speed = Scale * Calc.Random.Range(2f, 8f);
-                Sin = Calc.Random.NextFloat((float) Math.PI * 2f);
+                Sin = Calc.Random.NextFloat((float)Math.PI * 2f);
             }
         }
     }

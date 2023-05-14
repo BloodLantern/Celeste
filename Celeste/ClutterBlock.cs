@@ -38,7 +38,9 @@ namespace Celeste
         public void WeightDown()
         {
             foreach (ClutterBlock clutterBlock in Below)
+            {
                 clutterBlock.WeightDown();
+            }
 
             floatTarget = 0f;
             floatDelay = 0.1f;
@@ -48,13 +50,17 @@ namespace Celeste
         {
             base.Update();
             if (OnTheGround)
+            {
                 return;
+            }
 
             if (floatDelay <= 0)
             {
                 Player entity = Scene.Tracker.GetEntity<Player>();
                 if (entity != null && ((!TopSideOpen ? 0 : (entity.Right <= Left || entity.Left >= Right || entity.Bottom < Top - 1 ? 0 : (entity.Bottom <= Top + 4 ? 1 : 0))) | (entity.StateMachine.State != 1 || !LeftSideOpen || entity.Right < Left - 1 || entity.Right >= Left + 4 || entity.Bottom <= Top ? 0 : (entity.Top < Bottom ? 1 : 0)) | (entity.StateMachine.State != 1 || !RightSideOpen || entity.Left > Right + 1 || entity.Left <= Right - 4 || entity.Bottom <= Top ? 0 : (entity.Top < Bottom ? 1 : 0))) != 0)
+                {
                     WeightDown();
+                }
             }
             floatTimer += Engine.DeltaTime;
             floatDelay -= Engine.DeltaTime;
@@ -66,7 +72,7 @@ namespace Celeste
             Image.Y = floatTarget;
         }
 
-        private float WaveTarget => -(((float) Math.Sin(Position.X / 16 * 0.25f + floatTimer * 2) + 1) / 2) - 1;
+        private float WaveTarget => -(((float)Math.Sin((Position.X / 16 * 0.25f) + (floatTimer * 2)) + 1) / 2) - 1;
 
         public void Absorb(ClutterAbsorbEffect effect)
         {

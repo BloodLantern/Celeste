@@ -16,10 +16,10 @@ namespace Celeste
     {
         public const string TentacleType = "tentacles";
         public Spikes.Directions Direction;
-        private PlayerCollider pc;
+        private readonly PlayerCollider pc;
         private Vector2 imageOffset;
-        private int size;
-        private string overrideType;
+        private readonly int size;
+        private readonly string overrideType;
         private string spikeType;
         public Color EnabledColor = Color.White;
         public Color DisabledColor = Color.White;
@@ -28,36 +28,36 @@ namespace Celeste
         public Spikes(Vector2 position, int size, Spikes.Directions direction, string type)
             : base(position)
         {
-            this.Depth = -1;
-            this.Direction = direction;
+            Depth = -1;
+            Direction = direction;
             this.size = size;
-            this.overrideType = type;
+            overrideType = type;
             switch (direction)
             {
                 case Spikes.Directions.Up:
-                    this.Collider = (Collider) new Hitbox((float) size, 3f, y: -3f);
-                    this.Add((Component) new LedgeBlocker());
+                    Collider = new Hitbox(size, 3f, y: -3f);
+                    Add(new LedgeBlocker());
                     break;
                 case Spikes.Directions.Down:
-                    this.Collider = (Collider) new Hitbox((float) size, 3f);
+                    Collider = new Hitbox(size, 3f);
                     break;
                 case Spikes.Directions.Left:
-                    this.Collider = (Collider) new Hitbox(3f, (float) size, -3f);
-                    this.Add((Component) new LedgeBlocker());
+                    Collider = new Hitbox(3f, size, -3f);
+                    Add(new LedgeBlocker());
                     break;
                 case Spikes.Directions.Right:
-                    this.Collider = (Collider) new Hitbox(3f, (float) size);
-                    this.Add((Component) new LedgeBlocker());
+                    Collider = new Hitbox(3f, size);
+                    Add(new LedgeBlocker());
                     break;
             }
-            this.Add((Component) (this.pc = new PlayerCollider(new Action<Player>(this.OnCollide))));
-            this.Add((Component) new StaticMover()
+            Add(pc = new PlayerCollider(new Action<Player>(OnCollide)));
+            Add(new StaticMover()
             {
-                OnShake = new Action<Vector2>(this.OnShake),
-                SolidChecker = new Func<Solid, bool>(this.IsRiding),
-                JumpThruChecker = new Func<JumpThru, bool>(this.IsRiding),
-                OnEnable = new Action(this.OnEnable),
-                OnDisable = new Action(this.OnDisable)
+                OnShake = new Action<Vector2>(OnShake),
+                SolidChecker = new Func<Solid, bool>(IsRiding),
+                JumpThruChecker = new Func<JumpThru, bool>(IsRiding),
+                OnEnable = new Action(OnEnable),
+                OnDisable = new Action(OnDisable)
             });
         }
 
@@ -68,54 +68,65 @@ namespace Celeste
 
         public void SetSpikeColor(Color color)
         {
-            foreach (Component component in this.Components)
+            foreach (Component component in Components)
             {
                 if (component is Monocle.Image image)
+                {
                     image.Color = color;
+                }
             }
         }
 
         public override void Added(Scene scene)
         {
             base.Added(scene);
-            this.spikeType = AreaData.Get(scene).Spike;
-            if (!string.IsNullOrEmpty(this.overrideType) && !this.overrideType.Equals("default"))
-                this.spikeType = this.overrideType;
-            string lower = this.Direction.ToString().ToLower();
-            if (this.spikeType == "tentacles")
+            spikeType = AreaData.Get(scene).Spike;
+            if (!string.IsNullOrEmpty(overrideType) && !overrideType.Equals("default"))
             {
-                for (int i = 0; i < this.size / 16; ++i)
-                    this.AddTentacle((float) i);
-                if (this.size / 8 % 2 != 1)
+                spikeType = overrideType;
+            }
+
+            string lower = Direction.ToString().ToLower();
+            if (spikeType == "tentacles")
+            {
+                for (int i = 0; i < size / 16; ++i)
+                {
+                    AddTentacle(i);
+                }
+
+                if (size / 8 % 2 != 1)
+                {
                     return;
-                this.AddTentacle((float) (this.size / 16) - 0.5f);
+                }
+
+                AddTentacle((size / 16) - 0.5f);
             }
             else
             {
-                List<MTexture> atlasSubtextures = GFX.Game.GetAtlasSubtextures("danger/spikes/" + this.spikeType + "_" + lower);
-                for (int index = 0; index < this.size / 8; ++index)
+                List<MTexture> atlasSubtextures = GFX.Game.GetAtlasSubtextures("danger/spikes/" + spikeType + "_" + lower);
+                for (int index = 0; index < size / 8; ++index)
                 {
-                    Monocle.Image image = new Monocle.Image(Calc.Random.Choose<MTexture>(atlasSubtextures));
-                    switch (this.Direction)
+                    Monocle.Image image = new(Calc.Random.Choose<MTexture>(atlasSubtextures));
+                    switch (Direction)
                     {
                         case Spikes.Directions.Up:
-                            image.JustifyOrigin(0.5f, 1f);
-                            image.Position = Vector2.UnitX * ((float) index + 0.5f) * 8f + Vector2.UnitY;
+                            _ = image.JustifyOrigin(0.5f, 1f);
+                            image.Position = (Vector2.UnitX * (index + 0.5f) * 8f) + Vector2.UnitY;
                             break;
                         case Spikes.Directions.Down:
-                            image.JustifyOrigin(0.5f, 0.0f);
-                            image.Position = Vector2.UnitX * ((float) index + 0.5f) * 8f - Vector2.UnitY;
+                            _ = image.JustifyOrigin(0.5f, 0.0f);
+                            image.Position = (Vector2.UnitX * (index + 0.5f) * 8f) - Vector2.UnitY;
                             break;
                         case Spikes.Directions.Left:
-                            image.JustifyOrigin(1f, 0.5f);
-                            image.Position = Vector2.UnitY * ((float) index + 0.5f) * 8f + Vector2.UnitX;
+                            _ = image.JustifyOrigin(1f, 0.5f);
+                            image.Position = (Vector2.UnitY * (index + 0.5f) * 8f) + Vector2.UnitX;
                             break;
                         case Spikes.Directions.Right:
-                            image.JustifyOrigin(0.0f, 0.5f);
-                            image.Position = Vector2.UnitY * ((float) index + 0.5f) * 8f - Vector2.UnitX;
+                            _ = image.JustifyOrigin(0.0f, 0.5f);
+                            image.Position = (Vector2.UnitY * (index + 0.5f) * 8f) - Vector2.UnitX;
                             break;
                     }
-                    this.Add((Component) image);
+                    Add(image);
                 }
             }
         }
@@ -124,71 +135,78 @@ namespace Celeste
         {
             Sprite sprite = GFX.SpriteBank.Create("tentacles");
             sprite.Play(Calc.Random.Next(3).ToString(), true, true);
-            sprite.Position = (this.Direction == Spikes.Directions.Up || this.Direction == Spikes.Directions.Down ? Vector2.UnitX : Vector2.UnitY) * (i + 0.5f) * 16f;
-            sprite.Scale.X = (float) Calc.Random.Choose<int>(-1, 1);
+            sprite.Position = (Direction is Spikes.Directions.Up or Spikes.Directions.Down ? Vector2.UnitX : Vector2.UnitY) * (i + 0.5f) * 16f;
+            sprite.Scale.X = Calc.Random.Choose<int>(-1, 1);
             sprite.SetAnimationFrame(Calc.Random.Next(sprite.CurrentAnimationTotalFrames));
-            if (this.Direction == Spikes.Directions.Up)
+            if (Direction == Spikes.Directions.Up)
             {
                 sprite.Rotation = -1.57079637f;
                 ++sprite.Y;
             }
-            else if (this.Direction == Spikes.Directions.Right)
+            else if (Direction == Spikes.Directions.Right)
             {
                 sprite.Rotation = 0.0f;
                 --sprite.X;
             }
-            else if (this.Direction == Spikes.Directions.Left)
+            else if (Direction == Spikes.Directions.Left)
             {
                 sprite.Rotation = 3.14159274f;
                 ++sprite.X;
             }
-            else if (this.Direction == Spikes.Directions.Down)
+            else if (Direction == Spikes.Directions.Down)
             {
                 sprite.Rotation = 1.57079637f;
                 --sprite.Y;
             }
             sprite.Rotation += 1.57079637f;
-            this.Add((Component) sprite);
+            Add(sprite);
         }
 
         private void OnEnable()
         {
-            this.Active = this.Visible = this.Collidable = true;
-            this.SetSpikeColor(this.EnabledColor);
+            Active = Visible = Collidable = true;
+            SetSpikeColor(EnabledColor);
         }
 
         private void OnDisable()
         {
-            this.Active = this.Collidable = false;
-            if (this.VisibleWhenDisabled)
+            Active = Collidable = false;
+            if (VisibleWhenDisabled)
             {
-                foreach (Component component in this.Components)
+                foreach (Component component in Components)
                 {
                     if (component is Monocle.Image image)
-                        image.Color = this.DisabledColor;
+                    {
+                        image.Color = DisabledColor;
+                    }
                 }
             }
             else
-                this.Visible = false;
+            {
+                Visible = false;
+            }
         }
 
-        private void OnShake(Vector2 amount) => this.imageOffset += amount;
+        private void OnShake(Vector2 amount)
+        {
+            imageOffset += amount;
+        }
 
         public override void Render()
         {
-            Vector2 position = this.Position;
-            this.Position = this.Position + this.imageOffset;
+            Vector2 position = Position;
+            Position += imageOffset;
             base.Render();
-            this.Position = position;
+            Position = position;
         }
 
         public void SetOrigins(Vector2 origin)
         {
-            foreach (Component component in this.Components)
+            foreach (Component component in Components)
             {
                 if (component is Monocle.Image image)
                 {
-                    Vector2 vector2 = origin - this.Position;
+                    Vector2 vector2 = origin - Position;
                     image.Origin = image.Origin + vector2 - image.Position;
                     image.Position = vector2;
                 }
@@ -197,27 +215,39 @@ namespace Celeste
 
         private void OnCollide(Player player)
         {
-            switch (this.Direction)
+            switch (Direction)
             {
                 case Spikes.Directions.Up:
-                    if ((double) player.Speed.Y < 0.0 || (double) player.Bottom > (double) this.Bottom)
+                    if (player.Speed.Y < 0.0 || (double)player.Bottom > (double)Bottom)
+                    {
                         break;
-                    player.Die(new Vector2(0.0f, -1f));
+                    }
+
+                    _ = player.Die(new Vector2(0.0f, -1f));
                     break;
                 case Spikes.Directions.Down:
-                    if ((double) player.Speed.Y > 0.0)
+                    if (player.Speed.Y > 0.0)
+                    {
                         break;
-                    player.Die(new Vector2(0.0f, 1f));
+                    }
+
+                    _ = player.Die(new Vector2(0.0f, 1f));
                     break;
                 case Spikes.Directions.Left:
-                    if ((double) player.Speed.X < 0.0)
+                    if (player.Speed.X < 0.0)
+                    {
                         break;
-                    player.Die(new Vector2(-1f, 0.0f));
+                    }
+
+                    _ = player.Die(new Vector2(-1f, 0.0f));
                     break;
                 case Spikes.Directions.Right:
-                    if ((double) player.Speed.X > 0.0)
+                    if (player.Speed.X > 0.0)
+                    {
                         break;
-                    player.Die(new Vector2(1f, 0.0f));
+                    }
+
+                    _ = player.Die(new Vector2(1f, 0.0f));
                     break;
             }
         }
@@ -230,29 +260,27 @@ namespace Celeste
                 case Spikes.Directions.Down:
                     return data.Width;
                 default:
-                    int num = (int) (dir - 2);
+                    _ = (int)(dir - 2);
                     return data.Height;
             }
         }
 
         private bool IsRiding(Solid solid)
         {
-            switch (this.Direction)
+            return Direction switch
             {
-                case Spikes.Directions.Up:
-                    return this.CollideCheckOutside((Entity) solid, this.Position + Vector2.UnitY);
-                case Spikes.Directions.Down:
-                    return this.CollideCheckOutside((Entity) solid, this.Position - Vector2.UnitY);
-                case Spikes.Directions.Left:
-                    return this.CollideCheckOutside((Entity) solid, this.Position + Vector2.UnitX);
-                case Spikes.Directions.Right:
-                    return this.CollideCheckOutside((Entity) solid, this.Position - Vector2.UnitX);
-                default:
-                    return false;
-            }
+                Spikes.Directions.Up => CollideCheckOutside(solid, Position + Vector2.UnitY),
+                Spikes.Directions.Down => CollideCheckOutside(solid, Position - Vector2.UnitY),
+                Spikes.Directions.Left => CollideCheckOutside(solid, Position + Vector2.UnitX),
+                Spikes.Directions.Right => CollideCheckOutside(solid, Position - Vector2.UnitX),
+                _ => false,
+            };
         }
 
-        private bool IsRiding(JumpThru jumpThru) => this.Direction == Spikes.Directions.Up && this.CollideCheck((Entity) jumpThru, this.Position + Vector2.UnitY);
+        private bool IsRiding(JumpThru jumpThru)
+        {
+            return Direction == Spikes.Directions.Up && CollideCheck(jumpThru, Position + Vector2.UnitY);
+        }
 
         public enum Directions
         {

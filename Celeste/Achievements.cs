@@ -10,7 +10,10 @@ namespace Celeste
 {
     public static class Achievements
     {
-        public static string ID(Achievement achievement) => achievement.ToString();
+        public static string ID(Achievement achievement)
+        {
+            return achievement.ToString();
+        }
 
         public static bool Has(Achievement achievement)
         {
@@ -20,8 +23,11 @@ namespace Celeste
         public static void Register(Achievement achievement)
         {
             if (Has(achievement))
+            {
                 return;
-            SteamUserStats.SetAchievement(ID(achievement));
+            }
+
+            _ = SteamUserStats.SetAchievement(ID(achievement));
             Stats.Store();
         }
     }

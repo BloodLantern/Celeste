@@ -47,7 +47,7 @@ namespace Celeste
             Add(new PlayerCollider(new Action<Player>(OnPlayer)));
             Add(light = new VertexLight(Color.White, 1f, 16, 32));
             Add(bloom = new BloomPoint(0.1f, 16f));
-            Add(wiggler = Wiggler.Create(0.5f, 4f, f => sprite.Scale = Vector2.One * (1 + f * 0.25f)));
+            Add(wiggler = Wiggler.Create(0.5f, 4f, f => sprite.Scale = Vector2.One * (1 + (f * 0.25f))));
             Add(dashRoutine = new Coroutine(false));
             Add(dashListener = new DashListener());
             Add(new MirrorReflection());
@@ -91,19 +91,27 @@ namespace Celeste
         {
             ParticleSystem particlesBg = SceneAs<Level>().ParticlesBG;
             for (int angleDegree = 0; angleDegree < 360; angleDegree += 30)
-                particlesBg.Emit(red ? P_RedAppear : P_Appear, 1, Center, Vector2.One * 2f, angleDegree * (float) Math.PI / 180f);
+            {
+                particlesBg.Emit(red ? P_RedAppear : P_Appear, 1, Center, Vector2.One * 2f, angleDegree * (float)Math.PI / 180f);
+            }
         }
 
         private void OnPlayer(Player player)
         {
             if (respawnTimer > 0 || cannotUseTimer > 0 || BoostingPlayer)
+            {
                 return;
+            }
 
             cannotUseTimer = 0.45f;
             if (red)
+            {
                 player.RedBoost(this);
+            }
             else
+            {
                 player.Boost(this);
+            }
 
             _ = Audio.Play(red ? "event:/game/05_mirror_temple/redbooster_enter" : "event:/game/04_cliffside/greenbooster_enter", Position);
             wiggler.Start();
@@ -126,11 +134,13 @@ namespace Celeste
                 if (all.Count > 0)
                 {
                     foreach (LockBlock lockBlock in all)
+                    {
                         if (!lockBlock.UnlockingRegistered)
                         {
                             flag = false;
                             break;
                         }
+                    }
                 }
                 if (flag)
                 {
@@ -159,16 +169,22 @@ namespace Celeste
                 booster.sprite.RenderPosition = player.Center + playerOffset;
                 booster.loopingSfx.Position = booster.sprite.Position;
                 if (booster.Scene.OnInterval(0.02f))
+                {
                     (booster.Scene as Level).ParticlesBG.Emit(booster.particleType, 2, player.Center - (dir * 3f) + new Vector2(0.0f, -2f), new Vector2(3f, 3f), angle);
+                }
 
                 yield return null;
             }
             booster.PlayerReleased();
             if (player.StateMachine.State == 4)
+            {
                 booster.sprite.Visible = false;
+            }
 
             while (booster.SceneAs<Level>().Transitioning)
+            {
                 yield return null;
+            }
 
             booster.Tag = 0;
         }
@@ -176,7 +192,9 @@ namespace Celeste
         public void OnPlayerDashed(Vector2 direction)
         {
             if (!BoostingPlayer)
+            {
                 return;
+            }
 
             BoostingPlayer = false;
         }
@@ -195,7 +213,9 @@ namespace Celeste
         public void PlayerDied()
         {
             if (!BoostingPlayer)
+            {
                 return;
+            }
 
             PlayerReleased();
             dashRoutine.Active = false;
@@ -217,25 +237,33 @@ namespace Celeste
         {
             base.Update();
             if (cannotUseTimer > 0)
+            {
                 cannotUseTimer -= Engine.DeltaTime;
+            }
 
             if (respawnTimer > 0)
             {
                 respawnTimer -= Engine.DeltaTime;
                 if (respawnTimer <= 0)
+                {
                     Respawn();
+                }
             }
             if (!dashRoutine.Active && respawnTimer <= 0)
             {
                 Vector2 target = Vector2.Zero;
                 Player entity = Scene.Tracker.GetEntity<Player>();
                 if (entity != null && CollideCheck(entity))
+                {
                     target = entity.Center + playerOffset - Position;
+                }
 
                 sprite.Position = Calc.Approach(sprite.Position, target, 80f * Engine.DeltaTime);
             }
             if (!(sprite.CurrentAnimationID == "inside") || BoostingPlayer || CollideCheck<Player>())
+            {
                 return;
+            }
 
             sprite.Play("loop");
         }

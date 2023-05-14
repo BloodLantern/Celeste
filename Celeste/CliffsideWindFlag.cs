@@ -23,16 +23,18 @@ namespace Celeste
             MTexture atlasSubtexturesAt = GFX.Game.GetAtlasSubtexturesAt("scenery/cliffside/flag", data.Int("index"));
             segments = new Segment[atlasSubtexturesAt.Width];
             for (int x = 0; x < segments.Length; ++x)
+            {
                 segments[x] = new Segment()
                 {
                     Texture = atlasSubtexturesAt.GetSubtexture(x, 0, 1, atlasSubtexturesAt.Height),
                     Offset = new Vector2(x, 0.0f)
                 };
+            }
 
-            sine = Calc.Random.NextFloat((float) Math.PI * 2);
+            sine = Calc.Random.NextFloat((float)Math.PI * 2);
             random = Calc.Random.NextFloat();
             Depth = 8999;
-            Tag = (int) Tags.TransitionUpdate;
+            Tag = (int)Tags.TransitionUpdate;
         }
 
         private float wind => Calc.ClampedMap(Math.Abs((Scene as Level).Wind.X), 0f, 800f);
@@ -42,33 +44,41 @@ namespace Celeste
             base.Added(scene);
             sign = 1;
             if (wind != 0)
+            {
                 sign = Math.Sign((Scene as Level).Wind.X);
+            }
 
             for (int i = 0; i < segments.Length; ++i)
+            {
                 SetFlagSegmentPosition(i, true);
+            }
         }
 
         public override void Update()
         {
             base.Update();
             if (wind != 0)
+            {
                 sign = Math.Sign((Scene as Level).Wind.X);
+            }
 
             sine += Engine.DeltaTime * (4 + (wind * 4)) * (0.8f + (random * 0.2f));
             for (int i = 0; i < segments.Length; ++i)
+            {
                 SetFlagSegmentPosition(i, false);
+            }
         }
 
         private float Sin(float timer)
         {
-            return (float) Math.Sin(-timer);
+            return (float)Math.Sin(-timer);
         }
 
         private void SetFlagSegmentPosition(int i, bool snap)
         {
             Segment segment = segments[i];
-            float num = i * sign * (0.2f + wind * 0.8f * (0.8f + random * 0.2f)) * (0.9f + Sin(sine) * 0.1f);
-            float target1 = Calc.LerpClamp(Sin(sine * 0.5f - i * 0.1f) * (i / segments.Length) * i * 0.2f, num, (float) Math.Ceiling(wind));
+            float num = i * sign * (0.2f + (wind * 0.8f * (0.8f + (random * 0.2f)))) * (0.9f + (Sin(sine) * 0.1f));
+            float target1 = Calc.LerpClamp(Sin((sine * 0.5f) - (i * 0.1f)) * (i / segments.Length) * i * 0.2f, num, (float)Math.Ceiling(wind));
             float target2 = i / segments.Length * Math.Max(0.1f, 1f - wind) * 16;
             if (!snap)
             {
@@ -88,8 +98,8 @@ namespace Celeste
             for (int index = 0; index < segments.Length; ++index)
             {
                 Segment segment = segments[index];
-                float num = index / segments.Length * Sin(-index * 0.1f + sine) * 2;
-                segment.Texture.Draw(Position + segment.Offset + Vector2.UnitY * num);
+                float num = index / segments.Length * Sin((-index * 0.1f) + sine) * 2;
+                segment.Texture.Draw(Position + segment.Offset + (Vector2.UnitY * num));
             }
         }
 

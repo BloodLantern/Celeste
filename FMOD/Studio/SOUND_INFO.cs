@@ -21,18 +21,24 @@ namespace FMOD.Studio
         {
             get
             {
-                if ((this.mode & (MODE.OPENMEMORY | MODE.OPENMEMORY_POINT)) != MODE.DEFAULT || this.name_or_data == null)
-                    return (string) null;
-                int count = Array.IndexOf<byte>(this.name_or_data, (byte) 0);
-                return count > 0 ? Encoding.UTF8.GetString(this.name_or_data, 0, count) : (string) null;
+                if ((mode & (MODE.OPENMEMORY | MODE.OPENMEMORY_POINT)) != MODE.DEFAULT || name_or_data == null)
+                {
+                    return null;
+                }
+
+                int count = Array.IndexOf<byte>(name_or_data, 0);
+                return count > 0 ? Encoding.UTF8.GetString(name_or_data, 0, count) : null;
             }
         }
 
         ~SOUND_INFO()
         {
-            if (!(this.exinfo.inclusionlist != IntPtr.Zero))
+            if (!(exinfo.inclusionlist != IntPtr.Zero))
+            {
                 return;
-            Marshal.FreeHGlobal(this.exinfo.inclusionlist);
+            }
+
+            Marshal.FreeHGlobal(exinfo.inclusionlist);
         }
     }
 }

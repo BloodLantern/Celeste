@@ -14,10 +14,10 @@ namespace Celeste
 {
     public class OuiChapterSelect : Oui
     {
-        private List<OuiChapterSelectIcon> icons = new List<OuiChapterSelectIcon>();
+        private readonly List<OuiChapterSelectIcon> icons = new();
         private int indexToSnap = -1;
         private const int scarfSegmentSize = 2;
-        private MTexture scarf = GFX.Gui["areas/hover"];
+        private readonly MTexture scarf = GFX.Gui["areas/hover"];
         private MTexture[] scarfSegments;
         private float ease;
         private float journalEase;
@@ -35,8 +35,11 @@ namespace Celeste
 
         public override bool IsStart(Overworld overworld, Overworld.StartMode start)
         {
-            if (start == Overworld.StartMode.AreaComplete || start == Overworld.StartMode.AreaQuit)
-                this.indexToSnap = this.area;
+            if (start is Overworld.StartMode.AreaComplete or Overworld.StartMode.AreaQuit)
+            {
+                indexToSnap = area;
+            }
+
             return false;
         }
 
@@ -48,18 +51,21 @@ namespace Celeste
             {
                 MTexture front = GFX.Gui[AreaData.Areas[index].Icon];
                 MTexture back = GFX.Gui.Has(AreaData.Areas[index].Icon + "_back") ? GFX.Gui[AreaData.Areas[index].Icon + "_back"] : front;
-                this.icons.Add(new OuiChapterSelectIcon(index, front, back));
-                this.Scene.Add((Entity) this.icons[index]);
+                icons.Add(new OuiChapterSelectIcon(index, front, back));
+                Scene.Add(icons[index]);
             }
-            this.scarfSegments = new MTexture[this.scarf.Height / 2];
-            for (int index = 0; index < this.scarfSegments.Length; ++index)
-                this.scarfSegments[index] = this.scarf.GetSubtexture(0, index * 2, this.scarf.Width, 2);
-            if (this.indexToSnap >= 0)
+            scarfSegments = new MTexture[scarf.Height / 2];
+            for (int index = 0; index < scarfSegments.Length; ++index)
             {
-                this.area = this.indexToSnap;
-                this.icons[this.indexToSnap].SnapToSelected();
+                scarfSegments[index] = scarf.GetSubtexture(0, index * 2, scarf.Width, 2);
             }
-            this.Depth = -20;
+
+            if (indexToSnap >= 0)
+            {
+                area = indexToSnap;
+                icons[indexToSnap].SnapToSelected();
+            }
+            Depth = -20;
         }
 
         public override IEnumerator Enter(Oui from)
@@ -72,11 +78,16 @@ namespace Celeste
             for (int index = 0; index <= SaveData.Instance.UnlockedAreas && !ouiChapterSelect.journalEnabled; ++index)
             {
                 if (SaveData.Instance.Areas[index].Modes[0].TimePlayed > 0L && !AreaData.Get(index).Interlude)
+                {
                     ouiChapterSelect.journalEnabled = true;
+                }
             }
-            OuiChapterSelectIcon unselected = (OuiChapterSelectIcon) null;
+            OuiChapterSelectIcon unselected = null;
             if (from is OuiChapterPanel)
+            {
                 (unselected = ouiChapterSelect.icons[ouiChapterSelect.area]).Unselect();
+            }
+
             foreach (OuiChapterSelectIcon icon in ouiChapterSelect.icons)
             {
                 if (icon.Area <= SaveData.Instance.UnlockedAreas && icon != unselected)
@@ -91,56 +102,71 @@ namespace Celeste
                     icon.Show();
                     icon.AssistModeUnlockable = true;
                 }
-                yield return (object) 0.01f;
+                yield return 0.01f;
             }
             if (!ouiChapterSelect.autoAdvancing && SaveData.Instance.UnlockedAreas == 10 && !SaveData.Instance.RevealedChapter9)
             {
                 int ch = ouiChapterSelect.area;
-                yield return (object) ouiChapterSelect.SetupCh9Unlock();
-                yield return (object) ouiChapterSelect.PerformCh9Unlock(ch != 10);
+                yield return ouiChapterSelect.SetupCh9Unlock();
+                yield return ouiChapterSelect.PerformCh9Unlock(ch != 10);
             }
             if (from is OuiChapterPanel)
-                yield return (object) 0.25f;
+            {
+                yield return 0.25f;
+            }
         }
 
         public override IEnumerator Leave(Oui next)
         {
-            this.display = false;
+            display = false;
             if (next is OuiMainMenu)
             {
-                while (this.area > SaveData.Instance.UnlockedAreas)
-                    this.area--;
+                while (area > SaveData.Instance.UnlockedAreas)
+                {
+                    area--;
+                }
+
                 UserIO.SaveHandler(true, false);
-                yield return (object) this.EaseOut(next);
+                yield return EaseOut(next);
                 while (UserIO.Saving)
-                    yield return (object) null;
+                {
+                    yield return null;
+                }
             }
             else
-                yield return (object) this.EaseOut(next);
+            {
+                yield return EaseOut(next);
+            }
         }
 
         private IEnumerator EaseOut(Oui next)
         {
             OuiChapterSelect ouiChapterSelect = this;
-            OuiChapterSelectIcon selected = (OuiChapterSelectIcon) null;
+            OuiChapterSelectIcon selected = null;
             if (next is OuiChapterPanel)
+            {
                 (selected = ouiChapterSelect.icons[ouiChapterSelect.area]).Select();
+            }
+
             foreach (OuiChapterSelectIcon icon in ouiChapterSelect.icons)
             {
                 if (selected != icon)
+                {
                     icon.Hide();
-                yield return (object) 0.01f;
+                }
+
+                yield return 0.01f;
             }
             ouiChapterSelect.Visible = false;
         }
 
         public void AdvanceToNext()
         {
-            this.autoAdvancing = true;
-            this.Overworld.ShowInputUI = false;
-            this.Focused = false;
-            this.disableInput = true;
-            this.Add((Component) new Coroutine(this.AutoAdvanceRoutine()));
+            autoAdvancing = true;
+            Overworld.ShowInputUI = false;
+            Focused = false;
+            disableInput = true;
+            Add(new Coroutine(AutoAdvanceRoutine()));
         }
 
         private IEnumerator AutoAdvanceRoutine()
@@ -149,28 +175,34 @@ namespace Celeste
             if (ouiChapterSelect.area < SaveData.Instance.MaxArea)
             {
                 int nextArea = ouiChapterSelect.area + 1;
-                if (nextArea == 9 || nextArea == 10)
+                if (nextArea is 9 or 10)
+                {
                     ouiChapterSelect.icons[nextArea].HideIcon = true;
+                }
+
                 while (!ouiChapterSelect.Selected)
-                    yield return (object) null;
-                yield return (object) 1f;
+                {
+                    yield return null;
+                }
+
+                yield return 1f;
                 switch (nextArea)
                 {
                     case 9:
-                        yield return (object) ouiChapterSelect.PerformCh8Unlock();
+                        yield return ouiChapterSelect.PerformCh8Unlock();
                         break;
                     case 10:
-                        yield return (object) ouiChapterSelect.PerformCh9Unlock();
+                        yield return ouiChapterSelect.PerformCh9Unlock();
                         break;
                     default:
-                        Audio.Play("event:/ui/postgame/unlock_newchapter");
-                        Audio.Play("event:/ui/world_map/icon/roll_right");
+                        _ = Audio.Play("event:/ui/postgame/unlock_newchapter");
+                        _ = Audio.Play("event:/ui/world_map/icon/roll_right");
                         ouiChapterSelect.area = nextArea;
                         ouiChapterSelect.EaseCamera();
                         ouiChapterSelect.Overworld.Maddy.Hide();
                         break;
                 }
-                yield return (object) 0.25f;
+                yield return 0.25f;
             }
             ouiChapterSelect.autoAdvancing = false;
             ouiChapterSelect.disableInput = false;
@@ -180,144 +212,167 @@ namespace Celeste
 
         public override void Update()
         {
-            if (this.Focused && !this.disableInput)
+            if (Focused && !disableInput)
             {
-                this.inputDelay -= Engine.DeltaTime;
-                if (this.area >= 0 && this.area < AreaData.Areas.Count)
-                    Input.SetLightbarColor(AreaData.Get(this.area).TitleBaseColor);
+                inputDelay -= Engine.DeltaTime;
+                if (area >= 0 && area < AreaData.Areas.Count)
+                {
+                    Input.SetLightbarColor(AreaData.Get(area).TitleBaseColor);
+                }
+
                 if (Input.MenuCancel.Pressed)
                 {
-                    Audio.Play("event:/ui/main/button_back");
-                    this.Overworld.Goto<OuiMainMenu>();
-                    this.Overworld.Maddy.Hide();
+                    _ = Audio.Play("event:/ui/main/button_back");
+                    _ = Overworld.Goto<OuiMainMenu>();
+                    Overworld.Maddy.Hide();
                 }
-                else if (Input.MenuJournal.Pressed && this.journalEnabled)
+                else if (Input.MenuJournal.Pressed && journalEnabled)
                 {
-                    Audio.Play("event:/ui/world_map/journal/select");
-                    this.Overworld.Goto<OuiJournal>();
+                    _ = Audio.Play("event:/ui/world_map/journal/select");
+                    _ = Overworld.Goto<OuiJournal>();
                 }
-                else if ((double) this.inputDelay <= 0.0)
+                else if (inputDelay <= 0.0)
                 {
-                    if (this.area > 0 && Input.MenuLeft.Pressed)
+                    if (area > 0 && Input.MenuLeft.Pressed)
                     {
-                        Audio.Play("event:/ui/world_map/icon/roll_left");
-                        this.inputDelay = 0.15f;
-                        --this.area;
-                        this.icons[this.area].Hovered(-1);
-                        this.EaseCamera();
-                        this.Overworld.Maddy.Hide();
+                        _ = Audio.Play("event:/ui/world_map/icon/roll_left");
+                        inputDelay = 0.15f;
+                        --area;
+                        icons[area].Hovered(-1);
+                        EaseCamera();
+                        Overworld.Maddy.Hide();
                     }
                     else if (Input.MenuRight.Pressed)
                     {
-                        bool flag = SaveData.Instance.AssistMode && this.area == SaveData.Instance.UnlockedAreas && this.area < SaveData.Instance.MaxAssistArea;
-                        if (this.area < SaveData.Instance.UnlockedAreas | flag)
+                        bool flag = SaveData.Instance.AssistMode && area == SaveData.Instance.UnlockedAreas && area < SaveData.Instance.MaxAssistArea;
+                        if (area < SaveData.Instance.UnlockedAreas | flag)
                         {
-                            Audio.Play("event:/ui/world_map/icon/roll_right");
-                            this.inputDelay = 0.15f;
-                            ++this.area;
-                            this.icons[this.area].Hovered(1);
-                            if (this.area <= SaveData.Instance.UnlockedAreas)
-                                this.EaseCamera();
-                            this.Overworld.Maddy.Hide();
+                            _ = Audio.Play("event:/ui/world_map/icon/roll_right");
+                            inputDelay = 0.15f;
+                            ++area;
+                            icons[area].Hovered(1);
+                            if (area <= SaveData.Instance.UnlockedAreas)
+                            {
+                                EaseCamera();
+                            }
+
+                            Overworld.Maddy.Hide();
                         }
                     }
                     else if (Input.MenuConfirm.Pressed)
                     {
-                        if (this.icons[this.area].AssistModeUnlockable)
+                        if (icons[area].AssistModeUnlockable)
                         {
-                            Audio.Play("event:/ui/world_map/icon/assist_skip");
-                            this.Focused = false;
-                            this.Overworld.ShowInputUI = false;
-                            this.icons[this.area].AssistModeUnlock((Action) (() =>
+                            _ = Audio.Play("event:/ui/world_map/icon/assist_skip");
+                            Focused = false;
+                            Overworld.ShowInputUI = false;
+                            icons[area].AssistModeUnlock(() =>
                             {
-                                this.Focused = true;
-                                this.Overworld.ShowInputUI = true;
-                                this.EaseCamera();
-                                if (this.area == 10)
+                                Focused = true;
+                                Overworld.ShowInputUI = true;
+                                EaseCamera();
+                                if (area == 10)
+                                {
                                     SaveData.Instance.RevealedChapter9 = true;
-                                if (this.area >= SaveData.Instance.MaxAssistArea)
+                                }
+
+                                if (area >= SaveData.Instance.MaxAssistArea)
+                                {
                                     return;
-                                OuiChapterSelectIcon icon = this.icons[this.area + 1];
+                                }
+
+                                OuiChapterSelectIcon icon = icons[area + 1];
                                 icon.AssistModeUnlockable = true;
                                 icon.Position = icon.HiddenPosition;
                                 icon.Show();
-                            }));
+                            });
                         }
                         else
                         {
-                            Audio.Play("event:/ui/world_map/icon/select");
+                            _ = Audio.Play("event:/ui/world_map/icon/select");
                             SaveData.Instance.LastArea.Mode = AreaMode.Normal;
-                            this.Overworld.Goto<OuiChapterPanel>();
+                            _ = Overworld.Goto<OuiChapterPanel>();
                         }
                     }
                 }
             }
-            this.ease = Calc.Approach(this.ease, this.display ? 1f : 0.0f, Engine.DeltaTime * 3f);
-            this.journalEase = Calc.Approach(this.journalEase, !this.display || this.disableInput || !this.Focused || !this.journalEnabled ? 0.0f : 1f, Engine.DeltaTime * 4f);
+            ease = Calc.Approach(ease, display ? 1f : 0.0f, Engine.DeltaTime * 3f);
+            journalEase = Calc.Approach(journalEase, !display || disableInput || !Focused || !journalEnabled ? 0.0f : 1f, Engine.DeltaTime * 4f);
             base.Update();
         }
 
         public override void Render()
         {
-            Vector2 vector2 = new Vector2(960f, (float) -this.scarf.Height * Ease.CubeInOut(1f - this.ease));
-            for (int index = 0; index < this.scarfSegments.Length; ++index)
+            Vector2 vector2 = new(960f, -scarf.Height * Ease.CubeInOut(1f - ease));
+            for (int index = 0; index < scarfSegments.Length; ++index)
             {
-                float num = Ease.CubeIn((float) index / (float) this.scarfSegments.Length);
-                float x = (float) ((double) num * Math.Sin((double) this.Scene.RawTimeActive * 4.0 + (double) index * 0.05000000074505806) * 4.0 - (double) num * 16.0);
-                this.scarfSegments[index].DrawJustified(vector2 + new Vector2(x, (float) (index * 2)), new Vector2(0.5f, 0.0f));
+                float num = Ease.CubeIn(index / (float)scarfSegments.Length);
+                float x = (float)(((double)num * Math.Sin((Scene.RawTimeActive * 4.0) + (index * 0.05000000074505806)) * 4.0) - ((double)num * 16.0));
+                scarfSegments[index].DrawJustified(vector2 + new Vector2(x, index * 2), new Vector2(0.5f, 0.0f));
             }
-            if ((double) this.journalEase <= 0.0)
+            if (journalEase <= 0.0)
+            {
                 return;
-            Vector2 position = new Vector2(128f * Ease.CubeOut(this.journalEase), 952f);
-            GFX.Gui["menu/journal"].DrawCentered(position, Color.White * Ease.CubeOut(this.journalEase));
-            Input.GuiButton(Input.MenuJournal).Draw(position, Vector2.Zero, Color.White * Ease.CubeOut(this.journalEase));
+            }
+
+            Vector2 position = new(128f * Ease.CubeOut(journalEase), 952f);
+            GFX.Gui["menu/journal"].DrawCentered(position, Color.White * Ease.CubeOut(journalEase));
+            Input.GuiButton(Input.MenuJournal).Draw(position, Vector2.Zero, Color.White * Ease.CubeOut(journalEase));
         }
 
         private void EaseCamera()
         {
             AreaData area = AreaData.Areas[this.area];
-            double num = (double) this.Overworld.Mountain.EaseCamera(this.area, area.MountainIdle, targetRotate: (this.area == 10));
-            this.Overworld.Mountain.Model.EaseState(area.MountainState);
+            _ = (double)Overworld.Mountain.EaseCamera(this.area, area.MountainIdle, targetRotate: this.area == 10);
+            Overworld.Mountain.Model.EaseState(area.MountainState);
         }
 
         private IEnumerator PerformCh8Unlock()
         {
             OuiChapterSelect ouiChapterSelect = this;
-            Audio.Play("event:/ui/postgame/unlock_newchapter");
-            Audio.Play("event:/ui/world_map/icon/roll_right");
+            _ = Audio.Play("event:/ui/postgame/unlock_newchapter");
+            _ = Audio.Play("event:/ui/world_map/icon/roll_right");
             ouiChapterSelect.area = 9;
             ouiChapterSelect.EaseCamera();
             ouiChapterSelect.Overworld.Maddy.Hide();
             bool ready = false;
-            ouiChapterSelect.icons[9].HighlightUnlock((Action) (() => ready = true));
+            ouiChapterSelect.icons[9].HighlightUnlock(() => ready = true);
             while (!ready)
-                yield return (object) null;
+            {
+                yield return null;
+            }
         }
 
         private IEnumerator SetupCh9Unlock()
         {
-            this.icons[10].HideIcon = true;
-            yield return (object) 0.25f;
-            while (this.area < 9)
+            icons[10].HideIcon = true;
+            yield return 0.25f;
+            while (area < 9)
             {
-                this.area++;
-                yield return (object) 0.1f;
+                area++;
+                yield return 0.1f;
             }
         }
 
         private IEnumerator PerformCh9Unlock(bool easeCamera = true)
         {
             OuiChapterSelect ouiChapterSelect = this;
-            Audio.Play("event:/ui/postgame/unlock_newchapter");
-            Audio.Play("event:/ui/world_map/icon/roll_right");
+            _ = Audio.Play("event:/ui/postgame/unlock_newchapter");
+            _ = Audio.Play("event:/ui/world_map/icon/roll_right");
             ouiChapterSelect.area = 10;
-            yield return (object) 0.25f;
+            yield return 0.25f;
             bool ready = false;
-            ouiChapterSelect.icons[10].HighlightUnlock((Action) (() => ready = true));
+            ouiChapterSelect.icons[10].HighlightUnlock(() => ready = true);
             while (!ready)
-                yield return (object) null;
+            {
+                yield return null;
+            }
+
             if (easeCamera)
+            {
                 ouiChapterSelect.EaseCamera();
+            }
+
             ouiChapterSelect.Overworld.Maddy.Hide();
             SaveData.Instance.RevealedChapter9 = true;
         }

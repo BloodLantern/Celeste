@@ -57,13 +57,17 @@ namespace Celeste
             base.Update();
             bool flag = images[0].Width == 16;
             if (!Fallen)
+            {
                 return;
+            }
 
             if (shakeTimer > 0)
             {
                 shakeTimer -= Engine.DeltaTime;
                 if (Scene.OnInterval(0.02f))
+                {
                     shakeOffset = Calc.Random.ShakeVector();
+                }
 
                 if (shakeTimer <= 0)
                 {
@@ -74,8 +78,12 @@ namespace Celeste
                     {
                         _ = Audio.Play("event:/game/00_prologue/bridge_support_break", Position);
                         foreach (Image image in images)
+                        {
                             if (image.RenderPosition.Y > Y + 4)
-                                Dust.Burst(image.RenderPosition, (float) -Math.PI / 2, 8);
+                            {
+                                Dust.Burst(image.RenderPosition, (float)-Math.PI / 2, 8);
+                            }
+                        }
                     }
                 }
                 images[0].Position = new Vector2(images[0].Width / 2f, -8f) + shakeOffset;
@@ -97,11 +105,15 @@ namespace Celeste
                     speedY = Calc.Approach(speedY, 120f, 600f * Engine.DeltaTime);
                 }
                 else
+                {
                     speedY = Calc.Approach(speedY, 200f, 900f * Engine.DeltaTime);
+                }
 
                 MoveV(speedY * Engine.DeltaTime);
                 if (Top <= 220)
+                {
                     return;
+                }
 
                 RemoveSelf();
             }
@@ -110,7 +122,9 @@ namespace Celeste
         public void Fall(float timer = 0.2f)
         {
             if (Fallen)
+            {
                 return;
+            }
 
             Fallen = true;
             shakeTimer = timer;
