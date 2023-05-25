@@ -20,36 +20,36 @@ namespace Celeste
 
         public static void Set(MTexture grade)
         {
-            ColorGrade.Set(grade, grade, 0.0f);
+            Set(grade, grade, 0.0f);
         }
 
         public static void Set(MTexture fromTex, MTexture toTex, float p)
         {
-            if (!ColorGrade.Enabled || fromTex == null || toTex == null)
+            if (!Enabled || fromTex == null || toTex == null)
             {
-                ColorGrade.from = GFX.ColorGrades["none"];
-                ColorGrade.to = GFX.ColorGrades["none"];
+                from = GFX.ColorGrades["none"];
+                to = GFX.ColorGrades["none"];
             }
             else
             {
-                ColorGrade.from = fromTex;
-                ColorGrade.to = toTex;
+                from = fromTex;
+                to = toTex;
             }
-            ColorGrade.percent = Calc.Clamp(p, 0.0f, 1f);
-            if (ColorGrade.from == ColorGrade.to || percent <= 0.0)
+            percent = Calc.Clamp(p, 0f, 1f);
+            if (from == to || percent <= 0)
             {
-                ColorGrade.Effect.CurrentTechnique = ColorGrade.Effect.Techniques["ColorGradeSingle"];
+                Effect.CurrentTechnique = Effect.Techniques["ColorGradeSingle"];
                 Engine.Graphics.GraphicsDevice.Textures[1] = from.Texture.Texture;
             }
-            else if (percent >= 1.0)
+            else if (percent >= 1)
             {
-                ColorGrade.Effect.CurrentTechnique = ColorGrade.Effect.Techniques["ColorGradeSingle"];
+                Effect.CurrentTechnique = Effect.Techniques["ColorGradeSingle"];
                 Engine.Graphics.GraphicsDevice.Textures[1] = to.Texture.Texture;
             }
             else
             {
-                ColorGrade.Effect.CurrentTechnique = ColorGrade.Effect.Techniques[nameof(ColorGrade)];
-                ColorGrade.Effect.Parameters["percent"].SetValue(ColorGrade.percent);
+                Effect.CurrentTechnique = Effect.Techniques[nameof(ColorGrade)];
+                Effect.Parameters["percent"].SetValue(percent);
                 Engine.Graphics.GraphicsDevice.Textures[1] = from.Texture.Texture;
                 Engine.Graphics.GraphicsDevice.Textures[2] = to.Texture.Texture;
             }
@@ -57,8 +57,8 @@ namespace Celeste
 
         public static float Percent
         {
-            get => ColorGrade.percent;
-            set => ColorGrade.Set(ColorGrade.from, ColorGrade.to, value);
+            get => percent;
+            set => Set(from, to, value);
         }
     }
 }

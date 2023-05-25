@@ -20,21 +20,21 @@ namespace Monocle
         private readonly Dictionary<string, List<MTexture>> orderedTexturesCache = new();
         private readonly Dictionary<string, string> links = new();
 
-        public static Atlas FromAtlas(string path, Atlas.AtlasDataFormat format)
+        public static Atlas FromAtlas(string path, AtlasDataFormat format)
         {
             Atlas atlas = new()
             {
                 Sources = new List<VirtualTexture>()
             };
-            Atlas.ReadAtlasData(atlas, path, format);
+            ReadAtlasData(atlas, path, format);
             return atlas;
         }
 
-        private static void ReadAtlasData(Atlas atlas, string path, Atlas.AtlasDataFormat format)
+        private static void ReadAtlasData(Atlas atlas, string path, AtlasDataFormat format)
         {
             switch (format)
             {
-                case Atlas.AtlasDataFormat.TexturePacker_Sparrow:
+                case AtlasDataFormat.TexturePacker_Sparrow:
                     XmlElement xml1 = Calc.LoadContentXML(path)["TextureAtlas"];
                     string path2_1 = xml1.Attr("imagePath", "");
                     VirtualTexture texture1 = VirtualContent.CreateTexture(Path.Combine(Path.GetDirectoryName(path), path2_1));
@@ -45,36 +45,44 @@ namespace Monocle
                     {
                         while (enumerator1.MoveNext())
                         {
-                            XmlElement current = (XmlElement)enumerator1.Current;
+                            XmlElement current = (XmlElement) enumerator1.Current;
                             string str = current.Attr("name");
                             Rectangle clipRect = current.Rect();
-                            atlas.textures[str] = !current.HasAttr("frameX") ? new MTexture(parent1, str, clipRect) : new MTexture(parent1, str, clipRect, new Vector2(-current.AttrInt("frameX"), -current.AttrInt("frameY")), current.AttrInt("frameWidth"), current.AttrInt("frameHeight"));
+                            atlas.textures[str] =
+                                !current.HasAttr("frameX")
+                                ? new MTexture(parent1, str, clipRect)
+                                : new MTexture(parent1, str, clipRect,
+                                    new Vector2(-current.AttrInt("frameX"), -current.AttrInt("frameY")),
+                                        current.AttrInt("frameWidth"), current.AttrInt("frameHeight"));
                         }
                         break;
                     }
                     finally
                     {
                         if (enumerator1 is IDisposable disposable)
-                        {
                             disposable.Dispose();
-                        }
                     }
-                case Atlas.AtlasDataFormat.CrunchXml:
+                case AtlasDataFormat.CrunchXml:
                     IEnumerator enumerator2 = Calc.LoadContentXML(path)[nameof(atlas)].GetEnumerator();
                     try
                     {
                         while (enumerator2.MoveNext())
                         {
-                            XmlElement current = (XmlElement)enumerator2.Current;
+                            XmlElement current = (XmlElement) enumerator2.Current;
                             string str1 = current.Attr("n", "");
                             VirtualTexture texture2 = VirtualContent.CreateTexture(Path.Combine(Path.GetDirectoryName(path), str1 + ".png"));
                             MTexture parent2 = new(texture2);
                             atlas.Sources.Add(texture2);
-                            foreach (XmlElement xml2 in (XmlNode)current)
+                            foreach (XmlElement xml2 in (XmlNode) current)
                             {
                                 string str2 = xml2.Attr("n");
                                 Rectangle clipRect = new(xml2.AttrInt("x"), xml2.AttrInt("y"), xml2.AttrInt("w"), xml2.AttrInt("h"));
-                                atlas.textures[str2] = !xml2.HasAttr("fx") ? new MTexture(parent2, str2, clipRect) : new MTexture(parent2, str2, clipRect, new Vector2(-xml2.AttrInt("fx"), -xml2.AttrInt("fy")), xml2.AttrInt("fw"), xml2.AttrInt("fh"));
+                                atlas.textures[str2] =
+                                    !xml2.HasAttr("fx")
+                                    ? new MTexture(parent2, str2, clipRect)
+                                    : new MTexture(parent2, str2, clipRect,
+                                        new Vector2(-xml2.AttrInt("fx"), -xml2.AttrInt("fy")),
+                                            xml2.AttrInt("fw"), xml2.AttrInt("fh"));
                             }
                         }
                         break;
@@ -82,11 +90,9 @@ namespace Monocle
                     finally
                     {
                         if (enumerator2 is IDisposable disposable)
-                        {
                             disposable.Dispose();
-                        }
                     }
-                case Atlas.AtlasDataFormat.CrunchBinary:
+                case AtlasDataFormat.CrunchBinary:
                     using (FileStream input = File.OpenRead(Path.Combine(Engine.ContentDirectory, path)))
                     {
                         BinaryReader stream = new(input);
@@ -114,15 +120,15 @@ namespace Monocle
                         }
                         break;
                     }
-                case Atlas.AtlasDataFormat.CrunchXmlOrBinary:
+                case AtlasDataFormat.CrunchXmlOrBinary:
                     if (File.Exists(Path.Combine(Engine.ContentDirectory, path + ".bin")))
                     {
-                        Atlas.ReadAtlasData(atlas, path + ".bin", Atlas.AtlasDataFormat.CrunchBinary);
+                        ReadAtlasData(atlas, path + ".bin", AtlasDataFormat.CrunchBinary);
                         break;
                     }
-                    Atlas.ReadAtlasData(atlas, path + ".xml", Atlas.AtlasDataFormat.CrunchXml);
+                    ReadAtlasData(atlas, path + ".xml", AtlasDataFormat.CrunchXml);
                     break;
-                case Atlas.AtlasDataFormat.CrunchBinaryNoAtlas:
+                case AtlasDataFormat.CrunchBinaryNoAtlas:
                     using (FileStream input = File.OpenRead(Path.Combine(Engine.ContentDirectory, path + ".bin")))
                     {
                         BinaryReader stream = new(input);
@@ -135,10 +141,11 @@ namespace Monocle
                             for (int index4 = 0; index4 < num6; ++index4)
                             {
                                 string key = stream.ReadNullTerminatedString();
+                                /*_ = (int)stream.ReadInt16();
                                 _ = (int)stream.ReadInt16();
                                 _ = (int)stream.ReadInt16();
-                                _ = (int)stream.ReadInt16();
-                                _ = (int)stream.ReadInt16();
+                                _ = (int)stream.ReadInt16();*/
+                                _ = stream.ReadBytes(8);
                                 short num11 = stream.ReadInt16();
                                 short num12 = stream.ReadInt16();
                                 short frameWidth = stream.ReadInt16();
@@ -150,7 +157,7 @@ namespace Monocle
                         }
                         break;
                     }
-                case Atlas.AtlasDataFormat.Packer:
+                case AtlasDataFormat.Packer:
                     using (FileStream input = File.OpenRead(Path.Combine(Engine.ContentDirectory, path + ".meta")))
                     {
                         BinaryReader binaryReader = new(input);
@@ -180,9 +187,7 @@ namespace Monocle
                             }
                         }
                         if (input.Position >= input.Length || !(binaryReader.ReadString() == "LINKS"))
-                        {
                             break;
-                        }
 
                         short num17 = binaryReader.ReadInt16();
                         for (int index = 0; index < num17; ++index)
@@ -193,7 +198,7 @@ namespace Monocle
                         }
                         break;
                     }
-                case Atlas.AtlasDataFormat.PackerNoAtlas:
+                case AtlasDataFormat.PackerNoAtlas:
                     using (FileStream input = File.OpenRead(Path.Combine(Engine.ContentDirectory, path + ".meta")))
                     {
                         BinaryReader binaryReader = new(input);
@@ -226,9 +231,7 @@ namespace Monocle
                             }
                         }
                         if (input.Position >= input.Length || !(binaryReader.ReadString() == "LINKS"))
-                        {
                             break;
-                        }
 
                         short num26 = binaryReader.ReadInt16();
                         for (int index = 0; index < num26; ++index)
@@ -247,16 +250,14 @@ namespace Monocle
         public static Atlas FromMultiAtlas(
             string rootPath,
             string[] dataPath,
-            Atlas.AtlasDataFormat format)
+            AtlasDataFormat format)
         {
             Atlas atlas = new()
             {
                 Sources = new List<VirtualTexture>()
             };
             for (int index = 0; index < dataPath.Length; ++index)
-            {
-                Atlas.ReadAtlasData(atlas, Path.Combine(rootPath, dataPath[index]), format);
-            }
+                ReadAtlasData(atlas, Path.Combine(rootPath, dataPath[index]), format);
 
             return atlas;
         }
@@ -264,7 +265,7 @@ namespace Monocle
         public static Atlas FromMultiAtlas(
             string rootPath,
             string filename,
-            Atlas.AtlasDataFormat format)
+            AtlasDataFormat format)
         {
             Atlas atlas = new()
             {
@@ -276,13 +277,11 @@ namespace Monocle
                 string str = Path.Combine(rootPath, filename + num.ToString() + ".xml");
                 if (File.Exists(Path.Combine(Engine.ContentDirectory, str)))
                 {
-                    Atlas.ReadAtlasData(atlas, str, format);
+                    ReadAtlasData(atlas, str, format);
                     ++num;
                 }
                 else
-                {
                     break;
-                }
             }
             return atlas;
         }
@@ -294,21 +293,21 @@ namespace Monocle
                 Sources = new List<VirtualTexture>()
             };
             string contentDirectory = Engine.ContentDirectory;
-            int length1 = contentDirectory.Length;
-            string path1 = Path.Combine(contentDirectory, path);
-            int length2 = path1.Length;
-            foreach (string file in Directory.GetFiles(path1, "*", SearchOption.AllDirectories))
+            int contentPathLength = contentDirectory.Length;
+            string fullPath = Path.Combine(contentDirectory, path);
+            int fullPathLength = fullPath.Length;
+            foreach (string file in Directory.GetFiles(fullPath, "*", SearchOption.AllDirectories))
             {
                 string extension = Path.GetExtension(file);
                 if (extension is ".png" or ".xnb")
                 {
-                    VirtualTexture texture = VirtualContent.CreateTexture(file.Substring(length1 + 1));
+                    VirtualTexture texture = VirtualContent.CreateTexture(file.Substring(contentPathLength + 1));
                     atlas.Sources.Add(texture);
-                    string str = file.Substring(length2 + 1);
+                    string str = file.Substring(fullPathLength + 1);
                     string key = str.Substring(0, str.Length - 4).Replace('\\', '/');
                     atlas.textures.Add(key, new MTexture(texture));
                 }
-            }
+             }
             return atlas;
         }
 
@@ -343,9 +342,7 @@ namespace Monocle
                         ++index;
                     }
                     else
-                    {
                         break;
-                    }
                 }
                 orderedTexturesCache.Add(key, atlasSubtextures);
             }
@@ -360,18 +357,12 @@ namespace Monocle
         private MTexture GetAtlasSubtextureFromAtlasAt(string key, int index)
         {
             if (index == 0 && textures.ContainsKey(key))
-            {
                 return textures[key];
-            }
 
             string str = index.ToString();
             for (int length = str.Length; str.Length < length + 6; str = "0" + str)
-            {
                 if (textures.TryGetValue(key + str, out MTexture subtextureFromAtlasAt))
-                {
                     return subtextureFromAtlasAt;
-                }
-            }
             return null;
         }
 
@@ -388,9 +379,7 @@ namespace Monocle
         public void Dispose()
         {
             foreach (VirtualAsset source in Sources)
-            {
                 source.Dispose();
-            }
 
             Sources.Clear();
             textures.Clear();

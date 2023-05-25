@@ -27,7 +27,6 @@ namespace Celeste
             anchorA = Position = data.Position + offset;
             anchorB = data.Nodes[0] + offset;
             foreach (Vector2 node in data.Nodes)
-            {
                 if (offshoots == null)
                 {
                     offshoots = new List<Vector2>();
@@ -38,24 +37,21 @@ namespace Celeste
                     offshoots.Add(node + offset);
                     offshootEndings.Add(0.3f + Calc.Random.NextFloat(0.4f));
                 }
-            }
             waveTimer = Calc.Random.NextFloat();
         }
 
         public override void Added(Scene scene)
         {
             base.Added(scene);
-            color = Calc.Random.Choose<Color>(AreaData.Get(scene).CobwebColor);
+            color = Calc.Random.Choose(AreaData.Get(scene).CobwebColor);
             edge = Color.Lerp(color, Calc.HexToColor("0f0e17"), 0.2f);
-            if (!Scene.CollideCheck<Solid>(new Rectangle((int)anchorA.X - 2, (int)anchorA.Y - 2, 4, 4)) || !Scene.CollideCheck<Solid>(new Rectangle((int)anchorB.X - 2, (int)anchorB.Y - 2, 4, 4)))
-            {
+            if (!Scene.CollideCheck<Solid>(new Rectangle((int) anchorA.X - 2, (int) anchorA.Y - 2, 4, 4)) || !Scene.CollideCheck<Solid>(new Rectangle((int) anchorB.X - 2, (int) anchorB.Y - 2, 4, 4)))
                 RemoveSelf();
-            }
 
             for (int index = 0; index < offshoots.Count; ++index)
             {
                 Vector2 offshoot = offshoots[index];
-                if (!Scene.CollideCheck<Solid>(new Rectangle((int)offshoot.X - 2, (int)offshoot.Y - 2, 4, 4)))
+                if (!Scene.CollideCheck<Solid>(new Rectangle((int) offshoot.X - 2, (int) offshoot.Y - 2, 4, 4)))
                 {
                     offshoots.RemoveAt(index);
                     offshootEndings.RemoveAt(index);
@@ -77,14 +73,10 @@ namespace Celeste
 
         private void DrawCobweb(Vector2 a, Vector2 b, int steps, bool drawOffshoots)
         {
-            SimpleCurve simpleCurve = new(a, b, ((a + b) / 2f) + (Vector2.UnitY * (float)(8.0 + (Math.Sin(waveTimer) * 4.0))));
+            SimpleCurve simpleCurve = new(a, b, ((a + b) / 2f) + (Vector2.UnitY * (8 + (float) Math.Sin(waveTimer) * 4)));
             if (drawOffshoots && offshoots != null)
-            {
                 for (int index = 0; index < offshoots.Count; ++index)
-                {
                     DrawCobweb(offshoots[index], simpleCurve.GetPoint(offshootEndings[index]), 4, false);
-                }
-            }
             Vector2 start = simpleCurve.Begin;
             for (int index = 1; index <= steps; ++index)
             {
