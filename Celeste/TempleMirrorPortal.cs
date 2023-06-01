@@ -22,10 +22,10 @@ namespace Celeste
         private VirtualRenderTarget buffer;
         private float bufferAlpha;
         private float bufferTimer;
-        private readonly TempleMirrorPortal.Debris[] debris = new TempleMirrorPortal.Debris[50];
+        private TempleMirrorPortal.Debris[] debris = new TempleMirrorPortal.Debris[50];
         private Color debrisColorFrom = Calc.HexToColor("f442d4");
         private Color debrisColorTo = Calc.HexToColor("000000");
-        private readonly MTexture debrisTexture = GFX.Game["particles/blob"];
+        private MTexture debrisTexture = GFX.Game["particles/blob"];
         private TempleMirrorPortal.Curtain curtain;
         private TemplePortalTorch leftTorch;
         private TemplePortalTorch rightTorch;
@@ -33,9 +33,9 @@ namespace Celeste
         public TempleMirrorPortal(Vector2 position)
             : base(position)
         {
-            Depth = 2000;
-            Collider = new Hitbox(120f, 64f, -60f, -32f);
-            Add(new PlayerCollider(new Action<Player>(OnPlayer)));
+            this.Depth = 2000;
+            this.Collider = (Collider) new Hitbox(120f, 64f, -60f, -32f);
+            this.Add((Component) new PlayerCollider(new Action<Player>(this.OnPlayer)));
         }
 
         public TempleMirrorPortal(EntityData data, Vector2 offset)
@@ -46,79 +46,65 @@ namespace Celeste
         public override void Added(Scene scene)
         {
             base.Added(scene);
-            scene.Add(curtain = new TempleMirrorPortal.Curtain(Position));
-            scene.Add(new TempleMirrorPortal.Bg(Position));
-            scene.Add(leftTorch = new TemplePortalTorch(Position + new Vector2(-90f, 0.0f)));
-            scene.Add(rightTorch = new TemplePortalTorch(Position + new Vector2(90f, 0.0f)));
+            scene.Add((Entity) (this.curtain = new TempleMirrorPortal.Curtain(this.Position)));
+            scene.Add((Entity) new TempleMirrorPortal.Bg(this.Position));
+            scene.Add((Entity) (this.leftTorch = new TemplePortalTorch(this.Position + new Vector2(-90f, 0.0f))));
+            scene.Add((Entity) (this.rightTorch = new TemplePortalTorch(this.Position + new Vector2(90f, 0.0f))));
         }
 
-        public void OnSwitchHit(int side)
-        {
-            Add(new Coroutine(OnSwitchRoutine(side)));
-        }
+        public void OnSwitchHit(int side) => this.Add((Component) new Coroutine(this.OnSwitchRoutine(side)));
 
         private IEnumerator OnSwitchRoutine(int side)
         {
             TempleMirrorPortal templeMirrorPortal = this;
-            yield return 0.4f;
+            yield return (object) 0.4f;
             if (side < 0)
-            {
                 templeMirrorPortal.leftTorch.Light(templeMirrorPortal.switchCounter);
-            }
             else
-            {
                 templeMirrorPortal.rightTorch.Light(templeMirrorPortal.switchCounter);
-            }
-
             ++templeMirrorPortal.switchCounter;
             if ((templeMirrorPortal.Scene as Level).Session.Area.Mode == AreaMode.Normal)
             {
                 LightingRenderer lighting = (templeMirrorPortal.Scene as Level).Lighting;
                 float lightTarget = Math.Max(0.0f, lighting.Alpha - 0.2f);
-                while ((double)(lighting.Alpha -= Engine.DeltaTime) > (double)lightTarget)
-                {
-                    yield return null;
-                }
+                while ((double) (lighting.Alpha -= Engine.DeltaTime) > (double) lightTarget)
+                    yield return (object) null;
+                lighting = (LightingRenderer) null;
             }
-            yield return 0.15f;
+            yield return (object) 0.15f;
             if (templeMirrorPortal.switchCounter >= 2)
             {
-                yield return 0.1f;
-                _ = Audio.Play("event:/game/05_mirror_temple/mainmirror_reveal", templeMirrorPortal.Position);
+                yield return (object) 0.1f;
+                Audio.Play("event:/game/05_mirror_temple/mainmirror_reveal", templeMirrorPortal.Position);
                 templeMirrorPortal.curtain.Drop();
                 templeMirrorPortal.canTrigger = true;
-                yield return 0.1f;
+                yield return (object) 0.1f;
                 Level level = templeMirrorPortal.SceneAs<Level>();
                 for (int index1 = 0; index1 < 120; index1 += 12)
                 {
                     for (int index2 = 0; index2 < 60; index2 += 6)
-                    {
-                        level.Particles.Emit(TempleMirrorPortal.P_CurtainDrop, 1, templeMirrorPortal.curtain.Position + new Vector2(index1 - 57, index2 - 27), new Vector2(6f, 3f));
-                    }
+                        level.Particles.Emit(TempleMirrorPortal.P_CurtainDrop, 1, templeMirrorPortal.curtain.Position + new Vector2((float) (index1 - 57), (float) (index2 - 27)), new Vector2(6f, 3f));
                 }
             }
         }
 
-        public void Activate()
-        {
-            Add(new Coroutine(ActivateRoutine()));
-        }
+        public void Activate() => this.Add((Component) new Coroutine(this.ActivateRoutine()));
 
         private IEnumerator ActivateRoutine()
         {
             TempleMirrorPortal templeMirrorPortal = this;
             LightingRenderer light = (templeMirrorPortal.Scene as Level).Lighting;
             float debrisStart = 0.0f;
-            templeMirrorPortal.Add(new BeforeRenderHook(new Action(templeMirrorPortal.BeforeRender)));
-            templeMirrorPortal.Add(new DisplacementRenderHook(new Action(templeMirrorPortal.RenderDisplacement)));
+            templeMirrorPortal.Add((Component) new BeforeRenderHook(new Action(templeMirrorPortal.BeforeRender)));
+            templeMirrorPortal.Add((Component) new DisplacementRenderHook(new Action(templeMirrorPortal.RenderDisplacement)));
             while (true)
             {
                 templeMirrorPortal.bufferAlpha = Calc.Approach(templeMirrorPortal.bufferAlpha, 1f, Engine.DeltaTime);
                 templeMirrorPortal.bufferTimer += 4f * Engine.DeltaTime;
                 light.Alpha = Calc.Approach(light.Alpha, 0.2f, Engine.DeltaTime * 0.25f);
-                if ((double)debrisStart < templeMirrorPortal.debris.Length)
+                if ((double) debrisStart < (double) templeMirrorPortal.debris.Length)
                 {
-                    int index = (int)debrisStart;
+                    int index = (int) debrisStart;
                     templeMirrorPortal.debris[index].Direction = Calc.AngleToVector(Calc.Random.NextFloat(6.28318548f), 1f);
                     templeMirrorPortal.debris[index].Enabled = true;
                     templeMirrorPortal.debris[index].Duration = 0.5f + Calc.Random.NextFloat(0.7f);
@@ -132,21 +118,22 @@ namespace Celeste
                         templeMirrorPortal.debris[index].Percent += Engine.DeltaTime / templeMirrorPortal.debris[index].Duration;
                     }
                 }
-                yield return null;
+                yield return (object) null;
             }
         }
 
         private void BeforeRender()
         {
-            buffer ??= VirtualContent.CreateRenderTarget("temple-portal", 120, 64);
-            Vector2 position = new Vector2(buffer.Width, buffer.Height) / 2f;
+            if (this.buffer == null)
+                this.buffer = VirtualContent.CreateRenderTarget("temple-portal", 120, 64);
+            Vector2 position = new Vector2((float) this.buffer.Width, (float) this.buffer.Height) / 2f;
             MTexture mtexture = GFX.Game["objects/temple/portal/portal"];
-            Engine.Graphics.GraphicsDevice.SetRenderTarget((RenderTarget2D)buffer);
+            Engine.Graphics.GraphicsDevice.SetRenderTarget((RenderTarget2D) this.buffer);
             Engine.Graphics.GraphicsDevice.Clear(Color.Black);
             Draw.SpriteBatch.Begin();
-            for (int index = 0; index < 10.0; ++index)
+            for (int index = 0; (double) index < 10.0; ++index)
             {
-                float amount = (float)((bufferTimer % 1.0 * 0.10000000149011612) + (index / 10.0));
+                float amount = (float) ((double) this.bufferTimer % 1.0 * 0.10000000149011612 + (double) index / 10.0);
                 Color color = Color.Lerp(Color.Black, Color.Purple, amount);
                 float scale = amount;
                 float rotation = 6.28318548f * amount;
@@ -155,59 +142,51 @@ namespace Celeste
             Draw.SpriteBatch.End();
         }
 
-        private void RenderDisplacement()
-        {
-            Draw.Rect(X - 60f, Y - 32f, 120f, 64f, new Color(0.5f, 0.5f, 0.25f * DistortionFade * bufferAlpha, 1f));
-        }
+        private void RenderDisplacement() => Draw.Rect(this.X - 60f, this.Y - 32f, 120f, 64f, new Color(0.5f, 0.5f, 0.25f * this.DistortionFade * this.bufferAlpha, 1f));
 
         public override void Render()
         {
             base.Render();
-            if (buffer != null)
+            if (this.buffer != null)
+                Draw.SpriteBatch.Draw((Texture2D) (RenderTarget2D) this.buffer, this.Position + new Vector2((float) (-(double) this.Collider.Width / 2.0), (float) (-(double) this.Collider.Height / 2.0)), Color.White * this.bufferAlpha);
+            GFX.Game["objects/temple/portal/portalframe"].DrawCentered(this.Position);
+            Level scene = this.Scene as Level;
+            for (int index = 0; index < this.debris.Length; ++index)
             {
-                Draw.SpriteBatch.Draw((RenderTarget2D)buffer, Position + new Vector2((float)(-(double)Collider.Width / 2.0), (float)(-(double)Collider.Height / 2.0)), Color.White * bufferAlpha);
-            }
-
-            GFX.Game["objects/temple/portal/portalframe"].DrawCentered(Position);
-            Level scene = Scene as Level;
-            for (int index = 0; index < debris.Length; ++index)
-            {
-                TempleMirrorPortal.Debris debri = debris[index];
+                TempleMirrorPortal.Debris debri = this.debris[index];
                 if (debri.Enabled)
                 {
                     float num = Ease.SineOut(debri.Percent);
-                    debrisTexture.DrawCentered(Position + (debri.Direction * (1f - num) * (float)(190.0 - (scene.Zoom * 30.0))), Color.Lerp(debrisColorFrom, debrisColorTo, num), Calc.LerpClamp(1f, 0.2f, num), index * 0.05f);
+                    this.debrisTexture.DrawCentered(this.Position + debri.Direction * (1f - num) * (float) (190.0 - (double) scene.Zoom * 30.0), Color.Lerp(this.debrisColorFrom, this.debrisColorTo, num), Calc.LerpClamp(1f, 0.2f, num), (float) index * 0.05f);
                 }
             }
         }
 
         private void OnPlayer(Player player)
         {
-            if (!canTrigger)
-            {
+            if (!this.canTrigger)
                 return;
-            }
-
-            canTrigger = false;
-            Scene.Add(new CS04_MirrorPortal(player, this));
+            this.canTrigger = false;
+            this.Scene.Add((Entity) new CS04_MirrorPortal(player, this));
         }
 
         public override void Removed(Scene scene)
         {
-            Dispose();
+            this.Dispose();
             base.Removed(scene);
         }
 
         public override void SceneEnd(Scene scene)
         {
-            Dispose();
+            this.Dispose();
             base.SceneEnd(scene);
         }
 
         private void Dispose()
         {
-            buffer?.Dispose();
-            buffer = null;
+            if (this.buffer != null)
+                this.buffer.Dispose();
+            this.buffer = (VirtualRenderTarget) null;
         }
 
         private struct Debris
@@ -220,37 +199,31 @@ namespace Celeste
 
         private class Bg : Entity
         {
-            private readonly MirrorSurface surface;
-            private readonly Vector2[] offsets;
-            private readonly List<MTexture> textures;
+            private MirrorSurface surface;
+            private Vector2[] offsets;
+            private List<MTexture> textures;
 
             public Bg(Vector2 position)
                 : base(position)
             {
-                Depth = 9500;
-                textures = GFX.Game.GetAtlasSubtextures("objects/temple/portal/reflection");
-                Vector2 vector2 = new(10f, 4f);
-                offsets = new Vector2[textures.Count];
-                for (int index = 0; index < offsets.Length; ++index)
+                this.Depth = 9500;
+                this.textures = GFX.Game.GetAtlasSubtextures("objects/temple/portal/reflection");
+                Vector2 vector2 = new Vector2(10f, 4f);
+                this.offsets = new Vector2[this.textures.Count];
+                for (int index = 0; index < this.offsets.Length; ++index)
+                    this.offsets[index] = vector2 + new Vector2((float) Calc.Random.Range(-4, 4), (float) Calc.Random.Range(-4, 4));
+                this.Add((Component) (this.surface = new MirrorSurface()));
+                this.surface.OnRender = (Action) (() =>
                 {
-                    offsets[index] = vector2 + new Vector2(Calc.Random.Range(-4, 4), Calc.Random.Range(-4, 4));
-                }
-
-                Add(surface = new MirrorSurface());
-                surface.OnRender = () =>
-                {
-                    for (int index = 0; index < textures.Count; ++index)
+                    for (int index = 0; index < this.textures.Count; ++index)
                     {
-                        surface.ReflectionOffset = offsets[index];
-                        textures[index].DrawCentered(Position, surface.ReflectionColor);
+                        this.surface.ReflectionOffset = this.offsets[index];
+                        this.textures[index].DrawCentered(this.Position, this.surface.ReflectionColor);
                     }
-                };
+                });
             }
 
-            public override void Render()
-            {
-                GFX.Game["objects/temple/portal/surface"].DrawCentered(Position);
-            }
+            public override void Render() => GFX.Game["objects/temple/portal/surface"].DrawCentered(this.Position);
         }
 
         private class Curtain : Solid
@@ -260,53 +233,47 @@ namespace Celeste
             public Curtain(Vector2 position)
                 : base(position, 140f, 12f, true)
             {
-                Add(Sprite = GFX.SpriteBank.Create("temple_portal_curtain"));
-                Depth = 1999;
-                Collider.Position.X = -70f;
-                Collider.Position.Y = 33f;
-                Collidable = false;
-                SurfaceSoundIndex = 17;
+                this.Add((Component) (this.Sprite = GFX.SpriteBank.Create("temple_portal_curtain")));
+                this.Depth = 1999;
+                this.Collider.Position.X = -70f;
+                this.Collider.Position.Y = 33f;
+                this.Collidable = false;
+                this.SurfaceSoundIndex = 17;
             }
 
             public override void Update()
             {
                 base.Update();
-                if (!Collidable)
-                {
+                if (!this.Collidable)
                     return;
-                }
-
                 Player player1;
-                if ((player1 = CollideFirst<Player>(Position + new Vector2(-1f, 0.0f))) != null && player1.OnGround() && Input.Aim.Value.X > 0.0)
+                if ((player1 = this.CollideFirst<Player>(this.Position + new Vector2(-1f, 0.0f))) != null && player1.OnGround() && (double) Input.Aim.Value.X > 0.0)
                 {
-                    _ = player1.MoveV(Top - player1.Bottom);
-                    _ = player1.MoveH(1f);
+                    player1.MoveV(this.Top - player1.Bottom);
+                    player1.MoveH(1f);
                 }
                 else
                 {
                     Player player2;
-                    if ((player2 = CollideFirst<Player>(Position + new Vector2(1f, 0.0f))) == null || !player2.OnGround() || Input.Aim.Value.X >= 0.0)
-                    {
+                    if ((player2 = this.CollideFirst<Player>(this.Position + new Vector2(1f, 0.0f))) == null || !player2.OnGround() || (double) Input.Aim.Value.X >= 0.0)
                         return;
-                    }
-
-                    _ = player2.MoveV(Top - player2.Bottom);
-                    _ = player2.MoveH(-1f);
+                    player2.MoveV(this.Top - player2.Bottom);
+                    player2.MoveH(-1f);
                 }
             }
 
             public void Drop()
             {
-                Sprite.Play("fall");
-                Depth = -8999;
-                Collidable = true;
+                this.Sprite.Play("fall");
+                this.Depth = -8999;
+                this.Collidable = true;
                 bool flag = false;
                 Player player;
-                while ((player = CollideFirst<Player>(Position)) != null && !flag)
+                while ((player = this.CollideFirst<Player>(this.Position)) != null && !flag)
                 {
-                    Collidable = false;
+                    this.Collidable = false;
                     flag = player.MoveV(-1f);
-                    Collidable = true;
+                    this.Collidable = true;
                 }
             }
         }

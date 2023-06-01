@@ -16,22 +16,19 @@ namespace Celeste
     {
         public bool Enabled = true;
         private float timer;
-        private readonly List<DisplacementRenderer.Burst> points = new();
+        private List<DisplacementRenderer.Burst> points = new List<DisplacementRenderer.Burst>();
 
-        public bool HasDisplacement(Scene scene)
-        {
-            return points.Count > 0 || scene.Tracker.GetComponent<DisplacementRenderHook>() != null || (scene as Level).Foreground.Get<HeatWave>() != null;
-        }
+        public bool HasDisplacement(Scene scene) => this.points.Count > 0 || scene.Tracker.GetComponent<DisplacementRenderHook>() != null || (scene as Level).Foreground.Get<HeatWave>() != null;
 
         public DisplacementRenderer.Burst Add(DisplacementRenderer.Burst point)
         {
-            points.Add(point);
+            this.points.Add(point);
             return point;
         }
 
         public DisplacementRenderer.Burst Remove(DisplacementRenderer.Burst point)
         {
-            _ = points.Remove(point);
+            this.points.Remove(point);
             return point;
         }
 
@@ -45,10 +42,10 @@ namespace Celeste
             Ease.Easer radiusEaser = null)
         {
             MTexture texture = GFX.Game["util/displacementcircle"];
-            return Add(new DisplacementRenderer.Burst(texture, position, texture.Center, duration)
+            return this.Add(new DisplacementRenderer.Burst(texture, position, texture.Center, duration)
             {
-                ScaleFrom = radiusFrom / (texture.Width / 2),
-                ScaleTo = radiusTo / (texture.Width / 2),
+                ScaleFrom = radiusFrom / (float) (texture.Width / 2),
+                ScaleTo = radiusTo / (float) (texture.Width / 2),
                 AlphaFrom = alpha,
                 AlphaTo = 0.0f,
                 AlphaEaser = alphaEaser
@@ -57,57 +54,39 @@ namespace Celeste
 
         public override void Update(Scene scene)
         {
-            timer += Engine.DeltaTime;
-            for (int index = points.Count - 1; index >= 0; --index)
+            this.timer += Engine.DeltaTime;
+            for (int index = this.points.Count - 1; index >= 0; --index)
             {
-                if (points[index].Percent >= 1.0)
-                {
-                    points.RemoveAt(index);
-                }
+                if ((double) this.points[index].Percent >= 1.0)
+                    this.points.RemoveAt(index);
                 else
-                {
-                    points[index].Update();
-                }
+                    this.points[index].Update();
             }
         }
 
-        public void Clear()
-        {
-            points.Clear();
-        }
+        public void Clear() => this.points.Clear();
 
         public override void BeforeRender(Scene scene)
         {
-            Distort.WaterSine = timer * 16f;
-            Distort.WaterCameraY = (int)Math.Floor((double)(scene as Level).Camera.Y);
+            Distort.WaterSine = this.timer * 16f;
+            Distort.WaterCameraY = (float) (int) Math.Floor((double) (scene as Level).Camera.Y);
             Camera camera = (scene as Level).Camera;
-            Color color = new(0.5f, 0.5f, 0.0f, 1f);
+            Color color = new Color(0.5f, 0.5f, 0.0f, 1f);
             Engine.Graphics.GraphicsDevice.SetRenderTarget(GameplayBuffers.Displacement.Target);
             Engine.Graphics.GraphicsDevice.Clear(color);
-            if (!Enabled)
-            {
+            if (!this.Enabled)
                 return;
-            }
-
-            Draw.SpriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, SamplerState.LinearClamp, DepthStencilState.Default, RasterizerState.CullNone, null, camera.Matrix);
+            Draw.SpriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, SamplerState.LinearClamp, DepthStencilState.Default, RasterizerState.CullNone, (Effect) null, camera.Matrix);
             (scene as Level).Foreground.Get<HeatWave>()?.RenderDisplacement(scene as Level);
             foreach (DisplacementRenderHook component in scene.Tracker.GetComponents<DisplacementRenderHook>())
             {
                 if (component.Visible && component.RenderDisplacement != null)
-                {
                     component.RenderDisplacement();
-                }
             }
-            foreach (DisplacementRenderer.Burst point in points)
-            {
+            foreach (DisplacementRenderer.Burst point in this.points)
                 point.Render();
-            }
-
             foreach (Entity entity in scene.Tracker.GetEntities<FakeWall>())
-            {
                 Draw.Rect(entity.X, entity.Y, entity.Width, entity.Height, color);
-            }
-
             Draw.SpriteBatch.End();
         }
 
@@ -131,71 +110,62 @@ namespace Celeste
 
             public Burst(MTexture texture, Vector2 position, Vector2 origin, float duration)
             {
-                Texture = texture;
-                Position = position;
-                Origin = origin;
-                Duration = duration;
+                this.Texture = texture;
+                this.Position = position;
+                this.Origin = origin;
+                this.Duration = duration;
             }
 
-            public void Update()
-            {
-                Percent += Engine.DeltaTime / Duration;
-            }
+            public void Update() => this.Percent += Engine.DeltaTime / this.Duration;
 
             public void Render()
             {
-                Vector2 position = Position;
-                if (Follow != null)
+                Vector2 position = this.Position;
+                if (this.Follow != null)
+                    position += this.Follow.Position;
+                float num1 = this.AlphaEaser == null ? this.AlphaFrom + (this.AlphaTo - this.AlphaFrom) * this.Percent : this.AlphaFrom + (this.AlphaTo - this.AlphaFrom) * this.AlphaEaser(this.Percent);
+                float num2 = this.ScaleEaser == null ? this.ScaleFrom + (this.ScaleTo - this.ScaleFrom) * this.Percent : this.ScaleFrom + (this.ScaleTo - this.ScaleFrom) * this.ScaleEaser(this.Percent);
+                Vector2 origin = this.Origin;
+                Rectangle clip = new Rectangle(0, 0, this.Texture.Width, this.Texture.Height);
+                if (this.WorldClipCollider != null)
+                    this.WorldClipRect = new Rectangle?(this.WorldClipCollider.Bounds);
+                if (this.WorldClipRect.HasValue)
                 {
-                    position += Follow.Position;
-                }
-
-                float num1 = AlphaEaser == null ? AlphaFrom + ((AlphaTo - AlphaFrom) * Percent) : AlphaFrom + ((AlphaTo - AlphaFrom) * AlphaEaser(Percent));
-                float num2 = ScaleEaser == null ? ScaleFrom + ((ScaleTo - ScaleFrom) * Percent) : ScaleFrom + ((ScaleTo - ScaleFrom) * ScaleEaser(Percent));
-                Vector2 origin = Origin;
-                Rectangle clip = new(0, 0, Texture.Width, Texture.Height);
-                if (WorldClipCollider != null)
-                {
-                    WorldClipRect = new Rectangle?(WorldClipCollider.Bounds);
-                }
-
-                if (WorldClipRect.HasValue)
-                {
-                    Rectangle rectangle = WorldClipRect.Value;
-                    rectangle.X -= 1 + WorldClipPadding;
-                    rectangle.Y -= 1 + WorldClipPadding;
-                    rectangle.Width += 1 + (WorldClipPadding * 2);
-                    rectangle.Height += 1 + (WorldClipPadding * 2);
-                    float num3 = position.X - (origin.X * num2);
-                    if ((double)num3 < rectangle.Left)
+                    Rectangle rectangle = this.WorldClipRect.Value;
+                    rectangle.X -= 1 + this.WorldClipPadding;
+                    rectangle.Y -= 1 + this.WorldClipPadding;
+                    rectangle.Width += 1 + this.WorldClipPadding * 2;
+                    rectangle.Height += 1 + this.WorldClipPadding * 2;
+                    float num3 = position.X - origin.X * num2;
+                    if ((double) num3 < (double) rectangle.Left)
                     {
-                        int num4 = (int)((rectangle.Left - (double)num3) / (double)num2);
-                        origin.X -= num4;
+                        int num4 = (int) (((double) rectangle.Left - (double) num3) / (double) num2);
+                        origin.X -= (float) num4;
                         clip.X = num4;
                         clip.Width -= num4;
                     }
-                    float num5 = position.Y - (origin.Y * num2);
-                    if ((double)num5 < rectangle.Top)
+                    float num5 = position.Y - origin.Y * num2;
+                    if ((double) num5 < (double) rectangle.Top)
                     {
-                        int num6 = (int)((rectangle.Top - (double)num5) / (double)num2);
-                        origin.Y -= num6;
+                        int num6 = (int) (((double) rectangle.Top - (double) num5) / (double) num2);
+                        origin.Y -= (float) num6;
                         clip.Y = num6;
                         clip.Height -= num6;
                     }
-                    float num7 = position.X + ((Texture.Width - origin.X) * num2);
-                    if ((double)num7 > rectangle.Right)
+                    float num7 = position.X + ((float) this.Texture.Width - origin.X) * num2;
+                    if ((double) num7 > (double) rectangle.Right)
                     {
-                        int num8 = (int)(((double)num7 - rectangle.Right) / (double)num2);
+                        int num8 = (int) (((double) num7 - (double) rectangle.Right) / (double) num2);
                         clip.Width -= num8;
                     }
-                    float num9 = position.Y + ((Texture.Height - origin.Y) * num2);
-                    if ((double)num9 > rectangle.Bottom)
+                    float num9 = position.Y + ((float) this.Texture.Height - origin.Y) * num2;
+                    if ((double) num9 > (double) rectangle.Bottom)
                     {
-                        int num10 = (int)(((double)num9 - rectangle.Bottom) / (double)num2);
+                        int num10 = (int) (((double) num9 - (double) rectangle.Bottom) / (double) num2);
                         clip.Height -= num10;
                     }
                 }
-                Texture.Draw(position, origin, Color.White * num1, Vector2.One * num2, 0.0f, clip);
+                this.Texture.Draw(position, origin, Color.White * num1, Vector2.One * num2, 0.0f, clip);
             }
         }
     }

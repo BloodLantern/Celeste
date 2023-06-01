@@ -24,40 +24,37 @@ namespace Celeste
         public Slider(Vector2 position, bool clockwise, Slider.Surfaces surface)
             : base(position)
         {
-            Collider = new Monocle.Circle(10f);
-            Add(new StaticMover());
+            this.Collider = (Collider) new Monocle.Circle(10f);
+            this.Add((Component) new StaticMover());
             switch (surface)
             {
                 case Slider.Surfaces.Ceiling:
-                    dir = -Vector2.UnitX;
+                    this.dir = -Vector2.UnitX;
                     this.surface = -Vector2.UnitY;
                     break;
                 case Slider.Surfaces.LeftWall:
-                    dir = -Vector2.UnitY;
+                    this.dir = -Vector2.UnitY;
                     this.surface = -Vector2.UnitX;
                     break;
                 case Slider.Surfaces.RightWall:
-                    dir = Vector2.UnitY;
+                    this.dir = Vector2.UnitY;
                     this.surface = Vector2.UnitX;
                     break;
                 default:
-                    dir = Vector2.UnitX;
+                    this.dir = Vector2.UnitX;
                     this.surface = Vector2.UnitY;
                     break;
             }
             if (!clockwise)
-            {
-                dir *= -1f;
-            }
-
-            moving = true;
-            foundSurfaceAfterCorner = gotOutOfWall = true;
-            speed = 80f;
-            Add(new PlayerCollider(new Action<Player>(OnPlayer)));
+                this.dir *= -1f;
+            this.moving = true;
+            this.foundSurfaceAfterCorner = this.gotOutOfWall = true;
+            this.speed = 80f;
+            this.Add((Component) new PlayerCollider(new Action<Player>(this.OnPlayer)));
         }
 
         public Slider(EntityData e, Vector2 offset)
-            : this(e.Position + offset, e.Bool("clockwise", true), e.Enum<Slider.Surfaces>(nameof(surface)))
+            : this(e.Position + offset, e.Bool("clockwise", true), e.Enum<Slider.Surfaces>(nameof (surface)))
         {
         }
 
@@ -65,103 +62,77 @@ namespace Celeste
         {
             base.Awake(scene);
             int num = 0;
-            while (!Scene.CollideCheck<Solid>(Position))
+            while (!this.Scene.CollideCheck<Solid>(this.Position))
             {
-                Position += surface;
+                this.Position = this.Position + this.surface;
                 if (num >= 100)
-                {
                     throw new Exception("Couldn't find surface");
-                }
             }
         }
 
         private void OnPlayer(Player Player)
         {
-            _ = Player.Die((Player.Center - Center).SafeNormalize(-Vector2.UnitY));
-            moving = false;
+            Player.Die((Player.Center - this.Center).SafeNormalize(-Vector2.UnitY));
+            this.moving = false;
         }
 
         public override void Update()
         {
             base.Update();
-            if (!moving)
-            {
+            if (!this.moving)
                 return;
-            }
-
-            speed = Calc.Approach(speed, 80f, 400f * Engine.DeltaTime);
-            Position += dir * speed * Engine.DeltaTime;
-            if (!OnSurfaceCheck())
+            this.speed = Calc.Approach(this.speed, 80f, 400f * Engine.DeltaTime);
+            this.Position = this.Position + this.dir * this.speed * Engine.DeltaTime;
+            if (!this.OnSurfaceCheck())
             {
-                if (!foundSurfaceAfterCorner)
-                {
+                if (!this.foundSurfaceAfterCorner)
                     return;
-                }
-
-                Position = Position.Round();
+                this.Position = this.Position.Round();
                 int num = 0;
-                while (!OnSurfaceCheck())
+                while (!this.OnSurfaceCheck())
                 {
-                    Position -= this.dir;
+                    this.Position = this.Position - this.dir;
                     ++num;
                     if (num >= 100)
-                    {
                         throw new Exception("Couldn't get back onto corner!");
-                    }
                 }
-                foundSurfaceAfterCorner = false;
+                this.foundSurfaceAfterCorner = false;
                 Vector2 dir = this.dir;
-                this.dir = surface;
-                surface = -dir;
+                this.dir = this.surface;
+                this.surface = -dir;
             }
             else
             {
-                foundSurfaceAfterCorner = true;
-                if (InWallCheck())
+                this.foundSurfaceAfterCorner = true;
+                if (this.InWallCheck())
                 {
-                    if (!gotOutOfWall)
-                    {
+                    if (!this.gotOutOfWall)
                         return;
-                    }
-
-                    Position = Position.Round();
+                    this.Position = this.Position.Round();
                     int num = 0;
-                    while (InWallCheck())
+                    while (this.InWallCheck())
                     {
-                        Position -= dir;
+                        this.Position = this.Position - this.dir;
                         ++num;
                         if (num >= 100)
-                        {
                             throw new Exception("Couldn't get out of wall!");
-                        }
                     }
-                    Position += dir - this.surface;
-                    gotOutOfWall = false;
+                    this.Position = this.Position + (this.dir - this.surface);
+                    this.gotOutOfWall = false;
                     Vector2 surface = this.surface;
-                    this.surface = dir;
-                    dir = -surface;
+                    this.surface = this.dir;
+                    this.dir = -surface;
                 }
                 else
-                {
-                    gotOutOfWall = true;
-                }
+                    this.gotOutOfWall = true;
             }
         }
 
-        private bool OnSurfaceCheck()
-        {
-            return Scene.CollideCheck<Solid>(Position.Round() + surface);
-        }
+        private bool OnSurfaceCheck() => this.Scene.CollideCheck<Solid>(this.Position.Round() + this.surface);
 
-        private bool InWallCheck()
-        {
-            return Scene.CollideCheck<Solid>(Position.Round() - surface);
-        }
+        private bool InWallCheck() => this.Scene.CollideCheck<Solid>(this.Position.Round() - this.surface);
 
-        public override void Render()
-        {
-            Draw.Circle(Position, 12f, Color.Red, 8);
-        }
+        public override void Render() => Draw.Circle(this.Position, 12f, Color.Red, 8);
 
         public enum Surfaces
         {

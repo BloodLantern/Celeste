@@ -12,56 +12,53 @@ namespace Celeste
 {
     public class TestWipes : Scene
     {
-        private readonly Coroutine coroutine;
+        private Coroutine coroutine;
         private Color lastColor = Color.White;
 
-        public TestWipes()
-        {
-            coroutine = new Coroutine(routine());
-        }
+        public TestWipes() => this.coroutine = new Coroutine(this.routine());
 
         private IEnumerator routine()
         {
             TestWipes testWipes = this;
             float dur = 1f;
-            yield return 1f;
+            yield return (object) 1f;
             while (true)
             {
                 ScreenWipe.WipeColor = Color.Black;
-                new CurtainWipe(testWipes, false).Duration = dur;
-                yield return dur;
+                new CurtainWipe((Scene) testWipes, false).Duration = dur;
+                yield return (object) dur;
                 testWipes.lastColor = ScreenWipe.WipeColor;
                 ScreenWipe.WipeColor = Calc.HexToColor("ff0034");
-                new AngledWipe(testWipes, false).Duration = dur;
-                yield return dur;
+                new AngledWipe((Scene) testWipes, false).Duration = dur;
+                yield return (object) dur;
                 testWipes.lastColor = ScreenWipe.WipeColor;
                 ScreenWipe.WipeColor = Calc.HexToColor("0b0960");
-                new DreamWipe(testWipes, false).Duration = dur;
-                yield return dur;
+                new DreamWipe((Scene) testWipes, false).Duration = dur;
+                yield return (object) dur;
                 testWipes.lastColor = ScreenWipe.WipeColor;
                 ScreenWipe.WipeColor = Calc.HexToColor("39bf00");
-                new KeyDoorWipe(testWipes, false).Duration = dur;
-                yield return dur;
+                new KeyDoorWipe((Scene) testWipes, false).Duration = dur;
+                yield return (object) dur;
                 testWipes.lastColor = ScreenWipe.WipeColor;
                 ScreenWipe.WipeColor = Calc.HexToColor("4376b3");
-                new WindWipe(testWipes, false).Duration = dur;
-                yield return dur;
+                new WindWipe((Scene) testWipes, false).Duration = dur;
+                yield return (object) dur;
                 testWipes.lastColor = ScreenWipe.WipeColor;
                 ScreenWipe.WipeColor = Calc.HexToColor("ffae00");
-                new DropWipe(testWipes, false).Duration = dur;
-                yield return dur;
+                new DropWipe((Scene) testWipes, false).Duration = dur;
+                yield return (object) dur;
                 testWipes.lastColor = ScreenWipe.WipeColor;
                 ScreenWipe.WipeColor = Calc.HexToColor("cc54ff");
-                new FallWipe(testWipes, false).Duration = dur;
-                yield return dur;
+                new FallWipe((Scene) testWipes, false).Duration = dur;
+                yield return (object) dur;
                 testWipes.lastColor = ScreenWipe.WipeColor;
                 ScreenWipe.WipeColor = Calc.HexToColor("ff007a");
-                new MountainWipe(testWipes, false).Duration = dur;
-                yield return dur;
+                new MountainWipe((Scene) testWipes, false).Duration = dur;
+                yield return (object) dur;
                 testWipes.lastColor = ScreenWipe.WipeColor;
                 ScreenWipe.WipeColor = Color.White;
-                new HeartWipe(testWipes, false).Duration = dur;
-                yield return dur;
+                new HeartWipe((Scene) testWipes, false).Duration = dur;
+                yield return (object) dur;
                 testWipes.lastColor = ScreenWipe.WipeColor;
             }
         }
@@ -69,13 +66,13 @@ namespace Celeste
         public override void Update()
         {
             base.Update();
-            coroutine.Update();
+            this.coroutine.Update();
         }
 
         public override void Render()
         {
             Draw.SpriteBatch.Begin();
-            Draw.Rect(-1f, -1f, 1920f, 1080f, lastColor);
+            Draw.Rect(-1f, -1f, 1920f, 1080f, this.lastColor);
             Draw.SpriteBatch.End();
             base.Render();
         }

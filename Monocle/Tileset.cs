@@ -8,20 +8,18 @@ namespace Monocle
 {
     public class Tileset
     {
-        private readonly MTexture[,] tiles;
+        private MTexture[,] tiles;
 
         public Tileset(MTexture texture, int tileWidth, int tileHeight)
         {
-            Texture = texture;
-            TileWidth = tileWidth;
-            TileHeight = TileHeight;
-            tiles = new MTexture[Texture.Width / tileWidth, Texture.Height / tileHeight];
-            for (int index1 = 0; index1 < Texture.Width / tileWidth; ++index1)
+            this.Texture = texture;
+            this.TileWidth = tileWidth;
+            this.TileHeight = this.TileHeight;
+            this.tiles = new MTexture[this.Texture.Width / tileWidth, this.Texture.Height / tileHeight];
+            for (int index1 = 0; index1 < this.Texture.Width / tileWidth; ++index1)
             {
-                for (int index2 = 0; index2 < Texture.Height / tileHeight; ++index2)
-                {
-                    tiles[index1, index2] = new MTexture(Texture, index1 * tileWidth, index2 * tileHeight, tileWidth, tileHeight);
-                }
+                for (int index2 = 0; index2 < this.Texture.Height / tileHeight; ++index2)
+                    this.tiles[index1, index2] = new MTexture(this.Texture, index1 * tileWidth, index2 * tileHeight, tileWidth, tileHeight);
             }
         }
 
@@ -31,8 +29,8 @@ namespace Monocle
 
         public int TileHeight { get; private set; }
 
-        public MTexture this[int x, int y] => tiles[x, y];
+        public MTexture this[int x, int y] => this.tiles[x, y];
 
-        public MTexture this[int index] => index < 0 ? null : tiles[index % tiles.GetLength(0), index / tiles.GetLength(0)];
+        public MTexture this[int index] => index < 0 ? (MTexture) null : this.tiles[index % this.tiles.GetLength(0), index / this.tiles.GetLength(0)];
     }
 }

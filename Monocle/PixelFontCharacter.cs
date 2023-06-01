@@ -16,15 +16,15 @@ namespace Monocle
         public int XOffset;
         public int YOffset;
         public int XAdvance;
-        public Dictionary<int, int> Kerning = new();
+        public Dictionary<int, int> Kerning = new Dictionary<int, int>();
 
         public PixelFontCharacter(int character, MTexture texture, XmlElement xml)
         {
-            Character = character;
-            Texture = texture.GetSubtexture(xml.AttrInt("x"), xml.AttrInt("y"), xml.AttrInt("width"), xml.AttrInt("height"));
-            XOffset = xml.AttrInt("xoffset");
-            YOffset = xml.AttrInt("yoffset");
-            XAdvance = xml.AttrInt("xadvance");
+            this.Character = character;
+            this.Texture = texture.GetSubtexture(xml.AttrInt("x"), xml.AttrInt("y"), xml.AttrInt("width"), xml.AttrInt("height"));
+            this.XOffset = xml.AttrInt("xoffset");
+            this.YOffset = xml.AttrInt("yoffset");
+            this.XAdvance = xml.AttrInt("xadvance");
         }
     }
 }

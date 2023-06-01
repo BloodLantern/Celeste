@@ -6,6 +6,7 @@
 
 using FMOD.Studio;
 using Monocle;
+using System;
 
 namespace Celeste
 {
@@ -25,203 +26,161 @@ namespace Celeste
 
         public CassetteBlockManager()
         {
-            Tag = (int)Tags.Global;
-            Add(new TransitionListener()
+            this.Tag = (int) Tags.Global;
+            this.Add((Component) new TransitionListener()
             {
-                OnOutBegin = () =>
+                OnOutBegin = (Action) (() =>
                 {
-                    if (!SceneAs<Level>().HasCassetteBlocks)
+                    if (!this.SceneAs<Level>().HasCassetteBlocks)
                     {
-                        RemoveSelf();
+                        this.RemoveSelf();
                     }
                     else
                     {
-                        maxBeat = SceneAs<Level>().CassetteBlockBeats;
-                        tempoMult = SceneAs<Level>().CassetteBlockTempo;
+                        this.maxBeat = this.SceneAs<Level>().CassetteBlockBeats;
+                        this.tempoMult = this.SceneAs<Level>().CassetteBlockTempo;
                     }
-                }
+                })
             });
         }
 
         public override void Awake(Scene scene)
         {
             base.Awake(scene);
-            isLevelMusic = AreaData.Areas[SceneAs<Level>().Session.Area.ID].CassetteSong == null;
-            if (isLevelMusic)
+            this.isLevelMusic = AreaData.Areas[this.SceneAs<Level>().Session.Area.ID].CassetteSong == null;
+            if (this.isLevelMusic)
             {
-                leadBeats = 0;
-                beatIndexOffset = 5;
+                this.leadBeats = 0;
+                this.beatIndexOffset = 5;
             }
             else
             {
-                beatIndexOffset = 0;
-                leadBeats = 16;
-                snapshot = Audio.CreateSnapshot("snapshot:/music_mains_mute");
+                this.beatIndexOffset = 0;
+                this.leadBeats = 16;
+                this.snapshot = Audio.CreateSnapshot("snapshot:/music_mains_mute");
             }
-            maxBeat = SceneAs<Level>().CassetteBlockBeats;
-            tempoMult = SceneAs<Level>().CassetteBlockTempo;
+            this.maxBeat = this.SceneAs<Level>().CassetteBlockBeats;
+            this.tempoMult = this.SceneAs<Level>().CassetteBlockTempo;
         }
 
         public override void Removed(Scene scene)
         {
             base.Removed(scene);
-            if (isLevelMusic)
-            {
+            if (this.isLevelMusic)
                 return;
-            }
-
-            Audio.Stop(snapshot);
-            Audio.Stop(sfx);
+            Audio.Stop(this.snapshot);
+            Audio.Stop(this.sfx);
         }
 
         public override void SceneEnd(Scene scene)
         {
             base.SceneEnd(scene);
-            if (isLevelMusic)
-            {
+            if (this.isLevelMusic)
                 return;
-            }
-
-            Audio.Stop(snapshot);
-            Audio.Stop(sfx);
+            Audio.Stop(this.snapshot);
+            Audio.Stop(this.sfx);
         }
 
         public override void Update()
         {
             base.Update();
-            if (isLevelMusic)
+            if (this.isLevelMusic)
+                this.sfx = Audio.CurrentMusicEventInstance;
+            if ((HandleBase) this.sfx == (HandleBase) null && !this.isLevelMusic)
             {
-                sfx = Audio.CurrentMusicEventInstance;
-            }
-
-            if (sfx == null && !isLevelMusic)
-            {
-                sfx = Audio.CreateInstance(AreaData.Areas[SceneAs<Level>().Session.Area.ID].CassetteSong);
-                _ = Audio.Play("event:/game/general/cassette_block_switch_2");
+                this.sfx = Audio.CreateInstance(AreaData.Areas[this.SceneAs<Level>().Session.Area.ID].CassetteSong);
+                Audio.Play("event:/game/general/cassette_block_switch_2");
             }
             else
-            {
-                AdvanceMusic(Engine.DeltaTime * tempoMult);
-            }
+                this.AdvanceMusic(Engine.DeltaTime * this.tempoMult);
         }
 
         public void AdvanceMusic(float time)
         {
-            beatTimer += time;
-            if (beatTimer < 1f / 6f)
-            {
+            double beatTimer = (double) this.beatTimer;
+            this.beatTimer += time;
+            if ((double) this.beatTimer < 0.1666666716337204)
                 return;
-            }
-
-            beatTimer -= 1f / 6f;
-            ++beatIndex;
-            beatIndex %= 256;
-            if (beatIndex % 8 == 0)
+            this.beatTimer -= 0.166666672f;
+            ++this.beatIndex;
+            this.beatIndex %= 256;
+            if (this.beatIndex % 8 == 0)
             {
-                ++currentIndex;
-                currentIndex %= maxBeat;
-                SetActiveIndex(currentIndex);
-                if (!isLevelMusic)
-                {
-                    _ = Audio.Play("event:/game/general/cassette_block_switch_2");
-                }
-
+                ++this.currentIndex;
+                this.currentIndex %= this.maxBeat;
+                this.SetActiveIndex(this.currentIndex);
+                if (!this.isLevelMusic)
+                    Audio.Play("event:/game/general/cassette_block_switch_2");
                 Input.Rumble(RumbleStrength.Medium, RumbleLength.Short);
             }
-            else if ((beatIndex + 1) % 8 == 0)
+            else if ((this.beatIndex + 1) % 8 == 0)
+                this.SetWillActivate((this.currentIndex + 1) % this.maxBeat);
+            else if ((this.beatIndex + 4) % 8 == 0 && !this.isLevelMusic)
+                Audio.Play("event:/game/general/cassette_block_switch_1");
+            if (this.leadBeats > 0)
             {
-                SetWillActivate((currentIndex + 1) % maxBeat);
-            }
-            else if ((beatIndex + 4) % 8 == 0 && !isLevelMusic)
-            {
-                _ = Audio.Play("event:/game/general/cassette_block_switch_1");
-            }
-
-            if (leadBeats > 0)
-            {
-                --leadBeats;
-                if (leadBeats == 0)
+                --this.leadBeats;
+                if (this.leadBeats == 0)
                 {
-                    beatIndex = 0;
-                    if (!isLevelMusic)
+                    this.beatIndex = 0;
+                    if (!this.isLevelMusic)
                     {
-                        _ = (int)sfx.start();
+                        int num = (int) this.sfx.start();
                     }
                 }
             }
-            if (leadBeats > 0)
-            {
+            if (this.leadBeats > 0)
                 return;
-            }
-
-            _ = (int)sfx.setParameterValue("sixteenth_note", GetSixteenthNote());
+            int num1 = (int) this.sfx.setParameterValue("sixteenth_note", (float) this.GetSixteenthNote());
         }
 
-        public int GetSixteenthNote()
-        {
-            return ((beatIndex + beatIndexOffset) % 256) + 1;
-        }
+        public int GetSixteenthNote() => (this.beatIndex + this.beatIndexOffset) % 256 + 1;
 
         public void StopBlocks()
         {
-            foreach (CassetteBlock entity in Scene.Tracker.GetEntities<CassetteBlock>())
-            {
+            foreach (CassetteBlock entity in this.Scene.Tracker.GetEntities<CassetteBlock>())
                 entity.Finish();
-            }
-
-            if (isLevelMusic)
-            {
+            if (this.isLevelMusic)
                 return;
-            }
-
-            Audio.Stop(sfx);
+            Audio.Stop(this.sfx);
         }
 
         public void Finish()
         {
-            if (!isLevelMusic)
-            {
-                Audio.Stop(snapshot);
-            }
-
-            RemoveSelf();
+            if (!this.isLevelMusic)
+                Audio.Stop(this.snapshot);
+            this.RemoveSelf();
         }
 
         public void OnLevelStart()
         {
-            maxBeat = SceneAs<Level>().CassetteBlockBeats;
-            tempoMult = SceneAs<Level>().CassetteBlockTempo;
-            currentIndex = beatIndex % 8 < 5 ? maxBeat - 1 : maxBeat - 2;
-            SilentUpdateBlocks();
+            this.maxBeat = this.SceneAs<Level>().CassetteBlockBeats;
+            this.tempoMult = this.SceneAs<Level>().CassetteBlockTempo;
+            this.currentIndex = this.beatIndex % 8 < 5 ? this.maxBeat - 1 : this.maxBeat - 2;
+            this.SilentUpdateBlocks();
         }
 
         private void SilentUpdateBlocks()
         {
-            foreach (CassetteBlock entity in Scene.Tracker.GetEntities<CassetteBlock>())
+            foreach (CassetteBlock entity in this.Scene.Tracker.GetEntities<CassetteBlock>())
             {
-                if (entity.ID.Level == SceneAs<Level>().Session.Level)
-                {
-                    entity.SetActivatedSilently(entity.Index == currentIndex);
-                }
+                if (entity.ID.Level == this.SceneAs<Level>().Session.Level)
+                    entity.SetActivatedSilently(entity.Index == this.currentIndex);
             }
         }
 
         public void SetActiveIndex(int index)
         {
-            foreach (CassetteBlock entity in Scene.Tracker.GetEntities<CassetteBlock>())
-            {
+            foreach (CassetteBlock entity in this.Scene.Tracker.GetEntities<CassetteBlock>())
                 entity.Activated = entity.Index == index;
-            }
         }
 
         public void SetWillActivate(int index)
         {
-            foreach (CassetteBlock entity in Scene.Tracker.GetEntities<CassetteBlock>())
+            foreach (CassetteBlock entity in this.Scene.Tracker.GetEntities<CassetteBlock>())
             {
                 if (entity.Index == index || entity.Activated)
-                {
                     entity.WillToggle();
-                }
             }
         }
     }

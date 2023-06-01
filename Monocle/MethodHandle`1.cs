@@ -10,16 +10,10 @@ namespace Monocle
 {
     public class MethodHandle<T> where T : Entity
     {
-        private readonly MethodInfo info;
+        private MethodInfo info;
 
-        public MethodHandle(string methodName)
-        {
-            info = typeof(T).GetMethod(methodName, BindingFlags.Public | BindingFlags.NonPublic);
-        }
+        public MethodHandle(string methodName) => this.info = typeof (T).GetMethod(methodName, BindingFlags.Public | BindingFlags.NonPublic);
 
-        public void Call(T instance)
-        {
-            _ = info.Invoke(instance, null);
-        }
+        public void Call(T instance) => this.info.Invoke((object) instance, (object[]) null);
     }
 }

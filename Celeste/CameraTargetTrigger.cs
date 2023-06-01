@@ -14,7 +14,7 @@ namespace Celeste
     {
         public Vector2 Target;
         public float LerpStrength;
-        public PositionModes PositionMode;
+        public Trigger.PositionModes PositionMode;
         public bool XOnly;
         public bool YOnly;
         public string DeleteFlag;
@@ -22,32 +22,29 @@ namespace Celeste
         public CameraTargetTrigger(EntityData data, Vector2 offset)
             : base(data, offset)
         {
-            Target = data.Nodes[0] + offset - (new Vector2(320f, 180f) * 0.5f);
-            LerpStrength = data.Float("lerpStrength");
-            PositionMode = data.Enum<PositionModes>("positionMode");
-            XOnly = data.Bool("xOnly");
-            YOnly = data.Bool("yOnly");
-            DeleteFlag = data.Attr("deleteFlag");
+            this.Target = data.Nodes[0] + offset - new Vector2(320f, 180f) * 0.5f;
+            this.LerpStrength = data.Float("lerpStrength");
+            this.PositionMode = data.Enum<Trigger.PositionModes>("positionMode");
+            this.XOnly = data.Bool("xOnly");
+            this.YOnly = data.Bool("yOnly");
+            this.DeleteFlag = data.Attr("deleteFlag");
         }
 
         public override void OnStay(Player player)
         {
-            if (!string.IsNullOrEmpty(DeleteFlag) && SceneAs<Level>().Session.GetFlag(DeleteFlag))
-            {
+            if (!string.IsNullOrEmpty(this.DeleteFlag) && this.SceneAs<Level>().Session.GetFlag(this.DeleteFlag))
                 return;
-            }
-
-            player.CameraAnchor = Target;
-            player.CameraAnchorLerp = Vector2.One * MathHelper.Clamp(LerpStrength * GetPositionLerp(player, PositionMode), 0f, 1f);
-            player.CameraAnchorIgnoreX = YOnly;
-            player.CameraAnchorIgnoreY = XOnly;
+            player.CameraAnchor = this.Target;
+            player.CameraAnchorLerp = Vector2.One * MathHelper.Clamp(this.LerpStrength * this.GetPositionLerp(player, this.PositionMode), 0.0f, 1f);
+            player.CameraAnchorIgnoreX = this.YOnly;
+            player.CameraAnchorIgnoreY = this.XOnly;
         }
 
         public override void OnLeave(Player player)
         {
             base.OnLeave(player);
             bool flag = false;
-            foreach (Trigger entity in Scene.Tracker.GetEntities<CameraTargetTrigger>())
+            foreach (Trigger entity in this.Scene.Tracker.GetEntities<CameraTargetTrigger>())
             {
                 if (entity.PlayerIsInside)
                 {
@@ -55,10 +52,9 @@ namespace Celeste
                     break;
                 }
             }
-
             if (!flag)
             {
-                foreach (Trigger entity in Scene.Tracker.GetEntities<CameraAdvanceTargetTrigger>())
+                foreach (Trigger entity in this.Scene.Tracker.GetEntities<CameraAdvanceTargetTrigger>())
                 {
                     if (entity.PlayerIsInside)
                     {
@@ -67,12 +63,8 @@ namespace Celeste
                     }
                 }
             }
-
             if (flag)
-            {
                 return;
-            }
-
             player.CameraAnchorLerp = Vector2.Zero;
         }
     }

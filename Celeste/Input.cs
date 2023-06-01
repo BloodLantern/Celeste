@@ -39,18 +39,18 @@ namespace Celeste
         public static VirtualButton CrouchDash;
         private static bool grabToggle;
         public static Vector2 LastAim;
-        public static string OverrideInputPrefix = null;
-        private static readonly Dictionary<Keys, string> keyNameLookup = new();
-        private static readonly Dictionary<Buttons, string> buttonNameLookup = new();
-        private static readonly Dictionary<string, Dictionary<string, string>> guiPathLookup = new();
-        private static readonly float[] rumbleStrengths = new float[4]
+        public static string OverrideInputPrefix = (string) null;
+        private static Dictionary<Keys, string> keyNameLookup = new Dictionary<Keys, string>();
+        private static Dictionary<Buttons, string> buttonNameLookup = new Dictionary<Buttons, string>();
+        private static Dictionary<string, Dictionary<string, string>> guiPathLookup = new Dictionary<string, Dictionary<string, string>>();
+        private static float[] rumbleStrengths = new float[4]
         {
             0.15f,
             0.4f,
             1f,
             0.05f
         };
-        private static readonly float[] rumbleLengths = new float[5]
+        private static float[] rumbleLengths = new float[5]
         {
             0.1f,
             0.25f,
@@ -66,10 +66,7 @@ namespace Celeste
             {
                 int num = Calc.Clamp(value, 0, MInput.GamePads.Length - 1);
                 if (Input.gamepad == num)
-                {
                     return;
-                }
-
                 Input.gamepad = num;
                 Input.Initialize();
             }
@@ -79,45 +76,36 @@ namespace Celeste
         {
             bool flag = false;
             if (Input.MoveX != null)
-            {
                 flag = Input.MoveX.Inverted;
-            }
-
             Input.Deregister();
-            Input.MoveX = new VirtualIntegerAxis(Settings.Instance.Left, Settings.Instance.LeftMoveOnly, Settings.Instance.Right, Settings.Instance.RightMoveOnly, Input.Gamepad, 0.3f)
-            {
-                Inverted = flag
-            };
+            Input.MoveX = new VirtualIntegerAxis(Settings.Instance.Left, Settings.Instance.LeftMoveOnly, Settings.Instance.Right, Settings.Instance.RightMoveOnly, Input.Gamepad, 0.3f);
+            Input.MoveX.Inverted = flag;
             Input.MoveY = new VirtualIntegerAxis(Settings.Instance.Up, Settings.Instance.UpMoveOnly, Settings.Instance.Down, Settings.Instance.DownMoveOnly, Input.Gamepad, 0.7f);
             Input.GliderMoveY = new VirtualIntegerAxis(Settings.Instance.Up, Settings.Instance.UpMoveOnly, Settings.Instance.Down, Settings.Instance.DownMoveOnly, Input.Gamepad, 0.3f);
-            Input.Aim = new VirtualJoystick(Settings.Instance.Up, Settings.Instance.UpDashOnly, Settings.Instance.Down, Settings.Instance.DownDashOnly, Settings.Instance.Left, Settings.Instance.LeftDashOnly, Settings.Instance.Right, Settings.Instance.RightDashOnly, Input.Gamepad, 0.25f)
-            {
-                InvertedX = flag
-            };
-            Input.Feather = new VirtualJoystick(Settings.Instance.Up, Settings.Instance.UpMoveOnly, Settings.Instance.Down, Settings.Instance.DownMoveOnly, Settings.Instance.Left, Settings.Instance.LeftMoveOnly, Settings.Instance.Right, Settings.Instance.RightMoveOnly, Input.Gamepad, 0.25f)
-            {
-                InvertedX = flag
-            };
+            Input.Aim = new VirtualJoystick(Settings.Instance.Up, Settings.Instance.UpDashOnly, Settings.Instance.Down, Settings.Instance.DownDashOnly, Settings.Instance.Left, Settings.Instance.LeftDashOnly, Settings.Instance.Right, Settings.Instance.RightDashOnly, Input.Gamepad, 0.25f);
+            Input.Aim.InvertedX = flag;
+            Input.Feather = new VirtualJoystick(Settings.Instance.Up, Settings.Instance.UpMoveOnly, Settings.Instance.Down, Settings.Instance.DownMoveOnly, Settings.Instance.Left, Settings.Instance.LeftMoveOnly, Settings.Instance.Right, Settings.Instance.RightMoveOnly, Input.Gamepad, 0.25f);
+            Input.Feather.InvertedX = flag;
             Input.Jump = new VirtualButton(Settings.Instance.Jump, Input.Gamepad, 0.08f, 0.2f);
             Input.Dash = new VirtualButton(Settings.Instance.Dash, Input.Gamepad, 0.08f, 0.2f);
             Input.Talk = new VirtualButton(Settings.Instance.Talk, Input.Gamepad, 0.08f, 0.2f);
             Input.Grab = new VirtualButton(Settings.Instance.Grab, Input.Gamepad, 0.0f, 0.2f);
             Input.CrouchDash = new VirtualButton(Settings.Instance.DemoDash, Input.Gamepad, 0.08f, 0.2f);
-            Binding left = new();
-            _ = left.Add(Keys.A);
-            _ = left.Add(Buttons.RightThumbstickLeft);
-            Binding right = new();
-            _ = right.Add(Keys.D);
-            _ = right.Add(Buttons.RightThumbstickRight);
-            Binding up = new();
-            _ = up.Add(Keys.W);
-            _ = up.Add(Buttons.RightThumbstickUp);
-            Binding down = new();
-            _ = down.Add(Keys.S);
-            _ = down.Add(Buttons.RightThumbstickDown);
+            Binding left = new Binding();
+            left.Add(Keys.A);
+            left.Add(Buttons.RightThumbstickLeft);
+            Binding right = new Binding();
+            right.Add(Keys.D);
+            right.Add(Buttons.RightThumbstickRight);
+            Binding up = new Binding();
+            up.Add(Keys.W);
+            up.Add(Buttons.RightThumbstickUp);
+            Binding down = new Binding();
+            down.Add(Keys.S);
+            down.Add(Buttons.RightThumbstickDown);
             Input.MountainAim = new VirtualJoystick(up, down, left, right, Input.Gamepad, 0.1f);
-            Binding binding = new();
-            _ = binding.Add(Keys.Escape);
+            Binding binding = new Binding();
+            binding.Add(Keys.Escape);
             Input.ESC = new VirtualButton(binding, Input.Gamepad, 0.1f, 0.2f);
             Input.Pause = new VirtualButton(Settings.Instance.Pause, Input.Gamepad, 0.1f, 0.2f);
             Input.QuickRestart = new VirtualButton(Settings.Instance.QuickRestart, Input.Gamepad, 0.1f, 0.2f);
@@ -136,30 +124,46 @@ namespace Celeste
 
         public static void Deregister()
         {
-            Input.ESC?.Deregister();
-            Input.Pause?.Deregister();
-            Input.MenuLeft?.Deregister();
-            Input.MenuRight?.Deregister();
-            Input.MenuUp?.Deregister();
-            Input.MenuDown?.Deregister();
-            Input.MenuConfirm?.Deregister();
-            Input.MenuCancel?.Deregister();
-            Input.MenuJournal?.Deregister();
-            Input.QuickRestart?.Deregister();
-            Input.MoveX?.Deregister();
-            Input.MoveY?.Deregister();
-            Input.GliderMoveY?.Deregister();
-            Input.Aim?.Deregister();
-            Input.MountainAim?.Deregister();
-            Input.Jump?.Deregister();
-            Input.Dash?.Deregister();
-            Input.Grab?.Deregister();
-            Input.Talk?.Deregister();
+            if (Input.ESC != null)
+                Input.ESC.Deregister();
+            if (Input.Pause != null)
+                Input.Pause.Deregister();
+            if (Input.MenuLeft != null)
+                Input.MenuLeft.Deregister();
+            if (Input.MenuRight != null)
+                Input.MenuRight.Deregister();
+            if (Input.MenuUp != null)
+                Input.MenuUp.Deregister();
+            if (Input.MenuDown != null)
+                Input.MenuDown.Deregister();
+            if (Input.MenuConfirm != null)
+                Input.MenuConfirm.Deregister();
+            if (Input.MenuCancel != null)
+                Input.MenuCancel.Deregister();
+            if (Input.MenuJournal != null)
+                Input.MenuJournal.Deregister();
+            if (Input.QuickRestart != null)
+                Input.QuickRestart.Deregister();
+            if (Input.MoveX != null)
+                Input.MoveX.Deregister();
+            if (Input.MoveY != null)
+                Input.MoveY.Deregister();
+            if (Input.GliderMoveY != null)
+                Input.GliderMoveY.Deregister();
+            if (Input.Aim != null)
+                Input.Aim.Deregister();
+            if (Input.MountainAim != null)
+                Input.MountainAim.Deregister();
+            if (Input.Jump != null)
+                Input.Jump.Deregister();
+            if (Input.Dash != null)
+                Input.Dash.Deregister();
+            if (Input.Grab != null)
+                Input.Grab.Deregister();
+            if (Input.Talk != null)
+                Input.Talk.Deregister();
             if (Input.CrouchDash == null)
-            {
                 return;
-            }
-
             Input.CrouchDash.Deregister();
         }
 
@@ -186,67 +190,74 @@ namespace Celeste
         {
             float num = 1f;
             if (Settings.Instance.Rumble == RumbleAmount.Half)
-            {
                 num = 0.5f;
-            }
-
             if (Settings.Instance.Rumble == RumbleAmount.Off || MInput.GamePads.Length == 0 || MInput.Disabled)
-            {
                 return;
-            }
-
-            MInput.GamePads[Input.Gamepad].Rumble(Input.rumbleStrengths[(int)strength] * num, Input.rumbleLengths[(int)length]);
+            MInput.GamePads[Input.Gamepad].Rumble(Input.rumbleStrengths[(int) strength] * num, Input.rumbleLengths[(int) length]);
         }
 
         public static void RumbleSpecific(float strength, float time)
         {
             float num = 1f;
             if (Settings.Instance.Rumble == RumbleAmount.Half)
-            {
                 num = 0.5f;
-            }
-
             if (Settings.Instance.Rumble == RumbleAmount.Off || MInput.GamePads.Length == 0 || MInput.Disabled)
-            {
                 return;
-            }
-
             MInput.GamePads[Input.Gamepad].Rumble(strength * num, time);
         }
 
-        public static bool GrabCheck => Settings.Instance.GrabMode switch
+        public static bool GrabCheck
         {
-            GrabModes.Invert => !Input.Grab.Check,
-            GrabModes.Toggle => Input.grabToggle,
-            _ => Input.Grab.Check,
-        };
+            get
+            {
+                switch (Settings.Instance.GrabMode)
+                {
+                    case GrabModes.Invert:
+                        return !Input.Grab.Check;
+                    case GrabModes.Toggle:
+                        return Input.grabToggle;
+                    default:
+                        return Input.Grab.Check;
+                }
+            }
+        }
 
-        public static bool DashPressed => Settings.Instance.CrouchDashMode switch
+        public static bool DashPressed
         {
-            CrouchDashModes.Hold => Input.Dash.Pressed && !Input.CrouchDash.Check,
-            _ => Input.Dash.Pressed,
-        };
+            get
+            {
+                switch (Settings.Instance.CrouchDashMode)
+                {
+                    case CrouchDashModes.Hold:
+                        return Input.Dash.Pressed && !Input.CrouchDash.Check;
+                    default:
+                        return Input.Dash.Pressed;
+                }
+            }
+        }
 
-        public static bool CrouchDashPressed => Settings.Instance.CrouchDashMode switch
+        public static bool CrouchDashPressed
         {
-            CrouchDashModes.Hold => Input.Dash.Pressed && Input.CrouchDash.Check,
-            _ => Input.CrouchDash.Pressed,
-        };
+            get
+            {
+                switch (Settings.Instance.CrouchDashMode)
+                {
+                    case CrouchDashModes.Hold:
+                        return Input.Dash.Pressed && Input.CrouchDash.Check;
+                    default:
+                        return Input.CrouchDash.Pressed;
+                }
+            }
+        }
 
         public static void UpdateGrab()
         {
             if (Settings.Instance.GrabMode != GrabModes.Toggle || !Input.Grab.Pressed)
-            {
                 return;
-            }
-
             Input.grabToggle = !Input.grabToggle;
         }
 
-        public static void ResetGrab()
-        {
-            Input.grabToggle = false;
-        }
+        public static void ResetGrab() => Input.grabToggle = false;
 
         public static Vector2 GetAimVector(Facings defaultFacing = Facings.Right)
         {
@@ -254,11 +265,8 @@ namespace Celeste
             if (vector2 == Vector2.Zero)
             {
                 if (SaveData.Instance != null && SaveData.Instance.Assists.DashAssist)
-                {
                     return Input.LastAim;
-                }
-
-                Input.LastAim = Vector2.UnitX * (float)defaultFacing;
+                Input.LastAim = Vector2.UnitX * (float) defaultFacing;
             }
             else if (SaveData.Instance != null && SaveData.Instance.Assists.ThreeSixtyDashing)
             {
@@ -267,23 +275,20 @@ namespace Celeste
             else
             {
                 float radiansA = vector2.Angle();
-                float num = (float)(0.39269909262657166 - (((double)radiansA < 0.0 ? 1.0 : 0.0) * 0.0872664600610733));
-                Input.LastAim = (double)Calc.AbsAngleDiff(radiansA, 0.0f) >= (double)num ? ((double)Calc.AbsAngleDiff(radiansA, 3.14159274f) >= (double)num ? ((double)Calc.AbsAngleDiff(radiansA, -1.57079637f) >= (double)num ? ((double)Calc.AbsAngleDiff(radiansA, 1.57079637f) >= (double)num ? new Vector2(Math.Sign(vector2.X), Math.Sign(vector2.Y)).SafeNormalize() : new Vector2(0.0f, 1f)) : new Vector2(0.0f, -1f)) : new Vector2(-1f, 0.0f)) : new Vector2(1f, 0.0f);
+                float num = (float) (0.39269909262657166 - ((double) radiansA < 0.0 ? 1.0 : 0.0) * 0.0872664600610733);
+                Input.LastAim = (double) Calc.AbsAngleDiff(radiansA, 0.0f) >= (double) num ? ((double) Calc.AbsAngleDiff(radiansA, 3.14159274f) >= (double) num ? ((double) Calc.AbsAngleDiff(radiansA, -1.57079637f) >= (double) num ? ((double) Calc.AbsAngleDiff(radiansA, 1.57079637f) >= (double) num ? new Vector2((float) Math.Sign(vector2.X), (float) Math.Sign(vector2.Y)).SafeNormalize() : new Vector2(0.0f, 1f)) : new Vector2(0.0f, -1f)) : new Vector2(-1f, 0.0f)) : new Vector2(1f, 0.0f);
             }
             return Input.LastAim;
         }
 
         public static string GuiInputPrefix(Input.PrefixMode mode = Input.PrefixMode.Latest)
         {
-            return !string.IsNullOrEmpty(Input.OverrideInputPrefix)
-                ? Input.OverrideInputPrefix
-                : (mode != Input.PrefixMode.Latest ? MInput.GamePads[Input.Gamepad].Attached : MInput.ControllerHasFocus) ? "xb1" : "keyboard";
+            if (!string.IsNullOrEmpty(Input.OverrideInputPrefix))
+                return Input.OverrideInputPrefix;
+            return (mode != Input.PrefixMode.Latest ? MInput.GamePads[Input.Gamepad].Attached : MInput.ControllerHasFocus) ? "xb1" : "keyboard";
         }
 
-        public static bool GuiInputController(Input.PrefixMode mode = Input.PrefixMode.Latest)
-        {
-            return !Input.GuiInputPrefix(mode).Equals("keyboard");
-        }
+        public static bool GuiInputController(Input.PrefixMode mode = Input.PrefixMode.Latest) => !Input.GuiInputPrefix(mode).Equals("keyboard");
 
         public static MTexture GuiButton(
             VirtualButton button,
@@ -295,13 +300,13 @@ namespace Celeste
             string input = "";
             if (num != 0)
             {
-                using List<Buttons>.Enumerator enumerator = button.Binding.Controller.GetEnumerator();
-                if (enumerator.MoveNext())
+                using (List<Buttons>.Enumerator enumerator = button.Binding.Controller.GetEnumerator())
                 {
-                    Buttons current = enumerator.Current;
-                    if (!Input.buttonNameLookup.TryGetValue(current, out input))
+                    if (enumerator.MoveNext())
                     {
-                        Input.buttonNameLookup.Add(current, input = current.ToString());
+                        Buttons current = enumerator.Current;
+                        if (!Input.buttonNameLookup.TryGetValue(current, out input))
+                            Input.buttonNameLookup.Add(current, input = current.ToString());
                     }
                 }
             }
@@ -309,9 +314,7 @@ namespace Celeste
             {
                 Keys key = Input.FirstKey(button);
                 if (!Input.keyNameLookup.TryGetValue(key, out input))
-                {
                     Input.keyNameLookup.Add(key, input = key.ToString());
-                }
             }
             MTexture mtexture = Input.GuiTexture(prefix, input);
             return mtexture == null && fallback != null ? GFX.Gui[fallback] : mtexture;
@@ -323,30 +326,30 @@ namespace Celeste
             string fallback = "controls/keyboard/oemquestion")
         {
             string prefix = !Input.GuiInputController(mode) ? "xb1" : Input.GuiInputPrefix(mode);
-            if (!Input.buttonNameLookup.TryGetValue(button, out string input))
-            {
+            string input = "";
+            if (!Input.buttonNameLookup.TryGetValue(button, out input))
                 Input.buttonNameLookup.Add(button, input = button.ToString());
-            }
-
             MTexture mtexture = Input.GuiTexture(prefix, input);
             return mtexture == null && fallback != null ? GFX.Gui[fallback] : mtexture;
         }
 
         public static MTexture GuiKey(Keys key, string fallback = "controls/keyboard/oemquestion")
         {
-            if (!Input.keyNameLookup.TryGetValue(key, out string input))
-            {
+            string input;
+            if (!Input.keyNameLookup.TryGetValue(key, out input))
                 Input.keyNameLookup.Add(key, input = key.ToString());
-            }
-
             MTexture mtexture = Input.GuiTexture("keyboard", input);
             return mtexture == null && fallback != null ? GFX.Gui[fallback] : mtexture;
         }
 
         public static Buttons FirstButton(VirtualButton button)
         {
-            using List<Buttons>.Enumerator enumerator = button.Binding.Controller.GetEnumerator();
-            return enumerator.MoveNext() ? enumerator.Current : Buttons.A;
+            using (List<Buttons>.Enumerator enumerator = button.Binding.Controller.GetEnumerator())
+            {
+                if (enumerator.MoveNext())
+                    return enumerator.Current;
+            }
+            return Buttons.A;
         }
 
         public static Keys FirstKey(VirtualButton button)
@@ -354,31 +357,24 @@ namespace Celeste
             foreach (Keys keys in button.Binding.Keyboard)
             {
                 if (keys != Keys.None)
-                {
                     return keys;
-                }
             }
             return Keys.None;
         }
 
-        public static MTexture GuiDirection(Vector2 direction)
-        {
-            return Input.GuiTexture("directions", Math.Sign(direction.X).ToString() + "x" + Math.Sign(direction.Y));
-        }
+        public static MTexture GuiDirection(Vector2 direction) => Input.GuiTexture("directions", Math.Sign(direction.X).ToString() + "x" + (object) Math.Sign(direction.Y));
 
         private static MTexture GuiTexture(string prefix, string input)
         {
-            if (!Input.guiPathLookup.TryGetValue(prefix, out Dictionary<string, string> dictionary))
-            {
+            Dictionary<string, string> dictionary;
+            if (!Input.guiPathLookup.TryGetValue(prefix, out dictionary))
                 Input.guiPathLookup.Add(prefix, dictionary = new Dictionary<string, string>());
-            }
-
-            if (!dictionary.TryGetValue(input, out string id))
-            {
+            string id;
+            if (!dictionary.TryGetValue(input, out id))
                 dictionary.Add(input, id = "controls/" + prefix + "/" + input);
-            }
-
-            return GFX.Gui.Has(id) ? GFX.Gui[id] : prefix != "fallback" ? Input.GuiTexture("fallback", input) : null;
+            if (GFX.Gui.Has(id))
+                return GFX.Gui[id];
+            return prefix != "fallback" ? Input.GuiTexture("fallback", input) : (MTexture) null;
         }
 
         public static void SetLightbarColor(Color color)

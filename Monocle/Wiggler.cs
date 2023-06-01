@@ -11,7 +11,7 @@ namespace Monocle
 {
     public class Wiggler : Component
     {
-        private static readonly Stack<Wiggler> cache = new();
+        private static Stack<Wiggler> cache = new Stack<Wiggler>();
         public bool StartZero;
         public bool UseRawDeltaTime;
         private float sineCounter;
@@ -56,17 +56,13 @@ namespace Monocle
             Counter = sineCounter = 0.0f;
             UseRawDeltaTime = false;
             increment = 1f / duration;
-            sineAdd = 6.28318548f * frequency;
+            sineAdd = 6.28318548f* frequency;
             this.onChange = onChange;
             this.removeSelfOnFinish = removeSelfOnFinish;
             if (start)
-            {
                 Start();
-            }
             else
-            {
                 Active = false;
-            }
         }
 
         public override void Removed(Entity entity)
@@ -82,13 +78,15 @@ namespace Monocle
             {
                 sineCounter = 1.57079637f;
                 Value = 0.0f;
-                onChange?.Invoke(0.0f);
+                if (onChange != null)
+                    onChange(0.0f);
             }
             else
             {
                 sineCounter = 0.0f;
                 Value = 1f;
-                onChange?.Invoke(1f);
+                if (onChange != null)
+                    onChange(1f);
             }
             Active = true;
         }
@@ -96,14 +94,11 @@ namespace Monocle
         public void Start(float duration, float frequency)
         {
             increment = 1f / duration;
-            sineAdd = 6.28318548f * frequency;
+            sineAdd = 6.28318548f* frequency;
             Start();
         }
 
-        public void Stop()
-        {
-            Active = false;
-        }
+        public void Stop() => Active = false;
 
         public void StopAndClear()
         {
@@ -128,16 +123,11 @@ namespace Monocle
                 Counter = 0.0f;
                 Active = false;
                 if (removeSelfOnFinish)
-                {
                     RemoveSelf();
-                }
             }
-            Value = (float)Math.Cos(sineCounter) * Counter;
+            Value = (float)Math.Cos((double)sineCounter) * Counter;
             if (onChange == null)
-            {
                 return;
-            }
-
             onChange(Value);
         }
     }

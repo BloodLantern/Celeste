@@ -16,11 +16,11 @@ namespace Celeste
         public Vector2 BirdEndPosition;
         public Sprite Sprite;
         public SoundEmitter CrashSfxEmitter;
-        private readonly Vector2[] nodes;
+        private Vector2[] nodes;
         private bool startedRoutine;
         private Vector2 start;
         private InvisibleBarrier fakeRightWall;
-        private readonly bool crashes;
+        private bool crashes;
         private Coroutine flyToRoutine;
         private bool emitParticles;
         private bool inCutscene;
@@ -29,145 +29,127 @@ namespace Celeste
             : base(position)
         {
             this.crashes = crashes;
-            Add(Sprite = GFX.SpriteBank.Create("bird"));
-            Sprite.Play(crashes ? "hoverStressed" : "hover");
-            Sprite.Scale.X = crashes ? -1f : 1f;
-            Sprite.OnFrameChange = anim =>
+            this.Add((Component) (this.Sprite = GFX.SpriteBank.Create("bird")));
+            this.Sprite.Play(crashes ? "hoverStressed" : "hover");
+            this.Sprite.Scale.X = crashes ? -1f : 1f;
+            this.Sprite.OnFrameChange = (Action<string>) (anim =>
             {
-                if (inCutscene)
-                {
+                if (this.inCutscene)
                     return;
-                }
-
-                BirdNPC.FlapSfxCheck(Sprite);
-            };
-            Collider = new Monocle.Circle(16f, y: -8f);
-            Add(new PlayerCollider(new Action<Player>(OnPlayer)));
+                BirdNPC.FlapSfxCheck(this.Sprite);
+            });
+            this.Collider = (Collider) new Monocle.Circle(16f, y: -8f);
+            this.Add((Component) new PlayerCollider(new Action<Player>(this.OnPlayer)));
             this.nodes = nodes;
-            start = position;
-            BirdEndPosition = nodes[nodes.Length - 1];
+            this.start = position;
+            this.BirdEndPosition = nodes[nodes.Length - 1];
         }
 
         public FlingBirdIntro(EntityData data, Vector2 levelOffset)
-            : this(data.Position + levelOffset, data.NodesOffset(levelOffset), data.Bool(nameof(crashes)))
+            : this(data.Position + levelOffset, data.NodesOffset(levelOffset), data.Bool(nameof (crashes)))
         {
         }
 
         public override void Awake(Scene scene)
         {
             base.Awake(scene);
-            if (!crashes && (scene as Level).Session.GetFlag("MissTheBird"))
+            if (!this.crashes && (scene as Level).Session.GetFlag("MissTheBird"))
             {
-                RemoveSelf();
+                this.RemoveSelf();
             }
             else
             {
-                Player entity1 = Scene.Tracker.GetEntity<Player>();
-                if (entity1 != null && (double)entity1.X > (double)X)
+                Player entity1 = this.Scene.Tracker.GetEntity<Player>();
+                if (entity1 != null && (double) entity1.X > (double) this.X)
                 {
-                    if (crashes)
-                    {
+                    if (this.crashes)
                         CS10_CatchTheBird.HandlePostCutsceneSpawn(this, scene as Level);
-                    }
-
-                    CassetteBlockManager entity2 = Scene.Tracker.GetEntity<CassetteBlockManager>();
+                    CassetteBlockManager entity2 = this.Scene.Tracker.GetEntity<CassetteBlockManager>();
                     if (entity2 != null)
                     {
                         entity2.StopBlocks();
                         entity2.Finish();
                     }
-                    RemoveSelf();
+                    this.RemoveSelf();
                 }
                 else
-                {
-                    scene.Add(fakeRightWall = new InvisibleBarrier(new Vector2(X + 160f, Y - 200f), 8f, 400f));
-                }
-
-                if (crashes)
-                {
+                    scene.Add((Entity) (this.fakeRightWall = new InvisibleBarrier(new Vector2(this.X + 160f, this.Y - 200f), 8f, 400f)));
+                if (this.crashes)
                     return;
-                }
-
-                Vector2 position = Position;
-                Position = new Vector2(X - 150f, (scene as Level).Bounds.Top - 8);
-                Add(flyToRoutine = new Coroutine(FlyTo(position)));
+                Vector2 position = this.Position;
+                this.Position = new Vector2(this.X - 150f, (float) ((scene as Level).Bounds.Top - 8));
+                this.Add((Component) (this.flyToRoutine = new Coroutine(this.FlyTo(position))));
             }
         }
 
         private IEnumerator FlyTo(Vector2 to)
         {
             FlingBirdIntro flingBirdIntro = this;
-            flingBirdIntro.Add(new SoundSource().Play("event:/new_content/game/10_farewell/bird_flappyscene_entry"));
+            flingBirdIntro.Add((Component) new SoundSource().Play("event:/new_content/game/10_farewell/bird_flappyscene_entry"));
             flingBirdIntro.Sprite.Play("fly");
             Vector2 from = flingBirdIntro.Position;
-            for (float p = 0.0f; (double)p < 1.0; p += Engine.DeltaTime * 0.3f)
+            for (float p = 0.0f; (double) p < 1.0; p += Engine.DeltaTime * 0.3f)
             {
-                flingBirdIntro.Position = from + ((to - from) * Ease.SineOut(p));
-                yield return null;
+                flingBirdIntro.Position = from + (to - from) * Ease.SineOut(p);
+                yield return (object) null;
             }
             flingBirdIntro.Sprite.Play("hover");
             float sine = 0.0f;
             while (true)
             {
-                flingBirdIntro.Position = to + (Vector2.UnitY * (float)Math.Sin((double)sine) * 8f);
+                flingBirdIntro.Position = to + Vector2.UnitY * (float) Math.Sin((double) sine) * 8f;
                 sine += Engine.DeltaTime * 2f;
-                yield return null;
+                yield return (object) null;
             }
         }
 
         public override void Removed(Scene scene)
         {
-            fakeRightWall?.RemoveSelf();
-            fakeRightWall = null;
+            if (this.fakeRightWall != null)
+                this.fakeRightWall.RemoveSelf();
+            this.fakeRightWall = (InvisibleBarrier) null;
             base.Removed(scene);
         }
 
         private void OnPlayer(Player player)
         {
-            if (player.Dead || startedRoutine)
-            {
+            if (player.Dead || this.startedRoutine)
                 return;
-            }
-
-            flyToRoutine?.RemoveSelf();
-            startedRoutine = true;
+            if (this.flyToRoutine != null)
+                this.flyToRoutine.RemoveSelf();
+            this.startedRoutine = true;
             player.Speed = Vector2.Zero;
-            Depth = player.Depth - 5;
-            Sprite.Play("hoverStressed");
-            Sprite.Scale.X = 1f;
-            fakeRightWall.RemoveSelf();
-            fakeRightWall = null;
-            if (!crashes)
+            this.Depth = player.Depth - 5;
+            this.Sprite.Play("hoverStressed");
+            this.Sprite.Scale.X = 1f;
+            this.fakeRightWall.RemoveSelf();
+            this.fakeRightWall = (InvisibleBarrier) null;
+            if (!this.crashes)
             {
-                Scene.Add(new CS10_MissTheBird(player, this));
+                this.Scene.Add((Entity) new CS10_MissTheBird(player, this));
             }
             else
             {
-                CassetteBlockManager entity = Scene.Tracker.GetEntity<CassetteBlockManager>();
+                CassetteBlockManager entity = this.Scene.Tracker.GetEntity<CassetteBlockManager>();
                 if (entity != null)
                 {
                     entity.StopBlocks();
                     entity.Finish();
                 }
-                Scene.Add(new CS10_CatchTheBird(player, this));
+                this.Scene.Add((Entity) new CS10_CatchTheBird(player, this));
             }
         }
 
         public override void Update()
         {
-            if (!startedRoutine && fakeRightWall != null)
+            if (!this.startedRoutine && this.fakeRightWall != null)
             {
-                Level scene = Scene as Level;
-                if ((double)scene.Camera.X > (double)fakeRightWall.X - 320.0 - 16.0)
-                {
-                    scene.Camera.X = (float)((double)fakeRightWall.X - 320.0 - 16.0);
-                }
+                Level scene = this.Scene as Level;
+                if ((double) scene.Camera.X > (double) this.fakeRightWall.X - 320.0 - 16.0)
+                    scene.Camera.X = (float) ((double) this.fakeRightWall.X - 320.0 - 16.0);
             }
-            if (emitParticles && Scene.OnInterval(0.1f))
-            {
-                SceneAs<Level>().ParticlesBG.Emit(FlingBird.P_Feather, 1, Position + new Vector2(0.0f, -8f), new Vector2(6f, 4f));
-            }
-
+            if (this.emitParticles && this.Scene.OnInterval(0.1f))
+                this.SceneAs<Level>().ParticlesBG.Emit(FlingBird.P_Feather, 1, this.Position + new Vector2(0.0f, -8f), new Vector2(6f, 4f));
             base.Update();
         }
 
@@ -176,7 +158,7 @@ namespace Celeste
             FlingBirdIntro follow = this;
             Level level = follow.Scene as Level;
             follow.inCutscene = true;
-            follow.CrashSfxEmitter = follow.crashes ? SoundEmitter.Play("event:/new_content/game/10_farewell/bird_crashscene_start", follow) : SoundEmitter.Play("event:/new_content/game/10_farewell/bird_flappyscene", follow);
+            follow.CrashSfxEmitter = follow.crashes ? SoundEmitter.Play("event:/new_content/game/10_farewell/bird_crashscene_start", (Entity) follow) : SoundEmitter.Play("event:/new_content/game/10_farewell/bird_flappyscene", (Entity) follow);
             player.StateMachine.State = 11;
             player.DummyGravity = false;
             player.DummyAutoAnimate = false;
@@ -188,16 +170,16 @@ namespace Celeste
             level.Shake();
             Input.Rumble(RumbleStrength.Strong, RumbleLength.Short);
             follow.emitParticles = true;
-            follow.Add(new Coroutine(level.ZoomTo(new Vector2(140f, 120f), 1.5f, 4f)));
+            follow.Add((Component) new Coroutine(level.ZoomTo(new Vector2(140f, 120f), 1.5f, 4f)));
             float sin = 0.0f;
             int index = 0;
             while (index < follow.nodes.Length - 1)
             {
                 Vector2 position = follow.Position;
                 Vector2 node = follow.nodes[index];
-                SimpleCurve curve = new(position, node, position + ((node - position) * 0.5f) + new Vector2(0.0f, -24f));
+                SimpleCurve curve = new SimpleCurve(position, node, position + (node - position) * 0.5f + new Vector2(0.0f, -24f));
                 float duration = curve.GetLengthParametric(32) / 100f;
-                if (node.Y < (double)position.Y)
+                if ((double) node.Y < (double) position.Y)
                 {
                     duration *= 1.1f;
                     follow.Sprite.Rate = 2f;
@@ -210,58 +192,50 @@ namespace Celeste
                 if (!follow.crashes)
                 {
                     if (index == 0)
-                    {
                         duration = 0.7f;
-                    }
-
                     if (index == 1)
-                    {
                         duration += 0.191f;
-                    }
-
                     if (index == 2)
-                    {
                         duration += 0.191f;
-                    }
                 }
-                for (float p = 0.0f; (double)p < 1.0; p += Engine.DeltaTime / duration)
+                for (float p = 0.0f; (double) p < 1.0; p += Engine.DeltaTime / duration)
                 {
                     sin += Engine.DeltaTime * 10f;
-                    follow.Position = (curve.GetPoint(p) + (Vector2.UnitY * (float)Math.Sin((double)sin) * 8f)).Floor();
+                    follow.Position = (curve.GetPoint(p) + Vector2.UnitY * (float) Math.Sin((double) sin) * 8f).Floor();
                     player.Position = follow.Position + new Vector2(2f, 10f);
                     switch (follow.Sprite.CurrentAnimationFrame)
                     {
                         case 1:
                             Player player1 = player;
-                            player1.Position += new Vector2(1f, -1f);
+                            player1.Position = player1.Position + new Vector2(1f, -1f);
                             break;
                         case 2:
                             Player player2 = player;
-                            player2.Position += new Vector2(-1f, 0.0f);
+                            player2.Position = player2.Position + new Vector2(-1f, 0.0f);
                             break;
                         case 3:
                             Player player3 = player;
-                            player3.Position += new Vector2(-1f, 1f);
+                            player3.Position = player3.Position + new Vector2(-1f, 1f);
                             break;
                         case 4:
                             Player player4 = player;
-                            player4.Position += new Vector2(1f, 3f);
+                            player4.Position = player4.Position + new Vector2(1f, 3f);
                             break;
                         case 5:
                             Player player5 = player;
-                            player5.Position += new Vector2(2f, 5f);
+                            player5.Position = player5.Position + new Vector2(2f, 5f);
                             break;
                     }
-                    yield return null;
+                    yield return (object) null;
                 }
                 level.Shake();
                 Input.Rumble(RumbleStrength.Medium, RumbleLength.Short);
                 ++index;
-                _ = new SimpleCurve();
+                curve = new SimpleCurve();
             }
             follow.Sprite.Rate = 1f;
             Celeste.Freeze(0.05f);
-            yield return null;
+            yield return (object) null;
             level.Shake();
             Input.Rumble(RumbleStrength.Strong, RumbleLength.Long);
             level.Flash(Color.White);

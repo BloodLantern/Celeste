@@ -1,6 +1,6 @@
 ﻿// Decompiled with JetBrains decompiler
 // Type: Celeste.ClutterBlockBase
-// Assembly: Celeste, Version=1, Culture=neutral, PublicKeyToken=null
+// Assembly: Celeste, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null
 // MVID: FAF6CA25-5C06-43EB-A08F-9CCF291FE6A3
 // Assembly location: C:\Program Files (x86)\Steam\steamapps\common\Celeste\orig\Celeste.exe
 
@@ -24,53 +24,42 @@ namespace Celeste
             int height,
             bool enabled,
             ClutterBlock.Colors blockColor)
-            : base(position, width, height, true)
+            : base(position, (float) width, (float) height, true)
         {
-            EnableAssistModeChecks = false;
-            BlockColor = blockColor;
-            Depth = 8999;
+            this.EnableAssistModeChecks = false;
+            this.BlockColor = blockColor;
+            this.Depth = 8999;
             this.enabled = enabled;
-            color = enabled ? enabledColor : disabledColor;
+            this.color = enabled ? ClutterBlockBase.enabledColor : ClutterBlockBase.disabledColor;
             if (enabled)
-            {
-                Add(occluder = new LightOcclude());
-            }
+                this.Add((Component) (this.occluder = new LightOcclude()));
             else
-            {
-                Collidable = false;
-            }
-
+                this.Collidable = false;
             switch (blockColor)
             {
                 case ClutterBlock.Colors.Red:
-                    SurfaceSoundIndex = 17;
+                    this.SurfaceSoundIndex = 17;
                     break;
                 case ClutterBlock.Colors.Green:
-                    SurfaceSoundIndex = 19;
+                    this.SurfaceSoundIndex = 19;
                     break;
                 case ClutterBlock.Colors.Yellow:
-                    SurfaceSoundIndex = 18;
+                    this.SurfaceSoundIndex = 18;
                     break;
             }
         }
 
         public void Deactivate()
         {
-            Collidable = false;
-            color = disabledColor;
-            enabled = false;
-            if (occluder == null)
-            {
+            this.Collidable = false;
+            this.color = ClutterBlockBase.disabledColor;
+            this.enabled = false;
+            if (this.occluder == null)
                 return;
-            }
-
-            Remove(occluder);
-            occluder = null;
+            this.Remove((Component) this.occluder);
+            this.occluder = (LightOcclude) null;
         }
 
-        public override void Render()
-        {
-            Draw.Rect(X, Y, Width, Height + (enabled ? 2f : 0f), color);
-        }
+        public override void Render() => Draw.Rect(this.X, this.Y, this.Width, this.Height + (this.enabled ? 2f : 0.0f), this.color);
     }
 }

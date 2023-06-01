@@ -5,13 +5,14 @@
 // Assembly location: C:\Program Files (x86)\Steam\steamapps\common\Celeste\orig\Celeste.exe
 
 using Monocle;
+using System;
 using System.Collections;
 
 namespace Celeste
 {
     public class FileErrorOverlay : Overlay
     {
-        private readonly FileErrorOverlay.Error mode;
+        private FileErrorOverlay.Error mode;
         private TextMenu menu;
 
         public bool Open { get; private set; }
@@ -22,42 +23,37 @@ namespace Celeste
 
         public FileErrorOverlay(FileErrorOverlay.Error mode)
         {
-            Open = true;
+            this.Open = true;
             this.mode = mode;
-            Add(new Coroutine(Routine()));
-            Engine.Scene.Add(this);
+            this.Add((Component) new Coroutine(this.Routine()));
+            Engine.Scene.Add((Entity) this);
         }
 
         private IEnumerator Routine()
         {
             FileErrorOverlay fileErrorOverlay = this;
-            yield return fileErrorOverlay.FadeIn();
+            yield return (object) fileErrorOverlay.FadeIn();
             bool waiting = true;
             int option = 0;
-            _ = Audio.Play("event:/ui/main/message_confirm");
-            fileErrorOverlay.menu = new TextMenu
+            Audio.Play("event:/ui/main/message_confirm");
+            fileErrorOverlay.menu = new TextMenu();
+            fileErrorOverlay.menu.Add((TextMenu.Item) new TextMenu.Header(Dialog.Clean("savefailed_title")));
+            fileErrorOverlay.menu.Add(new TextMenu.Button(Dialog.Clean(fileErrorOverlay.mode == FileErrorOverlay.Error.Save ? "savefailed_retry" : "loadfailed_goback")).Pressed((Action) (() =>
             {
-                new TextMenu.Header(Dialog.Clean("savefailed_title")),
-                new TextMenu.Button(Dialog.Clean(fileErrorOverlay.mode == FileErrorOverlay.Error.Save ? "savefailed_retry" : "loadfailed_goback")).Pressed(() =>
-                {
-                    option = 0;
-                    waiting = false;
-                }),
-                new TextMenu.Button(Dialog.Clean("savefailed_ignore")).Pressed(() =>
-                {
-                    option = 1;
-                    waiting = false;
-                })
-            };
+                option = 0;
+                waiting = false;
+            })));
+            fileErrorOverlay.menu.Add(new TextMenu.Button(Dialog.Clean("savefailed_ignore")).Pressed((Action) (() =>
+            {
+                option = 1;
+                waiting = false;
+            })));
             while (waiting)
-            {
-                yield return null;
-            }
-
-            fileErrorOverlay.menu = null;
+                yield return (object) null;
+            fileErrorOverlay.menu = (TextMenu) null;
             fileErrorOverlay.Ignore = option == 1;
             fileErrorOverlay.TryAgain = option == 0;
-            yield return fileErrorOverlay.FadeOut();
+            yield return (object) fileErrorOverlay.FadeOut();
             fileErrorOverlay.Open = false;
             fileErrorOverlay.RemoveSelf();
         }
@@ -65,19 +61,18 @@ namespace Celeste
         public override void Update()
         {
             base.Update();
-            menu?.Update();
-            if (SaveLoadIcon.Instance == null || SaveLoadIcon.Instance.Scene != Scene)
-            {
+            if (this.menu != null)
+                this.menu.Update();
+            if (SaveLoadIcon.Instance == null || SaveLoadIcon.Instance.Scene != this.Scene)
                 return;
-            }
-
             SaveLoadIcon.Instance.Update();
         }
 
         public override void Render()
         {
-            RenderFade();
-            menu?.Render();
+            this.RenderFade();
+            if (this.menu != null)
+                this.menu.Render();
             base.Render();
         }
 

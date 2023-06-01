@@ -18,23 +18,20 @@ namespace Celeste
         public const string Flag = "disable_lightning";
         public float Fade;
         private bool disappearing;
-        private readonly float toggleOffset;
+        private float toggleOffset;
         public int VisualWidth;
         public int VisualHeight;
 
         public Lightning(Vector2 position, int width, int height, Vector2? node, float moveTime)
             : base(position)
         {
-            VisualWidth = width;
-            VisualHeight = height;
-            Collider = new Hitbox(width - 2, height - 2, 1f, 1f);
-            Add(new PlayerCollider(new Action<Player>(OnPlayer)));
+            this.VisualWidth = width;
+            this.VisualHeight = height;
+            this.Collider = (Collider) new Hitbox((float) (width - 2), (float) (height - 2), 1f, 1f);
+            this.Add((Component) new PlayerCollider(new Action<Player>(this.OnPlayer)));
             if (node.HasValue)
-            {
-                Add(new Coroutine(MoveRoutine(position, node.Value, moveTime)));
-            }
-
-            toggleOffset = Calc.Random.NextFloat();
+                this.Add((Component) new Coroutine(this.MoveRoutine(position, node.Value, moveTime)));
+            this.toggleOffset = Calc.Random.NextFloat();
         }
 
         public Lightning(EntityData data, Vector2 levelOffset)
@@ -56,52 +53,37 @@ namespace Celeste
 
         public override void Update()
         {
-            if (Collidable && Scene.OnInterval(0.25f, toggleOffset))
-            {
-                ToggleCheck();
-            }
-
-            if (!Collidable && Scene.OnInterval(0.05f, toggleOffset))
-            {
-                ToggleCheck();
-            }
-
+            if (this.Collidable && this.Scene.OnInterval(0.25f, this.toggleOffset))
+                this.ToggleCheck();
+            if (!this.Collidable && this.Scene.OnInterval(0.05f, this.toggleOffset))
+                this.ToggleCheck();
             base.Update();
         }
 
-        public void ToggleCheck()
-        {
-            Collidable = Visible = InView();
-        }
+        public void ToggleCheck() => this.Collidable = this.Visible = this.InView();
 
         private bool InView()
         {
-            Camera camera = (Scene as Level).Camera;
-            return (double)X + (double)Width > (double)camera.X - 16.0 && (double)Y + (double)Height > (double)camera.Y - 16.0 && (double)X < (double)camera.X + 320.0 + 16.0 && (double)Y < (double)camera.Y + 180.0 + 16.0;
+            Camera camera = (this.Scene as Level).Camera;
+            return (double) this.X + (double) this.Width > (double) camera.X - 16.0 && (double) this.Y + (double) this.Height > (double) camera.Y - 16.0 && (double) this.X < (double) camera.X + 320.0 + 16.0 && (double) this.Y < (double) camera.Y + 180.0 + 16.0;
         }
 
         private void OnPlayer(Player player)
         {
-            if (disappearing || SaveData.Instance.Assists.Invincible)
-            {
+            if (this.disappearing || SaveData.Instance.Assists.Invincible)
                 return;
-            }
-
-            int num = Math.Sign(player.X - X);
+            int num = Math.Sign(player.X - this.X);
             if (num == 0)
-            {
                 num = -1;
-            }
-
-            _ = player.Die(Vector2.UnitX * num);
+            player.Die(Vector2.UnitX * (float) num);
         }
 
         private IEnumerator MoveRoutine(Vector2 start, Vector2 end, float moveTime)
         {
             while (true)
             {
-                yield return Move(start, end, moveTime);
-                yield return Move(end, start, moveTime);
+                yield return (object) this.Move(start, end, moveTime);
+                yield return (object) this.Move(end, start, moveTime);
             }
         }
 
@@ -112,46 +94,39 @@ namespace Celeste
             while (true)
             {
                 lightning.Position = Vector2.Lerp(start, end, Ease.SineInOut(at));
-                if ((double)at < 1.0)
+                if ((double) at < 1.0)
                 {
-                    yield return null;
-                    at = MathHelper.Clamp(at + (Engine.DeltaTime / moveTime), 0.0f, 1f);
+                    yield return (object) null;
+                    at = MathHelper.Clamp(at + Engine.DeltaTime / moveTime, 0.0f, 1f);
                 }
                 else
-                {
                     break;
-                }
             }
         }
 
         private void Shatter()
         {
-            if (Scene == null)
-            {
+            if (this.Scene == null)
                 return;
-            }
-
-            for (int x = 4; x < (double)Width; x += 8)
+            for (int x = 4; (double) x < (double) this.Width; x += 8)
             {
-                for (int y = 4; y < (double)Height; y += 8)
-                {
-                    SceneAs<Level>().ParticlesFG.Emit(Lightning.P_Shatter, 1, TopLeft + new Vector2(x, y), Vector2.One * 3f);
-                }
+                for (int y = 4; (double) y < (double) this.Height; y += 8)
+                    this.SceneAs<Level>().ParticlesFG.Emit(Lightning.P_Shatter, 1, this.TopLeft + new Vector2((float) x, (float) y), Vector2.One * 3f);
             }
         }
 
         public static IEnumerator PulseRoutine(Level level)
         {
             float t;
-            for (t = 0.0f; (double)t < 1.0; t += Engine.DeltaTime * 8f)
+            for (t = 0.0f; (double) t < 1.0; t += Engine.DeltaTime * 8f)
             {
                 Lightning.SetPulseValue(level, t);
-                yield return null;
+                yield return (object) null;
             }
-            for (t = 1f; (double)t > 0.0; t -= Engine.DeltaTime * 8f)
+            for (t = 1f; (double) t > 0.0; t -= Engine.DeltaTime * 8f)
             {
                 Lightning.SetPulseValue(level, t);
-                yield return null;
+                yield return (object) null;
             }
             Lightning.SetPulseValue(level, 0.0f);
         }
@@ -161,8 +136,8 @@ namespace Celeste
             BloomRenderer bloom = level.Bloom;
             LightningRenderer entity = level.Tracker.GetEntity<LightningRenderer>();
             Glitch.Value = MathHelper.Lerp(0.0f, 0.075f, t);
-            double num = (double)MathHelper.Lerp(1f, 1.2f, t);
-            bloom.Strength = (float)num;
+            double num = (double) MathHelper.Lerp(1f, 1.2f, t);
+            bloom.Strength = (float) num;
             entity.Fade = t * 0.2f;
         }
 
@@ -171,20 +146,20 @@ namespace Celeste
             BloomRenderer bloom = level.Bloom;
             LightningRenderer entity = level.Tracker.GetEntity<LightningRenderer>();
             Glitch.Value = MathHelper.Lerp(0.0f, 0.15f, t);
-            double num = (double)MathHelper.Lerp(1f, 1.5f, t);
-            bloom.Strength = (float)num;
+            double num = (double) MathHelper.Lerp(1f, 1.5f, t);
+            bloom.Strength = (float) num;
             entity.Fade = t * 0.6f;
         }
 
         public static IEnumerator RemoveRoutine(Level level, Action onComplete = null)
         {
             List<Lightning> blocks = level.Entities.FindAll<Lightning>();
-            foreach (Lightning lightning in new List<Lightning>(blocks))
+            foreach (Lightning lightning in new List<Lightning>((IEnumerable<Lightning>) blocks))
             {
                 lightning.disappearing = true;
-                if ((double)lightning.Right < (double)level.Camera.Left || (double)lightning.Bottom < (double)level.Camera.Top || (double)lightning.Left > (double)level.Camera.Right || (double)lightning.Top > (double)level.Camera.Bottom)
+                if ((double) lightning.Right < (double) level.Camera.Left || (double) lightning.Bottom < (double) level.Camera.Top || (double) lightning.Left > (double) level.Camera.Right || (double) lightning.Top > (double) level.Camera.Bottom)
                 {
-                    _ = blocks.Remove(lightning);
+                    blocks.Remove(lightning);
                     lightning.RemoveSelf();
                 }
             }
@@ -192,36 +167,28 @@ namespace Celeste
             entity1.StopAmbience();
             entity1.UpdateSeeds = false;
             float t;
-            for (t = 0.0f; (double)t < 1.0; t += Engine.DeltaTime * 4f)
+            for (t = 0.0f; (double) t < 1.0; t += Engine.DeltaTime * 4f)
             {
                 Lightning.SetBreakValue(level, t);
-                yield return null;
+                yield return (object) null;
             }
             Lightning.SetBreakValue(level, 1f);
             level.Shake();
             for (int index = blocks.Count - 1; index >= 0; --index)
-            {
                 blocks[index].Shatter();
-            }
-
-            for (t = 0.0f; (double)t < 1.0; t += Engine.DeltaTime * 8f)
+            for (t = 0.0f; (double) t < 1.0; t += Engine.DeltaTime * 8f)
             {
                 Lightning.SetBreakValue(level, 1f - t);
-                yield return null;
+                yield return (object) null;
             }
             Lightning.SetBreakValue(level, 0.0f);
             foreach (Entity entity2 in blocks)
-            {
                 entity2.RemoveSelf();
-            }
-
             FlingBird first = level.Entities.FindFirst<FlingBird>();
             if (first != null)
-            {
                 first.LightningRemoved = true;
-            }
-
-            onComplete?.Invoke();
+            if (onComplete != null)
+                onComplete();
         }
     }
 }

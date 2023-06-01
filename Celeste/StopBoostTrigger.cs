@@ -19,10 +19,7 @@ namespace Celeste
         {
             base.OnEnter(player);
             if (player.StateMachine.State != 10)
-            {
                 return;
-            }
-
             player.StopSummitLaunch();
         }
     }

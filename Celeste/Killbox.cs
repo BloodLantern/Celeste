@@ -16,41 +16,35 @@ namespace Celeste
         public Killbox(EntityData data, Vector2 offset)
             : base(data.Position + offset)
         {
-            Collider = new Hitbox(data.Width, 32f);
-            Collidable = false;
-            Add(new PlayerCollider(new Action<Player>(OnPlayer)));
+            this.Collider = (Collider) new Hitbox((float) data.Width, 32f);
+            this.Collidable = false;
+            this.Add((Component) new PlayerCollider(new Action<Player>(this.OnPlayer)));
         }
 
         private void OnPlayer(Player player)
         {
             if (SaveData.Instance.Assists.Invincible)
             {
-                _ = player.Play("event:/game/general/assist_screenbottom");
-                player.Bounce(Top);
+                player.Play("event:/game/general/assist_screenbottom");
+                player.Bounce(this.Top);
             }
             else
-            {
-                _ = player.Die(Vector2.Zero);
-            }
+                player.Die(Vector2.Zero);
         }
 
         public override void Update()
         {
-            if (!Collidable)
+            if (!this.Collidable)
             {
-                Player entity = Scene.Tracker.GetEntity<Player>();
-                if (entity != null && (double)entity.Bottom < (double)Top - 32.0)
-                {
-                    Collidable = true;
-                }
+                Player entity = this.Scene.Tracker.GetEntity<Player>();
+                if (entity != null && (double) entity.Bottom < (double) this.Top - 32.0)
+                    this.Collidable = true;
             }
             else
             {
-                Player entity = Scene.Tracker.GetEntity<Player>();
-                if (entity != null && (double)entity.Top > (double)Bottom + 32.0)
-                {
-                    Collidable = false;
-                }
+                Player entity = this.Scene.Tracker.GetEntity<Player>();
+                if (entity != null && (double) entity.Top > (double) this.Bottom + 32.0)
+                    this.Collidable = false;
             }
             base.Update();
         }

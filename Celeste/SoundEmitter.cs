@@ -14,15 +14,15 @@ namespace Celeste
     {
         public static SoundEmitter Play(string sfx)
         {
-            SoundEmitter soundEmitter = new(sfx);
-            Engine.Scene.Add(soundEmitter);
+            SoundEmitter soundEmitter = new SoundEmitter(sfx);
+            Engine.Scene.Add((Entity) soundEmitter);
             return soundEmitter;
         }
 
         public static SoundEmitter Play(string sfx, Entity follow, Vector2? offset = null)
         {
-            SoundEmitter soundEmitter = new(sfx, follow, offset.HasValue ? offset.Value : Vector2.Zero);
-            Engine.Scene.Add(soundEmitter);
+            SoundEmitter soundEmitter = new SoundEmitter(sfx, follow, offset.HasValue ? offset.Value : Vector2.Zero);
+            Engine.Scene.Add((Entity) soundEmitter);
             return soundEmitter;
         }
 
@@ -30,37 +30,31 @@ namespace Celeste
 
         private SoundEmitter(string sfx)
         {
-            Add(Source = new SoundSource());
-            _ = Source.Play(sfx);
-            Source.DisposeOnTransition = false;
-            Tag = (int)Tags.Persistent | (int)Tags.TransitionUpdate;
-            Add(new LevelEndingHook(new Action(OnLevelEnding)));
+            this.Add((Component) (this.Source = new SoundSource()));
+            this.Source.Play(sfx);
+            this.Source.DisposeOnTransition = false;
+            this.Tag = (int) Tags.Persistent | (int) Tags.TransitionUpdate;
+            this.Add((Component) new LevelEndingHook(new Action(this.OnLevelEnding)));
         }
 
         private SoundEmitter(string sfx, Entity follow, Vector2 offset)
         {
-            Add(Source = new SoundSource());
-            Position = follow.Position + offset;
-            _ = Source.Play(sfx);
-            Source.DisposeOnTransition = false;
-            Tag = (int)Tags.Persistent | (int)Tags.TransitionUpdate;
-            Add(new LevelEndingHook(new Action(OnLevelEnding)));
+            this.Add((Component) (this.Source = new SoundSource()));
+            this.Position = follow.Position + offset;
+            this.Source.Play(sfx);
+            this.Source.DisposeOnTransition = false;
+            this.Tag = (int) Tags.Persistent | (int) Tags.TransitionUpdate;
+            this.Add((Component) new LevelEndingHook(new Action(this.OnLevelEnding)));
         }
 
         public override void Update()
         {
             base.Update();
-            if (Source.Playing)
-            {
+            if (this.Source.Playing)
                 return;
-            }
-
-            RemoveSelf();
+            this.RemoveSelf();
         }
 
-        private void OnLevelEnding()
-        {
-            _ = Source.Stop();
-        }
+        private void OnLevelEnding() => this.Source.Stop();
     }
 }

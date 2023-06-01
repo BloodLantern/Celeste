@@ -16,28 +16,22 @@ namespace Celeste
 
         public ParticleRenderer(params ParticleSystem[] system)
         {
-            Systems = new List<ParticleSystem>();
-            Systems.AddRange(system);
+            this.Systems = new List<ParticleSystem>();
+            this.Systems.AddRange((IEnumerable<ParticleSystem>) system);
         }
 
         public override void Update(Scene scene)
         {
-            foreach (Entity system in Systems)
-            {
+            foreach (Entity system in this.Systems)
                 system.Update();
-            }
-
             base.Update(scene);
         }
 
         public override void Render(Scene scene)
         {
-            Draw.SpriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, SamplerState.LinearClamp, DepthStencilState.None, RasterizerState.CullNone, null, Engine.ScreenMatrix);
-            foreach (Entity system in Systems)
-            {
+            Draw.SpriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, SamplerState.LinearClamp, DepthStencilState.None, RasterizerState.CullNone, (Effect) null, Engine.ScreenMatrix);
+            foreach (Entity system in this.Systems)
                 system.Render();
-            }
-
             Draw.SpriteBatch.End();
         }
     }

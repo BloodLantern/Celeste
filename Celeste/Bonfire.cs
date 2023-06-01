@@ -13,76 +13,76 @@ namespace Celeste
     [Tracked(false)]
     public class Bonfire : Entity
     {
-        private Mode mode;
-        private readonly Sprite sprite;
-        private readonly VertexLight light;
-        private readonly BloomPoint bloom;
-        private readonly Wiggler wiggle;
+        private Bonfire.Mode mode;
+        private Sprite sprite;
+        private VertexLight light;
+        private BloomPoint bloom;
+        private Wiggler wiggle;
         private float brightness;
         private float multiplier;
         public bool Activated;
-        private readonly SoundSource loopSfx;
+        private SoundSource loopSfx;
 
-        public Bonfire(Vector2 position, Mode mode)
+        public Bonfire(Vector2 position, Bonfire.Mode mode)
         {
-            Tag = (int)Tags.TransitionUpdate;
-            Depth = -5;
-            Add(loopSfx = new SoundSource());
-            Add(sprite = GFX.SpriteBank.Create("campfire"));
-            Add(light = new VertexLight(new Vector2(0.0f, -6f), Color.PaleVioletRed, 1f, 32, 64));
-            Add(bloom = new BloomPoint(new Vector2(0.0f, -6f), 1f, 32f));
-            Add(wiggle = Wiggler.Create(0.2f, 4f, f => light.Alpha = bloom.Alpha = Math.Min(1f, brightness + (f * 0.25f)) * multiplier));
-            Position = position;
+            this.Tag = (int) Tags.TransitionUpdate;
+            this.Depth = -5;
+            this.Add((Component) (this.loopSfx = new SoundSource()));
+            this.Add((Component) (this.sprite = GFX.SpriteBank.Create("campfire")));
+            this.Add((Component) (this.light = new VertexLight(new Vector2(0.0f, -6f), Color.PaleVioletRed, 1f, 32, 64)));
+            this.Add((Component) (this.bloom = new BloomPoint(new Vector2(0.0f, -6f), 1f, 32f)));
+            this.Add((Component) (this.wiggle = Wiggler.Create(0.2f, 4f, (Action<float>) (f => this.light.Alpha = this.bloom.Alpha = Math.Min(1f, this.brightness + f * 0.25f) * this.multiplier))));
+            this.Position = position;
             this.mode = mode;
         }
 
         public Bonfire(EntityData data, Vector2 offset)
-            : this(data.Position + offset, data.Enum<Mode>(nameof(mode)))
+            : this(data.Position + offset, data.Enum<Bonfire.Mode>(nameof (mode)))
         {
         }
 
         public override void Added(Scene scene)
         {
             base.Added(scene);
-            SetMode(mode);
+            this.SetMode(this.mode);
         }
 
-        public void SetMode(Mode mode)
+        public void SetMode(Bonfire.Mode mode)
         {
             this.mode = mode;
             switch (mode)
             {
-                case Mode.Lit:
-                    if (Activated)
+                case Bonfire.Mode.Lit:
+                    if (this.Activated)
                     {
-                        _ = Audio.Play("event:/env/local/campfire_start", Position);
-                        _ = loopSfx.Play("event:/env/local/campfire_loop");
-                        sprite.Play(SceneAs<Level>().Session.Dreaming ? "startDream" : "start");
+                        Audio.Play("event:/env/local/campfire_start", this.Position);
+                        this.loopSfx.Play("event:/env/local/campfire_loop");
+                        this.sprite.Play(this.SceneAs<Level>().Session.Dreaming ? "startDream" : "start");
                         break;
                     }
-                    _ = loopSfx.Play("event:/env/local/campfire_loop");
-                    sprite.Play(SceneAs<Level>().Session.Dreaming ? "burnDream" : "burn");
+                    this.loopSfx.Play("event:/env/local/campfire_loop");
+                    this.sprite.Play(this.SceneAs<Level>().Session.Dreaming ? "burnDream" : "burn");
                     break;
-                case Mode.Smoking:
-                    sprite.Play("smoking");
+                case Bonfire.Mode.Smoking:
+                    this.sprite.Play("smoking");
                     break;
                 default:
-                    sprite.Play("idle");
-                    bloom.Alpha = light.Alpha = brightness = 0f;
+                    this.sprite.Play("idle");
+                    this.bloom.Alpha = this.light.Alpha = this.brightness = 0.0f;
                     break;
             }
-            Activated = true;
+            this.Activated = true;
         }
 
         public override void Update()
         {
-            if (mode == Mode.Lit)
+            if (this.mode == Bonfire.Mode.Lit)
             {
-                multiplier = Calc.Approach(multiplier, 1f, Engine.DeltaTime * 2f);
-                if (Scene.OnInterval(0.25f))
+                this.multiplier = Calc.Approach(this.multiplier, 1f, Engine.DeltaTime * 2f);
+                if (this.Scene.OnInterval(0.25f))
                 {
-                    brightness = 0.5f + Calc.Random.NextFloat(0.5f);
-                    wiggle.Start();
+                    this.brightness = 0.5f + Calc.Random.NextFloat(0.5f);
+                    this.wiggle.Start();
                 }
             }
             base.Update();

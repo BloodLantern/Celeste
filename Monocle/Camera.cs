@@ -23,55 +23,45 @@ namespace Monocle
 
         public Camera()
         {
-            Viewport = new Viewport
-            {
-                Width = Engine.Width,
-                Height = Engine.Height
-            };
-            UpdateMatrices();
+            this.Viewport = new Viewport();
+            this.Viewport.Width = Engine.Width;
+            this.Viewport.Height = Engine.Height;
+            this.UpdateMatrices();
         }
 
         public Camera(int width, int height)
         {
-            Viewport = new Viewport
-            {
-                Width = width,
-                Height = height
-            };
-            UpdateMatrices();
+            this.Viewport = new Viewport();
+            this.Viewport.Width = width;
+            this.Viewport.Height = height;
+            this.UpdateMatrices();
         }
 
-        public override string ToString()
-        {
-            return "Camera:\n\tViewport: { " + Viewport.X + ", " + Viewport.Y + ", " + Viewport.Width + ", " + Viewport.Height + " }\n\tPosition: { " + position.X + ", " + position.Y + " }\n\tOrigin: { " + origin.X + ", " + origin.Y + " }\n\tZoom: { " + zoom.X + ", " + zoom.Y + " }\n\tAngle: " + angle;
-        }
+        public override string ToString() => "Camera:\n\tViewport: { " + (object) this.Viewport.X + ", " + (object) this.Viewport.Y + ", " + (object) this.Viewport.Width + ", " + (object) this.Viewport.Height + " }\n\tPosition: { " + (object) this.position.X + ", " + (object) this.position.Y + " }\n\tOrigin: { " + (object) this.origin.X + ", " + (object) this.origin.Y + " }\n\tZoom: { " + (object) this.zoom.X + ", " + (object) this.zoom.Y + " }\n\tAngle: " + (object) this.angle;
 
         private void UpdateMatrices()
         {
-            matrix = Matrix.Identity * Matrix.CreateTranslation(new Vector3(-new Vector2((int)Math.Floor(position.X), (int)Math.Floor(position.Y)), 0.0f)) * Matrix.CreateRotationZ(angle) * Matrix.CreateScale(new Vector3(zoom, 1f)) * Matrix.CreateTranslation(new Vector3(new Vector2((int)Math.Floor(origin.X), (int)Math.Floor(origin.Y)), 0.0f));
-            inverse = Matrix.Invert(matrix);
-            changed = false;
+            this.matrix = Matrix.Identity * Matrix.CreateTranslation(new Vector3(-new Vector2((float) (int) Math.Floor((double) this.position.X), (float) (int) Math.Floor((double) this.position.Y)), 0.0f)) * Matrix.CreateRotationZ(this.angle) * Matrix.CreateScale(new Vector3(this.zoom, 1f)) * Matrix.CreateTranslation(new Vector3(new Vector2((float) (int) Math.Floor((double) this.origin.X), (float) (int) Math.Floor((double) this.origin.Y)), 0.0f));
+            this.inverse = Matrix.Invert(this.matrix);
+            this.changed = false;
         }
 
         public void CopyFrom(Camera other)
         {
-            position = other.position;
-            origin = other.origin;
-            angle = other.angle;
-            zoom = other.zoom;
-            changed = true;
+            this.position = other.position;
+            this.origin = other.origin;
+            this.angle = other.angle;
+            this.zoom = other.zoom;
+            this.changed = true;
         }
 
         public Matrix Matrix
         {
             get
             {
-                if (changed)
-                {
-                    UpdateMatrices();
-                }
-
-                return matrix;
+                if (this.changed)
+                    this.UpdateMatrices();
+                return this.matrix;
             }
         }
 
@@ -79,72 +69,69 @@ namespace Monocle
         {
             get
             {
-                if (changed)
-                {
-                    UpdateMatrices();
-                }
-
-                return inverse;
+                if (this.changed)
+                    this.UpdateMatrices();
+                return this.inverse;
             }
         }
 
         public Vector2 Position
         {
-            get => position;
+            get => this.position;
             set
             {
-                changed = true;
-                position = value;
+                this.changed = true;
+                this.position = value;
             }
         }
 
         public Vector2 Origin
         {
-            get => origin;
+            get => this.origin;
             set
             {
-                changed = true;
-                origin = value;
+                this.changed = true;
+                this.origin = value;
             }
         }
 
         public float X
         {
-            get => position.X;
+            get => this.position.X;
             set
             {
-                changed = true;
-                position.X = value;
+                this.changed = true;
+                this.position.X = value;
             }
         }
 
         public float Y
         {
-            get => position.Y;
+            get => this.position.Y;
             set
             {
-                changed = true;
-                position.Y = value;
+                this.changed = true;
+                this.position.Y = value;
             }
         }
 
         public float Zoom
         {
-            get => zoom.X;
+            get => this.zoom.X;
             set
             {
-                changed = true;
-                zoom.X = zoom.Y = value;
+                this.changed = true;
+                this.zoom.X = this.zoom.Y = value;
             }
         }
 
         public float Angle
         {
-            get => angle;
+            get => this.angle;
             set
             {
-                changed = true;
-                angle = value;
+                this.changed = true;
+                this.angle = value;
             }
         }
 
@@ -152,21 +139,15 @@ namespace Monocle
         {
             get
             {
-                if (changed)
-                {
-                    UpdateMatrices();
-                }
-
-                return Vector2.Transform(Vector2.Zero, Inverse).X;
+                if (this.changed)
+                    this.UpdateMatrices();
+                return Vector2.Transform(Vector2.Zero, this.Inverse).X;
             }
             set
             {
-                if (changed)
-                {
-                    UpdateMatrices();
-                }
-
-                X = Vector2.Transform(Vector2.UnitX * value, Matrix).X;
+                if (this.changed)
+                    this.UpdateMatrices();
+                this.X = Vector2.Transform(Vector2.UnitX * value, this.Matrix).X;
             }
         }
 
@@ -174,12 +155,9 @@ namespace Monocle
         {
             get
             {
-                if (changed)
-                {
-                    UpdateMatrices();
-                }
-
-                return Vector2.Transform(Vector2.UnitX * Viewport.Width, Inverse).X;
+                if (this.changed)
+                    this.UpdateMatrices();
+                return Vector2.Transform(Vector2.UnitX * (float) this.Viewport.Width, this.Inverse).X;
             }
             set => throw new NotImplementedException();
         }
@@ -188,21 +166,15 @@ namespace Monocle
         {
             get
             {
-                if (changed)
-                {
-                    UpdateMatrices();
-                }
-
-                return Vector2.Transform(Vector2.Zero, Inverse).Y;
+                if (this.changed)
+                    this.UpdateMatrices();
+                return Vector2.Transform(Vector2.Zero, this.Inverse).Y;
             }
             set
             {
-                if (changed)
-                {
-                    UpdateMatrices();
-                }
-
-                Y = Vector2.Transform(Vector2.UnitY * value, Matrix).Y;
+                if (this.changed)
+                    this.UpdateMatrices();
+                this.Y = Vector2.Transform(Vector2.UnitY * value, this.Matrix).Y;
             }
         }
 
@@ -210,55 +182,39 @@ namespace Monocle
         {
             get
             {
-                if (changed)
-                {
-                    UpdateMatrices();
-                }
-
-                return Vector2.Transform(Vector2.UnitY * Viewport.Height, Inverse).Y;
+                if (this.changed)
+                    this.UpdateMatrices();
+                return Vector2.Transform(Vector2.UnitY * (float) this.Viewport.Height, this.Inverse).Y;
             }
             set => throw new NotImplementedException();
         }
 
         public void CenterOrigin()
         {
-            origin = new Vector2(Viewport.Width / 2f, Viewport.Height / 2f);
-            changed = true;
+            this.origin = new Vector2((float) this.Viewport.Width / 2f, (float) this.Viewport.Height / 2f);
+            this.changed = true;
         }
 
         public void RoundPosition()
         {
-            position.X = (float)Math.Round(position.X);
-            position.Y = (float)Math.Round(position.Y);
-            changed = true;
+            this.position.X = (float) Math.Round((double) this.position.X);
+            this.position.Y = (float) Math.Round((double) this.position.Y);
+            this.changed = true;
         }
 
-        public Vector2 ScreenToCamera(Vector2 position)
-        {
-            return Vector2.Transform(position, Inverse);
-        }
+        public Vector2 ScreenToCamera(Vector2 position) => Vector2.Transform(position, this.Inverse);
 
-        public Vector2 CameraToScreen(Vector2 position)
-        {
-            return Vector2.Transform(position, Matrix);
-        }
+        public Vector2 CameraToScreen(Vector2 position) => Vector2.Transform(position, this.Matrix);
 
-        public void Approach(Vector2 position, float ease)
-        {
-            Position += (position - Position) * ease;
-        }
+        public void Approach(Vector2 position, float ease) => this.Position += (position - this.Position) * ease;
 
         public void Approach(Vector2 position, float ease, float maxDistance)
         {
-            Vector2 vector2 = (position - Position) * ease;
-            if ((double)vector2.Length() > (double)maxDistance)
-            {
-                Position += Vector2.Normalize(vector2) * maxDistance;
-            }
+            Vector2 vector2 = (position - this.Position) * ease;
+            if ((double) vector2.Length() > (double) maxDistance)
+                this.Position += Vector2.Normalize(vector2) * maxDistance;
             else
-            {
-                Position += vector2;
-            }
+                this.Position += vector2;
         }
     }
 }

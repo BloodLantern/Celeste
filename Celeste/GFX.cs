@@ -46,7 +46,7 @@ namespace Celeste
         public static Autotiler BGAutotiler;
         public static Autotiler FGAutotiler;
         public const float PortraitSize = 240f;
-        public static readonly BlendState Subtract = new()
+        public static readonly BlendState Subtract = new BlendState()
         {
             ColorSourceBlend = Blend.One,
             ColorDestinationBlend = Blend.One,
@@ -55,7 +55,7 @@ namespace Celeste
             AlphaDestinationBlend = Blend.One,
             AlphaBlendFunction = BlendFunction.Add
         };
-        public static readonly BlendState DestinationTransparencySubtract = new()
+        public static readonly BlendState DestinationTransparencySubtract = new BlendState()
         {
             ColorSourceBlend = Blend.One,
             ColorDestinationBlend = Blend.One,
@@ -87,12 +87,9 @@ namespace Celeste
                 GFX.MagicGlowNoise = VirtualContent.CreateTexture("glow-noise", 128, 128, Color.White);
                 Color[] data = new Color[GFX.MagicGlowNoise.Width * GFX.MagicGlowNoise.Height];
                 for (int index = 0; index < data.Length; ++index)
-                {
                     data[index] = new Color(Calc.Random.NextFloat(), Calc.Random.NextFloat(), Calc.Random.NextFloat(), 0.0f);
-                }
-
                 GFX.MagicGlowNoise.Texture.SetData<Color>(data);
-                Console.WriteLine(" - GFX LOAD: " + stopwatch.ElapsedMilliseconds + "ms");
+                Console.WriteLine(" - GFX LOAD: " + (object) stopwatch.ElapsedMilliseconds + "ms");
             }
             GFX.Loaded = true;
         }
@@ -115,14 +112,12 @@ namespace Celeste
                 PlayerSprite.CreateFramesMetadata("player_playback");
                 GFX.CompleteScreensXml = Calc.LoadContentXML(Path.Combine("Graphics", "CompleteScreens.xml"));
                 GFX.AnimatedTilesBank = new AnimatedTilesBank();
-                foreach (XmlElement xml in (XmlNode)Calc.LoadContentXML(Path.Combine("Graphics", "AnimatedTiles.xml"))["Data"])
+                foreach (XmlElement xml in (XmlNode) Calc.LoadContentXML(Path.Combine("Graphics", "AnimatedTiles.xml"))["Data"])
                 {
                     if (xml != null)
-                    {
                         GFX.AnimatedTilesBank.Add(xml.Attr("name"), xml.AttrFloat("delay", 0.0f), xml.AttrVector2("posX", "posY", Vector2.Zero), xml.AttrVector2("origX", "origY", Vector2.Zero), GFX.Game.GetAtlasSubtextures(xml.Attr("path")));
-                    }
                 }
-                Console.WriteLine(" - GFX DATA LOAD: " + stopwatch.ElapsedMilliseconds + "ms");
+                Console.WriteLine(" - GFX DATA LOAD: " + (object) stopwatch.ElapsedMilliseconds + "ms");
             }
             GFX.DataLoaded = true;
         }
@@ -132,19 +127,19 @@ namespace Celeste
             if (GFX.Loaded)
             {
                 GFX.Game.Dispose();
-                GFX.Game = null;
+                GFX.Game = (Atlas) null;
                 GFX.Gui.Dispose();
-                GFX.Gui = null;
+                GFX.Gui = (Atlas) null;
                 GFX.Opening.Dispose();
-                GFX.Opening = null;
+                GFX.Opening = (Atlas) null;
                 GFX.Misc.Dispose();
-                GFX.Misc = null;
+                GFX.Misc = (Atlas) null;
                 GFX.ColorGrades.Dispose();
-                GFX.ColorGrades = null;
+                GFX.ColorGrades = (Atlas) null;
                 GFX.MagicGlowNoise.Dispose();
-                GFX.MagicGlowNoise = null;
+                GFX.MagicGlowNoise = (VirtualTexture) null;
                 GFX.Portraits.Dispose();
-                GFX.Portraits = null;
+                GFX.Portraits = (Atlas) null;
             }
             GFX.Loaded = false;
         }
@@ -153,13 +148,13 @@ namespace Celeste
         {
             if (GFX.DataLoaded)
             {
-                GFX.GuiSpriteBank = null;
-                GFX.PortraitsSpriteBank = null;
-                GFX.SpriteBank = null;
-                GFX.CompleteScreensXml = null;
-                GFX.SceneryTiles = null;
-                GFX.BGAutotiler = null;
-                GFX.FGAutotiler = null;
+                GFX.GuiSpriteBank = (SpriteBank) null;
+                GFX.PortraitsSpriteBank = (SpriteBank) null;
+                GFX.SpriteBank = (SpriteBank) null;
+                GFX.CompleteScreensXml = (XmlDocument) null;
+                GFX.SceneryTiles = (Tileset) null;
+                GFX.BGAutotiler = (Autotiler) null;
+                GFX.FGAutotiler = (Autotiler) null;
             }
             GFX.DataLoaded = false;
         }
@@ -181,10 +176,7 @@ namespace Celeste
             GFX.FxDebug = new BasicEffect(Engine.Graphics.GraphicsDevice);
         }
 
-        public static Effect LoadFx(string name)
-        {
-            return Engine.Instance.Content.Load<Effect>(Path.Combine("Effects", name));
-        }
+        public static Effect LoadFx(string name) => Engine.Instance.Content.Load<Effect>(Path.Combine("Effects", name));
 
         public static void DrawVertices<T>(
             Matrix matrix,
@@ -194,14 +186,14 @@ namespace Celeste
             BlendState blendState = null)
             where T : struct, IVertexType
         {
-            Effect effect1 = effect ?? GFX.FxPrimitive;
-            BlendState blendState1 = blendState ?? BlendState.AlphaBlend;
+            Effect effect1 = effect != null ? effect : GFX.FxPrimitive;
+            BlendState blendState1 = blendState != null ? blendState : BlendState.AlphaBlend;
             Viewport viewport = Engine.Graphics.GraphicsDevice.Viewport;
-            double width = viewport.Width;
+            double width = (double) viewport.Width;
             viewport = Engine.Graphics.GraphicsDevice.Viewport;
-            double height = viewport.Height;
-            Vector2 local = new((float)width, (float)height);
-            matrix *= Matrix.CreateScale((float)(1.0 / local.X * 2.0), (float)(-(1.0 / local.Y) * 2.0), 1f);
+            double height = (double) viewport.Height;
+            Vector2 local = new Vector2((float) width, (float) height);
+            matrix *= Matrix.CreateScale((float) (1.0 / (double) local.X * 2.0), (float) (-(1.0 / (double) local.Y) * 2.0), 1f);
             matrix *= Matrix.CreateTranslation(-1f, 1f, 0.0f);
             Engine.Instance.GraphicsDevice.RasterizerState = RasterizerState.CullNone;
             Engine.Instance.GraphicsDevice.BlendState = blendState1;
@@ -223,14 +215,14 @@ namespace Celeste
             BlendState blendState = null)
             where T : struct, IVertexType
         {
-            Effect effect1 = effect ?? GFX.FxPrimitive;
-            BlendState blendState1 = blendState ?? BlendState.AlphaBlend;
+            Effect effect1 = effect != null ? effect : GFX.FxPrimitive;
+            BlendState blendState1 = blendState != null ? blendState : BlendState.AlphaBlend;
             Viewport viewport = Engine.Graphics.GraphicsDevice.Viewport;
-            double width = viewport.Width;
+            double width = (double) viewport.Width;
             viewport = Engine.Graphics.GraphicsDevice.Viewport;
-            double height = viewport.Height;
-            Vector2 local = new((float)width, (float)height);
-            matrix *= Matrix.CreateScale((float)(1.0 / local.X * 2.0), (float)(-(1.0 / local.Y) * 2.0), 1f);
+            double height = (double) viewport.Height;
+            Vector2 local = new Vector2((float) width, (float) height);
+            matrix *= Matrix.CreateScale((float) (1.0 / (double) local.X * 2.0), (float) (-(1.0 / (double) local.Y) * 2.0), 1f);
             matrix *= Matrix.CreateTranslation(-1f, 1f, 0.0f);
             Engine.Instance.GraphicsDevice.RasterizerState = RasterizerState.CullNone;
             Engine.Instance.GraphicsDevice.BlendState = blendState1;

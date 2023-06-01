@@ -17,7 +17,7 @@ namespace Celeste
         public PostUpdateHook(Action onPostUpdate)
             : base(false, false)
         {
-            OnPostUpdate = onPostUpdate;
+            this.OnPostUpdate = onPostUpdate;
         }
     }
 }

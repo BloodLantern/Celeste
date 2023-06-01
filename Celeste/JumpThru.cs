@@ -15,7 +15,7 @@ namespace Celeste
         public JumpThru(Vector2 position, int width, bool safe)
             : base(position, safe)
         {
-            Collider = new Hitbox(width, 5f);
+            this.Collider = (Collider) new Hitbox((float) width, 5f);
         }
 
         public override void Awake(Scene scene)
@@ -25,128 +25,109 @@ namespace Celeste
             {
                 if (component.IsRiding(this) && component.Platform == null)
                 {
-                    staticMovers.Add(component);
-                    component.Platform = this;
-                    component.OnAttach?.Invoke(this);
+                    this.staticMovers.Add(component);
+                    component.Platform = (Platform) this;
+                    if (component.OnAttach != null)
+                        component.OnAttach((Platform) this);
                 }
             }
         }
 
         public bool HasRider()
         {
-            foreach (Actor entity in Scene.Tracker.GetEntities<Actor>())
+            foreach (Actor entity in this.Scene.Tracker.GetEntities<Actor>())
             {
                 if (entity.IsRiding(this))
-                {
                     return true;
-                }
             }
             return false;
         }
 
         public bool HasPlayerRider()
         {
-            foreach (Actor entity in Scene.Tracker.GetEntities<Player>())
+            foreach (Actor entity in this.Scene.Tracker.GetEntities<Player>())
             {
                 if (entity.IsRiding(this))
-                {
                     return true;
-                }
             }
             return false;
         }
 
         public Player GetPlayerRider()
         {
-            foreach (Player entity in Scene.Tracker.GetEntities<Player>())
+            foreach (Player entity in this.Scene.Tracker.GetEntities<Player>())
             {
                 if (entity.IsRiding(this))
-                {
                     return entity;
-                }
             }
-            return null;
+            return (Player) null;
         }
 
         public override void MoveHExact(int move)
         {
-            if (Collidable)
+            if (this.Collidable)
             {
-                foreach (Actor entity in Scene.Tracker.GetEntities<Actor>())
+                foreach (Actor entity in this.Scene.Tracker.GetEntities<Actor>())
                 {
                     if (entity.IsRiding(this))
                     {
                         if (entity.TreatNaive)
-                        {
-                            entity.NaiveMove(Vector2.UnitX * move);
-                        }
+                            entity.NaiveMove(Vector2.UnitX * (float) move);
                         else
-                        {
-                            _ = entity.MoveHExact(move);
-                        }
+                            entity.MoveHExact(move);
                     }
                 }
             }
-            X += move;
-            MoveStaticMovers(Vector2.UnitX * move);
+            this.X += (float) move;
+            this.MoveStaticMovers(Vector2.UnitX * (float) move);
         }
 
         public override void MoveVExact(int move)
         {
-            if (Collidable)
+            if (this.Collidable)
             {
                 if (move < 0)
                 {
-                    foreach (Actor entity in Scene.Tracker.GetEntities<Actor>())
+                    foreach (Actor entity in this.Scene.Tracker.GetEntities<Actor>())
                     {
                         if (entity.IsRiding(this))
                         {
-                            Collidable = false;
+                            this.Collidable = false;
                             if (entity.TreatNaive)
-                            {
-                                entity.NaiveMove(Vector2.UnitY * move);
-                            }
+                                entity.NaiveMove(Vector2.UnitY * (float) move);
                             else
-                            {
-                                _ = entity.MoveVExact(move);
-                            }
-
-                            entity.LiftSpeed = LiftSpeed;
-                            Collidable = true;
+                                entity.MoveVExact(move);
+                            entity.LiftSpeed = this.LiftSpeed;
+                            this.Collidable = true;
                         }
-                        else if (!entity.TreatNaive && CollideCheck(entity, Position + (Vector2.UnitY * move)) && !CollideCheck(entity))
+                        else if (!entity.TreatNaive && this.CollideCheck((Entity) entity, this.Position + Vector2.UnitY * (float) move) && !this.CollideCheck((Entity) entity))
                         {
-                            Collidable = false;
-                            _ = entity.MoveVExact((int)((double)Top + move - (double)entity.Bottom));
-                            entity.LiftSpeed = LiftSpeed;
-                            Collidable = true;
+                            this.Collidable = false;
+                            entity.MoveVExact((int) ((double) this.Top + (double) move - (double) entity.Bottom));
+                            entity.LiftSpeed = this.LiftSpeed;
+                            this.Collidable = true;
                         }
                     }
                 }
                 else
                 {
-                    foreach (Actor entity in Scene.Tracker.GetEntities<Actor>())
+                    foreach (Actor entity in this.Scene.Tracker.GetEntities<Actor>())
                     {
                         if (entity.IsRiding(this))
                         {
-                            Collidable = false;
+                            this.Collidable = false;
                             if (entity.TreatNaive)
-                            {
-                                entity.NaiveMove(Vector2.UnitY * move);
-                            }
+                                entity.NaiveMove(Vector2.UnitY * (float) move);
                             else
-                            {
-                                _ = entity.MoveVExact(move);
-                            }
-
-                            entity.LiftSpeed = LiftSpeed;
-                            Collidable = true;
+                                entity.MoveVExact(move);
+                            entity.LiftSpeed = this.LiftSpeed;
+                            this.Collidable = true;
                         }
                     }
                 }
             }
-            Y += move;
-            MoveStaticMovers(Vector2.UnitY * move);
+            this.Y += (float) move;
+            this.MoveStaticMovers(Vector2.UnitY * (float) move);
         }
     }
 }

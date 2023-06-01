@@ -18,7 +18,7 @@ namespace Celeste
         public WindMover(Action<Vector2> move)
             : base(false, false)
         {
-            Move = move;
+            this.Move = move;
         }
     }
 }

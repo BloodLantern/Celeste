@@ -23,9 +23,9 @@ namespace Celeste
 
         public Clothesline(Vector2 from, Vector2 to)
         {
-            Depth = 8999;
-            Position = from;
-            Add(new Flagline(to, lineColor, pinColor, colors, 8, 20, 8, 16, 2, 8));
+            this.Depth = 8999;
+            this.Position = from;
+            this.Add((Component) new Flagline(to, Clothesline.lineColor, Clothesline.pinColor, Clothesline.colors, 8, 20, 8, 16, 2, 8));
         }
 
         public Clothesline(EntityData data, Vector2 offset)

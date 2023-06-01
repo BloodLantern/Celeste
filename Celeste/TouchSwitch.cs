@@ -16,58 +16,58 @@ namespace Celeste
         public static ParticleType P_Fire;
         public static ParticleType P_FireWhite;
         public Switch Switch;
-        private readonly SoundSource touchSfx;
-        private readonly MTexture border = GFX.Game["objects/touchswitch/container"];
-        private readonly Sprite icon = new(GFX.Game, "objects/touchswitch/icon");
+        private SoundSource touchSfx;
+        private MTexture border = GFX.Game["objects/touchswitch/container"];
+        private Sprite icon = new Sprite(GFX.Game, "objects/touchswitch/icon");
         private Color inactiveColor = Calc.HexToColor("5fcde4");
         private Color activeColor = Color.White;
         private Color finishColor = Calc.HexToColor("f141df");
         private float ease;
-        private readonly Wiggler wiggler;
+        private Wiggler wiggler;
         private Vector2 pulse = Vector2.One;
         private float timer;
-        private readonly BloomPoint bloom;
+        private BloomPoint bloom;
 
-        private Level level => (Level)Scene;
+        private Level level => (Level) this.Scene;
 
         public TouchSwitch(Vector2 position)
             : base(position)
         {
-            Depth = 2000;
-            Add(Switch = new Switch(false));
-            Add(new PlayerCollider(new Action<Player>(OnPlayer), featherCollider: new Hitbox(30f, 30f, -15f, -15f)));
-            Add(icon);
-            Add(bloom = new BloomPoint(0.0f, 16f));
-            bloom.Alpha = 0.0f;
-            icon.Add("idle", "", 0.0f, new int[1]);
-            icon.Add("spin", "", 0.1f, new Chooser<string>("spin", 1f), 0, 1, 2, 3, 4, 5);
-            icon.Play("spin");
-            icon.Color = inactiveColor;
-            _ = icon.CenterOrigin();
-            Collider = new Hitbox(16f, 16f, -8f, -8f);
-            Add(new HoldableCollider(new Action<Holdable>(OnHoldable), new Hitbox(20f, 20f, -10f, -10f)));
-            Add(new SeekerCollider(new Action<Seeker>(OnSeeker), new Hitbox(24f, 24f, -12f, -12f)));
-            Switch.OnActivate = () =>
+            this.Depth = 2000;
+            this.Add((Component) (this.Switch = new Switch(false)));
+            this.Add((Component) new PlayerCollider(new Action<Player>(this.OnPlayer), featherCollider: ((Collider) new Hitbox(30f, 30f, -15f, -15f))));
+            this.Add((Component) this.icon);
+            this.Add((Component) (this.bloom = new BloomPoint(0.0f, 16f)));
+            this.bloom.Alpha = 0.0f;
+            this.icon.Add("idle", "", 0.0f, new int[1]);
+            this.icon.Add("spin", "", 0.1f, new Chooser<string>("spin", 1f), 0, 1, 2, 3, 4, 5);
+            this.icon.Play("spin");
+            this.icon.Color = this.inactiveColor;
+            this.icon.CenterOrigin();
+            this.Collider = (Collider) new Hitbox(16f, 16f, -8f, -8f);
+            this.Add((Component) new HoldableCollider(new Action<Holdable>(this.OnHoldable), (Collider) new Hitbox(20f, 20f, -10f, -10f)));
+            this.Add((Component) new SeekerCollider(new Action<Seeker>(this.OnSeeker), (Collider) new Hitbox(24f, 24f, -12f, -12f)));
+            this.Switch.OnActivate = (Action) (() =>
             {
-                wiggler.Start();
+                this.wiggler.Start();
                 for (int index = 0; index < 32; ++index)
                 {
                     float num = Calc.Random.NextFloat(6.28318548f);
-                    level.Particles.Emit(TouchSwitch.P_FireWhite, Position + Calc.AngleToVector(num, 6f), num);
+                    this.level.Particles.Emit(TouchSwitch.P_FireWhite, this.Position + Calc.AngleToVector(num, 6f), num);
                 }
-                icon.Rate = 4f;
-            };
-            Switch.OnFinish = () => ease = 0.0f;
-            Switch.OnStartFinished = () =>
+                this.icon.Rate = 4f;
+            });
+            this.Switch.OnFinish = (Action) (() => this.ease = 0.0f);
+            this.Switch.OnStartFinished = (Action) (() =>
             {
-                icon.Rate = 0.1f;
-                icon.Play("idle");
-                icon.Color = finishColor;
-                ease = 1f;
-            };
-            Add(wiggler = Wiggler.Create(0.5f, 4f, v => pulse = Vector2.One * (float)(1.0 + ((double)v * 0.25))));
-            Add(new VertexLight(Color.White, 0.8f, 16, 32));
-            Add(touchSfx = new SoundSource());
+                this.icon.Rate = 0.1f;
+                this.icon.Play("idle");
+                this.icon.Color = this.finishColor;
+                this.ease = 1f;
+            });
+            this.Add((Component) (this.wiggler = Wiggler.Create(0.5f, 4f, (Action<float>) (v => this.pulse = Vector2.One * (float) (1.0 + (double) v * 0.25)))));
+            this.Add((Component) new VertexLight(Color.White, 0.8f, 16, 32));
+            this.Add((Component) (this.touchSfx = new SoundSource()));
         }
 
         public TouchSwitch(EntityData data, Vector2 offset)
@@ -77,66 +77,51 @@ namespace Celeste
 
         public void TurnOn()
         {
-            if (Switch.Activated)
-            {
+            if (this.Switch.Activated)
                 return;
-            }
-
-            _ = touchSfx.Play("event:/game/general/touchswitch_any");
-            if (!Switch.Activate())
-            {
+            this.touchSfx.Play("event:/game/general/touchswitch_any");
+            if (!this.Switch.Activate())
                 return;
-            }
-
-            _ = SoundEmitter.Play("event:/game/general/touchswitch_last_oneshot");
-            Add(new SoundSource("event:/game/general/touchswitch_last_cutoff"));
+            SoundEmitter.Play("event:/game/general/touchswitch_last_oneshot");
+            this.Add((Component) new SoundSource("event:/game/general/touchswitch_last_cutoff"));
         }
 
-        private void OnPlayer(Player player)
-        {
-            TurnOn();
-        }
+        private void OnPlayer(Player player) => this.TurnOn();
 
-        private void OnHoldable(Holdable h)
-        {
-            TurnOn();
-        }
+        private void OnHoldable(Holdable h) => this.TurnOn();
 
         private void OnSeeker(Seeker seeker)
         {
-            if (!SceneAs<Level>().InsideCamera(Position, 10f))
-            {
+            if (!this.SceneAs<Level>().InsideCamera(this.Position, 10f))
                 return;
-            }
-
-            TurnOn();
+            this.TurnOn();
         }
 
         public override void Update()
         {
-            timer += Engine.DeltaTime * 8f;
-            ease = Calc.Approach(ease, Switch.Finished || Switch.Activated ? 1f : 0.0f, Engine.DeltaTime * 2f);
-            this.icon.Color = Color.Lerp(inactiveColor, Switch.Finished ? finishColor : activeColor, ease);
+            this.timer += Engine.DeltaTime * 8f;
+            this.ease = Calc.Approach(this.ease, this.Switch.Finished || this.Switch.Activated ? 1f : 0.0f, Engine.DeltaTime * 2f);
+            this.icon.Color = Color.Lerp(this.inactiveColor, this.Switch.Finished ? this.finishColor : this.activeColor, this.ease);
             Sprite icon = this.icon;
-            icon.Color *= (float)(0.5 + ((Math.Sin(timer) + 1.0) / 2.0 * (1.0 - ease) * 0.5) + (0.5 * ease));
-            bloom.Alpha = ease;
-            if (Switch.Finished)
+            icon.Color = icon.Color * (float) (0.5 + (Math.Sin((double) this.timer) + 1.0) / 2.0 * (1.0 - (double) this.ease) * 0.5 + 0.5 * (double) this.ease);
+            this.bloom.Alpha = this.ease;
+            if (this.Switch.Finished)
             {
-                if (this.icon.Rate > 0.10000000149011612)
+                if ((double) this.icon.Rate > 0.10000000149011612)
                 {
                     this.icon.Rate -= 2f * Engine.DeltaTime;
-                    if (this.icon.Rate <= 0.10000000149011612)
+                    if ((double) this.icon.Rate <= 0.10000000149011612)
                     {
                         this.icon.Rate = 0.1f;
-                        wiggler.Start();
+                        this.wiggler.Start();
                         this.icon.Play("idle");
-                        _ = level.Displacement.AddBurst(Position, 0.6f, 4f, 28f, 0.2f);
+                        this.level.Displacement.AddBurst(this.Position, 0.6f, 4f, 28f, 0.2f);
                     }
                 }
-                else if (Scene.OnInterval(0.03f))
+                else if (this.Scene.OnInterval(0.03f))
                 {
-                    Vector2 position = Position + new Vector2(0.0f, 1f) + Calc.AngleToVector(Calc.Random.NextAngle(), 5f);
-                    level.ParticlesBG.Emit(TouchSwitch.P_Fire, position);
+                    Vector2 position = this.Position + new Vector2(0.0f, 1f) + Calc.AngleToVector(Calc.Random.NextAngle(), 5f);
+                    this.level.ParticlesBG.Emit(TouchSwitch.P_Fire, position);
                 }
             }
             base.Update();
@@ -144,8 +129,8 @@ namespace Celeste
 
         public override void Render()
         {
-            border.DrawCentered(Position + new Vector2(0.0f, -1f), Color.Black);
-            border.DrawCentered(Position, icon.Color, pulse);
+            this.border.DrawCentered(this.Position + new Vector2(0.0f, -1f), Color.Black);
+            this.border.DrawCentered(this.Position, this.icon.Color, this.pulse);
             base.Render();
         }
     }

@@ -16,38 +16,32 @@ namespace Celeste
 
         public WaveDashPage06()
         {
-            Transition = WaveDashPage.Transitions.Rotate3D;
-            ClearColor = Calc.HexToColor("d9d2e9");
+            this.Transition = WaveDashPage.Transitions.Rotate3D;
+            this.ClearColor = Calc.HexToColor("d9d2e9");
         }
 
         public override IEnumerator Routine()
         {
             WaveDashPage06 waveDashPage06 = this;
-            yield return 1f;
-            _ = Audio.Play("event:/new_content/game/10_farewell/ppt_happy_wavedashing");
-            waveDashPage06.title = new AreaCompleteTitle(new Vector2(waveDashPage06.Width / 2f, 150f), Dialog.Clean("WAVEDASH_PAGE6_TITLE"), 2f, true);
-            yield return 1.5f;
+            yield return (object) 1f;
+            Audio.Play("event:/new_content/game/10_farewell/ppt_happy_wavedashing");
+            waveDashPage06.title = new AreaCompleteTitle(new Vector2((float) waveDashPage06.Width / 2f, 150f), Dialog.Clean("WAVEDASH_PAGE6_TITLE"), 2f, true);
+            yield return (object) 1.5f;
         }
 
         public override void Update()
         {
-            if (title == null)
-            {
+            if (this.title == null)
                 return;
-            }
-
-            title.Update();
+            this.title.Update();
         }
 
         public override void Render()
         {
-            Presentation.Gfx["Bird Clip Art"].DrawCentered(new Vector2(Width, Height) / 2f, Color.White, 1.5f);
-            if (title == null)
-            {
+            this.Presentation.Gfx["Bird Clip Art"].DrawCentered(new Vector2((float) this.Width, (float) this.Height) / 2f, Color.White, 1.5f);
+            if (this.title == null)
                 return;
-            }
-
-            title.Render();
+            this.title.Render();
         }
     }
 }

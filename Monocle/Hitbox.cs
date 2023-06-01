@@ -17,141 +17,108 @@ namespace Monocle
         {
             this.width = width;
             this.height = height;
-            Position.X = x;
-            Position.Y = y;
+            this.Position.X = x;
+            this.Position.Y = y;
         }
 
         public override float Width
         {
-            get => width;
-            set => width = value;
+            get => this.width;
+            set => this.width = value;
         }
 
         public override float Height
         {
-            get => height;
-            set => height = value;
+            get => this.height;
+            set => this.height = value;
         }
 
         public override float Left
         {
-            get => Position.X;
-            set => Position.X = value;
+            get => this.Position.X;
+            set => this.Position.X = value;
         }
 
         public override float Top
         {
-            get => Position.Y;
-            set => Position.Y = value;
+            get => this.Position.Y;
+            set => this.Position.Y = value;
         }
 
         public override float Right
         {
-            get => Position.X + Width;
-            set => Position.X = value - Width;
+            get => this.Position.X + this.Width;
+            set => this.Position.X = value - this.Width;
         }
 
         public override float Bottom
         {
-            get => Position.Y + Height;
-            set => Position.Y = value - Height;
+            get => this.Position.Y + this.Height;
+            set => this.Position.Y = value - this.Height;
         }
 
-        public bool Intersects(Hitbox hitbox)
-        {
-            return (double)AbsoluteLeft < (double)hitbox.AbsoluteRight && (double)AbsoluteRight > (double)hitbox.AbsoluteLeft && (double)AbsoluteBottom > (double)hitbox.AbsoluteTop && (double)AbsoluteTop < (double)hitbox.AbsoluteBottom;
-        }
+        public bool Intersects(Hitbox hitbox) => (double) this.AbsoluteLeft < (double) hitbox.AbsoluteRight && (double) this.AbsoluteRight > (double) hitbox.AbsoluteLeft && (double) this.AbsoluteBottom > (double) hitbox.AbsoluteTop && (double) this.AbsoluteTop < (double) hitbox.AbsoluteBottom;
 
-        public bool Intersects(float x, float y, float width, float height)
-        {
-            return (double)AbsoluteRight > (double)x && (double)AbsoluteBottom > (double)y && (double)AbsoluteLeft < (double)x + (double)width && (double)AbsoluteTop < (double)y + (double)height;
-        }
+        public bool Intersects(float x, float y, float width, float height) => (double) this.AbsoluteRight > (double) x && (double) this.AbsoluteBottom > (double) y && (double) this.AbsoluteLeft < (double) x + (double) width && (double) this.AbsoluteTop < (double) y + (double) height;
 
-        public override Collider Clone()
-        {
-            return new Hitbox(width, height, Position.X, Position.Y);
-        }
+        public override Collider Clone() => (Collider) new Hitbox(this.width, this.height, this.Position.X, this.Position.Y);
 
-        public override void Render(Camera camera, Color color)
-        {
-            Draw.HollowRect(AbsoluteX, AbsoluteY, Width, Height, color);
-        }
+        public override void Render(Camera camera, Color color) => Draw.HollowRect(this.AbsoluteX, this.AbsoluteY, this.Width, this.Height, color);
 
         public void SetFromRectangle(Rectangle rect)
         {
-            Position = new Vector2(rect.X, rect.Y);
-            Width = rect.Width;
-            Height = rect.Height;
+            this.Position = new Vector2((float) rect.X, (float) rect.Y);
+            this.Width = (float) rect.Width;
+            this.Height = (float) rect.Height;
         }
 
         public void Set(float x, float y, float w, float h)
         {
-            Position = new Vector2(x, y);
-            Width = w;
-            Height = h;
+            this.Position = new Vector2(x, y);
+            this.Width = w;
+            this.Height = h;
         }
 
         public void GetTopEdge(out Vector2 from, out Vector2 to)
         {
-            from.X = AbsoluteLeft;
-            to.X = AbsoluteRight;
-            from.Y = to.Y = AbsoluteTop;
+            from.X = this.AbsoluteLeft;
+            to.X = this.AbsoluteRight;
+            from.Y = to.Y = this.AbsoluteTop;
         }
 
         public void GetBottomEdge(out Vector2 from, out Vector2 to)
         {
-            from.X = AbsoluteLeft;
-            to.X = AbsoluteRight;
-            from.Y = to.Y = AbsoluteBottom;
+            from.X = this.AbsoluteLeft;
+            to.X = this.AbsoluteRight;
+            from.Y = to.Y = this.AbsoluteBottom;
         }
 
         public void GetLeftEdge(out Vector2 from, out Vector2 to)
         {
-            from.Y = AbsoluteTop;
-            to.Y = AbsoluteBottom;
-            from.X = to.X = AbsoluteLeft;
+            from.Y = this.AbsoluteTop;
+            to.Y = this.AbsoluteBottom;
+            from.X = to.X = this.AbsoluteLeft;
         }
 
         public void GetRightEdge(out Vector2 from, out Vector2 to)
         {
-            from.Y = AbsoluteTop;
-            to.Y = AbsoluteBottom;
-            from.X = to.X = AbsoluteRight;
+            from.Y = this.AbsoluteTop;
+            to.Y = this.AbsoluteBottom;
+            from.X = to.X = this.AbsoluteRight;
         }
 
-        public override bool Collide(Vector2 point)
-        {
-            return Monocle.Collide.RectToPoint(AbsoluteLeft, AbsoluteTop, Width, Height, point);
-        }
+        public override bool Collide(Vector2 point) => Monocle.Collide.RectToPoint(this.AbsoluteLeft, this.AbsoluteTop, this.Width, this.Height, point);
 
-        public override bool Collide(Rectangle rect)
-        {
-            return (double)AbsoluteRight > rect.Left && (double)AbsoluteBottom > rect.Top && (double)AbsoluteLeft < rect.Right && (double)AbsoluteTop < rect.Bottom;
-        }
+        public override bool Collide(Rectangle rect) => (double) this.AbsoluteRight > (double) rect.Left && (double) this.AbsoluteBottom > (double) rect.Top && (double) this.AbsoluteLeft < (double) rect.Right && (double) this.AbsoluteTop < (double) rect.Bottom;
 
-        public override bool Collide(Vector2 from, Vector2 to)
-        {
-            return Monocle.Collide.RectToLine(AbsoluteLeft, AbsoluteTop, Width, Height, from, to);
-        }
+        public override bool Collide(Vector2 from, Vector2 to) => Monocle.Collide.RectToLine(this.AbsoluteLeft, this.AbsoluteTop, this.Width, this.Height, from, to);
 
-        public override bool Collide(Hitbox hitbox)
-        {
-            return Intersects(hitbox);
-        }
+        public override bool Collide(Hitbox hitbox) => this.Intersects(hitbox);
 
-        public override bool Collide(Grid grid)
-        {
-            return grid.Collide(Bounds);
-        }
+        public override bool Collide(Grid grid) => grid.Collide(this.Bounds);
 
-        public override bool Collide(Circle circle)
-        {
-            return Monocle.Collide.RectToCircle(AbsoluteLeft, AbsoluteTop, Width, Height, circle.AbsolutePosition, circle.Radius);
-        }
+        public override bool Collide(Circle circle) => Monocle.Collide.RectToCircle(this.AbsoluteLeft, this.AbsoluteTop, this.Width, this.Height, circle.AbsolutePosition, circle.Radius);
 
-        public override bool Collide(ColliderList list)
-        {
-            return list.Collide(this);
-        }
+        public override bool Collide(ColliderList list) => list.Collide(this);
     }
 }

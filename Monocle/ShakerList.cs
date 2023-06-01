@@ -21,96 +21,70 @@ namespace Monocle
         public ShakerList(int length, bool on = true, Action<Vector2[]> onShake = null)
             : base(true, false)
         {
-            Values = new Vector2[length];
+            this.Values = new Vector2[length];
             this.on = on;
-            OnShake = onShake;
+            this.OnShake = onShake;
         }
 
         public ShakerList(int length, float time, bool removeOnFinish, Action<Vector2[]> onShake = null)
             : this(length, onShake: onShake)
         {
-            Timer = time;
-            RemoveOnFinish = removeOnFinish;
+            this.Timer = time;
+            this.RemoveOnFinish = removeOnFinish;
         }
 
         public bool On
         {
-            get => on;
+            get => this.on;
             set
             {
-                on = value;
-                if (on)
-                {
+                this.on = value;
+                if (this.on)
                     return;
-                }
-
-                Timer = 0.0f;
-                if (!(Values[0] != Vector2.Zero))
-                {
+                this.Timer = 0.0f;
+                if (!(this.Values[0] != Vector2.Zero))
                     return;
-                }
-
-                for (int index = 0; index < Values.Length; ++index)
-                {
-                    Values[index] = Vector2.Zero;
-                }
-
-                if (OnShake == null)
-                {
+                for (int index = 0; index < this.Values.Length; ++index)
+                    this.Values[index] = Vector2.Zero;
+                if (this.OnShake == null)
                     return;
-                }
-
-                OnShake(Values);
+                this.OnShake(this.Values);
             }
         }
 
         public ShakerList ShakeFor(float seconds, bool removeOnFinish)
         {
-            on = true;
-            Timer = seconds;
-            RemoveOnFinish = removeOnFinish;
+            this.on = true;
+            this.Timer = seconds;
+            this.RemoveOnFinish = removeOnFinish;
             return this;
         }
 
         public override void Update()
         {
-            if (on && Timer > 0.0)
+            if (this.on && (double) this.Timer > 0.0)
             {
-                Timer -= Engine.DeltaTime;
-                if (Timer <= 0.0)
+                this.Timer -= Engine.DeltaTime;
+                if ((double) this.Timer <= 0.0)
                 {
-                    on = false;
-                    for (int index = 0; index < Values.Length; ++index)
-                    {
-                        Values[index] = Vector2.Zero;
-                    }
-
-                    OnShake?.Invoke(Values);
-                    if (!RemoveOnFinish)
-                    {
+                    this.on = false;
+                    for (int index = 0; index < this.Values.Length; ++index)
+                        this.Values[index] = Vector2.Zero;
+                    if (this.OnShake != null)
+                        this.OnShake(this.Values);
+                    if (!this.RemoveOnFinish)
                         return;
-                    }
-
-                    RemoveSelf();
+                    this.RemoveSelf();
                     return;
                 }
             }
-            if (!on || !Scene.OnInterval(Interval))
-            {
+            if (!this.on || !this.Scene.OnInterval(this.Interval))
                 return;
-            }
-
-            for (int index = 0; index < Values.Length; ++index)
-            {
-                Values[index] = Calc.Random.ShakeVector();
-            }
-
-            if (OnShake == null)
-            {
+            for (int index = 0; index < this.Values.Length; ++index)
+                this.Values[index] = Calc.Random.ShakeVector();
+            if (this.OnShake == null)
                 return;
-            }
-
-            OnShake(Values);
+            this.OnShake(this.Values);
         }
     }
 }

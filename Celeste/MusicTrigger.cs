@@ -19,37 +19,28 @@ namespace Celeste
         public MusicTrigger(EntityData data, Vector2 offset)
             : base(data, offset)
         {
-            Track = data.Attr("track");
-            ResetOnLeave = data.Bool("resetOnLeave", true);
-            Progress = data.Int("progress");
+            this.Track = data.Attr("track");
+            this.ResetOnLeave = data.Bool("resetOnLeave", true);
+            this.Progress = data.Int("progress");
         }
 
         public override void OnEnter(Player player)
         {
-            if (ResetOnLeave)
-            {
-                oldTrack = Audio.CurrentMusic;
-            }
-
-            Session session = SceneAs<Level>().Session;
-            session.Audio.Music.Event = SFX.EventnameByHandle(Track);
-            if (Progress != 0)
-            {
-                session.Audio.Music.Progress = Progress;
-            }
-
+            if (this.ResetOnLeave)
+                this.oldTrack = Audio.CurrentMusic;
+            Session session = this.SceneAs<Level>().Session;
+            session.Audio.Music.Event = SFX.EventnameByHandle(this.Track);
+            if (this.Progress != 0)
+                session.Audio.Music.Progress = this.Progress;
             session.Audio.Apply();
         }
 
         public override void OnLeave(Player player)
         {
-            if (!ResetOnLeave)
-            {
+            if (!this.ResetOnLeave)
                 return;
-            }
-
-            Session session = SceneAs<Level>().Session;
-            session.Audio.Music.Event = oldTrack;
+            Session session = this.SceneAs<Level>().Session;
+            session.Audio.Music.Event = this.oldTrack;
             session.Audio.Apply();
         }
     }

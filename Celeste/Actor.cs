@@ -26,17 +26,14 @@ namespace Celeste
         public Actor(Vector2 position)
             : base(position)
         {
-            SquishCallback = new Collision(OnSquish);
+            this.SquishCallback = new Collision(this.OnSquish);
         }
 
         protected virtual void OnSquish(CollisionData data)
         {
-            if (TrySquishWiggle(data))
-            {
+            if (this.TrySquishWiggle(data))
                 return;
-            }
-
-            RemoveSelf();
+            this.RemoveSelf();
         }
 
         protected bool TrySquishWiggle(CollisionData data, int wiggleX = 3, int wiggleY = 3)
@@ -52,10 +49,10 @@ namespace Celeste
                         {
                             for (int index4 = 1; index4 >= -1; index4 -= 2)
                             {
-                                Vector2 vector2 = new(index1 * index3, index2 * index4);
-                                if (!CollideCheck<Solid>(Position + vector2))
+                                Vector2 vector2 = new Vector2((float) (index1 * index3), (float) (index2 * index4));
+                                if (!this.CollideCheck<Solid>(this.Position + vector2))
                                 {
-                                    Position += vector2;
+                                    this.Position = this.Position + vector2;
                                     data.Pusher.Collidable = false;
                                     return true;
                                 }
@@ -74,10 +71,10 @@ namespace Celeste
                         {
                             for (int index8 = 1; index8 >= -1; index8 -= 2)
                             {
-                                Vector2 vector2 = new(index5 * index7, index6 * index8);
-                                if (!CollideCheck<Solid>(data.TargetPosition + vector2))
+                                Vector2 vector2 = new Vector2((float) (index5 * index7), (float) (index6 * index8));
+                                if (!this.CollideCheck<Solid>(data.TargetPosition + vector2))
                                 {
-                                    Position = data.TargetPosition + vector2;
+                                    this.Position = data.TargetPosition + vector2;
                                     data.Pusher.Collidable = false;
                                     return true;
                                 }
@@ -90,211 +87,176 @@ namespace Celeste
             return false;
         }
 
-        public virtual bool IsRiding(JumpThru jumpThru)
-        {
-            return !IgnoreJumpThrus && CollideCheckOutside(jumpThru, Position + Vector2.UnitY);
-        }
+        public virtual bool IsRiding(JumpThru jumpThru) => !this.IgnoreJumpThrus && this.CollideCheckOutside((Entity) jumpThru, this.Position + Vector2.UnitY);
 
-        public virtual bool IsRiding(Solid solid)
-        {
-            return CollideCheck(solid, Position + Vector2.UnitY);
-        }
+        public virtual bool IsRiding(Solid solid) => this.CollideCheck((Entity) solid, this.Position + Vector2.UnitY);
 
         public bool OnGround(int downCheck = 1)
         {
-            return CollideCheck<Solid>(Position + (Vector2.UnitY * downCheck))
-|| (!IgnoreJumpThrus && CollideCheckOutside<JumpThru>(Position + (Vector2.UnitY * downCheck)));
+            if (this.CollideCheck<Solid>(this.Position + Vector2.UnitY * (float) downCheck))
+                return true;
+            return !this.IgnoreJumpThrus && this.CollideCheckOutside<JumpThru>(this.Position + Vector2.UnitY * (float) downCheck);
         }
 
         public bool OnGround(Vector2 at, int downCheck = 1)
         {
-            Vector2 position = Position;
-            Position = at;
-            int num = OnGround(downCheck) ? 1 : 0;
-            Position = position;
+            Vector2 position = this.Position;
+            this.Position = at;
+            int num = this.OnGround(downCheck) ? 1 : 0;
+            this.Position = position;
             return num != 0;
         }
 
-        public Vector2 ExactPosition => Position + movementCounter;
+        public Vector2 ExactPosition => this.Position + this.movementCounter;
 
-        public Vector2 PositionRemainder => movementCounter;
+        public Vector2 PositionRemainder => this.movementCounter;
 
-        public void ZeroRemainderX()
-        {
-            movementCounter.X = 0.0f;
-        }
+        public void ZeroRemainderX() => this.movementCounter.X = 0.0f;
 
-        public void ZeroRemainderY()
-        {
-            movementCounter.Y = 0.0f;
-        }
+        public void ZeroRemainderY() => this.movementCounter.Y = 0.0f;
 
         public override void Update()
         {
             base.Update();
-            LiftSpeed = Vector2.Zero;
-            if (liftSpeedTimer <= 0.0)
-            {
+            this.LiftSpeed = Vector2.Zero;
+            if ((double) this.liftSpeedTimer <= 0.0)
                 return;
-            }
-
-            liftSpeedTimer -= Engine.DeltaTime;
-            if (liftSpeedTimer > 0.0)
-            {
+            this.liftSpeedTimer -= Engine.DeltaTime;
+            if ((double) this.liftSpeedTimer > 0.0)
                 return;
-            }
-
-            lastLiftSpeed = Vector2.Zero;
+            this.lastLiftSpeed = Vector2.Zero;
         }
 
         public Vector2 LiftSpeed
         {
             set
             {
-                currentLiftSpeed = value;
-                if (!(value != Vector2.Zero) || LiftSpeedGraceTime <= 0.0)
-                {
+                this.currentLiftSpeed = value;
+                if (!(value != Vector2.Zero) || (double) this.LiftSpeedGraceTime <= 0.0)
                     return;
-                }
-
-                lastLiftSpeed = value;
-                liftSpeedTimer = LiftSpeedGraceTime;
+                this.lastLiftSpeed = value;
+                this.liftSpeedTimer = this.LiftSpeedGraceTime;
             }
-            get => currentLiftSpeed == Vector2.Zero ? lastLiftSpeed : currentLiftSpeed;
+            get => this.currentLiftSpeed == Vector2.Zero ? this.lastLiftSpeed : this.currentLiftSpeed;
         }
 
         public void ResetLiftSpeed()
         {
-            currentLiftSpeed = lastLiftSpeed = Vector2.Zero;
-            liftSpeedTimer = 0.0f;
+            this.currentLiftSpeed = this.lastLiftSpeed = Vector2.Zero;
+            this.liftSpeedTimer = 0.0f;
         }
 
         public bool MoveH(float moveH, Collision onCollide = null, Solid pusher = null)
         {
-            movementCounter.X += moveH;
-            int moveH1 = (int)Math.Round(movementCounter.X, MidpointRounding.ToEven);
+            this.movementCounter.X += moveH;
+            int moveH1 = (int) Math.Round((double) this.movementCounter.X, MidpointRounding.ToEven);
             if (moveH1 == 0)
-            {
                 return false;
-            }
-
-            movementCounter.X -= moveH1;
-            return MoveHExact(moveH1, onCollide, pusher);
+            this.movementCounter.X -= (float) moveH1;
+            return this.MoveHExact(moveH1, onCollide, pusher);
         }
 
         public bool MoveV(float moveV, Collision onCollide = null, Solid pusher = null)
         {
-            movementCounter.Y += moveV;
-            int moveV1 = (int)Math.Round(movementCounter.Y, MidpointRounding.ToEven);
+            this.movementCounter.Y += moveV;
+            int moveV1 = (int) Math.Round((double) this.movementCounter.Y, MidpointRounding.ToEven);
             if (moveV1 == 0)
-            {
                 return false;
-            }
-
-            movementCounter.Y -= moveV1;
-            return MoveVExact(moveV1, onCollide, pusher);
+            this.movementCounter.Y -= (float) moveV1;
+            return this.MoveVExact(moveV1, onCollide, pusher);
         }
 
         public bool MoveHExact(int moveH, Collision onCollide = null, Solid pusher = null)
         {
-            Vector2 vector2 = Position + (Vector2.UnitX * moveH);
-            int direction = Math.Sign(moveH);
+            Vector2 vector2 = this.Position + Vector2.UnitX * (float) moveH;
+            int num1 = Math.Sign(moveH);
             int num2 = 0;
             while (moveH != 0)
             {
-                Solid solid = CollideFirst<Solid>(Position + (Vector2.UnitX * direction));
+                Solid solid = this.CollideFirst<Solid>(this.Position + Vector2.UnitX * (float) num1);
                 if (solid != null)
                 {
-                    movementCounter.X = 0.0f;
-                    onCollide?.Invoke(new CollisionData()
-                    {
-                        Direction = Vector2.UnitX * direction,
-                        Moved = Vector2.UnitX * num2,
-                        TargetPosition = vector2,
-                        Hit = solid,
-                        Pusher = pusher
-                    });
+                    this.movementCounter.X = 0.0f;
+                    if (onCollide != null)
+                        onCollide(new CollisionData()
+                        {
+                            Direction = Vector2.UnitX * (float) num1,
+                            Moved = Vector2.UnitX * (float) num2,
+                            TargetPosition = vector2,
+                            Hit = (Platform) solid,
+                            Pusher = pusher
+                        });
                     return true;
                 }
-                num2 += direction;
-                moveH -= direction;
-                X += direction;
+                num2 += num1;
+                moveH -= num1;
+                this.X += (float) num1;
             }
             return false;
         }
 
         public bool MoveVExact(int moveV, Collision onCollide = null, Solid pusher = null)
         {
-            Vector2 vector2 = Position + (Vector2.UnitY * moveV);
+            Vector2 vector2 = this.Position + Vector2.UnitY * (float) moveV;
             int num1 = Math.Sign(moveV);
             int num2 = 0;
             while (moveV != 0)
             {
-                Platform platform1 = CollideFirst<Solid>(Position + (Vector2.UnitY * num1));
+                Platform platform1 = (Platform) this.CollideFirst<Solid>(this.Position + Vector2.UnitY * (float) num1);
                 if (platform1 != null)
                 {
-                    movementCounter.Y = 0.0f;
-                    onCollide?.Invoke(new CollisionData()
-                    {
-                        Direction = Vector2.UnitY * num1,
-                        Moved = Vector2.UnitY * num2,
-                        TargetPosition = vector2,
-                        Hit = platform1,
-                        Pusher = pusher
-                    });
-                    return true;
-                }
-                if (moveV > 0 && !IgnoreJumpThrus)
-                {
-                    Platform platform2 = CollideFirstOutside<JumpThru>(Position + (Vector2.UnitY * num1));
-                    if (platform2 != null)
-                    {
-                        movementCounter.Y = 0.0f;
-                        onCollide?.Invoke(new CollisionData()
+                    this.movementCounter.Y = 0.0f;
+                    if (onCollide != null)
+                        onCollide(new CollisionData()
                         {
-                            Direction = Vector2.UnitY * num1,
-                            Moved = Vector2.UnitY * num2,
+                            Direction = Vector2.UnitY * (float) num1,
+                            Moved = Vector2.UnitY * (float) num2,
                             TargetPosition = vector2,
-                            Hit = platform2,
+                            Hit = platform1,
                             Pusher = pusher
                         });
+                    return true;
+                }
+                if (moveV > 0 && !this.IgnoreJumpThrus)
+                {
+                    Platform platform2 = (Platform) this.CollideFirstOutside<JumpThru>(this.Position + Vector2.UnitY * (float) num1);
+                    if (platform2 != null)
+                    {
+                        this.movementCounter.Y = 0.0f;
+                        if (onCollide != null)
+                            onCollide(new CollisionData()
+                            {
+                                Direction = Vector2.UnitY * (float) num1,
+                                Moved = Vector2.UnitY * (float) num2,
+                                TargetPosition = vector2,
+                                Hit = platform2,
+                                Pusher = pusher
+                            });
                         return true;
                     }
                 }
                 num2 += num1;
                 moveV -= num1;
-                Y += num1;
+                this.Y += (float) num1;
             }
             return false;
         }
 
-        public void MoveTowardsX(float targetX, float maxAmount, Collision onCollide = null)
-        {
-            MoveToX(Calc.Approach(ExactPosition.X, targetX, maxAmount), onCollide);
-        }
+        public void MoveTowardsX(float targetX, float maxAmount, Collision onCollide = null) => this.MoveToX(Calc.Approach(this.ExactPosition.X, targetX, maxAmount), onCollide);
 
-        public void MoveTowardsY(float targetY, float maxAmount, Collision onCollide = null)
-        {
-            MoveToY(Calc.Approach(ExactPosition.Y, targetY, maxAmount), onCollide);
-        }
+        public void MoveTowardsY(float targetY, float maxAmount, Collision onCollide = null) => this.MoveToY(Calc.Approach(this.ExactPosition.Y, targetY, maxAmount), onCollide);
 
-        public void MoveToX(float toX, Collision onCollide = null)
-        {
-            _ = MoveH(toX - ExactPosition.X, onCollide);
-        }
+        public void MoveToX(float toX, Collision onCollide = null) => this.MoveH(toX - this.ExactPosition.X, onCollide);
 
-        public void MoveToY(float toY, Collision onCollide = null)
-        {
-            _ = MoveV(toY - ExactPosition.Y, onCollide);
-        }
+        public void MoveToY(float toY, Collision onCollide = null) => this.MoveV(toY - this.ExactPosition.Y, onCollide);
 
         public void NaiveMove(Vector2 amount)
         {
-            movementCounter += amount;
-            int x = (int)Math.Round(movementCounter.X);
-            int y = (int)Math.Round(movementCounter.Y);
-            Position += new Vector2(x, y);
-            movementCounter -= new Vector2(x, y);
+            this.movementCounter += amount;
+            int x = (int) Math.Round((double) this.movementCounter.X);
+            int y = (int) Math.Round((double) this.movementCounter.Y);
+            this.Position = this.Position + new Vector2((float) x, (float) y);
+            this.movementCounter -= new Vector2((float) x, (float) y);
         }
     }
 }

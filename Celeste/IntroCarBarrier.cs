@@ -13,12 +13,12 @@ namespace Celeste
     {
         public IntroCarBarrier(Vector2 position, int depth, Color color)
         {
-            Position = position;
-            Depth = depth;
-            Monocle.Image image = new(GFX.Game["scenery/car/barrier"]);
+            this.Position = position;
+            this.Depth = depth;
+            Monocle.Image image = new Monocle.Image(GFX.Game["scenery/car/barrier"]);
             image.Origin = new Vector2(0.0f, image.Height);
             image.Color = color;
-            Add(image);
+            this.Add((Component) image);
         }
     }
 }

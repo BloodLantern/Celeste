@@ -11,19 +11,19 @@ namespace Celeste
 {
     public class CustomSpriteEffect : Effect
     {
-        private readonly EffectParameter matrixParam;
+        private EffectParameter matrixParam;
 
         public CustomSpriteEffect(Effect effect)
             : base(effect)
         {
-            matrixParam = Parameters["MatrixTransform"];
+            this.matrixParam = this.Parameters["MatrixTransform"];
         }
 
         protected override void OnApply()
         {
-            Viewport viewport = GraphicsDevice.Viewport;
-            Matrix orthographicOffCenter = Matrix.CreateOrthographicOffCenter(0.0f, viewport.Width, viewport.Height, 0.0f, 0.0f, 1f);
-            matrixParam.SetValue(Matrix.CreateTranslation(-0.5f, -0.5f, 0.0f) * orthographicOffCenter);
+            Viewport viewport = this.GraphicsDevice.Viewport;
+            Matrix orthographicOffCenter = Matrix.CreateOrthographicOffCenter(0.0f, (float) viewport.Width, (float) viewport.Height, 0.0f, 0.0f, 1f);
+            this.matrixParam.SetValue(Matrix.CreateTranslation(-0.5f, -0.5f, 0.0f) * orthographicOffCenter);
             base.OnApply();
         }
     }

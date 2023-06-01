@@ -12,37 +12,37 @@ namespace Celeste
 {
     public class ResortLantern : Entity
     {
-        private readonly Monocle.Image holder;
-        private readonly Sprite lantern;
+        private Monocle.Image holder;
+        private Sprite lantern;
         private float collideTimer;
         private int mult;
-        private readonly Wiggler wiggler;
-        private readonly VertexLight light;
-        private readonly BloomPoint bloom;
+        private Wiggler wiggler;
+        private VertexLight light;
+        private BloomPoint bloom;
         private float alphaTimer;
-        private readonly SoundSource sfx;
+        private SoundSource sfx;
 
         public ResortLantern(Vector2 position)
             : base(position)
         {
-            Collider = new Hitbox(8f, 8f, -4f, -4f);
-            Depth = 2000;
-            Add(new PlayerCollider(new Action<Player>(OnPlayer)));
-            holder = new Monocle.Image(GFX.Game["objects/resortLantern/holder"]);
-            _ = holder.CenterOrigin();
-            Add(holder);
-            lantern = new Sprite(GFX.Game, "objects/resortLantern/");
-            lantern.AddLoop(nameof(light), nameof(lantern), 0.3f, 0, 0, 1, 2, 1);
-            lantern.Play(nameof(light));
-            lantern.Origin = new Vector2(7f, 7f);
-            lantern.Position = new Vector2(-1f, -5f);
-            Add(lantern);
-            wiggler = Wiggler.Create(2.5f, 1.2f, v => lantern.Rotation = (float)((double)v * mult * (Math.PI / 180.0) * 30.0));
-            wiggler.StartZero = true;
-            Add(wiggler);
-            Add(light = new VertexLight(Color.White, 0.95f, 32, 64));
-            Add(bloom = new BloomPoint(0.8f, 8f));
-            Add(sfx = new SoundSource());
+            this.Collider = (Collider) new Hitbox(8f, 8f, -4f, -4f);
+            this.Depth = 2000;
+            this.Add((Component) new PlayerCollider(new Action<Player>(this.OnPlayer)));
+            this.holder = new Monocle.Image(GFX.Game["objects/resortLantern/holder"]);
+            this.holder.CenterOrigin();
+            this.Add((Component) this.holder);
+            this.lantern = new Sprite(GFX.Game, "objects/resortLantern/");
+            this.lantern.AddLoop(nameof (light), nameof (lantern), 0.3f, 0, 0, 1, 2, 1);
+            this.lantern.Play(nameof (light));
+            this.lantern.Origin = new Vector2(7f, 7f);
+            this.lantern.Position = new Vector2(-1f, -5f);
+            this.Add((Component) this.lantern);
+            this.wiggler = Wiggler.Create(2.5f, 1.2f, (Action<float>) (v => this.lantern.Rotation = (float) ((double) v * (double) this.mult * (Math.PI / 180.0) * 30.0)));
+            this.wiggler.StartZero = true;
+            this.Add((Component) this.wiggler);
+            this.Add((Component) (this.light = new VertexLight(Color.White, 0.95f, 32, 64)));
+            this.Add((Component) (this.bloom = new BloomPoint(0.8f, 8f)));
+            this.Add((Component) (this.sfx = new SoundSource()));
         }
 
         public ResortLantern(EntityData data, Vector2 offset)
@@ -53,46 +53,35 @@ namespace Celeste
         public override void Awake(Scene scene)
         {
             base.Awake(scene);
-            if (!CollideCheck<Solid>(Position + (Vector2.UnitX * 8f)))
-            {
+            if (!this.CollideCheck<Solid>(this.Position + Vector2.UnitX * 8f))
                 return;
-            }
-
-            holder.Scale.X = -1f;
-            lantern.Scale.X = -1f;
-            lantern.X += 2f;
+            this.holder.Scale.X = -1f;
+            this.lantern.Scale.X = -1f;
+            this.lantern.X += 2f;
         }
 
         public override void Update()
         {
             base.Update();
-            if (collideTimer > 0.0)
-            {
-                collideTimer -= Engine.DeltaTime;
-            }
-
-            alphaTimer += Engine.DeltaTime;
-            bloom.Alpha = light.Alpha = (float)(0.949999988079071 + (Math.Sin(alphaTimer * 1.0) * 0.05000000074505806));
+            if ((double) this.collideTimer > 0.0)
+                this.collideTimer -= Engine.DeltaTime;
+            this.alphaTimer += Engine.DeltaTime;
+            this.bloom.Alpha = this.light.Alpha = (float) (0.949999988079071 + Math.Sin((double) this.alphaTimer * 1.0) * 0.05000000074505806);
         }
 
         private void OnPlayer(Player player)
         {
-            if (collideTimer <= 0.0)
+            if ((double) this.collideTimer <= 0.0)
             {
                 if (!(player.Speed != Vector2.Zero))
-                {
                     return;
-                }
-
-                _ = sfx.Play("event:/game/03_resort/lantern_bump");
-                collideTimer = 0.5f;
-                mult = Calc.Random.Choose<int>(1, -1);
-                wiggler.Start();
+                this.sfx.Play("event:/game/03_resort/lantern_bump");
+                this.collideTimer = 0.5f;
+                this.mult = Calc.Random.Choose<int>(1, -1);
+                this.wiggler.Start();
             }
             else
-            {
-                collideTimer = 0.5f;
-            }
+                this.collideTimer = 0.5f;
         }
     }
 }

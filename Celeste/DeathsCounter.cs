@@ -21,136 +21,121 @@ namespace Celeste
         public Color Color = Color.White;
         private int amount;
         private int minDigits;
-        private readonly Wiggler wiggler;
-        private readonly Wiggler iconWiggler;
+        private Wiggler wiggler;
+        private Wiggler iconWiggler;
         private float flashTimer;
         private string sAmount;
         private MTexture icon;
-        private readonly MTexture x;
+        private MTexture x;
 
         public DeathsCounter(AreaMode mode, bool centeredX, int amount, int minDigits = 0)
             : base(true, true)
         {
-            CenteredX = centeredX;
+            this.CenteredX = centeredX;
             this.amount = amount;
             this.minDigits = minDigits;
-            UpdateString();
-            wiggler = Wiggler.Create(0.5f, 3f);
-            wiggler.StartZero = true;
-            wiggler.UseRawDeltaTime = true;
-            iconWiggler = Wiggler.Create(0.5f, 3f);
-            iconWiggler.UseRawDeltaTime = true;
-            SetMode(mode);
-            x = GFX.Gui[nameof(x)];
+            this.UpdateString();
+            this.wiggler = Wiggler.Create(0.5f, 3f);
+            this.wiggler.StartZero = true;
+            this.wiggler.UseRawDeltaTime = true;
+            this.iconWiggler = Wiggler.Create(0.5f, 3f);
+            this.iconWiggler.UseRawDeltaTime = true;
+            this.SetMode(mode);
+            this.x = GFX.Gui[nameof (x)];
         }
 
         private void UpdateString()
         {
-            sAmount = minDigits > 0 ? amount.ToString("D" + minDigits) : amount.ToString();
+            if (this.minDigits > 0)
+                this.sAmount = this.amount.ToString("D" + (object) this.minDigits);
+            else
+                this.sAmount = this.amount.ToString();
         }
 
         public int Amount
         {
-            get => amount;
+            get => this.amount;
             set
             {
-                if (amount == value)
-                {
+                if (this.amount == value)
                     return;
-                }
-
-                amount = value;
-                UpdateString();
-                if (!CanWiggle)
-                {
+                this.amount = value;
+                this.UpdateString();
+                if (!this.CanWiggle)
                     return;
-                }
-
-                wiggler.Start();
-                flashTimer = 0.5f;
+                this.wiggler.Start();
+                this.flashTimer = 0.5f;
             }
         }
 
         public int MinDigits
         {
-            get => minDigits;
+            get => this.minDigits;
             set
             {
-                if (minDigits == value)
-                {
+                if (this.minDigits == value)
                     return;
-                }
-
-                minDigits = value;
-                UpdateString();
+                this.minDigits = value;
+                this.UpdateString();
             }
         }
 
         public void SetMode(AreaMode mode)
         {
-            icon = mode switch
+            switch (mode)
             {
-                AreaMode.Normal => GFX.Gui["collectables/skullBlue"],
-                AreaMode.BSide => GFX.Gui["collectables/skullRed"],
-                _ => GFX.Gui["collectables/skullGold"],
-            };
-            iconWiggler.Start();
+                case AreaMode.Normal:
+                    this.icon = GFX.Gui["collectables/skullBlue"];
+                    break;
+                case AreaMode.BSide:
+                    this.icon = GFX.Gui["collectables/skullRed"];
+                    break;
+                default:
+                    this.icon = GFX.Gui["collectables/skullGold"];
+                    break;
+            }
+            this.iconWiggler.Start();
         }
 
         public void Wiggle()
         {
-            wiggler.Start();
-            flashTimer = 0.5f;
+            this.wiggler.Start();
+            this.flashTimer = 0.5f;
         }
 
         public override void Update()
         {
             base.Update();
-            if (wiggler.Active)
-            {
-                wiggler.Update();
-            }
-
-            if (iconWiggler.Active)
-            {
-                iconWiggler.Update();
-            }
-
-            if (flashTimer <= 0.0)
-            {
+            if (this.wiggler.Active)
+                this.wiggler.Update();
+            if (this.iconWiggler.Active)
+                this.iconWiggler.Update();
+            if ((double) this.flashTimer <= 0.0)
                 return;
-            }
-
-            flashTimer -= Engine.RawDeltaTime;
+            this.flashTimer -= Engine.RawDeltaTime;
         }
 
         public override void Render()
         {
-            Vector2 renderPosition = RenderPosition;
-            float x = ActiveFont.Measure(sAmount).X;
-            float num = (float)(62.0 + this.x.Width + 2.0) + x;
-            Color color = Color;
+            Vector2 renderPosition = this.RenderPosition;
+            float x = ActiveFont.Measure(this.sAmount).X;
+            float num = (float) (62.0 + (double) this.x.Width + 2.0) + x;
+            Color color = this.Color;
             Color black = Color.Black;
-            if (flashTimer > 0.0 && Scene != null && Scene.BetweenRawInterval(0.05f))
-            {
+            if ((double) this.flashTimer > 0.0 && this.Scene != null && this.Scene.BetweenRawInterval(0.05f))
                 color = StrawberriesCounter.FlashColor;
-            }
-
-            if (Alpha < 1.0)
+            if ((double) this.Alpha < 1.0)
             {
-                color *= Alpha;
-                black *= Alpha;
+                color *= this.Alpha;
+                black *= this.Alpha;
             }
-            if (CenteredX)
-            {
-                renderPosition -= Vector2.UnitX * (num / 2f) * Scale;
-            }
-
-            icon.DrawCentered(renderPosition + (new Vector2(30f, 0.0f) * Scale), Color.White * Alpha, Scale * (float)(1.0 + ((double)iconWiggler.Value * 0.20000000298023224)));
-            this.x.DrawCentered(renderPosition + (new Vector2(62f + (this.x.Width / 2), 2f) * Scale), color, Scale);
-            ActiveFont.DrawOutline(sAmount, renderPosition + (new Vector2(num - (x / 2f), (float)(-(double)wiggler.Value * 18.0)) * Scale), new Vector2(0.5f, 0.5f), Vector2.One * Scale, color, Stroke, black);
+            if (this.CenteredX)
+                renderPosition -= Vector2.UnitX * (num / 2f) * this.Scale;
+            this.icon.DrawCentered(renderPosition + new Vector2(30f, 0.0f) * this.Scale, Color.White * this.Alpha, this.Scale * (float) (1.0 + (double) this.iconWiggler.Value * 0.20000000298023224));
+            this.x.DrawCentered(renderPosition + new Vector2(62f + (float) (this.x.Width / 2), 2f) * this.Scale, color, this.Scale);
+            ActiveFont.DrawOutline(this.sAmount, renderPosition + new Vector2(num - x / 2f, (float) (-(double) this.wiggler.Value * 18.0)) * this.Scale, new Vector2(0.5f, 0.5f), Vector2.One * this.Scale, color, this.Stroke, black);
         }
 
-        public Vector2 RenderPosition => ((Entity != null ? Entity.Position : Vector2.Zero) + Position).Round();
+        public Vector2 RenderPosition => ((this.Entity != null ? this.Entity.Position : Vector2.Zero) + this.Position).Round();
     }
 }

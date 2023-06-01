@@ -17,7 +17,7 @@ namespace Celeste
         public CustomBloom(Action onRenderBloom)
             : base(false, true)
         {
-            OnRenderBloom = onRenderBloom;
+            this.OnRenderBloom = onRenderBloom;
         }
     }
 }

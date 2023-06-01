@@ -17,7 +17,7 @@ namespace Celeste
         public BeforeRenderHook(Action callback)
             : base(false, true)
         {
-            Callback = callback;
+            this.Callback = callback;
         }
     }
 }

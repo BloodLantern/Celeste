@@ -17,20 +17,20 @@ namespace Celeste
 
         public SinkingPlatformLine(Vector2 position)
         {
-            Position = position;
-            Depth = 9001;
+            this.Position = position;
+            this.Depth = 9001;
         }
 
         public override void Added(Scene scene)
         {
             base.Added(scene);
-            height = SceneAs<Level>().Bounds.Height - (Y - SceneAs<Level>().Bounds.Y);
+            this.height = (float) this.SceneAs<Level>().Bounds.Height - (this.Y - (float) this.SceneAs<Level>().Bounds.Y);
         }
 
         public override void Render()
         {
-            Draw.Rect(X - 1f, Y, 3f, height, lineEdgeColor);
-            Draw.Rect(X, Y + 1f, 1f, height, lineInnerColor);
+            Draw.Rect(this.X - 1f, this.Y, 3f, this.height, this.lineEdgeColor);
+            Draw.Rect(this.X, this.Y + 1f, 1f, this.height, this.lineInnerColor);
         }
     }
 }

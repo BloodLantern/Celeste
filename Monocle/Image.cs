@@ -16,60 +16,57 @@ namespace Monocle
         public Image(MTexture texture)
             : base(false)
         {
-            Texture = texture;
+            this.Texture = texture;
         }
 
         internal Image(MTexture texture, bool active)
             : base(active)
         {
-            Texture = texture;
+            this.Texture = texture;
         }
 
         public override void Render()
         {
-            if (Texture == null)
-            {
+            if (this.Texture == null)
                 return;
-            }
-
-            Texture.Draw(RenderPosition, Origin, Color, Scale, Rotation, Effects);
+            this.Texture.Draw(this.RenderPosition, this.Origin, this.Color, this.Scale, this.Rotation, this.Effects);
         }
 
-        public virtual float Width => Texture.Width;
+        public virtual float Width => (float) this.Texture.Width;
 
-        public virtual float Height => Texture.Height;
+        public virtual float Height => (float) this.Texture.Height;
 
         public Image SetOrigin(float x, float y)
         {
-            Origin.X = x;
-            Origin.Y = y;
+            this.Origin.X = x;
+            this.Origin.Y = y;
             return this;
         }
 
         public Image CenterOrigin()
         {
-            Origin.X = Width / 2f;
-            Origin.Y = Height / 2f;
+            this.Origin.X = this.Width / 2f;
+            this.Origin.Y = this.Height / 2f;
             return this;
         }
 
         public Image JustifyOrigin(Vector2 at)
         {
-            Origin.X = Width * at.X;
-            Origin.Y = Height * at.Y;
+            this.Origin.X = this.Width * at.X;
+            this.Origin.Y = this.Height * at.Y;
             return this;
         }
 
         public Image JustifyOrigin(float x, float y)
         {
-            Origin.X = Width * x;
-            Origin.Y = Height * y;
+            this.Origin.X = this.Width * x;
+            this.Origin.Y = this.Height * y;
             return this;
         }
 
         public Image SetColor(Color color)
         {
-            Color = color;
+            this.Color = color;
             return this;
         }
     }

@@ -13,14 +13,11 @@ namespace FMOD
     {
         public RESULT release()
         {
-            int num = (int)Geometry.FMOD_Geometry_Release(getRaw());
+            int num = (int) Geometry.FMOD_Geometry_Release(this.getRaw());
             if (num != 0)
-            {
-                return (RESULT)num;
-            }
-
-            rawPtr = IntPtr.Zero;
-            return (RESULT)num;
+                return (RESULT) num;
+            this.rawPtr = IntPtr.Zero;
+            return (RESULT) num;
         }
 
         public RESULT addPolygon(
@@ -31,33 +28,18 @@ namespace FMOD
             VECTOR[] vertices,
             out int polygonindex)
         {
-            return Geometry.FMOD_Geometry_AddPolygon(rawPtr, directocclusion, reverbocclusion, doublesided, numvertices, vertices, out polygonindex);
+            return Geometry.FMOD_Geometry_AddPolygon(this.rawPtr, directocclusion, reverbocclusion, doublesided, numvertices, vertices, out polygonindex);
         }
 
-        public RESULT getNumPolygons(out int numpolygons)
-        {
-            return Geometry.FMOD_Geometry_GetNumPolygons(rawPtr, out numpolygons);
-        }
+        public RESULT getNumPolygons(out int numpolygons) => Geometry.FMOD_Geometry_GetNumPolygons(this.rawPtr, out numpolygons);
 
-        public RESULT getMaxPolygons(out int maxpolygons, out int maxvertices)
-        {
-            return Geometry.FMOD_Geometry_GetMaxPolygons(rawPtr, out maxpolygons, out maxvertices);
-        }
+        public RESULT getMaxPolygons(out int maxpolygons, out int maxvertices) => Geometry.FMOD_Geometry_GetMaxPolygons(this.rawPtr, out maxpolygons, out maxvertices);
 
-        public RESULT getPolygonNumVertices(int index, out int numvertices)
-        {
-            return Geometry.FMOD_Geometry_GetPolygonNumVertices(rawPtr, index, out numvertices);
-        }
+        public RESULT getPolygonNumVertices(int index, out int numvertices) => Geometry.FMOD_Geometry_GetPolygonNumVertices(this.rawPtr, index, out numvertices);
 
-        public RESULT setPolygonVertex(int index, int vertexindex, ref VECTOR vertex)
-        {
-            return Geometry.FMOD_Geometry_SetPolygonVertex(rawPtr, index, vertexindex, ref vertex);
-        }
+        public RESULT setPolygonVertex(int index, int vertexindex, ref VECTOR vertex) => Geometry.FMOD_Geometry_SetPolygonVertex(this.rawPtr, index, vertexindex, ref vertex);
 
-        public RESULT getPolygonVertex(int index, int vertexindex, out VECTOR vertex)
-        {
-            return Geometry.FMOD_Geometry_GetPolygonVertex(rawPtr, index, vertexindex, out vertex);
-        }
+        public RESULT getPolygonVertex(int index, int vertexindex, out VECTOR vertex) => Geometry.FMOD_Geometry_GetPolygonVertex(this.rawPtr, index, vertexindex, out vertex);
 
         public RESULT setPolygonAttributes(
             int index,
@@ -65,7 +47,7 @@ namespace FMOD
             float reverbocclusion,
             bool doublesided)
         {
-            return Geometry.FMOD_Geometry_SetPolygonAttributes(rawPtr, index, directocclusion, reverbocclusion, doublesided);
+            return Geometry.FMOD_Geometry_SetPolygonAttributes(this.rawPtr, index, directocclusion, reverbocclusion, doublesided);
         }
 
         public RESULT getPolygonAttributes(
@@ -74,63 +56,30 @@ namespace FMOD
             out float reverbocclusion,
             out bool doublesided)
         {
-            return Geometry.FMOD_Geometry_GetPolygonAttributes(rawPtr, index, out directocclusion, out reverbocclusion, out doublesided);
+            return Geometry.FMOD_Geometry_GetPolygonAttributes(this.rawPtr, index, out directocclusion, out reverbocclusion, out doublesided);
         }
 
-        public RESULT setActive(bool active)
-        {
-            return Geometry.FMOD_Geometry_SetActive(rawPtr, active);
-        }
+        public RESULT setActive(bool active) => Geometry.FMOD_Geometry_SetActive(this.rawPtr, active);
 
-        public RESULT getActive(out bool active)
-        {
-            return Geometry.FMOD_Geometry_GetActive(rawPtr, out active);
-        }
+        public RESULT getActive(out bool active) => Geometry.FMOD_Geometry_GetActive(this.rawPtr, out active);
 
-        public RESULT setRotation(ref VECTOR forward, ref VECTOR up)
-        {
-            return Geometry.FMOD_Geometry_SetRotation(rawPtr, ref forward, ref up);
-        }
+        public RESULT setRotation(ref VECTOR forward, ref VECTOR up) => Geometry.FMOD_Geometry_SetRotation(this.rawPtr, ref forward, ref up);
 
-        public RESULT getRotation(out VECTOR forward, out VECTOR up)
-        {
-            return Geometry.FMOD_Geometry_GetRotation(rawPtr, out forward, out up);
-        }
+        public RESULT getRotation(out VECTOR forward, out VECTOR up) => Geometry.FMOD_Geometry_GetRotation(this.rawPtr, out forward, out up);
 
-        public RESULT setPosition(ref VECTOR position)
-        {
-            return Geometry.FMOD_Geometry_SetPosition(rawPtr, ref position);
-        }
+        public RESULT setPosition(ref VECTOR position) => Geometry.FMOD_Geometry_SetPosition(this.rawPtr, ref position);
 
-        public RESULT getPosition(out VECTOR position)
-        {
-            return Geometry.FMOD_Geometry_GetPosition(rawPtr, out position);
-        }
+        public RESULT getPosition(out VECTOR position) => Geometry.FMOD_Geometry_GetPosition(this.rawPtr, out position);
 
-        public RESULT setScale(ref VECTOR scale)
-        {
-            return Geometry.FMOD_Geometry_SetScale(rawPtr, ref scale);
-        }
+        public RESULT setScale(ref VECTOR scale) => Geometry.FMOD_Geometry_SetScale(this.rawPtr, ref scale);
 
-        public RESULT getScale(out VECTOR scale)
-        {
-            return Geometry.FMOD_Geometry_GetScale(rawPtr, out scale);
-        }
+        public RESULT getScale(out VECTOR scale) => Geometry.FMOD_Geometry_GetScale(this.rawPtr, out scale);
 
-        public RESULT save(IntPtr data, out int datasize)
-        {
-            return Geometry.FMOD_Geometry_Save(rawPtr, data, out datasize);
-        }
+        public RESULT save(IntPtr data, out int datasize) => Geometry.FMOD_Geometry_Save(this.rawPtr, data, out datasize);
 
-        public RESULT setUserData(IntPtr userdata)
-        {
-            return Geometry.FMOD_Geometry_SetUserData(rawPtr, userdata);
-        }
+        public RESULT setUserData(IntPtr userdata) => Geometry.FMOD_Geometry_SetUserData(this.rawPtr, userdata);
 
-        public RESULT getUserData(out IntPtr userdata)
-        {
-            return Geometry.FMOD_Geometry_GetUserData(rawPtr, out userdata);
-        }
+        public RESULT getUserData(out IntPtr userdata) => Geometry.FMOD_Geometry_GetUserData(this.rawPtr, out userdata);
 
         [DllImport("fmod")]
         private static extern RESULT FMOD_Geometry_Release(IntPtr geometry);

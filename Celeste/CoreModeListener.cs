@@ -17,7 +17,7 @@ namespace Celeste
         public CoreModeListener(Action<Session.CoreModes> onChange)
             : base(false, false)
         {
-            OnChange = onChange;
+            this.OnChange = onChange;
         }
     }
 }

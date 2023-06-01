@@ -14,53 +14,40 @@ namespace Celeste
         public float Alpha = 1f;
         private float visibleFade = 1f;
         private float linearFade = 1f;
-        private readonly RainFG.Particle[] particles = new RainFG.Particle[240];
+        private RainFG.Particle[] particles = new RainFG.Particle[240];
 
         public RainFG()
         {
-            for (int index = 0; index < particles.Length; ++index)
-            {
-                particles[index].Init();
-            }
+            for (int index = 0; index < this.particles.Length; ++index)
+                this.particles[index].Init();
         }
 
         public override void Update(Scene scene)
         {
             base.Update(scene);
-            bool flag = IsVisible(scene as Level);
+            bool flag = this.IsVisible(scene as Level);
             (scene as Level).Raining = flag;
-            visibleFade = Calc.Approach(visibleFade, flag ? 1f : 0.0f, Engine.DeltaTime * (flag ? 10f : 0.25f));
-            if (FadeX != null)
-            {
-                linearFade = FadeX.Value((scene as Level).Camera.X + 160f);
-            }
-
-            for (int index = 0; index < particles.Length; ++index)
-            {
-                particles[index].Position += particles[index].Speed * Engine.DeltaTime;
-            }
+            this.visibleFade = Calc.Approach(this.visibleFade, flag ? 1f : 0.0f, Engine.DeltaTime * (flag ? 10f : 0.25f));
+            if (this.FadeX != null)
+                this.linearFade = this.FadeX.Value((scene as Level).Camera.X + 160f);
+            for (int index = 0; index < this.particles.Length; ++index)
+                this.particles[index].Position += this.particles[index].Speed * Engine.DeltaTime;
         }
 
         public override void Render(Scene scene)
         {
-            if (Alpha <= 0.0 || visibleFade <= 0.0 || linearFade <= 0.0)
-            {
+            if ((double) this.Alpha <= 0.0 || (double) this.visibleFade <= 0.0 || (double) this.linearFade <= 0.0)
                 return;
-            }
-
-            Color color = Calc.HexToColor("161933") * 0.5f * Alpha * linearFade * visibleFade;
+            Color color = Calc.HexToColor("161933") * 0.5f * this.Alpha * this.linearFade * this.visibleFade;
             Camera camera = (scene as Level).Camera;
-            for (int index = 0; index < particles.Length; ++index)
+            for (int index = 0; index < this.particles.Length; ++index)
             {
-                Vector2 position = new(mod((float)(particles[index].Position.X - (double)camera.X - 32.0), 384f), mod((float)(particles[index].Position.Y - (double)camera.Y - 32.0), 244f));
-                Draw.Pixel.DrawCentered(position, color, particles[index].Scale, particles[index].Rotation);
+                Vector2 position = new Vector2(this.mod((float) ((double) this.particles[index].Position.X - (double) camera.X - 32.0), 384f), this.mod((float) ((double) this.particles[index].Position.Y - (double) camera.Y - 32.0), 244f));
+                Draw.Pixel.DrawCentered(position, color, this.particles[index].Scale, this.particles[index].Rotation);
             }
         }
 
-        private float mod(float x, float m)
-        {
-            return ((x % m) + m) % m;
-        }
+        private float mod(float x, float m) => (x % m + m) % m;
 
         private struct Particle
         {
@@ -71,10 +58,10 @@ namespace Celeste
 
             public void Init()
             {
-                Position = new Vector2(Calc.Random.NextFloat(384f) - 32f, Calc.Random.NextFloat(244f) - 32f);
-                Rotation = 1.57079637f + Calc.Random.Range(-0.05f, 0.05f);
-                Speed = Calc.AngleToVector(Rotation, Calc.Random.Range(200f, 600f));
-                Scale = new Vector2((float)(4.0 + (((double)Speed.Length() - 200.0) / 400.0 * 12.0)), 1f);
+                this.Position = new Vector2(Calc.Random.NextFloat(384f) - 32f, Calc.Random.NextFloat(244f) - 32f);
+                this.Rotation = 1.57079637f + Calc.Random.Range(-0.05f, 0.05f);
+                this.Speed = Calc.AngleToVector(this.Rotation, Calc.Random.Range(200f, 600f));
+                this.Scale = new Vector2((float) (4.0 + ((double) this.Speed.Length() - 200.0) / 400.0 * 12.0), 1f);
             }
         }
     }

@@ -16,14 +16,11 @@ namespace FMOD
         {
             byte[] numArray = new byte[builder.Capacity];
             Marshal.Copy(nativeMem, numArray, 0, builder.Capacity);
-            int count = Array.IndexOf<byte>(numArray, 0);
+            int count = Array.IndexOf<byte>(numArray, (byte) 0);
             if (count <= 0)
-            {
                 return;
-            }
-
             string str = Encoding.UTF8.GetString(numArray, 0, count);
-            _ = builder.Append(str);
+            builder.Append(str);
         }
     }
 }

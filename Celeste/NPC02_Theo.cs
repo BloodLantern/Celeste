@@ -20,37 +20,31 @@ namespace Celeste
 
         private int CurrentConversation
         {
-            get => Session.GetCounter("theo");
-            set => Session.SetCounter("theo", value);
+            get => this.Session.GetCounter("theo");
+            set => this.Session.SetCounter("theo", value);
         }
 
         public NPC02_Theo(Vector2 position)
             : base(position)
         {
-            Add(Sprite = GFX.SpriteBank.Create("theo"));
-            Sprite.Play("idle");
+            this.Add((Component) (this.Sprite = GFX.SpriteBank.Create("theo")));
+            this.Sprite.Play("idle");
         }
 
         public override void Added(Scene scene)
         {
             base.Added(scene);
-            if (Session.GetFlag("theoDoneTalking"))
-            {
+            if (this.Session.GetFlag("theoDoneTalking"))
                 return;
-            }
-
-            Add(Talker = new TalkComponent(new Rectangle(-20, -8, 100, 8), new Vector2(0.0f, -24f), new Action<Player>(OnTalk)));
+            this.Add((Component) (this.Talker = new TalkComponent(new Rectangle(-20, -8, 100, 8), new Vector2(0.0f, -24f), new Action<Player>(this.OnTalk))));
         }
 
         private void OnTalk(Player player)
         {
             if (!SaveData.Instance.HasFlag("MetTheo") || !SaveData.Instance.HasFlag("TheoKnowsName"))
-            {
-                CurrentConversation = -1;
-            }
-
-            Level.StartCutscene(new Action<Level>(OnTalkEnd));
-            Add(talkRoutine = new Coroutine(Talk(player)));
+                this.CurrentConversation = -1;
+            this.Level.StartCutscene(new Action<Level>(this.OnTalkEnd));
+            this.Add((Component) (this.talkRoutine = new Coroutine(this.Talk(player))));
         }
 
         private IEnumerator Talk(Player player)
@@ -60,49 +54,47 @@ namespace Celeste
             {
                 npC02Theo.Session.SetFlag("hadntMetTheoAtStart");
                 SaveData.Instance.SetFlag("MetTheo");
-                yield return npC02Theo.PlayerApproachRightSide(player, spacing: new float?(48f));
-                yield return Textbox.Say("CH2_THEO_INTRO_NEVER_MET");
+                yield return (object) npC02Theo.PlayerApproachRightSide(player, spacing: new float?(48f));
+                yield return (object) Textbox.Say("CH2_THEO_INTRO_NEVER_MET");
             }
             else if (!SaveData.Instance.HasFlag("TheoKnowsName"))
             {
                 npC02Theo.Session.SetFlag("hadntMetTheoAtStart");
                 SaveData.Instance.SetFlag("TheoKnowsName");
-                yield return npC02Theo.PlayerApproachRightSide(player, spacing: new float?(48f));
-                yield return Textbox.Say("CH2_THEO_INTRO_NEVER_INTRODUCED");
+                yield return (object) npC02Theo.PlayerApproachRightSide(player, spacing: new float?(48f));
+                yield return (object) Textbox.Say("CH2_THEO_INTRO_NEVER_INTRODUCED");
             }
             else if (npC02Theo.CurrentConversation <= 0)
             {
-                yield return npC02Theo.PlayerApproachRightSide(player);
-                yield return 0.2f;
+                yield return (object) npC02Theo.PlayerApproachRightSide(player);
+                yield return (object) 0.2f;
                 if (npC02Theo.Session.GetFlag("hadntMetTheoAtStart"))
                 {
-                    yield return npC02Theo.PlayerApproach48px();
-                    yield return Textbox.Say("CH2_THEO_A", new Func<IEnumerator>(npC02Theo.ShowPhotos), new Func<IEnumerator>(npC02Theo.HidePhotos), new Func<IEnumerator>(npC02Theo.Selfie));
+                    yield return (object) npC02Theo.PlayerApproach48px();
+                    yield return (object) Textbox.Say("CH2_THEO_A", new Func<IEnumerator>(npC02Theo.ShowPhotos), new Func<IEnumerator>(npC02Theo.HidePhotos), new Func<IEnumerator>(npC02Theo.Selfie));
                 }
                 else
-                {
-                    yield return Textbox.Say("CH2_THEO_A_EXT", new Func<IEnumerator>(npC02Theo.ShowPhotos), new Func<IEnumerator>(npC02Theo.HidePhotos), new Func<IEnumerator>(npC02Theo.Selfie), new Func<IEnumerator>(npC02Theo.PlayerApproach48px));
-                }
+                    yield return (object) Textbox.Say("CH2_THEO_A_EXT", new Func<IEnumerator>(npC02Theo.ShowPhotos), new Func<IEnumerator>(npC02Theo.HidePhotos), new Func<IEnumerator>(npC02Theo.Selfie), new Func<IEnumerator>(((NPC) npC02Theo).PlayerApproach48px));
             }
             else if (npC02Theo.CurrentConversation == 1)
             {
-                yield return npC02Theo.PlayerApproachRightSide(player, spacing: new float?(48f));
-                yield return Textbox.Say("CH2_THEO_B", new Func<IEnumerator>(npC02Theo.SelfieFiltered));
+                yield return (object) npC02Theo.PlayerApproachRightSide(player, spacing: new float?(48f));
+                yield return (object) Textbox.Say("CH2_THEO_B", new Func<IEnumerator>(npC02Theo.SelfieFiltered));
             }
             else if (npC02Theo.CurrentConversation == 2)
             {
-                yield return npC02Theo.PlayerApproachRightSide(player, spacing: new float?(48f));
-                yield return Textbox.Say("CH2_THEO_C");
+                yield return (object) npC02Theo.PlayerApproachRightSide(player, spacing: new float?(48f));
+                yield return (object) Textbox.Say("CH2_THEO_C");
             }
             else if (npC02Theo.CurrentConversation == 3)
             {
-                yield return npC02Theo.PlayerApproachRightSide(player, spacing: new float?(48f));
-                yield return Textbox.Say("CH2_THEO_D");
+                yield return (object) npC02Theo.PlayerApproachRightSide(player, spacing: new float?(48f));
+                yield return (object) Textbox.Say("CH2_THEO_D");
             }
             else if (npC02Theo.CurrentConversation == 4)
             {
-                yield return npC02Theo.PlayerApproachRightSide(player, spacing: new float?(48f));
-                yield return Textbox.Say("CH2_THEO_E");
+                yield return (object) npC02Theo.PlayerApproachRightSide(player, spacing: new float?(48f));
+                yield return (object) Textbox.Say("CH2_THEO_E");
             }
             npC02Theo.Level.EndCutscene();
             npC02Theo.OnTalkEnd(npC02Theo.Level);
@@ -110,67 +102,68 @@ namespace Celeste
 
         private void OnTalkEnd(Level level)
         {
-            if (CurrentConversation == 4)
+            if (this.CurrentConversation == 4)
             {
-                Session.SetFlag("theoDoneTalking");
-                Remove(Talker);
+                this.Session.SetFlag("theoDoneTalking");
+                this.Remove((Component) this.Talker);
             }
-            Player entity = Scene.Tracker.GetEntity<Player>();
+            Player entity = this.Scene.Tracker.GetEntity<Player>();
             if (entity != null)
             {
                 entity.StateMachine.Locked = false;
                 entity.StateMachine.State = 0;
                 if (level.SkippingCutscene)
                 {
-                    entity.X = (int)((double)X + 48.0);
+                    entity.X = (float) (int) ((double) this.X + 48.0);
                     entity.Facing = Facings.Left;
                 }
             }
-            Sprite.Scale.X = 1f;
-            selfie?.RemoveSelf();
-            ++CurrentConversation;
-            talkRoutine.Cancel();
-            talkRoutine.RemoveSelf();
+            this.Sprite.Scale.X = 1f;
+            if (this.selfie != null)
+                this.selfie.RemoveSelf();
+            ++this.CurrentConversation;
+            this.talkRoutine.Cancel();
+            this.talkRoutine.RemoveSelf();
         }
 
         private IEnumerator ShowPhotos()
         {
             NPC02_Theo npC02Theo = this;
             Player entity = npC02Theo.Scene.Tracker.GetEntity<Player>();
-            yield return npC02Theo.PlayerApproach(entity, spacing: new float?(10f));
+            yield return (object) npC02Theo.PlayerApproach(entity, spacing: new float?(10f));
             npC02Theo.Sprite.Play("getPhone");
-            yield return 2f;
+            yield return (object) 2f;
         }
 
         // ISSUE: reference to a compiler-generated field
         private IEnumerator HidePhotos()
         {
-            Sprite.Play("idle", false, false);
-            yield return 0.5f;
-            yield break;
+                this.Sprite.Play("idle", false, false);
+                yield return 0.5f;
+                yield break;
         }
 
         private IEnumerator Selfie()
         {
             NPC02_Theo npC02Theo = this;
-            yield return 0.5f;
-            _ = Audio.Play("event:/game/02_old_site/theoselfie_foley", npC02Theo.Position);
+            yield return (object) 0.5f;
+            Audio.Play("event:/game/02_old_site/theoselfie_foley", npC02Theo.Position);
             npC02Theo.Sprite.Scale.X = -npC02Theo.Sprite.Scale.X;
             npC02Theo.Sprite.Play("takeSelfie");
-            yield return 1f;
-            npC02Theo.Scene.Add(npC02Theo.selfie = new Selfie(npC02Theo.SceneAs<Level>()));
-            yield return npC02Theo.selfie.PictureRoutine();
-            npC02Theo.selfie = null;
+            yield return (object) 1f;
+            npC02Theo.Scene.Add((Entity) (npC02Theo.selfie = new Selfie(npC02Theo.SceneAs<Level>())));
+            yield return (object) npC02Theo.selfie.PictureRoutine();
+            npC02Theo.selfie = (Selfie) null;
             npC02Theo.Sprite.Scale.X = -npC02Theo.Sprite.Scale.X;
         }
 
         // ISSUE: reference to a compiler-generated field
         private IEnumerator SelfieFiltered()
-        {
-            base.Scene.Add(selfie = new Selfie(base.SceneAs<Level>()));
-            yield return selfie.FilterRoutine();
-            selfie = null;
-            yield break;
+                {
+                base.Scene.Add(this.selfie = new Selfie(base.SceneAs<Level>()));
+                yield return this.selfie.FilterRoutine();
+                this.selfie = null;
+                yield break;
         }
     }
 }

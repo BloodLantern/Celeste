@@ -19,12 +19,9 @@ namespace Celeste
                 byte num = 1;
                 char ch;
                 for (ch = str[index]; index + 1 < str.Length && str[index + 1] == ch && num < byte.MaxValue; ++index)
-                {
                     ++num;
-                }
-
                 byteList.Add(num);
-                byteList.Add((byte)ch);
+                byteList.Add((byte) ch);
             }
             return byteList.ToArray();
         }
@@ -33,10 +30,7 @@ namespace Celeste
         {
             StringBuilder stringBuilder = new();
             for (int index = 0; index < bytes.Length; index += 2)
-            {
-                _ = stringBuilder.Append((char)bytes[index + 1], bytes[index]);
-            }
-
+                stringBuilder.Append((char) bytes[index + 1], bytes[index]);
             return stringBuilder.ToString();
         }
     }

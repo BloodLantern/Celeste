@@ -13,99 +13,83 @@ namespace Celeste
     public class FireBarrier : Entity
     {
         public static ParticleType P_Deactivate;
-        private readonly LavaRect Lava;
+        private LavaRect Lava;
         private Solid solid;
-        private readonly SoundSource idleSfx;
+        private SoundSource idleSfx;
 
         public FireBarrier(Vector2 position, float width, float height)
             : base(position)
         {
-            Tag = (int)Tags.TransitionUpdate;
-            Collider = new Hitbox(width, height);
-            Add(new PlayerCollider(new Action<Player>(OnPlayer)));
-            Add(new CoreModeListener(new Action<Session.CoreModes>(OnChangeMode)));
-            Add(Lava = new LavaRect(width, height, 4));
-            Lava.SurfaceColor = RisingLava.Hot[0];
-            Lava.EdgeColor = RisingLava.Hot[1];
-            Lava.CenterColor = RisingLava.Hot[2];
-            Lava.SmallWaveAmplitude = 2f;
-            Lava.BigWaveAmplitude = 1f;
-            Lava.CurveAmplitude = 1f;
-            Depth = -8500;
-            Add(idleSfx = new SoundSource());
-            idleSfx.Position = new Vector2(Width, Height) / 2f;
+            this.Tag = (int) Tags.TransitionUpdate;
+            this.Collider = (Collider) new Hitbox(width, height);
+            this.Add((Component) new PlayerCollider(new Action<Player>(this.OnPlayer)));
+            this.Add((Component) new CoreModeListener(new Action<Session.CoreModes>(this.OnChangeMode)));
+            this.Add((Component) (this.Lava = new LavaRect(width, height, 4)));
+            this.Lava.SurfaceColor = RisingLava.Hot[0];
+            this.Lava.EdgeColor = RisingLava.Hot[1];
+            this.Lava.CenterColor = RisingLava.Hot[2];
+            this.Lava.SmallWaveAmplitude = 2f;
+            this.Lava.BigWaveAmplitude = 1f;
+            this.Lava.CurveAmplitude = 1f;
+            this.Depth = -8500;
+            this.Add((Component) (this.idleSfx = new SoundSource()));
+            this.idleSfx.Position = new Vector2(this.Width, this.Height) / 2f;
         }
 
         public FireBarrier(EntityData data, Vector2 offset)
-            : this(data.Position + offset, data.Width, data.Height)
+            : this(data.Position + offset, (float) data.Width, (float) data.Height)
         {
         }
 
         public override void Added(Scene scene)
         {
             base.Added(scene);
-            scene.Add(solid = new Solid(Position + new Vector2(2f, 3f), Width - 4f, Height - 5f, false));
-            Collidable = solid.Collidable = SceneAs<Level>().CoreMode == Session.CoreModes.Hot;
-            if (!Collidable)
-            {
+            scene.Add((Entity) (this.solid = new Solid(this.Position + new Vector2(2f, 3f), this.Width - 4f, this.Height - 5f, false)));
+            this.Collidable = this.solid.Collidable = this.SceneAs<Level>().CoreMode == Session.CoreModes.Hot;
+            if (!this.Collidable)
                 return;
-            }
-
-            _ = idleSfx.Play("event:/env/local/09_core/lavagate_idle");
+            this.idleSfx.Play("event:/env/local/09_core/lavagate_idle");
         }
 
         private void OnChangeMode(Session.CoreModes mode)
         {
-            Collidable = solid.Collidable = mode == Session.CoreModes.Hot;
-            if (!Collidable)
+            this.Collidable = this.solid.Collidable = mode == Session.CoreModes.Hot;
+            if (!this.Collidable)
             {
-                Level level = SceneAs<Level>();
-                Vector2 center = Center;
-                for (int index1 = 0; index1 < (double)Width; index1 += 4)
+                Level level = this.SceneAs<Level>();
+                Vector2 center = this.Center;
+                for (int index1 = 0; (double) index1 < (double) this.Width; index1 += 4)
                 {
-                    for (int index2 = 0; index2 < (double)Height; index2 += 4)
+                    for (int index2 = 0; (double) index2 < (double) this.Height; index2 += 4)
                     {
-                        Vector2 position = Position + new Vector2(index1 + 2, index2 + 2) + Calc.Random.Range(-Vector2.One * 2f, Vector2.One * 2f);
+                        Vector2 position = this.Position + new Vector2((float) (index1 + 2), (float) (index2 + 2)) + Calc.Random.Range(-Vector2.One * 2f, Vector2.One * 2f);
                         level.Particles.Emit(FireBarrier.P_Deactivate, position, (position - center).Angle());
                     }
                 }
-                _ = idleSfx.Stop();
+                this.idleSfx.Stop();
             }
             else
-            {
-                _ = idleSfx.Play("event:/env/local/09_core/lavagate_idle");
-            }
+                this.idleSfx.Play("event:/env/local/09_core/lavagate_idle");
         }
 
-        private void OnPlayer(Player player)
-        {
-            _ = player.Die((player.Center - Center).SafeNormalize());
-        }
+        private void OnPlayer(Player player) => player.Die((player.Center - this.Center).SafeNormalize());
 
         public override void Update()
         {
-            if ((Scene as Level).Transitioning)
+            if ((this.Scene as Level).Transitioning)
             {
-                if (idleSfx == null)
-                {
+                if (this.idleSfx == null)
                     return;
-                }
-
-                idleSfx.UpdateSfxPosition();
+                this.idleSfx.UpdateSfxPosition();
             }
             else
-            {
                 base.Update();
-            }
         }
 
         public override void Render()
         {
-            if (!Collidable)
-            {
+            if (!this.Collidable)
                 return;
-            }
-
             base.Render();
         }
     }

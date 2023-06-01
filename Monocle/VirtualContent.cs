@@ -12,15 +12,15 @@ namespace Monocle
 {
     public static class VirtualContent
     {
-        private static readonly List<VirtualAsset> assets = new();
+        private static List<VirtualAsset> assets = new List<VirtualAsset>();
         private static bool reloading;
 
-        public static int Count => assets.Count;
+        public static int Count => VirtualContent.assets.Count;
 
         public static VirtualTexture CreateTexture(string path)
         {
-            VirtualTexture texture = new(path);
-            assets.Add(texture);
+            VirtualTexture texture = new VirtualTexture(path);
+            VirtualContent.assets.Add((VirtualAsset) texture);
             return texture;
         }
 
@@ -30,8 +30,8 @@ namespace Monocle
             int height,
             Color color)
         {
-            VirtualTexture texture = new(name, width, height, color);
-            assets.Add(texture);
+            VirtualTexture texture = new VirtualTexture(name, width, height, color);
+            VirtualContent.assets.Add((VirtualAsset) texture);
             return texture;
         }
 
@@ -43,70 +43,52 @@ namespace Monocle
             bool preserve = true,
             int multiSampleCount = 0)
         {
-            VirtualRenderTarget renderTarget = new(name, width, height, multiSampleCount, depth, preserve);
-            assets.Add(renderTarget);
+            VirtualRenderTarget renderTarget = new VirtualRenderTarget(name, width, height, multiSampleCount, depth, preserve);
+            VirtualContent.assets.Add((VirtualAsset) renderTarget);
             return renderTarget;
         }
 
         public static void BySize()
         {
-            Dictionary<int, Dictionary<int, int>> dictionary = new();
-            foreach (VirtualAsset asset in assets)
+            Dictionary<int, Dictionary<int, int>> dictionary = new Dictionary<int, Dictionary<int, int>>();
+            foreach (VirtualAsset asset in VirtualContent.assets)
             {
                 if (!dictionary.ContainsKey(asset.Width))
-                {
                     dictionary.Add(asset.Width, new Dictionary<int, int>());
-                }
-
                 if (!dictionary[asset.Width].ContainsKey(asset.Height))
-                {
                     dictionary[asset.Width].Add(asset.Height, 0);
-                }
-
                 dictionary[asset.Width][asset.Height]++;
             }
             foreach (KeyValuePair<int, Dictionary<int, int>> keyValuePair1 in dictionary)
             {
                 foreach (KeyValuePair<int, int> keyValuePair2 in keyValuePair1.Value)
-                {
-                    Console.WriteLine(keyValuePair1.Key.ToString() + "x" + keyValuePair2.Key + ": " + keyValuePair2.Value);
-                }
+                    Console.WriteLine(keyValuePair1.Key.ToString() + "x" + (object) keyValuePair2.Key + ": " + (object) keyValuePair2.Value);
             }
         }
 
         public static void ByName()
         {
-            foreach (VirtualAsset asset in assets)
-            {
-                Console.WriteLine(asset.Name + "[" + asset.Width + "x" + asset.Height + "]");
-            }
+            foreach (VirtualAsset asset in VirtualContent.assets)
+                Console.WriteLine(asset.Name + "[" + (object) asset.Width + "x" + (object) asset.Height + "]");
         }
 
-        internal static void Remove(VirtualAsset asset)
-        {
-            _ = assets.Remove(asset);
-        }
+        internal static void Remove(VirtualAsset asset) => VirtualContent.assets.Remove(asset);
 
         internal static void Reload()
         {
-            if (reloading)
+            if (VirtualContent.reloading)
             {
-                foreach (VirtualAsset asset in assets)
-                {
+                foreach (VirtualAsset asset in VirtualContent.assets)
                     asset.Reload();
-                }
             }
-            reloading = false;
+            VirtualContent.reloading = false;
         }
 
         internal static void Unload()
         {
-            foreach (VirtualAsset asset in assets)
-            {
+            foreach (VirtualAsset asset in VirtualContent.assets)
                 asset.Unload();
-            }
-
-            reloading = true;
+            VirtualContent.reloading = true;
         }
     }
 }

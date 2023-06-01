@@ -18,50 +18,36 @@ namespace Celeste
 
         public FormationBackdrop()
         {
-            Tag = (int)Tags.FrozenUpdate | (int)Tags.Global;
-            Depth = -1999900;
+            this.Tag = (int) Tags.FrozenUpdate | (int) Tags.Global;
+            this.Depth = -1999900;
         }
 
         public override void Update()
         {
-            fade = Calc.Approach(fade, Display ? 1f : 0.0f, Engine.RawDeltaTime * 3f);
-            if (Display)
+            this.fade = Calc.Approach(this.fade, this.Display ? 1f : 0.0f, Engine.RawDeltaTime * 3f);
+            if (this.Display)
+                this.wasDisplayed = true;
+            if (this.wasDisplayed)
             {
-                wasDisplayed = true;
-            }
-
-            if (wasDisplayed)
-            {
-                Level scene = Scene as Level;
+                Level scene = this.Scene as Level;
                 Snow snow = scene.Foreground.Get<Snow>();
                 if (snow != null)
-                {
-                    snow.Alpha = 1f - fade;
-                }
-
+                    snow.Alpha = 1f - this.fade;
                 WindSnowFG windSnowFg = scene.Foreground.Get<WindSnowFG>();
                 if (windSnowFg != null)
-                {
-                    windSnowFg.Alpha = 1f - fade;
-                }
-
-                if (fade <= 0.0)
-                {
-                    wasDisplayed = false;
-                }
+                    windSnowFg.Alpha = 1f - this.fade;
+                if ((double) this.fade <= 0.0)
+                    this.wasDisplayed = false;
             }
             base.Update();
         }
 
         public override void Render()
         {
-            Level scene = Scene as Level;
-            if (fade <= 0.0)
-            {
+            Level scene = this.Scene as Level;
+            if ((double) this.fade <= 0.0)
                 return;
-            }
-
-            Draw.Rect(scene.Camera.Left - 1f, scene.Camera.Top - 1f, 322f, 182f, Color.Black * fade * Alpha * 0.85f);
+            Draw.Rect(scene.Camera.Left - 1f, scene.Camera.Top - 1f, 322f, 182f, Color.Black * this.fade * this.Alpha * 0.85f);
         }
     }
 }

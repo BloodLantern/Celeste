@@ -23,126 +23,97 @@ namespace Celeste
         private int sectionsComplete;
         private bool talked;
         private bool inRoutine;
-        private readonly List<Vector2> nodes = new();
+        private List<Vector2> nodes = new List<Vector2>();
         private Coroutine paceRoutine;
         private Coroutine talkRoutine;
-        private readonly SoundSource paceSfx;
+        private SoundSource paceSfx;
         private float paceTimer;
 
         public NPC03_Oshiro_Cluttter(EntityData data, Vector2 offset)
             : base(data.Position + offset)
         {
-            Add(Sprite = new OshiroSprite(-1));
-            Add(Talker = new TalkComponent(new Rectangle(-24, -8, 48, 8), new Vector2(0.0f, -24f), new Action<Player>(OnTalk)));
-            Add(Light = new VertexLight(-Vector2.UnitY * 16f, Color.White, 1f, 32, 64));
-            MoveAnim = "move";
-            IdleAnim = "idle";
+            this.Add((Component) (this.Sprite = (Sprite) new OshiroSprite(-1)));
+            this.Add((Component) (this.Talker = new TalkComponent(new Rectangle(-24, -8, 48, 8), new Vector2(0.0f, -24f), new Action<Player>(this.OnTalk))));
+            this.Add((Component) (this.Light = new VertexLight(-Vector2.UnitY * 16f, Color.White, 1f, 32, 64)));
+            this.MoveAnim = "move";
+            this.IdleAnim = "idle";
             foreach (Vector2 node in data.Nodes)
-            {
-                nodes.Add(node + offset);
-            }
-
-            Add(paceSfx = new SoundSource());
+                this.nodes.Add(node + offset);
+            this.Add((Component) (this.paceSfx = new SoundSource()));
         }
 
         public override void Added(Scene scene)
         {
             base.Added(scene);
-            if (Session.GetFlag("oshiro_clutter_finished"))
+            if (this.Session.GetFlag("oshiro_clutter_finished"))
             {
-                RemoveSelf();
+                this.RemoveSelf();
             }
             else
             {
-                if (Session.GetFlag("oshiro_clutter_cleared_0"))
-                {
-                    ++sectionsComplete;
-                }
-
-                if (Session.GetFlag("oshiro_clutter_cleared_1"))
-                {
-                    ++sectionsComplete;
-                }
-
-                if (Session.GetFlag("oshiro_clutter_cleared_2"))
-                {
-                    ++sectionsComplete;
-                }
-
-                if (sectionsComplete is 0 or 3)
-                {
-                    Sprite.Scale.X = 1f;
-                }
-
-                if (sectionsComplete > 0)
-                {
-                    Position = nodes[sectionsComplete - 1];
-                }
-                else if (!Session.GetFlag("oshiro_clutter_0"))
-                {
-                    Add(paceRoutine = new Coroutine(Pace()));
-                }
-
-                if (sectionsComplete == 0 && Session.GetFlag("oshiro_clutter_0") && !Session.GetFlag("oshiro_clutter_optional_0"))
-                {
-                    Sprite.Play("idle_ground");
-                }
-
-                if (sectionsComplete == 3 || Session.GetFlag("oshiro_clutter_optional_" + sectionsComplete))
-                {
-                    Remove(Talker);
-                }
+                if (this.Session.GetFlag("oshiro_clutter_cleared_0"))
+                    ++this.sectionsComplete;
+                if (this.Session.GetFlag("oshiro_clutter_cleared_1"))
+                    ++this.sectionsComplete;
+                if (this.Session.GetFlag("oshiro_clutter_cleared_2"))
+                    ++this.sectionsComplete;
+                if (this.sectionsComplete == 0 || this.sectionsComplete == 3)
+                    this.Sprite.Scale.X = 1f;
+                if (this.sectionsComplete > 0)
+                    this.Position = this.nodes[this.sectionsComplete - 1];
+                else if (!this.Session.GetFlag("oshiro_clutter_0"))
+                    this.Add((Component) (this.paceRoutine = new Coroutine(this.Pace())));
+                if (this.sectionsComplete == 0 && this.Session.GetFlag("oshiro_clutter_0") && !this.Session.GetFlag("oshiro_clutter_optional_0"))
+                    this.Sprite.Play("idle_ground");
+                if (this.sectionsComplete == 3 || this.Session.GetFlag("oshiro_clutter_optional_" + (object) this.sectionsComplete))
+                    this.Remove((Component) this.Talker);
             }
-            HomePosition = Position;
+            this.HomePosition = this.Position;
         }
 
-        public Vector2 ZoomPoint => sectionsComplete < 2 ? Position + new Vector2(0.0f, -30f) - Level.Camera.Position : Position + new Vector2(0.0f, -15f) - Level.Camera.Position;
+        public Vector2 ZoomPoint => this.sectionsComplete < 2 ? this.Position + new Vector2(0.0f, -30f) - this.Level.Camera.Position : this.Position + new Vector2(0.0f, -15f) - this.Level.Camera.Position;
 
         private void OnTalk(Player player)
         {
-            talked = true;
-            paceRoutine?.RemoveSelf();
-            paceRoutine = null;
-            if (!Session.GetFlag("oshiro_clutter_" + sectionsComplete))
+            this.talked = true;
+            if (this.paceRoutine != null)
+                this.paceRoutine.RemoveSelf();
+            this.paceRoutine = (Coroutine) null;
+            if (!this.Session.GetFlag("oshiro_clutter_" + (object) this.sectionsComplete))
             {
-                Scene.Add(new CS03_OshiroClutter(player, this, sectionsComplete));
+                this.Scene.Add((Entity) new CS03_OshiroClutter(player, this, this.sectionsComplete));
             }
             else
             {
-                Level.StartCutscene(new Action<Level>(EndTalkRoutine));
-                Session.SetFlag("oshiro_clutter_optional_" + sectionsComplete);
-                Add(talkRoutine = new Coroutine(TalkRoutine(player)));
-                if (Talker == null)
-                {
+                this.Level.StartCutscene(new Action<Level>(this.EndTalkRoutine));
+                this.Session.SetFlag("oshiro_clutter_optional_" + (object) this.sectionsComplete);
+                this.Add((Component) (this.talkRoutine = new Coroutine(this.TalkRoutine(player))));
+                if (this.Talker == null)
                     return;
-                }
-
-                Talker.Enabled = false;
+                this.Talker.Enabled = false;
             }
         }
 
         private IEnumerator TalkRoutine(Player player)
         {
             NPC03_Oshiro_Cluttter c03OshiroCluttter = this;
-            yield return c03OshiroCluttter.PlayerApproach(player, spacing: new float?(24f), side: new int?(c03OshiroCluttter.sectionsComplete is 1 or 2 ? -1 : 1));
-            yield return c03OshiroCluttter.Level.ZoomTo(c03OshiroCluttter.ZoomPoint, 2f, 0.5f);
-            yield return Textbox.Say("CH3_OSHIRO_CLUTTER" + c03OshiroCluttter.sectionsComplete + "_B", new Func<IEnumerator>(c03OshiroCluttter.StandUp));
-            yield return c03OshiroCluttter.Level.ZoomBack(0.5f);
+            yield return (object) c03OshiroCluttter.PlayerApproach(player, spacing: new float?(24f), side: new int?(c03OshiroCluttter.sectionsComplete == 1 || c03OshiroCluttter.sectionsComplete == 2 ? -1 : 1));
+            yield return (object) c03OshiroCluttter.Level.ZoomTo(c03OshiroCluttter.ZoomPoint, 2f, 0.5f);
+            yield return (object) Textbox.Say("CH3_OSHIRO_CLUTTER" + (object) c03OshiroCluttter.sectionsComplete + "_B", new Func<IEnumerator>(c03OshiroCluttter.StandUp));
+            yield return (object) c03OshiroCluttter.Level.ZoomBack(0.5f);
             c03OshiroCluttter.Level.EndCutscene();
             c03OshiroCluttter.EndTalkRoutine(c03OshiroCluttter.Level);
         }
 
         private void EndTalkRoutine(Level level)
         {
-            talkRoutine?.RemoveSelf();
-            talkRoutine = null;
-            (Sprite as OshiroSprite).Pop("idle", false);
-            Player entity = Scene.Tracker.GetEntity<Player>();
+            if (this.talkRoutine != null)
+                this.talkRoutine.RemoveSelf();
+            this.talkRoutine = (Coroutine) null;
+            (this.Sprite as OshiroSprite).Pop("idle", false);
+            Player entity = this.Scene.Tracker.GetEntity<Player>();
             if (entity == null)
-            {
                 return;
-            }
-
             entity.StateMachine.Locked = false;
             entity.StateMachine.State = 0;
         }
@@ -150,10 +121,10 @@ namespace Celeste
         // ISSUE: reference to a compiler-generated field
         private IEnumerator StandUp()
         {
-            _ = Audio.Play("event:/char/oshiro/chat_get_up", Position);
-            (Sprite as OshiroSprite).Pop("idle", false);
-            yield return 0.25f;
-            yield break;
+                Audio.Play("event:/char/oshiro/chat_get_up", this.Position);
+                (this.Sprite as OshiroSprite).Pop("idle", false);
+                yield return 0.25f;
+                yield break;
         }
 
         private IEnumerator Pace()
@@ -162,20 +133,14 @@ namespace Celeste
             while (true)
             {
                 (c03OshiroCluttter.Sprite as OshiroSprite).Wiggle();
-                yield return c03OshiroCluttter.PaceLeft();
-                while (c03OshiroCluttter.paceTimer < 2.2660000324249268)
-                {
-                    yield return null;
-                }
-
+                yield return (object) c03OshiroCluttter.PaceLeft();
+                while ((double) c03OshiroCluttter.paceTimer < 2.2660000324249268)
+                    yield return (object) null;
                 c03OshiroCluttter.paceTimer = 0.0f;
                 (c03OshiroCluttter.Sprite as OshiroSprite).Wiggle();
-                yield return c03OshiroCluttter.PaceRight();
-                while (c03OshiroCluttter.paceTimer < 2.2660000324249268)
-                {
-                    yield return null;
-                }
-
+                yield return (object) c03OshiroCluttter.PaceRight();
+                while ((double) c03OshiroCluttter.paceTimer < 2.2660000324249268)
+                    yield return (object) null;
                 c03OshiroCluttter.paceTimer = 0.0f;
             }
         }
@@ -184,53 +149,44 @@ namespace Celeste
         {
             NPC03_Oshiro_Cluttter c03OshiroCluttter = this;
             Vector2 homePosition = c03OshiroCluttter.HomePosition;
-            if ((double)(c03OshiroCluttter.Position - homePosition).Length() > 8.0)
-            {
-                _ = c03OshiroCluttter.paceSfx.Play("event:/char/oshiro/move_04_pace_right");
-            }
-
-            yield return c03OshiroCluttter.MoveTo(homePosition);
+            if ((double) (c03OshiroCluttter.Position - homePosition).Length() > 8.0)
+                c03OshiroCluttter.paceSfx.Play("event:/char/oshiro/move_04_pace_right");
+            yield return (object) c03OshiroCluttter.MoveTo(homePosition);
         }
 
         public IEnumerator PaceLeft()
         {
             NPC03_Oshiro_Cluttter c03OshiroCluttter = this;
             Vector2 target = c03OshiroCluttter.HomePosition + new Vector2(-20f, 0.0f);
-            if ((double)(c03OshiroCluttter.Position - target).Length() > 8.0)
-            {
-                _ = c03OshiroCluttter.paceSfx.Play("event:/char/oshiro/move_04_pace_left");
-            }
-
-            yield return c03OshiroCluttter.MoveTo(target);
+            if ((double) (c03OshiroCluttter.Position - target).Length() > 8.0)
+                c03OshiroCluttter.paceSfx.Play("event:/char/oshiro/move_04_pace_left");
+            yield return (object) c03OshiroCluttter.MoveTo(target);
         }
 
         public override void Update()
         {
             base.Update();
-            paceTimer += Engine.DeltaTime;
-            Player entity = Scene.Tracker.GetEntity<Player>();
-            if (sectionsComplete == 3 && !inRoutine && entity != null && (double)entity.X < (double)X + 32.0 && (double)entity.Y <= (double)Y)
+            this.paceTimer += Engine.DeltaTime;
+            Player entity = this.Scene.Tracker.GetEntity<Player>();
+            if (this.sectionsComplete == 3 && !this.inRoutine && entity != null && (double) entity.X < (double) this.X + 32.0 && (double) entity.Y <= (double) this.Y)
             {
-                OnTalk(entity);
-                inRoutine = true;
+                this.OnTalk(entity);
+                this.inRoutine = true;
             }
-            if (sectionsComplete != 0 || talked)
-            {
+            if (this.sectionsComplete != 0 || this.talked)
                 return;
-            }
-
-            Level scene = Scene as Level;
+            Level scene = this.Scene as Level;
             if (entity != null && !entity.Dead)
             {
-                float num = Calc.ClampedMap(Vector2.Distance(Center, entity.Center), 40f, 128f);
-                _ = scene.Session.Audio.Music.Layer(1, num);
-                _ = scene.Session.Audio.Music.Layer(2, 1f - num);
+                float num = Calc.ClampedMap(Vector2.Distance(this.Center, entity.Center), 40f, 128f);
+                scene.Session.Audio.Music.Layer(1, num);
+                scene.Session.Audio.Music.Layer(2, 1f - num);
                 scene.Session.Audio.Apply();
             }
             else
             {
-                _ = scene.Session.Audio.Music.Layer(1, true);
-                _ = scene.Session.Audio.Music.Layer(2, false);
+                scene.Session.Audio.Music.Layer(1, true);
+                scene.Session.Audio.Music.Layer(2, false);
                 scene.Session.Audio.Apply();
             }
         }

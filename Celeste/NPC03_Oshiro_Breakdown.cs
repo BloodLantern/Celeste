@@ -16,56 +16,45 @@ namespace Celeste
         public NPC03_Oshiro_Breakdown(Vector2 position)
             : base(position)
         {
-            Add(Sprite = new OshiroSprite(1));
-            Add(Light = new VertexLight(-Vector2.UnitY * 16f, Color.White, 1f, 32, 64));
-            MoveAnim = "move";
-            IdleAnim = "idle";
+            this.Add((Component) (this.Sprite = (Sprite) new OshiroSprite(1)));
+            this.Add((Component) (this.Light = new VertexLight(-Vector2.UnitY * 16f, Color.White, 1f, 32, 64)));
+            this.MoveAnim = "move";
+            this.IdleAnim = "idle";
         }
 
         public override void Added(Scene scene)
         {
             base.Added(scene);
-            if (!Session.GetFlag("oshiro_breakdown"))
-            {
+            if (!this.Session.GetFlag("oshiro_breakdown"))
                 return;
-            }
-
-            RemoveSelf();
+            this.RemoveSelf();
         }
 
         public override void Update()
         {
             base.Update();
-            Player entity = Scene.Tracker.GetEntity<Player>();
-            if (talked || entity == null)
-            {
+            Player entity = this.Scene.Tracker.GetEntity<Player>();
+            if (this.talked || entity == null)
                 return;
-            }
-
-            double x1 = (double)entity.X;
-            Rectangle bounds = Level.Bounds;
-            double num1 = bounds.Left + 370;
+            double x1 = (double) entity.X;
+            Rectangle bounds = this.Level.Bounds;
+            double num1 = (double) (bounds.Left + 370);
             if (x1 <= num1 && entity.OnSafeGround)
             {
-                double y1 = (double)entity.Y;
-                bounds = Level.Bounds;
-                double y2 = bounds.Center.Y;
+                double y1 = (double) entity.Y;
+                bounds = this.Level.Bounds;
+                double y2 = (double) bounds.Center.Y;
                 if (y1 < y2)
-                {
                     goto label_4;
-                }
             }
-            double x2 = (double)entity.X;
-            bounds = Level.Bounds;
-            double num2 = bounds.Left + 320;
+            double x2 = (double) entity.X;
+            bounds = this.Level.Bounds;
+            double num2 = (double) (bounds.Left + 320);
             if (x2 > num2)
-            {
                 return;
-            }
-
-        label_4:
-            Scene.Add(new CS03_OshiroBreakdown(entity, this));
-            talked = true;
+label_4:
+            this.Scene.Add((Entity) new CS03_OshiroBreakdown(entity, (NPC) this));
+            this.talked = true;
         }
     }
 }

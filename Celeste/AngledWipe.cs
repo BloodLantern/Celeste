@@ -15,57 +15,49 @@ namespace Celeste
     {
         private const int rows = 6;
         private const float angleSize = 64f;
-        private readonly VertexPositionColor[] vertexBuffer = new VertexPositionColor[36];
+        private VertexPositionColor[] vertexBuffer = new VertexPositionColor[36];
 
         public AngledWipe(Scene scene, bool wipeIn, Action onComplete = null)
             : base(scene, wipeIn, onComplete)
         {
-            for (int index = 0; index < vertexBuffer.Length; ++index)
-            {
-                vertexBuffer[index].Color = WipeColor;
-            }
+            for (int index = 0; index < this.vertexBuffer.Length; ++index)
+                this.vertexBuffer[index].Color = ScreenWipe.WipeColor;
         }
 
         public override void Render(Scene scene)
         {
             float num1 = 183.333328f;
-            float num2 = -angleSize;
-            float num3 = 1984f; // 31 * angleSize ?
-            for (int index1 = 0; index1 < rows; ++index1)
+            float num2 = -64f;
+            float num3 = 1984f;
+            for (int index1 = 0; index1 < 6; ++index1)
             {
-                int index2 = index1 * rows;
+                int index2 = index1 * 6;
                 float x = num2;
-                float y = (index1 * num1) - 10;
-                float num4 = 0;
-                float num5 = index1 / 6f;
-                float num6 = (WipeIn ? 1f - num5 : num5) * 0.3f;
-                if (Percent > num6)
-                {
-                    num4 = Math.Min(1f, (Percent - num6) / 0.7f);
-                }
-
-                if (WipeIn)
-                {
+                float y = (float) ((double) index1 * (double) num1 - 10.0);
+                float num4 = 0.0f;
+                float num5 = (float) index1 / 6f;
+                float num6 = (float) ((this.WipeIn ? 1.0 - (double) num5 : (double) num5) * 0.30000001192092896);
+                if ((double) this.Percent > (double) num6)
+                    num4 = Math.Min(1f, (float) (((double) this.Percent - (double) num6) / 0.699999988079071));
+                if (this.WipeIn)
                     num4 = 1f - num4;
-                }
-
                 float num7 = num3 * num4;
-                vertexBuffer[index2].Position = new Vector3(x, y, 0);
-                vertexBuffer[index2 + 1].Position = new Vector3(x + num7, y, 0);
-                vertexBuffer[index2 + 2].Position = new Vector3(x, y + num1, 0);
-                vertexBuffer[index2 + 3].Position = new Vector3(x + num7, y, 0);
-                vertexBuffer[index2 + 4].Position = new Vector3(x + num7 + angleSize, y + num1, 0);
-                vertexBuffer[index2 + 5].Position = new Vector3(x, y + num1, 0);
+                this.vertexBuffer[index2].Position = new Vector3(x, y, 0.0f);
+                this.vertexBuffer[index2 + 1].Position = new Vector3(x + num7, y, 0.0f);
+                this.vertexBuffer[index2 + 2].Position = new Vector3(x, y + num1, 0.0f);
+                this.vertexBuffer[index2 + 3].Position = new Vector3(x + num7, y, 0.0f);
+                this.vertexBuffer[index2 + 4].Position = new Vector3((float) ((double) x + (double) num7 + 64.0), y + num1, 0.0f);
+                this.vertexBuffer[index2 + 5].Position = new Vector3(x, y + num1, 0.0f);
             }
-            if (WipeIn)
+            if (this.WipeIn)
             {
-                for (int index = 0; index < vertexBuffer.Length; ++index)
+                for (int index = 0; index < this.vertexBuffer.Length; ++index)
                 {
-                    vertexBuffer[index].Position.X = 1920f - vertexBuffer[index].Position.X;
-                    vertexBuffer[index].Position.Y = 1080f - vertexBuffer[index].Position.Y;
+                    this.vertexBuffer[index].Position.X = 1920f - this.vertexBuffer[index].Position.X;
+                    this.vertexBuffer[index].Position.Y = 1080f - this.vertexBuffer[index].Position.Y;
                 }
             }
-            DrawPrimitives(vertexBuffer);
+            ScreenWipe.DrawPrimitives(this.vertexBuffer);
         }
     }
 }

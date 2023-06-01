@@ -10,44 +10,39 @@ namespace Monocle
 {
     public class TagLists
     {
-        private readonly List<Entity>[] lists;
-        private readonly bool[] unsorted;
+        private List<Entity>[] lists;
+        private bool[] unsorted;
         private bool areAnyUnsorted;
 
         internal TagLists()
         {
-            lists = new List<Entity>[BitTag.TotalTags];
-            unsorted = new bool[BitTag.TotalTags];
-            for (int index = 0; index < lists.Length; ++index)
-            {
-                lists[index] = new List<Entity>();
-            }
+            this.lists = new List<Entity>[BitTag.TotalTags];
+            this.unsorted = new bool[BitTag.TotalTags];
+            for (int index = 0; index < this.lists.Length; ++index)
+                this.lists[index] = new List<Entity>();
         }
 
-        public List<Entity> this[int index] => lists[index];
+        public List<Entity> this[int index] => this.lists[index];
 
         internal void MarkUnsorted(int index)
         {
-            areAnyUnsorted = true;
-            unsorted[index] = true;
+            this.areAnyUnsorted = true;
+            this.unsorted[index] = true;
         }
 
         internal void UpdateLists()
         {
-            if (!areAnyUnsorted)
-            {
+            if (!this.areAnyUnsorted)
                 return;
-            }
-
-            for (int index = 0; index < lists.Length; ++index)
+            for (int index = 0; index < this.lists.Length; ++index)
             {
-                if (unsorted[index])
+                if (this.unsorted[index])
                 {
-                    lists[index].Sort(EntityList.CompareDepth);
-                    unsorted[index] = false;
+                    this.lists[index].Sort(EntityList.CompareDepth);
+                    this.unsorted[index] = false;
                 }
             }
-            areAnyUnsorted = false;
+            this.areAnyUnsorted = false;
         }
 
         internal void EntityAdded(Entity entity)
@@ -57,8 +52,8 @@ namespace Monocle
                 if (entity.TagCheck(1 << index))
                 {
                     this[index].Add(entity);
-                    areAnyUnsorted = true;
-                    unsorted[index] = true;
+                    this.areAnyUnsorted = true;
+                    this.unsorted[index] = true;
                 }
             }
         }
@@ -68,9 +63,7 @@ namespace Monocle
             for (int index = 0; index < BitTag.TotalTags; ++index)
             {
                 if (entity.TagCheck(1 << index))
-                {
-                    _ = lists[index].Remove(entity);
-                }
+                    this.lists[index].Remove(entity);
             }
         }
     }

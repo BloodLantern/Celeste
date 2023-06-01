@@ -10,24 +10,19 @@ namespace Celeste
 {
     public static class Achievements
     {
-        public static string ID(Achievement achievement)
-        {
-            return achievement.ToString();
-        }
+        public static string ID(Achievement achievement) => achievement.ToString();
 
         public static bool Has(Achievement achievement)
         {
-            return SteamUserStats.GetAchievement(ID(achievement), out bool flag) & flag;
+            bool flag;
+            return SteamUserStats.GetAchievement(Achievements.ID(achievement), out flag) & flag;
         }
 
         public static void Register(Achievement achievement)
         {
-            if (Has(achievement))
-            {
+            if (Achievements.Has(achievement))
                 return;
-            }
-
-            _ = SteamUserStats.SetAchievement(ID(achievement));
+            SteamUserStats.SetAchievement(Achievements.ID(achievement));
             Stats.Store();
         }
     }

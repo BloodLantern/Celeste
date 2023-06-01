@@ -16,35 +16,34 @@ namespace Monocle
         public const string Filename = "error_log.txt";
         public const string Marker = "==========================================";
 
-        public static void Write(Exception e)
-        {
-            Write(e.ToString());
-        }
+        public static void Write(Exception e) => ErrorLog.Write(e.ToString());
 
         public static void Write(string str)
         {
-            StringBuilder stringBuilder = new();
+            StringBuilder stringBuilder = new StringBuilder();
             string str1 = "";
-            if (Path.IsPathRooted(Filename))
+            if (Path.IsPathRooted("error_log.txt"))
             {
-                string directoryName = Path.GetDirectoryName(Filename);
+                string directoryName = Path.GetDirectoryName("error_log.txt");
                 if (!Directory.Exists(directoryName))
                     Directory.CreateDirectory(directoryName);
             }
-            if (File.Exists(Filename))
+            if (File.Exists("error_log.txt"))
             {
-                StreamReader streamReader = new(Filename);
+                StreamReader streamReader = new StreamReader("error_log.txt");
                 str1 = streamReader.ReadToEnd();
                 streamReader.Close();
-                if (!str1.Contains(Marker))
+                if (!str1.Contains("=========================================="))
                     str1 = "";
             }
-            _ = Engine.Instance != null ? stringBuilder.Append(Engine.Instance.Title) : stringBuilder.Append("Monocle Engine");
-
+            if (Engine.Instance != null)
+                stringBuilder.Append(Engine.Instance.Title);
+            else
+                stringBuilder.Append("Monocle Engine");
             stringBuilder.AppendLine(" Error Log");
-            stringBuilder.AppendLine(Marker);
+            stringBuilder.AppendLine("==========================================");
             stringBuilder.AppendLine();
-            if (Engine.Instance != null && Engine.Instance.Version != null)
+            if (Engine.Instance != null && Engine.Instance.Version != (Version) null)
             {
                 stringBuilder.Append("Ver ");
                 stringBuilder.AppendLine(Engine.Instance.Version.ToString());
@@ -53,21 +52,20 @@ namespace Monocle
             stringBuilder.AppendLine(str);
             if (str1 != "")
             {
-                int startIndex = str1.IndexOf(Marker) + Marker.Length;
+                int startIndex = str1.IndexOf("==========================================") + "==========================================".Length;
                 string str2 = str1.Substring(startIndex);
                 stringBuilder.AppendLine(str2);
             }
-            StreamWriter streamWriter = new(Filename, false);
+            StreamWriter streamWriter = new StreamWriter("error_log.txt", false);
             streamWriter.Write(stringBuilder.ToString());
             streamWriter.Close();
         }
 
         public static void Open()
         {
-            if (!File.Exists(Filename))
+            if (!File.Exists("error_log.txt"))
                 return;
-
-            Process.Start(Filename);
+            Process.Start("error_log.txt");
         }
     }
 }

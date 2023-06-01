@@ -17,7 +17,7 @@ namespace Celeste
         public Overworld.StartMode StartMode;
         public HiresSnow Snow;
         private bool loaded;
-        private readonly bool fadeIn;
+        private bool fadeIn;
         private Overworld overworld;
         private Postcard postcard;
         private bool showVariantPostcard;
@@ -26,53 +26,44 @@ namespace Celeste
 
         public OverworldLoader(Overworld.StartMode startMode, HiresSnow snow = null)
         {
-            StartMode = startMode;
-            Snow = snow ?? new HiresSnow();
-            fadeIn = snow == null;
+            this.StartMode = startMode;
+            this.Snow = snow == null ? new HiresSnow() : snow;
+            this.fadeIn = snow == null;
         }
 
         public override void Begin()
         {
-            Add(new HudRenderer());
-            Add(Snow);
-            if (fadeIn)
+            this.Add((Monocle.Renderer) new HudRenderer());
+            this.Add((Monocle.Renderer) this.Snow);
+            if (this.fadeIn)
             {
                 ScreenWipe.WipeColor = Color.Black;
-                FadeWipe fadeWipe = new(this, true);
+                FadeWipe fadeWipe = new FadeWipe((Scene) this, true);
             }
-            RendererList.UpdateLists();
-            Session session = null;
+            this.RendererList.UpdateLists();
+            Session session = (Session) null;
             if (SaveData.Instance != null)
-            {
                 session = SaveData.Instance.CurrentSession;
-            }
-
-            Add(new Entity()
+            this.Add(new Entity()
             {
-                 new Coroutine(Routine(session))
+                (Component) new Coroutine(this.Routine(session))
             });
-            activeThread = Thread.CurrentThread;
-            activeThread.Priority = ThreadPriority.Lowest;
-            RunThread.Start(new Action(LoadThread), "OVERWORLD_LOADER", true);
+            this.activeThread = Thread.CurrentThread;
+            this.activeThread.Priority = ThreadPriority.Lowest;
+            RunThread.Start(new Action(this.LoadThread), "OVERWORLD_LOADER", true);
         }
 
         private void LoadThread()
         {
             if (!MTN.Loaded)
-            {
                 MTN.Load();
-            }
-
             if (!MTN.DataLoaded)
-            {
                 MTN.LoadData();
-            }
-
-            CheckVariantsPostcardAtLaunch();
-            overworld = new Overworld(this);
-            overworld.Entities.UpdateLists();
-            loaded = true;
-            activeThread.Priority = ThreadPriority.Normal;
+            this.CheckVariantsPostcardAtLaunch();
+            this.overworld = new Overworld(this);
+            this.overworld.Entities.UpdateLists();
+            this.loaded = true;
+            this.activeThread.Priority = ThreadPriority.Normal;
         }
 
         private IEnumerator Routine(Session session)
@@ -81,64 +72,45 @@ namespace Celeste
             if ((overworldLoader.StartMode == Overworld.StartMode.AreaComplete || overworldLoader.StartMode == Overworld.StartMode.AreaQuit) && session != null)
             {
                 if (session.UnlockedCSide)
-                {
                     overworldLoader.showUnlockCSidePostcard = true;
-                }
-
                 if (!Settings.Instance.VariantsUnlocked && SaveData.Instance != null && SaveData.Instance.TotalHeartGems >= 24)
-                {
                     overworldLoader.showVariantPostcard = true;
-                }
             }
             if (overworldLoader.showUnlockCSidePostcard)
             {
-                yield return 3f;
-                overworldLoader.Add(overworldLoader.postcard = new Postcard(Dialog.Get("POSTCARD_CSIDES"), "event:/ui/main/postcard_csides_in", "event:/ui/main/postcard_csides_out"));
-                yield return overworldLoader.postcard.DisplayRoutine();
+                yield return (object) 3f;
+                overworldLoader.Add((Entity) (overworldLoader.postcard = new Postcard(Dialog.Get("POSTCARD_CSIDES"), "event:/ui/main/postcard_csides_in", "event:/ui/main/postcard_csides_out")));
+                yield return (object) overworldLoader.postcard.DisplayRoutine();
             }
             while (!overworldLoader.loaded)
-            {
-                yield return null;
-            }
-
+                yield return (object) null;
             if (overworldLoader.showVariantPostcard)
             {
-                yield return 3f;
+                yield return (object) 3f;
                 Settings.Instance.VariantsUnlocked = true;
-                overworldLoader.Add(overworldLoader.postcard = new Postcard(Dialog.Get("POSTCARD_VARIANTS"), "event:/new_content/ui/postcard_variants_in", "event:/new_content/ui/postcard_variants_out"));
-                yield return overworldLoader.postcard.DisplayRoutine();
+                overworldLoader.Add((Entity) (overworldLoader.postcard = new Postcard(Dialog.Get("POSTCARD_VARIANTS"), "event:/new_content/ui/postcard_variants_in", "event:/new_content/ui/postcard_variants_out")));
+                yield return (object) overworldLoader.postcard.DisplayRoutine();
                 UserIO.SaveHandler(false, true);
                 while (UserIO.Saving)
-                {
-                    yield return null;
-                }
-
+                    yield return (object) null;
                 while (SaveLoadIcon.Instance != null)
-                {
-                    yield return null;
-                }
+                    yield return (object) null;
             }
-            Engine.Scene = overworldLoader.overworld;
+            Engine.Scene = (Scene) overworldLoader.overworld;
         }
 
         public override void BeforeRender()
         {
             base.BeforeRender();
-            if (postcard == null)
-            {
+            if (this.postcard == null)
                 return;
-            }
-
-            postcard.BeforeRender();
+            this.postcard.BeforeRender();
         }
 
         private void CheckVariantsPostcardAtLaunch()
         {
-            if (StartMode != Overworld.StartMode.Titlescreen || Settings.Instance.VariantsUnlocked || (Settings.LastVersion != null && !(new Version(Settings.LastVersion) <= new Version(1, 2, 4, 2))) || !UserIO.Open(UserIO.Mode.Read))
-            {
+            if (this.StartMode != Overworld.StartMode.Titlescreen || Settings.Instance.VariantsUnlocked || Settings.LastVersion != null && !(new Version(Settings.LastVersion) <= new Version(1, 2, 4, 2)) || !UserIO.Open(UserIO.Mode.Read))
                 return;
-            }
-
             for (int slot = 0; slot < 3; ++slot)
             {
                 if (UserIO.Exists(SaveData.GetFilename(slot)))
@@ -149,14 +121,14 @@ namespace Celeste
                         saveData.AfterInitialize();
                         if (saveData.TotalHeartGems >= 24)
                         {
-                            showVariantPostcard = true;
+                            this.showVariantPostcard = true;
                             break;
                         }
                     }
                 }
             }
             UserIO.Close();
-            SaveData.Instance = null;
+            SaveData.Instance = (SaveData) null;
         }
     }
 }

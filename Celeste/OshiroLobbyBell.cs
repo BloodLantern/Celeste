@@ -12,27 +12,21 @@ namespace Celeste
 {
     public class OshiroLobbyBell : Entity
     {
-        private readonly TalkComponent talker;
+        private TalkComponent talker;
 
         public OshiroLobbyBell(Vector2 position)
             : base(position)
         {
-            Add(talker = new TalkComponent(new Rectangle(-8, -8, 16, 16), new Vector2(0.0f, -24f), new Action<Player>(OnTalk)));
-            talker.Enabled = false;
+            this.Add((Component) (this.talker = new TalkComponent(new Rectangle(-8, -8, 16, 16), new Vector2(0.0f, -24f), new Action<Player>(this.OnTalk))));
+            this.talker.Enabled = false;
         }
 
-        private void OnTalk(Player player)
-        {
-            _ = Audio.Play("event:/game/03_resort/deskbell_again", Position);
-        }
+        private void OnTalk(Player player) => Audio.Play("event:/game/03_resort/deskbell_again", this.Position);
 
         public override void Update()
         {
-            if (!talker.Enabled && Scene.Entities.FindFirst<NPC03_Oshiro_Lobby>() == null)
-            {
-                talker.Enabled = true;
-            }
-
+            if (!this.talker.Enabled && this.Scene.Entities.FindFirst<NPC03_Oshiro_Lobby>() == null)
+                this.talker.Enabled = true;
             base.Update();
         }
     }

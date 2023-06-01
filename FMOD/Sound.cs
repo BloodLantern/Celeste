@@ -14,21 +14,20 @@ namespace FMOD
     {
         public RESULT release()
         {
-            int num = (int)Sound.FMOD_Sound_Release(rawPtr);
+            int num = (int) Sound.FMOD_Sound_Release(this.rawPtr);
             if (num != 0)
-            {
-                return (RESULT)num;
-            }
-
-            rawPtr = IntPtr.Zero;
-            return (RESULT)num;
+                return (RESULT) num;
+            this.rawPtr = IntPtr.Zero;
+            return (RESULT) num;
         }
 
         public RESULT getSystemObject(out FMOD.System system)
         {
-            int systemObject = (int)Sound.FMOD_Sound_GetSystemObject(rawPtr, out IntPtr system1);
+            system = (FMOD.System) null;
+            IntPtr system1;
+            int systemObject = (int) Sound.FMOD_Sound_GetSystemObject(this.rawPtr, out system1);
             system = new FMOD.System(system1);
-            return (RESULT)systemObject;
+            return (RESULT) systemObject;
         }
 
         public RESULT @lock(
@@ -39,40 +38,25 @@ namespace FMOD
             out uint len1,
             out uint len2)
         {
-            return Sound.FMOD_Sound_Lock(rawPtr, offset, length, out ptr1, out ptr2, out len1, out len2);
+            return Sound.FMOD_Sound_Lock(this.rawPtr, offset, length, out ptr1, out ptr2, out len1, out len2);
         }
 
-        public RESULT unlock(IntPtr ptr1, IntPtr ptr2, uint len1, uint len2)
-        {
-            return Sound.FMOD_Sound_Unlock(rawPtr, ptr1, ptr2, len1, len2);
-        }
+        public RESULT unlock(IntPtr ptr1, IntPtr ptr2, uint len1, uint len2) => Sound.FMOD_Sound_Unlock(this.rawPtr, ptr1, ptr2, len1, len2);
 
-        public RESULT setDefaults(float frequency, int priority)
-        {
-            return Sound.FMOD_Sound_SetDefaults(rawPtr, frequency, priority);
-        }
+        public RESULT setDefaults(float frequency, int priority) => Sound.FMOD_Sound_SetDefaults(this.rawPtr, frequency, priority);
 
-        public RESULT getDefaults(out float frequency, out int priority)
-        {
-            return Sound.FMOD_Sound_GetDefaults(rawPtr, out frequency, out priority);
-        }
+        public RESULT getDefaults(out float frequency, out int priority) => Sound.FMOD_Sound_GetDefaults(this.rawPtr, out frequency, out priority);
 
-        public RESULT set3DMinMaxDistance(float min, float max)
-        {
-            return Sound.FMOD_Sound_Set3DMinMaxDistance(rawPtr, min, max);
-        }
+        public RESULT set3DMinMaxDistance(float min, float max) => Sound.FMOD_Sound_Set3DMinMaxDistance(this.rawPtr, min, max);
 
-        public RESULT get3DMinMaxDistance(out float min, out float max)
-        {
-            return Sound.FMOD_Sound_Get3DMinMaxDistance(rawPtr, out min, out max);
-        }
+        public RESULT get3DMinMaxDistance(out float min, out float max) => Sound.FMOD_Sound_Get3DMinMaxDistance(this.rawPtr, out min, out max);
 
         public RESULT set3DConeSettings(
             float insideconeangle,
             float outsideconeangle,
             float outsidevolume)
         {
-            return Sound.FMOD_Sound_Set3DConeSettings(rawPtr, insideconeangle, outsideconeangle, outsidevolume);
+            return Sound.FMOD_Sound_Set3DConeSettings(this.rawPtr, insideconeangle, outsideconeangle, outsidevolume);
         }
 
         public RESULT get3DConeSettings(
@@ -80,46 +64,41 @@ namespace FMOD
             out float outsideconeangle,
             out float outsidevolume)
         {
-            return Sound.FMOD_Sound_Get3DConeSettings(rawPtr, out insideconeangle, out outsideconeangle, out outsidevolume);
+            return Sound.FMOD_Sound_Get3DConeSettings(this.rawPtr, out insideconeangle, out outsideconeangle, out outsidevolume);
         }
 
-        public RESULT set3DCustomRolloff(ref VECTOR points, int numpoints)
-        {
-            return Sound.FMOD_Sound_Set3DCustomRolloff(rawPtr, ref points, numpoints);
-        }
+        public RESULT set3DCustomRolloff(ref VECTOR points, int numpoints) => Sound.FMOD_Sound_Set3DCustomRolloff(this.rawPtr, ref points, numpoints);
 
-        public RESULT get3DCustomRolloff(out IntPtr points, out int numpoints)
-        {
-            return Sound.FMOD_Sound_Get3DCustomRolloff(rawPtr, out points, out numpoints);
-        }
+        public RESULT get3DCustomRolloff(out IntPtr points, out int numpoints) => Sound.FMOD_Sound_Get3DCustomRolloff(this.rawPtr, out points, out numpoints);
 
         public RESULT getSubSound(int index, out Sound subsound)
         {
-            int subSound = (int)Sound.FMOD_Sound_GetSubSound(rawPtr, index, out IntPtr subsound1);
+            subsound = (Sound) null;
+            IntPtr subsound1;
+            int subSound = (int) Sound.FMOD_Sound_GetSubSound(this.rawPtr, index, out subsound1);
             subsound = new Sound(subsound1);
-            return (RESULT)subSound;
+            return (RESULT) subSound;
         }
 
         public RESULT getSubSoundParent(out Sound parentsound)
         {
-            int subSoundParent = (int)Sound.FMOD_Sound_GetSubSoundParent(rawPtr, out IntPtr parentsound1);
+            parentsound = (Sound) null;
+            IntPtr parentsound1;
+            int subSoundParent = (int) Sound.FMOD_Sound_GetSubSoundParent(this.rawPtr, out parentsound1);
             parentsound = new Sound(parentsound1);
-            return (RESULT)subSoundParent;
+            return (RESULT) subSoundParent;
         }
 
         public RESULT getName(StringBuilder name, int namelen)
         {
             IntPtr num = Marshal.AllocHGlobal(name.Capacity);
-            int name1 = (int)Sound.FMOD_Sound_GetName(rawPtr, num, namelen);
+            int name1 = (int) Sound.FMOD_Sound_GetName(this.rawPtr, num, namelen);
             StringMarshalHelper.NativeToBuilder(name, num);
             Marshal.FreeHGlobal(num);
-            return (RESULT)name1;
+            return (RESULT) name1;
         }
 
-        public RESULT getLength(out uint length, TIMEUNIT lengthtype)
-        {
-            return Sound.FMOD_Sound_GetLength(rawPtr, out length, lengthtype);
-        }
+        public RESULT getLength(out uint length, TIMEUNIT lengthtype) => Sound.FMOD_Sound_GetLength(this.rawPtr, out length, lengthtype);
 
         public RESULT getFormat(
             out SOUND_TYPE type,
@@ -127,23 +106,14 @@ namespace FMOD
             out int channels,
             out int bits)
         {
-            return Sound.FMOD_Sound_GetFormat(rawPtr, out type, out format, out channels, out bits);
+            return Sound.FMOD_Sound_GetFormat(this.rawPtr, out type, out format, out channels, out bits);
         }
 
-        public RESULT getNumSubSounds(out int numsubsounds)
-        {
-            return Sound.FMOD_Sound_GetNumSubSounds(rawPtr, out numsubsounds);
-        }
+        public RESULT getNumSubSounds(out int numsubsounds) => Sound.FMOD_Sound_GetNumSubSounds(this.rawPtr, out numsubsounds);
 
-        public RESULT getNumTags(out int numtags, out int numtagsupdated)
-        {
-            return Sound.FMOD_Sound_GetNumTags(rawPtr, out numtags, out numtagsupdated);
-        }
+        public RESULT getNumTags(out int numtags, out int numtagsupdated) => Sound.FMOD_Sound_GetNumTags(this.rawPtr, out numtags, out numtagsupdated);
 
-        public RESULT getTag(string name, int index, out TAG tag)
-        {
-            return Sound.FMOD_Sound_GetTag(rawPtr, name, index, out tag);
-        }
+        public RESULT getTag(string name, int index, out TAG tag) => Sound.FMOD_Sound_GetTag(this.rawPtr, name, index, out tag);
 
         public RESULT getOpenState(
             out OPENSTATE openstate,
@@ -151,40 +121,27 @@ namespace FMOD
             out bool starving,
             out bool diskbusy)
         {
-            return Sound.FMOD_Sound_GetOpenState(rawPtr, out openstate, out percentbuffered, out starving, out diskbusy);
+            return Sound.FMOD_Sound_GetOpenState(this.rawPtr, out openstate, out percentbuffered, out starving, out diskbusy);
         }
 
-        public RESULT readData(IntPtr buffer, uint length, out uint read)
-        {
-            return Sound.FMOD_Sound_ReadData(rawPtr, buffer, length, out read);
-        }
+        public RESULT readData(IntPtr buffer, uint length, out uint read) => Sound.FMOD_Sound_ReadData(this.rawPtr, buffer, length, out read);
 
-        public RESULT seekData(uint pcm)
-        {
-            return Sound.FMOD_Sound_SeekData(rawPtr, pcm);
-        }
+        public RESULT seekData(uint pcm) => Sound.FMOD_Sound_SeekData(this.rawPtr, pcm);
 
-        public RESULT setSoundGroup(SoundGroup soundgroup)
-        {
-            return Sound.FMOD_Sound_SetSoundGroup(rawPtr, soundgroup.getRaw());
-        }
+        public RESULT setSoundGroup(SoundGroup soundgroup) => Sound.FMOD_Sound_SetSoundGroup(this.rawPtr, soundgroup.getRaw());
 
         public RESULT getSoundGroup(out SoundGroup soundgroup)
         {
-            int soundGroup = (int)Sound.FMOD_Sound_GetSoundGroup(rawPtr, out IntPtr soundgroup1);
+            soundgroup = (SoundGroup) null;
+            IntPtr soundgroup1;
+            int soundGroup = (int) Sound.FMOD_Sound_GetSoundGroup(this.rawPtr, out soundgroup1);
             soundgroup = new SoundGroup(soundgroup1);
-            return (RESULT)soundGroup;
+            return (RESULT) soundGroup;
         }
 
-        public RESULT getNumSyncPoints(out int numsyncpoints)
-        {
-            return Sound.FMOD_Sound_GetNumSyncPoints(rawPtr, out numsyncpoints);
-        }
+        public RESULT getNumSyncPoints(out int numsyncpoints) => Sound.FMOD_Sound_GetNumSyncPoints(this.rawPtr, out numsyncpoints);
 
-        public RESULT getSyncPoint(int index, out IntPtr point)
-        {
-            return Sound.FMOD_Sound_GetSyncPoint(rawPtr, index, out point);
-        }
+        public RESULT getSyncPoint(int index, out IntPtr point) => Sound.FMOD_Sound_GetSyncPoint(this.rawPtr, index, out point);
 
         public RESULT getSyncPointInfo(
             IntPtr point,
@@ -194,10 +151,10 @@ namespace FMOD
             TIMEUNIT offsettype)
         {
             IntPtr num = Marshal.AllocHGlobal(name.Capacity);
-            int syncPointInfo = (int)Sound.FMOD_Sound_GetSyncPointInfo(rawPtr, point, num, namelen, out offset, offsettype);
+            int syncPointInfo = (int) Sound.FMOD_Sound_GetSyncPointInfo(this.rawPtr, point, num, namelen, out offset, offsettype);
             StringMarshalHelper.NativeToBuilder(name, num);
             Marshal.FreeHGlobal(num);
-            return (RESULT)syncPointInfo;
+            return (RESULT) syncPointInfo;
         }
 
         public RESULT addSyncPoint(
@@ -206,33 +163,18 @@ namespace FMOD
             string name,
             out IntPtr point)
         {
-            return Sound.FMOD_Sound_AddSyncPoint(rawPtr, offset, offsettype, name, out point);
+            return Sound.FMOD_Sound_AddSyncPoint(this.rawPtr, offset, offsettype, name, out point);
         }
 
-        public RESULT deleteSyncPoint(IntPtr point)
-        {
-            return Sound.FMOD_Sound_DeleteSyncPoint(rawPtr, point);
-        }
+        public RESULT deleteSyncPoint(IntPtr point) => Sound.FMOD_Sound_DeleteSyncPoint(this.rawPtr, point);
 
-        public RESULT setMode(MODE mode)
-        {
-            return Sound.FMOD_Sound_SetMode(rawPtr, mode);
-        }
+        public RESULT setMode(MODE mode) => Sound.FMOD_Sound_SetMode(this.rawPtr, mode);
 
-        public RESULT getMode(out MODE mode)
-        {
-            return Sound.FMOD_Sound_GetMode(rawPtr, out mode);
-        }
+        public RESULT getMode(out MODE mode) => Sound.FMOD_Sound_GetMode(this.rawPtr, out mode);
 
-        public RESULT setLoopCount(int loopcount)
-        {
-            return Sound.FMOD_Sound_SetLoopCount(rawPtr, loopcount);
-        }
+        public RESULT setLoopCount(int loopcount) => Sound.FMOD_Sound_SetLoopCount(this.rawPtr, loopcount);
 
-        public RESULT getLoopCount(out int loopcount)
-        {
-            return Sound.FMOD_Sound_GetLoopCount(rawPtr, out loopcount);
-        }
+        public RESULT getLoopCount(out int loopcount) => Sound.FMOD_Sound_GetLoopCount(this.rawPtr, out loopcount);
 
         public RESULT setLoopPoints(
             uint loopstart,
@@ -240,7 +182,7 @@ namespace FMOD
             uint loopend,
             TIMEUNIT loopendtype)
         {
-            return Sound.FMOD_Sound_SetLoopPoints(rawPtr, loopstart, loopstarttype, loopend, loopendtype);
+            return Sound.FMOD_Sound_SetLoopPoints(this.rawPtr, loopstart, loopstarttype, loopend, loopendtype);
         }
 
         public RESULT getLoopPoints(
@@ -249,43 +191,22 @@ namespace FMOD
             out uint loopend,
             TIMEUNIT loopendtype)
         {
-            return Sound.FMOD_Sound_GetLoopPoints(rawPtr, out loopstart, loopstarttype, out loopend, loopendtype);
+            return Sound.FMOD_Sound_GetLoopPoints(this.rawPtr, out loopstart, loopstarttype, out loopend, loopendtype);
         }
 
-        public RESULT getMusicNumChannels(out int numchannels)
-        {
-            return Sound.FMOD_Sound_GetMusicNumChannels(rawPtr, out numchannels);
-        }
+        public RESULT getMusicNumChannels(out int numchannels) => Sound.FMOD_Sound_GetMusicNumChannels(this.rawPtr, out numchannels);
 
-        public RESULT setMusicChannelVolume(int channel, float volume)
-        {
-            return Sound.FMOD_Sound_SetMusicChannelVolume(rawPtr, channel, volume);
-        }
+        public RESULT setMusicChannelVolume(int channel, float volume) => Sound.FMOD_Sound_SetMusicChannelVolume(this.rawPtr, channel, volume);
 
-        public RESULT getMusicChannelVolume(int channel, out float volume)
-        {
-            return Sound.FMOD_Sound_GetMusicChannelVolume(rawPtr, channel, out volume);
-        }
+        public RESULT getMusicChannelVolume(int channel, out float volume) => Sound.FMOD_Sound_GetMusicChannelVolume(this.rawPtr, channel, out volume);
 
-        public RESULT setMusicSpeed(float speed)
-        {
-            return Sound.FMOD_Sound_SetMusicSpeed(rawPtr, speed);
-        }
+        public RESULT setMusicSpeed(float speed) => Sound.FMOD_Sound_SetMusicSpeed(this.rawPtr, speed);
 
-        public RESULT getMusicSpeed(out float speed)
-        {
-            return Sound.FMOD_Sound_GetMusicSpeed(rawPtr, out speed);
-        }
+        public RESULT getMusicSpeed(out float speed) => Sound.FMOD_Sound_GetMusicSpeed(this.rawPtr, out speed);
 
-        public RESULT setUserData(IntPtr userdata)
-        {
-            return Sound.FMOD_Sound_SetUserData(rawPtr, userdata);
-        }
+        public RESULT setUserData(IntPtr userdata) => Sound.FMOD_Sound_SetUserData(this.rawPtr, userdata);
 
-        public RESULT getUserData(out IntPtr userdata)
-        {
-            return Sound.FMOD_Sound_GetUserData(rawPtr, out userdata);
-        }
+        public RESULT getUserData(out IntPtr userdata) => Sound.FMOD_Sound_GetUserData(this.rawPtr, out userdata);
 
         [DllImport("fmod")]
         private static extern RESULT FMOD_Sound_Release(IntPtr sound);

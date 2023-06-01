@@ -15,32 +15,26 @@ namespace Celeste
         public InvisibleBarrier(Vector2 position, float width, float height)
             : base(position, width, height, true)
         {
-            Tag = (int)Tags.TransitionUpdate;
-            Collidable = false;
-            Visible = false;
-            Add(new ClimbBlocker(true));
-            SurfaceSoundIndex = 33;
+            this.Tag = (int) Tags.TransitionUpdate;
+            this.Collidable = false;
+            this.Visible = false;
+            this.Add((Component) new ClimbBlocker(true));
+            this.SurfaceSoundIndex = 33;
         }
 
         public InvisibleBarrier(EntityData data, Vector2 offset)
-            : this(data.Position + offset, data.Width, data.Height)
+            : this(data.Position + offset, (float) data.Width, (float) data.Height)
         {
         }
 
         public override void Update()
         {
-            Collidable = true;
-            if (CollideCheck<Player>())
-            {
-                Collidable = false;
-            }
-
-            if (Collidable)
-            {
+            this.Collidable = true;
+            if (this.CollideCheck<Player>())
+                this.Collidable = false;
+            if (this.Collidable)
                 return;
-            }
-
-            Active = false;
+            this.Active = false;
         }
     }
 }

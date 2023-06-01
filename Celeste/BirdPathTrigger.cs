@@ -22,28 +22,23 @@ namespace Celeste
         public override void Awake(Scene scene)
         {
             base.Awake(scene);
-            BirdPath first = Scene.Entities.FindFirst<BirdPath>();
+            BirdPath first = this.Scene.Entities.FindFirst<BirdPath>();
             if (first != null)
             {
-                bird = first;
-                bird.WaitForTrigger();
+                this.bird = first;
+                this.bird.WaitForTrigger();
             }
             else
-            {
-                RemoveSelf();
-            }
+                this.RemoveSelf();
         }
 
         public override void OnEnter(Player player)
         {
             base.OnEnter(player);
-            if (triggered)
-            {
+            if (this.triggered)
                 return;
-            }
-
-            bird.Trigger();
-            triggered = true;
+            this.bird.Trigger();
+            this.triggered = true;
         }
     }
 }

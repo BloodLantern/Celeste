@@ -15,29 +15,26 @@ namespace Celeste
         private readonly Monocle.Image glow;
         private float ease;
         private float timer;
-        private readonly bool gotKey;
+        private bool gotKey;
 
         public PowerSourceNumber(Vector2 position, int index, bool gotCollectables)
         {
-            Position = position;
-            Depth = -10010;
-            Add(image = new Monocle.Image(GFX.Game["scenery/powersource_numbers/1"]));
-            Add(glow = new Monocle.Image(GFX.Game["scenery/powersource_numbers/1_glow"]));
-            glow.Color = Color.Transparent;
-            gotKey = gotCollectables;
+            this.Position = position;
+            this.Depth = -10010;
+            this.Add((Component) (this.image = new Monocle.Image(GFX.Game["scenery/powersource_numbers/1"])));
+            this.Add((Component) (this.glow = new Monocle.Image(GFX.Game["scenery/powersource_numbers/1_glow"])));
+            this.glow.Color = Color.Transparent;
+            this.gotKey = gotCollectables;
         }
 
         public override void Update()
         {
             base.Update();
-            if (!(Scene as Level).Session.GetFlag("disable_lightning") || gotKey)
-            {
+            if (!(this.Scene as Level).Session.GetFlag("disable_lightning") || this.gotKey)
                 return;
-            }
-
-            timer += Engine.DeltaTime;
-            ease = Calc.Approach(ease, 1f, Engine.DeltaTime * 4f);
-            glow.Color = Color.White * ease * Calc.SineMap(timer * 2f, 0.5f, 0.9f);
+            this.timer += Engine.DeltaTime;
+            this.ease = Calc.Approach(this.ease, 1f, Engine.DeltaTime * 4f);
+            this.glow.Color = Color.White * this.ease * Calc.SineMap(this.timer * 2f, 0.5f, 0.9f);
         }
     }
 }

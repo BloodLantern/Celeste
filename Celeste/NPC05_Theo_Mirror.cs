@@ -16,40 +16,34 @@ namespace Celeste
         public NPC05_Theo_Mirror(Vector2 position)
             : base(position)
         {
-            Add(Sprite = GFX.SpriteBank.Create("theo"));
-            IdleAnim = "idle";
-            MoveAnim = "walk";
-            Visible = false;
-            Add(new MirrorReflection()
+            this.Add((Component) (this.Sprite = GFX.SpriteBank.Create("theo")));
+            this.IdleAnim = "idle";
+            this.MoveAnim = "walk";
+            this.Visible = false;
+            this.Add((Component) new MirrorReflection()
             {
                 IgnoreEntityVisible = true
             });
-            Sprite.Scale.X = 1f;
-            Maxspeed = 48f;
+            this.Sprite.Scale.X = 1f;
+            this.Maxspeed = 48f;
         }
 
         public override void Added(Scene scene)
         {
             base.Added(scene);
-            if (!Session.GetFlag("theoInMirror"))
-            {
+            if (!this.Session.GetFlag("theoInMirror"))
                 return;
-            }
-
-            RemoveSelf();
+            this.RemoveSelf();
         }
 
         public override void Update()
         {
             base.Update();
-            Player entity = Scene.Tracker.GetEntity<Player>();
-            if (started || entity == null || (double)entity.X <= (double)X - 64.0)
-            {
+            Player entity = this.Scene.Tracker.GetEntity<Player>();
+            if (this.started || entity == null || (double) entity.X <= (double) this.X - 64.0)
                 return;
-            }
-
-            started = true;
-            Scene.Add(new CS05_TheoInMirror(this, entity));
+            this.started = true;
+            this.Scene.Add((Entity) new CS05_TheoInMirror((NPC) this, entity));
         }
     }
 }

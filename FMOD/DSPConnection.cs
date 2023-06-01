@@ -13,27 +13,25 @@ namespace FMOD
     {
         public RESULT getInput(out DSP input)
         {
-            int input2 = (int)DSPConnection.FMOD_DSPConnection_GetInput(rawPtr, out IntPtr input1);
+            input = (DSP) null;
+            IntPtr input1;
+            int input2 = (int) DSPConnection.FMOD_DSPConnection_GetInput(this.rawPtr, out input1);
             input = new DSP(input1);
-            return (RESULT)input2;
+            return (RESULT) input2;
         }
 
         public RESULT getOutput(out DSP output)
         {
-            int output2 = (int)DSPConnection.FMOD_DSPConnection_GetOutput(rawPtr, out IntPtr output1);
+            output = (DSP) null;
+            IntPtr output1;
+            int output2 = (int) DSPConnection.FMOD_DSPConnection_GetOutput(this.rawPtr, out output1);
             output = new DSP(output1);
-            return (RESULT)output2;
+            return (RESULT) output2;
         }
 
-        public RESULT setMix(float volume)
-        {
-            return DSPConnection.FMOD_DSPConnection_SetMix(rawPtr, volume);
-        }
+        public RESULT setMix(float volume) => DSPConnection.FMOD_DSPConnection_SetMix(this.rawPtr, volume);
 
-        public RESULT getMix(out float volume)
-        {
-            return DSPConnection.FMOD_DSPConnection_GetMix(rawPtr, out volume);
-        }
+        public RESULT getMix(out float volume) => DSPConnection.FMOD_DSPConnection_GetMix(this.rawPtr, out volume);
 
         public RESULT setMixMatrix(
             float[] matrix,
@@ -41,7 +39,7 @@ namespace FMOD
             int inchannels,
             int inchannel_hop = 0)
         {
-            return DSPConnection.FMOD_DSPConnection_SetMixMatrix(rawPtr, matrix, outchannels, inchannels, inchannel_hop);
+            return DSPConnection.FMOD_DSPConnection_SetMixMatrix(this.rawPtr, matrix, outchannels, inchannels, inchannel_hop);
         }
 
         public RESULT getMixMatrix(
@@ -50,23 +48,14 @@ namespace FMOD
             out int inchannels,
             int inchannel_hop = 0)
         {
-            return DSPConnection.FMOD_DSPConnection_GetMixMatrix(rawPtr, matrix, out outchannels, out inchannels, inchannel_hop);
+            return DSPConnection.FMOD_DSPConnection_GetMixMatrix(this.rawPtr, matrix, out outchannels, out inchannels, inchannel_hop);
         }
 
-        public RESULT getType(out DSPCONNECTION_TYPE type)
-        {
-            return DSPConnection.FMOD_DSPConnection_GetType(rawPtr, out type);
-        }
+        public RESULT getType(out DSPCONNECTION_TYPE type) => DSPConnection.FMOD_DSPConnection_GetType(this.rawPtr, out type);
 
-        public RESULT setUserData(IntPtr userdata)
-        {
-            return DSPConnection.FMOD_DSPConnection_SetUserData(rawPtr, userdata);
-        }
+        public RESULT setUserData(IntPtr userdata) => DSPConnection.FMOD_DSPConnection_SetUserData(this.rawPtr, userdata);
 
-        public RESULT getUserData(out IntPtr userdata)
-        {
-            return DSPConnection.FMOD_DSPConnection_GetUserData(rawPtr, out userdata);
-        }
+        public RESULT getUserData(out IntPtr userdata) => DSPConnection.FMOD_DSPConnection_GetUserData(this.rawPtr, out userdata);
 
         [DllImport("fmod")]
         private static extern RESULT FMOD_DSPConnection_GetInput(

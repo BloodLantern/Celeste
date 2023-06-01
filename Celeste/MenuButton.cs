@@ -21,7 +21,7 @@ namespace Celeste
         public MenuButton DownButton;
         public Action OnConfirm;
         private bool canAcceptInput;
-        private readonly Oui oui;
+        private Oui oui;
         private bool selected;
         private Tween tween;
 
@@ -30,138 +30,116 @@ namespace Celeste
             foreach (MenuButton entity in scene.Tracker.GetEntities<MenuButton>())
             {
                 if (entity.Selected)
-                {
                     return entity;
-                }
             }
-            return null;
+            return (MenuButton) null;
         }
 
         public static void ClearSelection(Scene scene)
         {
             MenuButton selection = MenuButton.GetSelection(scene);
             if (selection == null)
-            {
                 return;
-            }
-
             selection.Selected = false;
         }
 
         public MenuButton(Oui oui, Vector2 targetPosition, Vector2 tweenFrom, Action onConfirm)
             : base(tweenFrom)
         {
-            TargetPosition = targetPosition;
-            TweenFrom = tweenFrom;
-            OnConfirm = onConfirm;
+            this.TargetPosition = targetPosition;
+            this.TweenFrom = tweenFrom;
+            this.OnConfirm = onConfirm;
             this.oui = oui;
         }
 
         public override void Update()
         {
             base.Update();
-            if (!canAcceptInput)
+            if (!this.canAcceptInput)
             {
-                canAcceptInput = true;
+                this.canAcceptInput = true;
             }
             else
             {
-                if (!oui.Selected || !oui.Focused || !selected)
-                {
+                if (!this.oui.Selected || !this.oui.Focused || !this.selected)
                     return;
-                }
-
                 if (Input.MenuConfirm.Pressed)
+                    this.Confirm();
+                else if (Input.MenuLeft.Pressed && this.LeftButton != null)
                 {
-                    Confirm();
+                    Audio.Play("event:/ui/main/rollover_up");
+                    this.LeftButton.Selected = true;
                 }
-                else if (Input.MenuLeft.Pressed && LeftButton != null)
+                else if (Input.MenuRight.Pressed && this.RightButton != null)
                 {
-                    _ = Audio.Play("event:/ui/main/rollover_up");
-                    LeftButton.Selected = true;
+                    Audio.Play("event:/ui/main/rollover_down");
+                    this.RightButton.Selected = true;
                 }
-                else if (Input.MenuRight.Pressed && RightButton != null)
+                else if (Input.MenuUp.Pressed && this.UpButton != null)
                 {
-                    _ = Audio.Play("event:/ui/main/rollover_down");
-                    RightButton.Selected = true;
-                }
-                else if (Input.MenuUp.Pressed && UpButton != null)
-                {
-                    _ = Audio.Play("event:/ui/main/rollover_up");
-                    UpButton.Selected = true;
+                    Audio.Play("event:/ui/main/rollover_up");
+                    this.UpButton.Selected = true;
                 }
                 else
                 {
-                    if (!Input.MenuDown.Pressed || DownButton == null)
-                    {
+                    if (!Input.MenuDown.Pressed || this.DownButton == null)
                         return;
-                    }
-
-                    _ = Audio.Play("event:/ui/main/rollover_down");
-                    DownButton.Selected = true;
+                    Audio.Play("event:/ui/main/rollover_down");
+                    this.DownButton.Selected = true;
                 }
             }
         }
 
         public void TweenIn(float time)
         {
-            if (tween != null && tween.Entity == this)
-            {
-                tween.RemoveSelf();
-            }
-
-            Vector2 from = Position;
-            Add(tween = Tween.Create(Tween.TweenMode.Oneshot, Ease.CubeOut, time, true));
-            tween.OnUpdate = t => Position = Vector2.Lerp(from, TargetPosition, t.Eased);
+            if (this.tween != null && this.tween.Entity == this)
+                this.tween.RemoveSelf();
+            Vector2 from = this.Position;
+            this.Add((Component) (this.tween = Tween.Create(Tween.TweenMode.Oneshot, Ease.CubeOut, time, true)));
+            this.tween.OnUpdate = (Action<Tween>) (t => this.Position = Vector2.Lerp(from, this.TargetPosition, t.Eased));
         }
 
         public void TweenOut(float time)
         {
-            if (tween != null && tween.Entity == this)
-            {
-                tween.RemoveSelf();
-            }
-
-            Vector2 from = Position;
-            Add(tween = Tween.Create(Tween.TweenMode.Oneshot, Ease.CubeIn, time, true));
-            tween.OnUpdate = t => Position = Vector2.Lerp(from, TweenFrom, t.Eased);
+            if (this.tween != null && this.tween.Entity == this)
+                this.tween.RemoveSelf();
+            Vector2 from = this.Position;
+            this.Add((Component) (this.tween = Tween.Create(Tween.TweenMode.Oneshot, Ease.CubeIn, time, true)));
+            this.tween.OnUpdate = (Action<Tween>) (t => this.Position = Vector2.Lerp(from, this.TweenFrom, t.Eased));
         }
 
-        public Color SelectionColor => !selected
-                    ? Color.White
-                    : !Settings.Instance.DisableFlashes && !Scene.BetweenInterval(0.1f) ? TextMenu.HighlightColorB : TextMenu.HighlightColorA;
+        public Color SelectionColor
+        {
+            get
+            {
+                if (!this.selected)
+                    return Color.White;
+                return !Settings.Instance.DisableFlashes && !this.Scene.BetweenInterval(0.1f) ? TextMenu.HighlightColorB : TextMenu.HighlightColorA;
+            }
+        }
 
         public bool Selected
         {
-            get => selected;
+            get => this.selected;
             set
             {
-                if (Scene == null)
-                {
+                if (this.Scene == null)
                     throw new Exception("Cannot set Selected while MenuButton is not in a Scene.");
-                }
-
-                if (!selected & value)
+                if (!this.selected & value)
                 {
-                    MenuButton selection = MenuButton.GetSelection(Scene);
+                    MenuButton selection = MenuButton.GetSelection(this.Scene);
                     if (selection != null)
-                    {
                         selection.Selected = false;
-                    }
-
-                    selected = true;
-                    canAcceptInput = false;
-                    OnSelect();
+                    this.selected = true;
+                    this.canAcceptInput = false;
+                    this.OnSelect();
                 }
                 else
                 {
-                    if (!selected || value)
-                    {
+                    if (!this.selected || value)
                         return;
-                    }
-
-                    selected = false;
-                    OnDeselect();
+                    this.selected = false;
+                    this.OnDeselect();
                 }
             }
         }
@@ -174,15 +152,9 @@ namespace Celeste
         {
         }
 
-        public virtual void Confirm()
-        {
-            OnConfirm();
-        }
+        public virtual void Confirm() => this.OnConfirm();
 
-        public virtual void StartSelected()
-        {
-            selected = true;
-        }
+        public virtual void StartSelected() => this.selected = true;
 
         public abstract float ButtonHeight { get; }
     }

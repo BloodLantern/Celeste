@@ -23,7 +23,7 @@ namespace Celeste
         private bool launched;
         private float launchedDelay;
         private float launchedTimer;
-        private readonly int tag;
+        private int tag;
         private Vector2 dashDirection0;
         private Vector2 dashDirection1;
 
@@ -36,119 +36,100 @@ namespace Celeste
             Vector2 dashDirection1)
         {
             List<Player.ChaserState> tutorial = PlaybackData.Tutorials[name];
-            Playback = new PlayerPlayback(offset, PlayerSpriteMode.MadelineNoBackpack, tutorial);
-            tag = Calc.Random.Next();
+            this.Playback = new PlayerPlayback(offset, PlayerSpriteMode.MadelineNoBackpack, tutorial);
+            this.tag = Calc.Random.Next();
             this.dashDirection0 = dashDirection0;
             this.dashDirection1 = dashDirection1;
         }
 
         public void Update()
         {
-            Playback.Update();
-            Playback.Hair.AfterUpdate();
-            if (Playback.Sprite.CurrentAnimationID == "dash" && Playback.Sprite.CurrentAnimationFrame == 0)
+            this.Playback.Update();
+            this.Playback.Hair.AfterUpdate();
+            if (this.Playback.Sprite.CurrentAnimationID == "dash" && this.Playback.Sprite.CurrentAnimationFrame == 0)
             {
-                if (!dashing)
+                if (!this.dashing)
                 {
-                    dashing = true;
+                    this.dashing = true;
                     Celeste.Freeze(0.05f);
-                    SlashFx.Burst(Playback.Center, (firstDash ? dashDirection0 : dashDirection1).Angle()).Tag = tag;
-                    dashTrailTimer = 0.1f;
-                    dashTrailCounter = 2;
-                    CreateTrail();
-                    if (firstDash)
-                    {
-                        launchedDelay = 0.15f;
-                    }
-
-                    firstDash = !firstDash;
+                    SlashFx.Burst(this.Playback.Center, (this.firstDash ? this.dashDirection0 : this.dashDirection1).Angle()).Tag = this.tag;
+                    this.dashTrailTimer = 0.1f;
+                    this.dashTrailCounter = 2;
+                    this.CreateTrail();
+                    if (this.firstDash)
+                        this.launchedDelay = 0.15f;
+                    this.firstDash = !this.firstDash;
                 }
             }
             else
+                this.dashing = false;
+            if ((double) this.dashTrailTimer > 0.0)
             {
-                dashing = false;
-            }
-
-            if (dashTrailTimer > 0.0)
-            {
-                dashTrailTimer -= Engine.DeltaTime;
-                if (dashTrailTimer <= 0.0)
+                this.dashTrailTimer -= Engine.DeltaTime;
+                if ((double) this.dashTrailTimer <= 0.0)
                 {
-                    CreateTrail();
-                    --dashTrailCounter;
-                    if (dashTrailCounter > 0)
-                    {
-                        dashTrailTimer = 0.1f;
-                    }
+                    this.CreateTrail();
+                    --this.dashTrailCounter;
+                    if (this.dashTrailCounter > 0)
+                        this.dashTrailTimer = 0.1f;
                 }
             }
-            if (launchedDelay > 0.0)
+            if ((double) this.launchedDelay > 0.0)
             {
-                launchedDelay -= Engine.DeltaTime;
-                if (launchedDelay <= 0.0)
+                this.launchedDelay -= Engine.DeltaTime;
+                if ((double) this.launchedDelay <= 0.0)
                 {
-                    launched = true;
-                    launchedTimer = 0.0f;
+                    this.launched = true;
+                    this.launchedTimer = 0.0f;
                 }
             }
-            if (launched)
+            if (this.launched)
             {
                 float launchedTimer = this.launchedTimer;
                 this.launchedTimer += Engine.DeltaTime;
-                if (this.launchedTimer >= 0.5)
+                if ((double) this.launchedTimer >= 0.5)
                 {
-                    launched = false;
+                    this.launched = false;
                     this.launchedTimer = 0.0f;
                 }
                 else if (Calc.OnInterval(this.launchedTimer, launchedTimer, 0.15f))
                 {
-                    SpeedRing speedRing = Engine.Pooler.Create<SpeedRing>().Init(Playback.Center, (Playback.Position - Playback.LastPosition).Angle(), Color.White);
-                    speedRing.Tag = tag;
-                    Engine.Scene.Add(speedRing);
+                    SpeedRing speedRing = Engine.Pooler.Create<SpeedRing>().Init(this.Playback.Center, (this.Playback.Position - this.Playback.LastPosition).Angle(), Color.White);
+                    speedRing.Tag = this.tag;
+                    Engine.Scene.Add((Entity) speedRing);
                 }
             }
-            hasUpdated = true;
+            this.hasUpdated = true;
         }
 
         public void Render(Vector2 position, float scale)
         {
             Matrix transformMatrix = Matrix.CreateScale(4f) * Matrix.CreateTranslation(position.X, position.Y, 0.0f);
             Draw.SpriteBatch.End();
-            Draw.SpriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, SamplerState.PointClamp, null, null, null, transformMatrix);
+            Draw.SpriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, SamplerState.PointClamp, (DepthStencilState) null, (RasterizerState) null, (Effect) null, transformMatrix);
             foreach (Entity entity in Engine.Scene.Tracker.GetEntities<TrailManager.Snapshot>())
             {
-                if (entity.Tag == tag)
-                {
+                if (entity.Tag == this.tag)
                     entity.Render();
-                }
             }
             foreach (Entity entity in Engine.Scene.Tracker.GetEntities<SlashFx>())
             {
-                if (entity.Tag == tag && entity.Visible)
-                {
+                if (entity.Tag == this.tag && entity.Visible)
                     entity.Render();
-                }
             }
             foreach (Entity entity in Engine.Scene.Tracker.GetEntities<SpeedRing>())
             {
-                if (entity.Tag == tag)
-                {
+                if (entity.Tag == this.tag)
                     entity.Render();
-                }
             }
-            if (Playback.Visible && hasUpdated)
-            {
-                Playback.Render();
-            }
-
-            OnRender?.Invoke();
+            if (this.Playback.Visible && this.hasUpdated)
+                this.Playback.Render();
+            if (this.OnRender != null)
+                this.OnRender();
             Draw.SpriteBatch.End();
             Draw.SpriteBatch.Begin();
         }
 
-        private void CreateTrail()
-        {
-            TrailManager.Add(Playback.Position, Playback.Sprite, Playback.Hair, Playback.Sprite.Scale, Player.UsedHairColor, 0).Tag = tag;
-        }
+        private void CreateTrail() => TrailManager.Add(this.Playback.Position, (Monocle.Image) this.Playback.Sprite, this.Playback.Hair, this.Playback.Sprite.Scale, Player.UsedHairColor, 0).Tag = this.tag;
     }
 }

@@ -13,9 +13,9 @@ namespace Celeste
     [Tracked(false)]
     public class GoldenBlock : Solid
     {
-        private readonly MTexture[,] nineSlice;
-        private readonly Monocle.Image berry;
-        private readonly float startY;
+        private MTexture[,] nineSlice;
+        private Monocle.Image berry;
+        private float startY;
         private float yLerp;
         private float sinkTimer;
         private float renderLerp;
@@ -23,36 +23,34 @@ namespace Celeste
         public GoldenBlock(Vector2 position, float width, float height)
             : base(position, width, height, false)
         {
-            startY = Y;
-            berry = new Monocle.Image(GFX.Game["collectables/goldberry/idle00"]);
-            _ = berry.CenterOrigin();
-            berry.Position = new Vector2(width / 2f, height / 2f);
+            this.startY = this.Y;
+            this.berry = new Monocle.Image(GFX.Game["collectables/goldberry/idle00"]);
+            this.berry.CenterOrigin();
+            this.berry.Position = new Vector2(width / 2f, height / 2f);
             MTexture mtexture = GFX.Game["objects/goldblock"];
-            nineSlice = new MTexture[3, 3];
+            this.nineSlice = new MTexture[3, 3];
             for (int index1 = 0; index1 < 3; ++index1)
             {
                 for (int index2 = 0; index2 < 3; ++index2)
-                {
-                    nineSlice[index1, index2] = mtexture.GetSubtexture(new Rectangle(index1 * 8, index2 * 8, 8, 8));
-                }
+                    this.nineSlice[index1, index2] = mtexture.GetSubtexture(new Rectangle(index1 * 8, index2 * 8, 8, 8));
             }
-            Depth = -10000;
-            Add(new LightOcclude());
-            Add(new MirrorSurface());
-            SurfaceSoundIndex = 32;
+            this.Depth = -10000;
+            this.Add((Component) new LightOcclude());
+            this.Add((Component) new MirrorSurface());
+            this.SurfaceSoundIndex = 32;
         }
 
         public GoldenBlock(EntityData data, Vector2 offset)
-            : this(data.Position + offset, data.Width, data.Height)
+            : this(data.Position + offset, (float) data.Width, (float) data.Height)
         {
         }
 
         public override void Awake(Scene scene)
         {
             base.Awake(scene);
-            Visible = false;
-            Collidable = false;
-            renderLerp = 1f;
+            this.Visible = false;
+            this.Collidable = false;
+            this.renderLerp = 1f;
             bool flag = false;
             foreach (Strawberry strawberry in scene.Entities.FindAll<Strawberry>())
             {
@@ -63,71 +61,58 @@ namespace Celeste
                 }
             }
             if (flag)
-            {
                 return;
-            }
-
-            RemoveSelf();
+            this.RemoveSelf();
         }
 
         public override void Update()
         {
             base.Update();
-            if (!Visible)
+            if (!this.Visible)
             {
-                Player entity = Scene.Tracker.GetEntity<Player>();
-                if (entity != null && (double)entity.X > (double)X - 80.0)
+                Player entity = this.Scene.Tracker.GetEntity<Player>();
+                if (entity != null && (double) entity.X > (double) this.X - 80.0)
                 {
-                    Visible = true;
-                    Collidable = true;
-                    renderLerp = 1f;
+                    this.Visible = true;
+                    this.Collidable = true;
+                    this.renderLerp = 1f;
                 }
             }
-            if (Visible)
-            {
-                renderLerp = Calc.Approach(renderLerp, 0.0f, Engine.DeltaTime * 3f);
-            }
-
-            if (HasPlayerRider())
-            {
-                sinkTimer = 0.1f;
-            }
-            else if (sinkTimer > 0.0)
-            {
-                sinkTimer -= Engine.DeltaTime;
-            }
-
-            yLerp = sinkTimer <= 0.0 ? Calc.Approach(yLerp, 0.0f, 1f * Engine.DeltaTime) : Calc.Approach(yLerp, 1f, 1f * Engine.DeltaTime);
-            MoveToY(MathHelper.Lerp(startY, startY + 12f, Ease.SineInOut(yLerp)));
+            if (this.Visible)
+                this.renderLerp = Calc.Approach(this.renderLerp, 0.0f, Engine.DeltaTime * 3f);
+            if (this.HasPlayerRider())
+                this.sinkTimer = 0.1f;
+            else if ((double) this.sinkTimer > 0.0)
+                this.sinkTimer -= Engine.DeltaTime;
+            this.yLerp = (double) this.sinkTimer <= 0.0 ? Calc.Approach(this.yLerp, 0.0f, 1f * Engine.DeltaTime) : Calc.Approach(this.yLerp, 1f, 1f * Engine.DeltaTime);
+            this.MoveToY(MathHelper.Lerp(this.startY, this.startY + 12f, Ease.SineInOut(this.yLerp)));
         }
 
         private void DrawBlock(Vector2 offset, Color color)
         {
-            float num1 = (float)(((double)Collider.Width / 8.0) - 1.0);
-            float num2 = (float)(((double)Collider.Height / 8.0) - 1.0);
-            for (int val1_1 = 0; val1_1 <= (double)num1; ++val1_1)
+            float num1 = (float) ((double) this.Collider.Width / 8.0 - 1.0);
+            float num2 = (float) ((double) this.Collider.Height / 8.0 - 1.0);
+            for (int val1_1 = 0; (double) val1_1 <= (double) num1; ++val1_1)
             {
-                for (int val1_2 = 0; val1_2 <= (double)num2; ++val1_2)
-                {
-                    nineSlice[val1_1 < (double)num1 ? Math.Min(val1_1, 1) : 2, val1_2 < (double)num2 ? Math.Min(val1_2, 1) : 2].Draw(Position + offset + Shake + new Vector2(val1_1 * 8, val1_2 * 8), Vector2.Zero, color);
-                }
+                for (int val1_2 = 0; (double) val1_2 <= (double) num2; ++val1_2)
+                    this.nineSlice[(double) val1_1 < (double) num1 ? Math.Min(val1_1, 1) : 2, (double) val1_2 < (double) num2 ? Math.Min(val1_2, 1) : 2].Draw(this.Position + offset + this.Shake + new Vector2((float) (val1_1 * 8), (float) (val1_2 * 8)), Vector2.Zero, color);
             }
         }
 
         public override void Render()
         {
-            Vector2 vector2 = new(0.0f, (float)((Scene as Level).Bounds.Bottom - (double)startY + 32.0) * Ease.CubeIn(renderLerp));
-            Vector2 position = Position;
-            Position += vector2;
-            DrawBlock(new Vector2(-1f, 0.0f), Color.Black);
-            DrawBlock(new Vector2(1f, 0.0f), Color.Black);
-            DrawBlock(new Vector2(0.0f, -1f), Color.Black);
-            DrawBlock(new Vector2(0.0f, 1f), Color.Black);
-            DrawBlock(Vector2.Zero, Color.White);
-            berry.Color = Color.White;
-            berry.RenderPosition = Center;
-            berry.Render();
-            Position = position;
+            Vector2 vector2 = new Vector2(0.0f, (float) ((double) (this.Scene as Level).Bounds.Bottom - (double) this.startY + 32.0) * Ease.CubeIn(this.renderLerp));
+            Vector2 position = this.Position;
+            this.Position = this.Position + vector2;
+            this.DrawBlock(new Vector2(-1f, 0.0f), Color.Black);
+            this.DrawBlock(new Vector2(1f, 0.0f), Color.Black);
+            this.DrawBlock(new Vector2(0.0f, -1f), Color.Black);
+            this.DrawBlock(new Vector2(0.0f, 1f), Color.Black);
+            this.DrawBlock(Vector2.Zero, Color.White);
+            this.berry.Color = Color.White;
+            this.berry.RenderPosition = this.Center;
+            this.berry.Render();
+            this.Position = position;
         }
     }
 }

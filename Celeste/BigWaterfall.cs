@@ -13,138 +13,115 @@ namespace Celeste
 {
     public class BigWaterfall : Entity
     {
-        private readonly Layers layer;
-        private readonly float width;
-        private readonly float height;
-        private readonly float parallax;
-        private readonly List<float> lines = new();
+        private BigWaterfall.Layers layer;
+        private float width;
+        private float height;
+        private float parallax;
+        private List<float> lines = new List<float>();
         private Color surfaceColor;
         private Color fillColor;
         private float sine;
-        private readonly SoundSource loopingSfx;
+        private SoundSource loopingSfx;
         private float fade;
 
-        private Vector2 RenderPosition => RenderPositionAtCamera((Scene as Level).Camera.Position + new Vector2(160f, 90f));
+        private Vector2 RenderPosition => this.RenderPositionAtCamera((this.Scene as Level).Camera.Position + new Vector2(160f, 90f));
 
         public BigWaterfall(EntityData data, Vector2 offset)
             : base(data.Position + offset)
         {
-            Tag = Tags.TransitionUpdate;
-            layer = data.Enum(nameof(layer), Layers.BG);
-            width = data.Width;
-            height = data.Height;
-            if (layer == Layers.FG)
+            this.Tag = (int) Tags.TransitionUpdate;
+            this.layer = data.Enum<BigWaterfall.Layers>(nameof (layer), BigWaterfall.Layers.BG);
+            this.width = (float) data.Width;
+            this.height = (float) data.Height;
+            if (this.layer == BigWaterfall.Layers.FG)
             {
-                Depth = -49900;
-                parallax = 0.1f + (Calc.Random.NextFloat() * 0.2f);
-                surfaceColor = Water.SurfaceColor;
-                fillColor = Water.FillColor;
-                Add(new DisplacementRenderHook(new Action(RenderDisplacement)));
-                lines.Add(3f);
-                lines.Add(width - 4f);
-                Add(loopingSfx = new SoundSource());
-                _ = loopingSfx.Play("event:/env/local/waterfall_big_main");
+                this.Depth = -49900;
+                this.parallax = (float) (0.10000000149011612 + (double) Calc.Random.NextFloat() * 0.20000000298023224);
+                this.surfaceColor = Water.SurfaceColor;
+                this.fillColor = Water.FillColor;
+                this.Add((Component) new DisplacementRenderHook(new Action(this.RenderDisplacement)));
+                this.lines.Add(3f);
+                this.lines.Add(this.width - 4f);
+                this.Add((Component) (this.loopingSfx = new SoundSource()));
+                this.loopingSfx.Play("event:/env/local/waterfall_big_main");
             }
             else
             {
-                Depth = 10010;
-                parallax = -(0.7f + (Calc.Random.NextFloat() * 0.2f));
-                surfaceColor = Calc.HexToColor("89dbf0") * 0.5f;
-                fillColor = Calc.HexToColor("29a7ea") * 0.3f;
-                lines.Add(6f);
-                lines.Add(width - 7f);
+                this.Depth = 10010;
+                this.parallax = (float) -(0.699999988079071 + (double) Calc.Random.NextFloat() * 0.20000000298023224);
+                this.surfaceColor = Calc.HexToColor("89dbf0") * 0.5f;
+                this.fillColor = Calc.HexToColor("29a7ea") * 0.3f;
+                this.lines.Add(6f);
+                this.lines.Add(this.width - 7f);
             }
-            fade = 1f;
-            Add(new TransitionListener()
+            this.fade = 1f;
+            this.Add((Component) new TransitionListener()
             {
-                OnIn = f => fade = f,
-                OnOut = f => fade = 1f - f
+                OnIn = (Action<float>) (f => this.fade = f),
+                OnOut = (Action<float>) (f => this.fade = 1f - f)
             });
-            if (width <= 16)
-            {
+            if ((double) this.width <= 16.0)
                 return;
-            }
-
-            int num = Calc.Random.Next((int)(width / 16.0));
-            for (int i = 0; i < num; ++i)
-            {
-                lines.Add(8f + Calc.Random.NextFloat(width - 16f));
-            }
+            int num = Calc.Random.Next((int) ((double) this.width / 16.0));
+            for (int index = 0; index < num; ++index)
+                this.lines.Add(8f + Calc.Random.NextFloat(this.width - 16f));
         }
 
         public override void Added(Scene scene)
         {
             base.Added(scene);
-            if (!(Scene as Level).Transitioning)
-            {
+            if (!(this.Scene as Level).Transitioning)
                 return;
-            }
-
-            fade = 0;
+            this.fade = 0.0f;
         }
 
         public Vector2 RenderPositionAtCamera(Vector2 camera)
         {
-            Vector2 vector2 = Position + (new Vector2(width, height) / 2f) - camera;
+            Vector2 vector2 = this.Position + new Vector2(this.width, this.height) / 2f - camera;
             Vector2 zero = Vector2.Zero;
-            if (layer == Layers.BG)
-            {
+            if (this.layer == BigWaterfall.Layers.BG)
                 zero -= vector2 * 0.6f;
-            }
-            else if (layer == Layers.FG)
-            {
+            else if (this.layer == BigWaterfall.Layers.FG)
                 zero += vector2 * 0.2f;
-            }
-
-            return Position + zero;
+            return this.Position + zero;
         }
 
-        public void RenderDisplacement()
-        {
-            Draw.Rect(RenderPosition.X, Y, width, height, new Color(0.5f, 0.5f, 1f, 1f));
-        }
+        public void RenderDisplacement() => Draw.Rect(this.RenderPosition.X, this.Y, this.width, this.height, new Color(0.5f, 0.5f, 1f, 1f));
 
         public override void Update()
         {
-            sine += Engine.DeltaTime;
-            if (loopingSfx != null)
-            {
-                loopingSfx.Position = new Vector2(RenderPosition.X - X, Calc.Clamp((Scene as Level).Camera.Position.Y + 90f, Y, height) - Y);
-            }
-
+            this.sine += Engine.DeltaTime;
+            if (this.loopingSfx != null)
+                this.loopingSfx.Position = new Vector2(this.RenderPosition.X - this.X, Calc.Clamp((this.Scene as Level).Camera.Position.Y + 90f, this.Y, this.height) - this.Y);
             base.Update();
         }
 
         public override void Render()
         {
-            float x = RenderPosition.X;
-            Color color1 = fillColor * fade;
-            Color color2 = surfaceColor * fade;
-            Draw.Rect(x, Y, width, height, color1);
-            if (layer == Layers.FG)
+            float x = this.RenderPosition.X;
+            Color color1 = this.fillColor * this.fade;
+            Color color2 = this.surfaceColor * this.fade;
+            Draw.Rect(x, this.Y, this.width, this.height, color1);
+            if (this.layer == BigWaterfall.Layers.FG)
             {
-                Draw.Rect(x - 1f, Y, 3f, height, color2);
-                Draw.Rect(x + width - 2, Y, 3f, height, color2);
-                foreach (float line in lines)
-                {
-                    Draw.Rect(x + line, Y, 1f, height, color2);
-                }
+                Draw.Rect(x - 1f, this.Y, 3f, this.height, color2);
+                Draw.Rect((float) ((double) x + (double) this.width - 2.0), this.Y, 3f, this.height, color2);
+                foreach (float line in this.lines)
+                    Draw.Rect(x + line, this.Y, 1f, this.height, color2);
             }
             else
             {
-                Vector2 position = (Scene as Level).Camera.Position;
+                Vector2 position = (this.Scene as Level).Camera.Position;
                 int height = 3;
-                float num1 = (float)Math.Max(Y, Math.Floor(position.Y / height) * height);
-                float num2 = Math.Min(Y + this.height, position.Y + 180f);
-                for (float y = num1; y < num2; y += height)
+                double num1 = (double) Math.Max(this.Y, (float) Math.Floor((double) position.Y / (double) height) * (float) height);
+                float num2 = Math.Min(this.Y + this.height, position.Y + 180f);
+                for (float y = (float) num1; (double) y < (double) num2; y += (float) height)
                 {
-                    int num3 = (int)Math.Sin((y / 6) - (sine * 8)) * 2;
-                    Draw.Rect(x, y, 4 + num3, height, color2);
-                    Draw.Rect(x + width - 4 + num3, y, 4 - num3, height, color2);
-                    foreach (float line in lines)
-                    {
-                        Draw.Rect(x + num3 + line, y, 1f, height, color2);
-                    }
+                    int num3 = (int) (Math.Sin((double) y / 6.0 - (double) this.sine * 8.0) * 2.0);
+                    Draw.Rect(x, y, (float) (4 + num3), (float) height, color2);
+                    Draw.Rect((float) ((double) x + (double) this.width - 4.0) + (float) num3, y, (float) (4 - num3), (float) height, color2);
+                    foreach (float line in this.lines)
+                        Draw.Rect(x + (float) num3 + line, y, 1f, (float) height, color2);
                 }
             }
         }

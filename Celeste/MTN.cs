@@ -49,16 +49,16 @@ namespace Celeste
                 MTN.MountainSkyboxTextures = new VirtualTexture[3];
                 for (int index = 0; index < 3; ++index)
                 {
-                    MTN.MountainSkyboxTextures[index] = MTN.Mountain["skybox_" + index].Texture;
-                    MTN.MountainTerrainTextures[index] = MTN.Mountain["mountain_" + index].Texture;
-                    MTN.MountainBuildingTextures[index] = MTN.Mountain["buildings_" + index].Texture;
+                    MTN.MountainSkyboxTextures[index] = MTN.Mountain["skybox_" + (object) index].Texture;
+                    MTN.MountainTerrainTextures[index] = MTN.Mountain["mountain_" + (object) index].Texture;
+                    MTN.MountainBuildingTextures[index] = MTN.Mountain["buildings_" + (object) index].Texture;
                 }
                 MTN.MountainMoonTexture = MTN.Mountain["moon"].Texture;
                 MTN.MountainFogTexture = MTN.Mountain["fog"].Texture;
                 MTN.MountainStarSky = MTN.Mountain["space"].Texture;
                 MTN.MountainStars = MTN.Mountain["spacestars"].Texture;
                 MTN.MountainStarStream = MTN.Mountain["starstream"].Texture;
-                Console.WriteLine(" - MTN LOAD: " + stopwatch.ElapsedMilliseconds + "ms");
+                Console.WriteLine(" - MTN LOAD: " + (object) stopwatch.ElapsedMilliseconds + "ms");
             }
             MTN.Loaded = true;
         }
@@ -74,7 +74,7 @@ namespace Celeste
                 MTN.MountainCoreWall = ObjModel.Create(Path.Combine(Engine.ContentDirectory, "Overworld", "mountain_wall" + str));
                 MTN.MountainMoon = ObjModel.Create(Path.Combine(Engine.ContentDirectory, "Overworld", "moon" + str));
                 MTN.MountainBird = ObjModel.Create(Path.Combine(Engine.ContentDirectory, "Overworld", "bird" + str));
-                Console.WriteLine(" - MTN DATA LOAD: " + stopwatch.ElapsedMilliseconds + "ms");
+                Console.WriteLine(" - MTN DATA LOAD: " + (object) stopwatch.ElapsedMilliseconds + "ms");
             }
             MTN.DataLoaded = true;
         }
@@ -84,13 +84,13 @@ namespace Celeste
             if (MTN.Loaded)
             {
                 MTN.Journal.Dispose();
-                MTN.Journal = null;
+                MTN.Journal = (Atlas) null;
                 MTN.Mountain.Dispose();
-                MTN.Mountain = null;
+                MTN.Mountain = (Atlas) null;
                 MTN.Checkpoints.Dispose();
-                MTN.Checkpoints = null;
+                MTN.Checkpoints = (Atlas) null;
                 MTN.FileSelect.Dispose();
-                MTN.FileSelect = null;
+                MTN.FileSelect = (Atlas) null;
             }
             MTN.Loaded = false;
         }
@@ -100,15 +100,15 @@ namespace Celeste
             if (MTN.DataLoaded)
             {
                 MTN.MountainTerrain.Dispose();
-                MTN.MountainTerrain = null;
+                MTN.MountainTerrain = (ObjModel) null;
                 MTN.MountainBuildings.Dispose();
-                MTN.MountainBuildings = null;
+                MTN.MountainBuildings = (ObjModel) null;
                 MTN.MountainCoreWall.Dispose();
-                MTN.MountainCoreWall = null;
+                MTN.MountainCoreWall = (ObjModel) null;
                 MTN.MountainMoon.Dispose();
-                MTN.MountainMoon = null;
+                MTN.MountainMoon = (ObjModel) null;
                 MTN.MountainBird.Dispose();
-                MTN.MountainBird = null;
+                MTN.MountainBird = (ObjModel) null;
             }
             MTN.DataLoaded = false;
         }

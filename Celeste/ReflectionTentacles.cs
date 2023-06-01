@@ -16,7 +16,7 @@ namespace Celeste
     public class ReflectionTentacles : Entity
     {
         public int Index;
-        public List<Vector2> Nodes = new();
+        public List<Vector2> Nodes = new List<Vector2>();
         private Vector2 outwards;
         private Vector2 lastOutwards;
         private float ease;
@@ -24,7 +24,7 @@ namespace Celeste
         private Player player;
         private float fearDistance;
         private float offset;
-        private readonly bool createdFromLevel;
+        private bool createdFromLevel;
         private int slideUntilIndex;
         private int layer;
         private const int NodesPerTentacle = 10;
@@ -34,7 +34,7 @@ namespace Celeste
         private int vertexCount;
         private Color color = Color.Purple;
         private float soundDelay = 0.25f;
-        private readonly List<MTexture[]> arms = new();
+        private List<MTexture[]> arms = new List<MTexture[]>();
         private List<MTexture> fillers;
 
         public ReflectionTentacles()
@@ -44,73 +44,55 @@ namespace Celeste
         public ReflectionTentacles(EntityData data, Vector2 offset)
             : base(data.Position + offset)
         {
-            Nodes.Add(Position);
+            this.Nodes.Add(this.Position);
             foreach (Vector2 node in data.Nodes)
-            {
-                Nodes.Add(offset + node);
-            }
-
+                this.Nodes.Add(offset + node);
             string str = data.Attr("fear_distance");
             if (str == "close")
-            {
-                fearDistance = 16f;
-            }
+                this.fearDistance = 16f;
             else if (str == "medium")
-            {
-                fearDistance = 40f;
-            }
+                this.fearDistance = 40f;
             else if (str == "far")
-            {
-                fearDistance = 80f;
-            }
-
-            Create(fearDistance, data.Int("slide_until"), 0, Nodes);
-            createdFromLevel = true;
+                this.fearDistance = 80f;
+            this.Create(this.fearDistance, data.Int("slide_until"), 0, this.Nodes);
+            this.createdFromLevel = true;
         }
 
         public override void Added(Scene scene)
         {
             base.Added(scene);
-            if (!createdFromLevel)
-            {
+            if (!this.createdFromLevel)
                 return;
-            }
-
             for (int layer = 1; layer < 4; ++layer)
             {
-                ReflectionTentacles reflectionTentacles = new();
-                reflectionTentacles.Create(fearDistance, slideUntilIndex, layer, Nodes);
-                scene.Add(reflectionTentacles);
+                ReflectionTentacles reflectionTentacles = new ReflectionTentacles();
+                reflectionTentacles.Create(this.fearDistance, this.slideUntilIndex, layer, this.Nodes);
+                scene.Add((Entity) reflectionTentacles);
             }
         }
 
         public override void Awake(Scene scene)
         {
             base.Awake(scene);
-            Player entity = Scene.Tracker.GetEntity<Player>();
+            Player entity = this.Scene.Tracker.GetEntity<Player>();
             bool flag = false;
-            while (entity != null && Index < Nodes.Count - 1)
+            while (entity != null && this.Index < this.Nodes.Count - 1)
             {
                 Vector2 vector2;
-                p = vector2 = Calc.ClosestPointOnLine(Nodes[Index], Nodes[Index] + (outwards * 10000f), entity.Center);
-                vector2 = Nodes[Index] - vector2;
-                if ((double)vector2.Length() < fearDistance)
+                this.p = vector2 = Calc.ClosestPointOnLine(this.Nodes[this.Index], this.Nodes[this.Index] + this.outwards * 10000f, entity.Center);
+                vector2 = this.Nodes[this.Index] - vector2;
+                if ((double) vector2.Length() < (double) this.fearDistance)
                 {
                     flag = true;
-                    Retreat();
+                    this.Retreat();
                 }
                 else
-                {
                     break;
-                }
             }
             if (!flag)
-            {
                 return;
-            }
-
-            ease = 1f;
-            SnapTentacles();
+            this.ease = 1f;
+            this.SnapTentacles();
         }
 
         public void Create(
@@ -119,39 +101,36 @@ namespace Celeste
             int layer,
             List<Vector2> startNodes)
         {
-            Nodes = new List<Vector2>();
+            this.Nodes = new List<Vector2>();
             foreach (Vector2 startNode in startNodes)
-            {
-                Nodes.Add(startNode + new Vector2(Calc.Random.Range(-8, 8), Calc.Random.Range(-8, 8)));
-            }
-
-            Tag = (int)Tags.TransitionUpdate;
-            Position = Nodes[0];
-            outwards = (Nodes[0] - Nodes[1]).SafeNormalize();
+                this.Nodes.Add(startNode + new Vector2((float) Calc.Random.Range(-8, 8), (float) Calc.Random.Range(-8, 8)));
+            this.Tag = (int) Tags.TransitionUpdate;
+            this.Position = this.Nodes[0];
+            this.outwards = (this.Nodes[0] - this.Nodes[1]).SafeNormalize();
             this.fearDistance = fearDistance;
             this.slideUntilIndex = slideUntilIndex;
             this.layer = layer;
             switch (layer)
             {
                 case 0:
-                    Depth = -1000000;
-                    color = Calc.HexToColor("3f2a4f");
-                    offset = 110f;
+                    this.Depth = -1000000;
+                    this.color = Calc.HexToColor("3f2a4f");
+                    this.offset = 110f;
                     break;
                 case 1:
-                    Depth = 8990;
-                    color = Calc.HexToColor("7b3555");
-                    offset = 80f;
+                    this.Depth = 8990;
+                    this.color = Calc.HexToColor("7b3555");
+                    this.offset = 80f;
                     break;
                 case 2:
-                    Depth = 10010;
-                    color = Calc.HexToColor("662847");
-                    offset = 50f;
+                    this.Depth = 10010;
+                    this.color = Calc.HexToColor("662847");
+                    this.offset = 50f;
                     break;
                 case 3:
-                    Depth = 10011;
-                    color = Calc.HexToColor("492632");
-                    offset = 20f;
+                    this.Depth = 10011;
+                    this.color = Calc.HexToColor("492632");
+                    this.offset = 20f;
                     break;
             }
             foreach (MTexture atlasSubtexture in GFX.Game.GetAtlasSubtextures("scenery/tentacles/arms"))
@@ -159,35 +138,30 @@ namespace Celeste
                 MTexture[] mtextureArray = new MTexture[10];
                 int width = atlasSubtexture.Width / 10;
                 for (int index = 0; index < 10; ++index)
-                {
                     mtextureArray[index] = atlasSubtexture.GetSubtexture(width * (10 - index - 1), 0, width, atlasSubtexture.Height);
-                }
-
-                arms.Add(mtextureArray);
+                this.arms.Add(mtextureArray);
             }
-            fillers = GFX.Game.GetAtlasSubtextures("scenery/tentacles/filler");
-            tentacles = new ReflectionTentacles.Tentacle[100];
+            this.fillers = GFX.Game.GetAtlasSubtextures("scenery/tentacles/filler");
+            this.tentacles = new ReflectionTentacles.Tentacle[100];
             float along = 0.0f;
             int index1 = 0;
-            while (index1 < tentacles.Length && (double)along < 440.0)
+            while (index1 < this.tentacles.Length && (double) along < 440.0)
             {
-                tentacles[index1].Approach = (float)(0.25 + ((double)Calc.Random.NextFloat() * 0.75));
-                tentacles[index1].Length = 32f + Calc.Random.NextFloat(64f);
-                tentacles[index1].Width = 4f + Calc.Random.NextFloat(16f);
-                tentacles[index1].Position = TargetTentaclePosition(tentacles[index1], Nodes[0], along);
-                tentacles[index1].WaveOffset = Calc.Random.NextFloat();
-                tentacles[index1].TexIndex = Calc.Random.Next(arms.Count);
-                tentacles[index1].FillerTexIndex = Calc.Random.Next(fillers.Count);
-                tentacles[index1].LerpDuration = 0.5f + Calc.Random.NextFloat(0.25f);
-                along += tentacles[index1].Width;
+                this.tentacles[index1].Approach = (float) (0.25 + (double) Calc.Random.NextFloat() * 0.75);
+                this.tentacles[index1].Length = 32f + Calc.Random.NextFloat(64f);
+                this.tentacles[index1].Width = 4f + Calc.Random.NextFloat(16f);
+                this.tentacles[index1].Position = this.TargetTentaclePosition(this.tentacles[index1], this.Nodes[0], along);
+                this.tentacles[index1].WaveOffset = Calc.Random.NextFloat();
+                this.tentacles[index1].TexIndex = Calc.Random.Next(this.arms.Count);
+                this.tentacles[index1].FillerTexIndex = Calc.Random.Next(this.fillers.Count);
+                this.tentacles[index1].LerpDuration = 0.5f + Calc.Random.NextFloat(0.25f);
+                along += this.tentacles[index1].Width;
                 ++index1;
-                ++tentacleCount;
+                ++this.tentacleCount;
             }
-            vertices = new VertexPositionColorTexture[tentacleCount * 12 * 6];
-            for (int index2 = 0; index2 < vertices.Length; ++index2)
-            {
-                vertices[index2].Color = color;
-            }
+            this.vertices = new VertexPositionColorTexture[this.tentacleCount * 12 * 6];
+            for (int index2 = 0; index2 < this.vertices.Length; ++index2)
+                this.vertices[index2].Color = this.color;
         }
 
         private Vector2 TargetTentaclePosition(
@@ -196,156 +170,138 @@ namespace Celeste
             float along)
         {
             Vector2 vector2_1;
-            Vector2 vector2_2 = vector2_1 = position - (outwards * offset);
-            if (player != null)
+            Vector2 vector2_2 = vector2_1 = position - this.outwards * this.offset;
+            if (this.player != null)
             {
-                Vector2 vector2_3 = outwards.Perpendicular();
-                vector2_2 = Calc.ClosestPointOnLine(vector2_2 - (vector2_3 * 200f), vector2_2 + (vector2_3 * 200f), player.Position);
+                Vector2 vector2_3 = this.outwards.Perpendicular();
+                vector2_2 = Calc.ClosestPointOnLine(vector2_2 - vector2_3 * 200f, vector2_2 + vector2_3 * 200f, this.player.Position);
             }
-            Vector2 vector2_4 = outwards.Perpendicular() * (float)((double)along - 220.0 + (tentacle.Width * 0.5));
+            Vector2 vector2_4 = this.outwards.Perpendicular() * (float) ((double) along - 220.0 + (double) tentacle.Width * 0.5);
             Vector2 vector2_5 = vector2_1 + vector2_4;
             float num = (vector2_2 - vector2_5).Length();
-            return vector2_5 + (outwards * num * 0.6f);
+            return vector2_5 + this.outwards * num * 0.6f;
         }
 
         public void Retreat()
         {
-            if (Index >= Nodes.Count - 1)
-            {
+            if (this.Index >= this.Nodes.Count - 1)
                 return;
-            }
-
-            lastOutwards = outwards;
-            ease = 0.0f;
-            ++Index;
-            if (layer == 0 && soundDelay <= 0.0)
+            this.lastOutwards = this.outwards;
+            this.ease = 0.0f;
+            ++this.Index;
+            if (this.layer == 0 && (double) this.soundDelay <= 0.0)
+                Audio.Play((double) (this.Nodes[this.Index - 1] - this.Nodes[this.Index]).Length() > 180.0 ? "event:/game/06_reflection/scaryhair_whoosh" : "event:/game/06_reflection/scaryhair_move");
+            for (int index = 0; index < this.tentacleCount; ++index)
             {
-                _ = Audio.Play((double)(Nodes[Index - 1] - Nodes[Index]).Length() > 180.0 ? "event:/game/06_reflection/scaryhair_whoosh" : "event:/game/06_reflection/scaryhair_move");
-            }
-
-            for (int index = 0; index < tentacleCount; ++index)
-            {
-                tentacles[index].LerpPercent = 0.0f;
-                tentacles[index].LerpPositionFrom = tentacles[index].Position;
+                this.tentacles[index].LerpPercent = 0.0f;
+                this.tentacles[index].LerpPositionFrom = this.tentacles[index].Position;
             }
         }
 
         public override void Update()
         {
-            soundDelay -= Engine.DeltaTime;
-            if (slideUntilIndex > Index)
+            this.soundDelay -= Engine.DeltaTime;
+            if (this.slideUntilIndex > this.Index)
             {
-                player = Scene.Tracker.GetEntity<Player>();
-                if (player != null)
+                this.player = this.Scene.Tracker.GetEntity<Player>();
+                if (this.player != null)
                 {
-                    Vector2 vector2 = p = Calc.ClosestPointOnLine(Nodes[Index] - (outwards * 10000f), Nodes[Index] + (outwards * 10000f), player.Center);
-                    if ((double)(vector2 - Nodes[Index]).Length() < 32.0)
+                    Vector2 vector2 = this.p = Calc.ClosestPointOnLine(this.Nodes[this.Index] - this.outwards * 10000f, this.Nodes[this.Index] + this.outwards * 10000f, this.player.Center);
+                    if ((double) (vector2 - this.Nodes[this.Index]).Length() < 32.0)
                     {
-                        Retreat();
-                        outwards = (Nodes[Index - 1] - Nodes[Index]).SafeNormalize();
+                        this.Retreat();
+                        this.outwards = (this.Nodes[this.Index - 1] - this.Nodes[this.Index]).SafeNormalize();
                     }
                     else
-                    {
-                        MoveTentacles(vector2 - (outwards * 190f));
-                    }
+                        this.MoveTentacles(vector2 - this.outwards * 190f);
                 }
             }
             else
             {
-                FinalBoss entity = Scene.Tracker.GetEntity<FinalBoss>();
-                player = Scene.Tracker.GetEntity<Player>();
-                if (entity == null && player != null && Index < Nodes.Count - 1 && (double)(Nodes[Index] - (p = Calc.ClosestPointOnLine(Nodes[Index], Nodes[Index] + (outwards * 10000f), player.Center))).Length() < fearDistance)
+                FinalBoss entity = this.Scene.Tracker.GetEntity<FinalBoss>();
+                this.player = this.Scene.Tracker.GetEntity<Player>();
+                if (entity == null && this.player != null && this.Index < this.Nodes.Count - 1 && (double) (this.Nodes[this.Index] - (this.p = Calc.ClosestPointOnLine(this.Nodes[this.Index], this.Nodes[this.Index] + this.outwards * 10000f, this.player.Center))).Length() < (double) this.fearDistance)
+                    this.Retreat();
+                if (this.Index > 0)
                 {
-                    Retreat();
-                }
-
-                if (Index > 0)
-                {
-                    ease = Calc.Approach(ease, 1f, (Index == Nodes.Count - 1 ? 2f : 1f) * Engine.DeltaTime);
-                    outwards = Calc.AngleToVector(Calc.AngleLerp(lastOutwards.Angle(), (Nodes[Index - 1] - Nodes[Index]).Angle(), Ease.QuadOut(ease)), 1f);
+                    this.ease = Calc.Approach(this.ease, 1f, (this.Index == this.Nodes.Count - 1 ? 2f : 1f) * Engine.DeltaTime);
+                    this.outwards = Calc.AngleToVector(Calc.AngleLerp(this.lastOutwards.Angle(), (this.Nodes[this.Index - 1] - this.Nodes[this.Index]).Angle(), Ease.QuadOut(this.ease)), 1f);
                     float along = 0.0f;
-                    for (int index = 0; index < tentacleCount; ++index)
+                    for (int index = 0; index < this.tentacleCount; ++index)
                     {
-                        Vector2 vector2 = TargetTentaclePosition(tentacles[index], Nodes[Index], along);
-                        if (tentacles[index].LerpPercent < 1.0)
+                        Vector2 vector2 = this.TargetTentaclePosition(this.tentacles[index], this.Nodes[this.Index], along);
+                        if ((double) this.tentacles[index].LerpPercent < 1.0)
                         {
-                            tentacles[index].LerpPercent += Engine.DeltaTime / tentacles[index].LerpDuration;
-                            tentacles[index].Position = Vector2.Lerp(tentacles[index].LerpPositionFrom, vector2, Ease.CubeInOut(tentacles[index].LerpPercent));
+                            this.tentacles[index].LerpPercent += Engine.DeltaTime / this.tentacles[index].LerpDuration;
+                            this.tentacles[index].Position = Vector2.Lerp(this.tentacles[index].LerpPositionFrom, vector2, Ease.CubeInOut(this.tentacles[index].LerpPercent));
                         }
                         else
-                        {
-                            tentacles[index].Position += (vector2 - tentacles[index].Position) * (1f - (float)Math.Pow(0.10000000149011612 * tentacles[index].Approach, (double)Engine.DeltaTime));
-                        }
-
-                        along += tentacles[index].Width;
+                            this.tentacles[index].Position += (vector2 - this.tentacles[index].Position) * (1f - (float) Math.Pow(0.10000000149011612 * (double) this.tentacles[index].Approach, (double) Engine.DeltaTime));
+                        along += this.tentacles[index].Width;
                     }
                 }
                 else
-                {
-                    MoveTentacles(Nodes[Index]);
-                }
+                    this.MoveTentacles(this.Nodes[this.Index]);
             }
-            if (Index == Nodes.Count - 1)
+            if (this.Index == this.Nodes.Count - 1)
             {
-                Color color = this.color * (1f - ease);
-                for (int index = 0; index < vertices.Length; ++index)
-                {
-                    vertices[index].Color = color;
-                }
+                Color color = this.color * (1f - this.ease);
+                for (int index = 0; index < this.vertices.Length; ++index)
+                    this.vertices[index].Color = color;
             }
-            UpdateVertices();
+            this.UpdateVertices();
         }
 
         private void MoveTentacles(Vector2 pos)
         {
             float along = 0.0f;
-            for (int index = 0; index < tentacleCount; ++index)
+            for (int index = 0; index < this.tentacleCount; ++index)
             {
-                Vector2 vector2 = TargetTentaclePosition(tentacles[index], pos, along);
-                tentacles[index].Position += (vector2 - tentacles[index].Position) * (1f - (float)Math.Pow(0.10000000149011612 * tentacles[index].Approach, (double)Engine.DeltaTime));
-                along += tentacles[index].Width;
+                Vector2 vector2 = this.TargetTentaclePosition(this.tentacles[index], pos, along);
+                this.tentacles[index].Position += (vector2 - this.tentacles[index].Position) * (1f - (float) Math.Pow(0.10000000149011612 * (double) this.tentacles[index].Approach, (double) Engine.DeltaTime));
+                along += this.tentacles[index].Width;
             }
         }
 
         public void SnapTentacles()
         {
             float along = 0.0f;
-            for (int index = 0; index < tentacleCount; ++index)
+            for (int index = 0; index < this.tentacleCount; ++index)
             {
-                tentacles[index].LerpPercent = 1f;
-                tentacles[index].Position = TargetTentaclePosition(tentacles[index], Nodes[Index], along);
-                along += tentacles[index].Width;
+                this.tentacles[index].LerpPercent = 1f;
+                this.tentacles[index].Position = this.TargetTentaclePosition(this.tentacles[index], this.Nodes[this.Index], along);
+                along += this.tentacles[index].Width;
             }
         }
 
         private void UpdateVertices()
         {
-            Vector2 vector2_1 = -outwards.Perpendicular();
+            Vector2 vector2_1 = -this.outwards.Perpendicular();
             int n = 0;
-            for (int index = 0; index < tentacleCount; ++index)
+            for (int index = 0; index < this.tentacleCount; ++index)
             {
-                Vector2 position = tentacles[index].Position;
-                Vector2 vector2_2 = vector2_1 * (float)((tentacles[index].Width * 0.5) + 2.0);
-                MTexture[] arm = arms[tentacles[index].TexIndex];
-                Quad(ref n, position + vector2_2, position + (vector2_2 * 1.5f) - (outwards * 240f), position - (vector2_2 * 1.5f) - (outwards * 240f), position - vector2_2, fillers[tentacles[index].FillerTexIndex]);
+                Vector2 position = this.tentacles[index].Position;
+                Vector2 vector2_2 = vector2_1 * (float) ((double) this.tentacles[index].Width * 0.5 + 2.0);
+                MTexture[] arm = this.arms[this.tentacles[index].TexIndex];
+                this.Quad(ref n, position + vector2_2, position + vector2_2 * 1.5f - this.outwards * 240f, position - vector2_2 * 1.5f - this.outwards * 240f, position - vector2_2, this.fillers[this.tentacles[index].FillerTexIndex]);
                 Vector2 vector2_3 = position;
                 Vector2 vector2_4 = vector2_2;
-                float num1 = (tentacles[index].Length / 10f) + (Calc.YoYo(tentacles[index].LerpPercent) * 6f);
+                float num1 = this.tentacles[index].Length / 10f + Calc.YoYo(this.tentacles[index].LerpPercent) * 6f;
                 for (int y = 1; y <= 10; ++y)
                 {
-                    float num2 = y / 10f;
-                    float num3 = (float)(Scene.TimeActive * (double)tentacles[index].WaveOffset * Math.Pow(1.1000000238418579, y) * 2.0);
-                    float num4 = (float)((tentacles[index].WaveOffset * 3.0) + (y * 0.05000000074505806));
-                    float num5 = (float)(2.0 + (4.0 * (double)num2));
-                    Vector2 vector2_5 = vector2_1 * (float)Math.Sin((double)num3 + (double)num4) * num5;
-                    Vector2 vector2_6 = vector2_3 + (outwards * num1) + vector2_5;
+                    float num2 = (float) y / 10f;
+                    float num3 = (float) ((double) this.Scene.TimeActive * (double) this.tentacles[index].WaveOffset * Math.Pow(1.1000000238418579, (double) y) * 2.0);
+                    float num4 = (float) ((double) this.tentacles[index].WaveOffset * 3.0 + (double) y * 0.05000000074505806);
+                    float num5 = (float) (2.0 + 4.0 * (double) num2);
+                    Vector2 vector2_5 = vector2_1 * (float) Math.Sin((double) num3 + (double) num4) * num5;
+                    Vector2 vector2_6 = vector2_3 + this.outwards * num1 + vector2_5;
                     Vector2 vector2_7 = vector2_2 * (1f - num2);
-                    Quad(ref n, vector2_6 - vector2_7, vector2_3 - vector2_4, vector2_3 + vector2_4, vector2_6 + vector2_7, arm[y - 1]);
+                    this.Quad(ref n, vector2_6 - vector2_7, vector2_3 - vector2_4, vector2_3 + vector2_4, vector2_6 + vector2_7, arm[y - 1]);
                     vector2_3 = vector2_6;
                     vector2_4 = vector2_7;
                 }
             }
-            vertexCount = n;
+            this.vertexCount = n;
         }
 
         private void Quad(
@@ -356,51 +312,49 @@ namespace Celeste
             Vector2 d,
             MTexture subtexture = null)
         {
-            subtexture ??= GFX.Game["util/pixel"];
-            float num1 = 1f / subtexture.Texture.Texture.Width;
-            float num2 = 1f / subtexture.Texture.Texture.Height;
-            double x1 = subtexture.ClipRect.Left * (double)num1;
+            if (subtexture == null)
+                subtexture = GFX.Game["util/pixel"];
+            float num1 = 1f / (float) subtexture.Texture.Texture.Width;
+            float num2 = 1f / (float) subtexture.Texture.Texture.Height;
+            double x1 = (double) subtexture.ClipRect.Left * (double) num1;
             Rectangle clipRect1 = subtexture.ClipRect;
-            double y1 = clipRect1.Top * (double)num2;
-            Vector2 local1 = new((float)x1, (float)y1);
+            double y1 = (double) clipRect1.Top * (double) num2;
+            Vector2 local1 = new Vector2((float) x1, (float) y1);
             clipRect1 = subtexture.ClipRect;
-            double x2 = clipRect1.Right * (double)num1;
+            double x2 = (double) clipRect1.Right * (double) num1;
             Rectangle clipRect2 = subtexture.ClipRect;
-            double y2 = clipRect2.Top * (double)num2;
-            Vector2 local2 = new((float)x2, (float)y2);
+            double y2 = (double) clipRect2.Top * (double) num2;
+            Vector2 local2 = new Vector2((float) x2, (float) y2);
             clipRect2 = subtexture.ClipRect;
-            double x3 = clipRect2.Left * (double)num1;
+            double x3 = (double) clipRect2.Left * (double) num1;
             Rectangle clipRect3 = subtexture.ClipRect;
-            double y3 = clipRect3.Bottom * (double)num2;
-            Vector2 local3 = new((float)x3, (float)y3);
+            double y3 = (double) clipRect3.Bottom * (double) num2;
+            Vector2 local3 = new Vector2((float) x3, (float) y3);
             clipRect3 = subtexture.ClipRect;
-            double x4 = clipRect3.Right * (double)num1;
-            double y4 = subtexture.ClipRect.Bottom * (double)num2;
-            Vector2 local4 = new((float)x4, (float)y4);
-            vertices[n].Position = new Vector3(a, 0.0f);
-            vertices[n++].TextureCoordinate = local1;
-            vertices[n].Position = new Vector3(b, 0.0f);
-            vertices[n++].TextureCoordinate = local2;
-            vertices[n].Position = new Vector3(d, 0.0f);
-            vertices[n++].TextureCoordinate = local3;
-            vertices[n].Position = new Vector3(d, 0.0f);
-            vertices[n++].TextureCoordinate = local3;
-            vertices[n].Position = new Vector3(b, 0.0f);
-            vertices[n++].TextureCoordinate = local2;
-            vertices[n].Position = new Vector3(c, 0.0f);
-            vertices[n++].TextureCoordinate = local4;
+            double x4 = (double) clipRect3.Right * (double) num1;
+            double y4 = (double) subtexture.ClipRect.Bottom * (double) num2;
+            Vector2 local4 = new Vector2((float) x4, (float) y4);
+            this.vertices[n].Position = new Vector3(a, 0.0f);
+            this.vertices[n++].TextureCoordinate = local1;
+            this.vertices[n].Position = new Vector3(b, 0.0f);
+            this.vertices[n++].TextureCoordinate = local2;
+            this.vertices[n].Position = new Vector3(d, 0.0f);
+            this.vertices[n++].TextureCoordinate = local3;
+            this.vertices[n].Position = new Vector3(d, 0.0f);
+            this.vertices[n++].TextureCoordinate = local3;
+            this.vertices[n].Position = new Vector3(b, 0.0f);
+            this.vertices[n++].TextureCoordinate = local2;
+            this.vertices[n].Position = new Vector3(c, 0.0f);
+            this.vertices[n++].TextureCoordinate = local4;
         }
 
         public override void Render()
         {
-            if (vertexCount <= 0)
-            {
+            if (this.vertexCount <= 0)
                 return;
-            }
-
             GameplayRenderer.End();
-            Engine.Graphics.GraphicsDevice.Textures[0] = arms[0][0].Texture.Texture;
-            GFX.DrawVertices<VertexPositionColorTexture>((Scene as Level).Camera.Matrix, vertices, vertexCount, GFX.FxTexture);
+            Engine.Graphics.GraphicsDevice.Textures[0] = (Texture) this.arms[0][0].Texture.Texture;
+            GFX.DrawVertices<VertexPositionColorTexture>((this.Scene as Level).Camera.Matrix, this.vertices, this.vertexCount, GFX.FxTexture);
             GameplayRenderer.Begin();
         }
 

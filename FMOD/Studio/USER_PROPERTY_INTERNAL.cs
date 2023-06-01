@@ -10,30 +10,28 @@ namespace FMOD.Studio
 {
     internal struct USER_PROPERTY_INTERNAL
     {
-        private readonly IntPtr name;
-        private readonly USER_PROPERTY_TYPE type;
+        private IntPtr name;
+        private USER_PROPERTY_TYPE type;
         private Union_IntBoolFloatString value;
 
         public USER_PROPERTY createPublic()
         {
-            USER_PROPERTY userProperty = new()
-            {
-                name = MarshallingHelper.stringFromNativeUtf8(name),
-                type = type
-            };
-            switch (type)
+            USER_PROPERTY userProperty = new USER_PROPERTY();
+            userProperty.name = MarshallingHelper.stringFromNativeUtf8(this.name);
+            userProperty.type = this.type;
+            switch (this.type)
             {
                 case USER_PROPERTY_TYPE.INTEGER:
-                    userProperty.intvalue = value.intvalue;
+                    userProperty.intvalue = this.value.intvalue;
                     break;
                 case USER_PROPERTY_TYPE.BOOLEAN:
-                    userProperty.boolvalue = value.boolvalue;
+                    userProperty.boolvalue = this.value.boolvalue;
                     break;
                 case USER_PROPERTY_TYPE.FLOAT:
-                    userProperty.floatvalue = value.floatvalue;
+                    userProperty.floatvalue = this.value.floatvalue;
                     break;
                 case USER_PROPERTY_TYPE.STRING:
-                    userProperty.stringvalue = MarshallingHelper.stringFromNativeUtf8(value.stringvalue);
+                    userProperty.stringvalue = MarshallingHelper.stringFromNativeUtf8(this.value.stringvalue);
                     break;
             }
             return userProperty;

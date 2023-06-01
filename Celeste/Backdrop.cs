@@ -14,7 +14,7 @@ namespace Celeste
     {
         public bool UseSpritebatch = true;
         public string Name;
-        public HashSet<string> Tags = new();
+        public HashSet<string> Tags = new HashSet<string>();
         public Vector2 Position;
         public Vector2 Scroll = Vector2.One;
         public Vector2 Speed;
@@ -23,8 +23,8 @@ namespace Celeste
         public bool LoopY = true;
         public bool FlipX;
         public bool FlipY;
-        public Fader FadeX;
-        public Fader FadeY;
+        public Backdrop.Fader FadeX;
+        public Backdrop.Fader FadeY;
         public float FadeAlphaMultiplier = 1f;
         public float WindMultiplier;
         public HashSet<string> ExcludeFrom;
@@ -39,37 +39,23 @@ namespace Celeste
         public bool ForceVisible;
         public BackdropRenderer Renderer;
 
-        public Backdrop()
-        {
-            Visible = true;
-        }
+        public Backdrop() => this.Visible = true;
 
-        public bool IsVisible(Level level)
-        {
-            return ForceVisible || ((string.IsNullOrEmpty(OnlyIfNotFlag) || !level.Session.GetFlag(OnlyIfNotFlag)) && ((!string.IsNullOrEmpty(AlsoIfFlag) && level.Session.GetFlag(AlsoIfFlag)) || ((!Dreaming.HasValue || Dreaming.Value == level.Session.Dreaming) && (string.IsNullOrEmpty(OnlyIfFlag) || level.Session.GetFlag(OnlyIfFlag)) && (ExcludeFrom == null || !ExcludeFrom.Contains(level.Session.Level)) && (OnlyIn == null || OnlyIn.Contains(level.Session.Level)))));
-        }
+        public bool IsVisible(Level level) => this.ForceVisible || (string.IsNullOrEmpty(this.OnlyIfNotFlag) || !level.Session.GetFlag(this.OnlyIfNotFlag)) && (!string.IsNullOrEmpty(this.AlsoIfFlag) && level.Session.GetFlag(this.AlsoIfFlag) || (!this.Dreaming.HasValue || this.Dreaming.Value == level.Session.Dreaming) && (string.IsNullOrEmpty(this.OnlyIfFlag) || level.Session.GetFlag(this.OnlyIfFlag)) && (this.ExcludeFrom == null || !this.ExcludeFrom.Contains(level.Session.Level)) && (this.OnlyIn == null || this.OnlyIn.Contains(level.Session.Level)));
 
         public virtual void Update(Scene scene)
         {
             Level level = scene as Level;
             if (level.Transitioning)
             {
-                if (InstantIn && IsVisible(level))
-                {
-                    Visible = true;
-                }
-
-                if (!InstantOut || IsVisible(level))
-                {
+                if (this.InstantIn && this.IsVisible(level))
+                    this.Visible = true;
+                if (!this.InstantOut || this.IsVisible(level))
                     return;
-                }
-
-                Visible = false;
+                this.Visible = false;
             }
             else
-            {
-                Visible = IsVisible(level);
-            }
+                this.Visible = this.IsVisible(level);
         }
 
         public virtual void BeforeRender(Scene scene)
@@ -86,11 +72,11 @@ namespace Celeste
 
         public class Fader
         {
-            private readonly List<Segment> Segments = new();
+            private List<Backdrop.Fader.Segment> Segments = new List<Backdrop.Fader.Segment>();
 
-            public Fader Add(float posFrom, float posTo, float fadeFrom, float fadeTo)
+            public Backdrop.Fader Add(float posFrom, float posTo, float fadeFrom, float fadeTo)
             {
-                Segments.Add(new Segment()
+                this.Segments.Add(new Backdrop.Fader.Segment()
                 {
                     PositionFrom = posFrom,
                     PositionTo = posTo,
@@ -103,11 +89,8 @@ namespace Celeste
             public float Value(float position)
             {
                 float num = 1f;
-                foreach (Segment segment in Segments)
-                {
+                foreach (Backdrop.Fader.Segment segment in this.Segments)
                     num *= Calc.ClampedMap(position, segment.PositionFrom, segment.PositionTo, segment.From, segment.To);
-                }
-
                 return num;
             }
 

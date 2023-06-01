@@ -19,12 +19,12 @@ namespace FMOD.Studio
 
         public void assign(out PARAMETER_DESCRIPTION publicDesc)
         {
-            publicDesc.name = MarshallingHelper.stringFromNativeUtf8(name);
-            publicDesc.index = index;
-            publicDesc.minimum = minimum;
-            publicDesc.maximum = maximum;
-            publicDesc.defaultvalue = defaultvalue;
-            publicDesc.type = type;
+            publicDesc.name = MarshallingHelper.stringFromNativeUtf8(this.name);
+            publicDesc.index = this.index;
+            publicDesc.minimum = this.minimum;
+            publicDesc.maximum = this.maximum;
+            publicDesc.defaultvalue = this.defaultvalue;
+            publicDesc.type = this.type;
         }
     }
 }

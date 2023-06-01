@@ -80,7 +80,7 @@
     <Reference Include="Microsoft.Xna.Framework.Graphics" />
     <Reference Include="Steamworks.NET, Version=20.1.0.0, Culture=neutral, processorArchitecture=x86">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>References\Steamworks.NET.dll</HintPath>
+      <HintPath>Steamworks\Steamworks.NET.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
@@ -701,7 +701,7 @@
     <Compile Include="Monocle\Image.cs" />
     <Compile Include="Monocle\PixelText.cs" />
     <Compile Include="Monocle\Sprite.cs" />
-    <Compile Include="Monocle\Spritesheet.cs" />
+    <Compile Include="Monocle\Spritesheet`1.cs" />
     <Compile Include="Monocle\NumberText.cs" />
     <Compile Include="Monocle\OutlineText.cs" />
     <Compile Include="Monocle\Text.cs" />
@@ -710,7 +710,7 @@
     <Compile Include="Monocle\Alarm.cs" />
     <Compile Include="Monocle\Coroutine.cs" />
     <Compile Include="Monocle\CoroutineHolder.cs" />
-    <Compile Include="Monocle\CounterSet.cs" />
+    <Compile Include="Monocle\CounterSet`1.cs" />
     <Compile Include="Monocle\Shaker.cs" />
     <Compile Include="Monocle\ShakerList.cs" />
     <Compile Include="Monocle\SineWave.cs" />
@@ -749,14 +749,14 @@
     <Compile Include="Monocle\QuaternionExt.cs" />
     <Compile Include="Monocle\Camera.cs" />
     <Compile Include="Monocle\CheatListener.cs" />
-    <Compile Include="Monocle\ChoiceSet.cs" />
-    <Compile Include="Monocle\Chooser.cs" />
+    <Compile Include="Monocle\ChoiceSet`1.cs" />
+    <Compile Include="Monocle\Chooser`1.cs" />
     <Compile Include="Monocle\Commands.cs" />
     <Compile Include="Monocle\Command.cs" />
     <Compile Include="Monocle\Draw.cs" />
     <Compile Include="Monocle\Ease.cs" />
     <Compile Include="Monocle\ErrorLog.cs" />
-    <Compile Include="Monocle\MethodHandle.cs" />
+    <Compile Include="Monocle\MethodHandle`1.cs" />
     <Compile Include="Monocle\PixelFontCharacter.cs" />
     <Compile Include="Monocle\PixelFontSize.cs" />
     <Compile Include="Monocle\PixelFont.cs" />
@@ -765,7 +765,7 @@
     <Compile Include="Monocle\Pooled.cs" />
     <Compile Include="Monocle\SaveLoad.cs" />
     <Compile Include="Monocle\SimpleCurve.cs" />
-    <Compile Include="Monocle\SpecEntity.cs" />
+    <Compile Include="Monocle\SpecEntity`1.cs" />
     <Compile Include="Monocle\Tiler.cs" />
     <Compile Include="Monocle\AutotileData.cs" />
     <Compile Include="Monocle\Tracker.cs" />
@@ -774,7 +774,7 @@
     <Compile Include="Monocle\VirtualTexture.cs" />
     <Compile Include="Monocle\VirtualRenderTarget.cs" />
     <Compile Include="Monocle\VirtualContent.cs" />
-    <Compile Include="Monocle\VirtualMap.cs" />
+    <Compile Include="Monocle\VirtualMap`1.cs" />
     <Compile Include="FMOD\VERSION.cs" />
     <Compile Include="FMOD\CONSTANTS.cs" />
     <Compile Include="FMOD\RESULT.cs" />
@@ -1003,7 +1003,6 @@
     <Compile Include="FMOD\Studio\Bank.cs" />
     <Compile Include="FMOD\Studio\CommandReplay.cs" />
     <Compile Include="FMOD\Studio\MarshallingHelper.cs" />
-    <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="SimplexNoise\Noise.cs" />
   </ItemGroup>
   <ItemGroup>
@@ -1018,7 +1017,9 @@
       <Install>false</Install>
     </BootstrapperPackage>
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <Folder Include="Properties\" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
     <PostBuildEvent>copy /d /y "$(ProjectDir)DLLs\*" "$(TargetDir)"</PostBuildEvent>

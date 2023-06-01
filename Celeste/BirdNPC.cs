@@ -14,7 +14,7 @@ namespace Celeste
     public class BirdNPC : Actor
     {
         public static ParticleType P_Feather;
-        private static readonly string FlownFlag = "bird_fly_away_";
+        private static string FlownFlag = "bird_fly_away_";
         public Facings Facing = Facings.Left;
         public Sprite Sprite;
         public Vector2 StartPosition;
@@ -25,81 +25,76 @@ namespace Celeste
         public float WaitForLightningPostDelay;
         public bool DisableFlapSfx;
         private Coroutine tutorialRoutine;
-        private Modes mode;
+        private BirdNPC.Modes mode;
         private BirdTutorialGui gui;
         private Level level;
-        private readonly Vector2[] nodes;
+        private Vector2[] nodes;
         private StaticMover staticMover;
-        private readonly bool onlyOnce;
-        private readonly bool onlyIfPlayerLeft;
+        private bool onlyOnce;
+        private bool onlyIfPlayerLeft;
 
-        public BirdNPC(Vector2 position, Modes mode)
+        public BirdNPC(Vector2 position, BirdNPC.Modes mode)
             : base(position)
         {
-            Add(Sprite = GFX.SpriteBank.Create("bird"));
-            Sprite.Scale.X = (float)Facing;
-            Sprite.UseRawDeltaTime = true;
-            Sprite.OnFrameChange = spr =>
+            this.Add((Component) (this.Sprite = GFX.SpriteBank.Create("bird")));
+            this.Sprite.Scale.X = (float) this.Facing;
+            this.Sprite.UseRawDeltaTime = true;
+            this.Sprite.OnFrameChange = (Action<string>) (spr =>
             {
-                if (level != null && X > level.Camera.Left + 64 && X < level.Camera.Right - 64 && (spr.Equals("peck") || spr.Equals("peckRare")) && Sprite.CurrentAnimationFrame == 6)
-                {
-                    _ = Audio.Play("event:/game/general/bird_peck", Position);
-                }
-
-                if (level == null || level.Session.Area.ID != 10 || DisableFlapSfx)
-                {
+                if (this.level != null && (double) this.X > (double) this.level.Camera.Left + 64.0 && (double) this.X < (double) this.level.Camera.Right - 64.0 && (spr.Equals("peck") || spr.Equals("peckRare")) && this.Sprite.CurrentAnimationFrame == 6)
+                    Audio.Play("event:/game/general/bird_peck", this.Position);
+                if (this.level == null || this.level.Session.Area.ID != 10 || this.DisableFlapSfx)
                     return;
-                }
-
-                FlapSfxCheck(Sprite);
-            };
-            Add(Light = new VertexLight(new Vector2(0.0f, -8f), Color.White, 1f, 8, 32));
-            StartPosition = Position;
-            SetMode(mode);
+                BirdNPC.FlapSfxCheck(this.Sprite);
+            });
+            this.Add((Component) (this.Light = new VertexLight(new Vector2(0.0f, -8f), Color.White, 1f, 8, 32)));
+            this.StartPosition = this.Position;
+            this.SetMode(mode);
         }
 
         public BirdNPC(EntityData data, Vector2 offset)
-            : this(data.Position + offset, data.Enum(nameof(mode), Modes.None))
+            : this(data.Position + offset, data.Enum<BirdNPC.Modes>(nameof (mode), BirdNPC.Modes.None))
         {
-            EntityID = new EntityID(data.Level.Name, data.ID);
-            nodes = data.NodesOffset(offset);
-            onlyOnce = data.Bool(nameof(onlyOnce));
-            onlyIfPlayerLeft = data.Bool(nameof(onlyIfPlayerLeft));
+            this.EntityID = new EntityID(data.Level.Name, data.ID);
+            this.nodes = data.NodesOffset(offset);
+            this.onlyOnce = data.Bool(nameof (onlyOnce));
+            this.onlyIfPlayerLeft = data.Bool(nameof (onlyIfPlayerLeft));
         }
 
-        public void SetMode(Modes mode)
+        public void SetMode(BirdNPC.Modes mode)
         {
             this.mode = mode;
-            tutorialRoutine?.RemoveSelf();
+            if (this.tutorialRoutine != null)
+                this.tutorialRoutine.RemoveSelf();
             switch (mode)
             {
-                case Modes.ClimbingTutorial:
-                    Add(tutorialRoutine = new Coroutine(ClimbingTutorial()));
+                case BirdNPC.Modes.ClimbingTutorial:
+                    this.Add((Component) (this.tutorialRoutine = new Coroutine(this.ClimbingTutorial())));
                     break;
-                case Modes.DashingTutorial:
-                    Add(tutorialRoutine = new Coroutine(DashingTutorial()));
+                case BirdNPC.Modes.DashingTutorial:
+                    this.Add((Component) (this.tutorialRoutine = new Coroutine(this.DashingTutorial())));
                     break;
-                case Modes.DreamJumpTutorial:
-                    Add(tutorialRoutine = new Coroutine(DreamJumpTutorial()));
+                case BirdNPC.Modes.DreamJumpTutorial:
+                    this.Add((Component) (this.tutorialRoutine = new Coroutine(this.DreamJumpTutorial())));
                     break;
-                case Modes.SuperWallJumpTutorial:
-                    Add(tutorialRoutine = new Coroutine(SuperWallJumpTutorial()));
+                case BirdNPC.Modes.SuperWallJumpTutorial:
+                    this.Add((Component) (this.tutorialRoutine = new Coroutine(this.SuperWallJumpTutorial())));
                     break;
-                case Modes.HyperJumpTutorial:
-                    Add(tutorialRoutine = new Coroutine(HyperJumpTutorial()));
+                case BirdNPC.Modes.HyperJumpTutorial:
+                    this.Add((Component) (this.tutorialRoutine = new Coroutine(this.HyperJumpTutorial())));
                     break;
-                case Modes.FlyAway:
-                    Add(tutorialRoutine = new Coroutine(WaitRoutine()));
+                case BirdNPC.Modes.FlyAway:
+                    this.Add((Component) (this.tutorialRoutine = new Coroutine(this.WaitRoutine())));
                     break;
-                case Modes.Sleeping:
-                    Sprite.Play("sleep");
-                    Facing = Facings.Right;
+                case BirdNPC.Modes.Sleeping:
+                    this.Sprite.Play("sleep");
+                    this.Facing = Facings.Right;
                     break;
-                case Modes.MoveToNodes:
-                    Add(tutorialRoutine = new Coroutine(MoveToNodesRoutine()));
+                case BirdNPC.Modes.MoveToNodes:
+                    this.Add((Component) (this.tutorialRoutine = new Coroutine(this.MoveToNodesRoutine())));
                     break;
-                case Modes.WaitForLightningOff:
-                    Add(tutorialRoutine = new Coroutine(WaitForLightningOffRoutine()));
+                case BirdNPC.Modes.WaitForLightningOff:
+                    this.Add((Component) (this.tutorialRoutine = new Coroutine(this.WaitForLightningOffRoutine())));
                     break;
             }
         }
@@ -107,55 +102,41 @@ namespace Celeste
         public override void Added(Scene scene)
         {
             base.Added(scene);
-            level = scene as Level;
-            if (mode == Modes.ClimbingTutorial && level.Session.GetLevelFlag("2"))
+            this.level = scene as Level;
+            if (this.mode == BirdNPC.Modes.ClimbingTutorial && this.level.Session.GetLevelFlag("2"))
             {
-                RemoveSelf();
+                this.RemoveSelf();
             }
             else
             {
-                if (mode != Modes.FlyAway || !level.Session.GetFlag(FlownFlag + level.Session.Level))
-                {
+                if (this.mode != BirdNPC.Modes.FlyAway || !this.level.Session.GetFlag(BirdNPC.FlownFlag + this.level.Session.Level))
                     return;
-                }
-
-                RemoveSelf();
+                this.RemoveSelf();
             }
         }
 
         public override void Awake(Scene scene)
         {
             base.Awake(scene);
-            if (mode == Modes.SuperWallJumpTutorial)
+            if (this.mode == BirdNPC.Modes.SuperWallJumpTutorial)
             {
                 Player entity = scene.Tracker.GetEntity<Player>();
-                if (entity != null && entity.Y < Y + 32.0)
-                {
-                    RemoveSelf();
-                }
+                if (entity != null && (double) entity.Y < (double) this.Y + 32.0)
+                    this.RemoveSelf();
             }
-            if (!onlyIfPlayerLeft)
-            {
+            if (!this.onlyIfPlayerLeft)
                 return;
-            }
-
-            Player entity1 = level.Tracker.GetEntity<Player>();
-            if (entity1 == null || entity1.X <= X)
-            {
+            Player entity1 = this.level.Tracker.GetEntity<Player>();
+            if (entity1 == null || (double) entity1.X <= (double) this.X)
                 return;
-            }
-
-            RemoveSelf();
+            this.RemoveSelf();
         }
 
-        public override bool IsRiding(Solid solid)
-        {
-            return Scene.CollideCheck(new Rectangle((int)X - 4, (int)Y, 8, 2), solid);
-        }
+        public override bool IsRiding(Solid solid) => this.Scene.CollideCheck(new Rectangle((int) this.X - 4, (int) this.Y, 8, 2), (Entity) solid);
 
         public override void Update()
         {
-            Sprite.Scale.X = (float)Facing;
+            this.Sprite.Scale.X = (float) this.Facing;
             base.Update();
         }
 
@@ -164,28 +145,20 @@ namespace Celeste
             BirdNPC birdNpc = this;
             birdNpc.Sprite.Play("croak");
             while (birdNpc.Sprite.CurrentAnimationFrame < 9)
-            {
-                yield return null;
-            }
-
-            _ = Audio.Play("event:/game/general/bird_squawk", birdNpc.Position);
+                yield return (object) null;
+            Audio.Play("event:/game/general/bird_squawk", birdNpc.Position);
         }
 
         public IEnumerator ShowTutorial(BirdTutorialGui gui, bool caw = false)
         {
             BirdNPC birdNpc = this;
             if (caw)
-            {
-                yield return birdNpc.Caw();
-            }
-
+                yield return (object) birdNpc.Caw();
             birdNpc.gui = gui;
             gui.Open = true;
-            birdNpc.Scene.Add(gui);
-            while (gui.Scale < 1.0)
-            {
-                yield return null;
-            }
+            birdNpc.Scene.Add((Entity) gui);
+            while ((double) gui.Scale < 1.0)
+                yield return (object) null;
         }
 
         public IEnumerator HideTutorial()
@@ -194,13 +167,10 @@ namespace Celeste
             if (birdNpc.gui != null)
             {
                 birdNpc.gui.Open = false;
-                while (birdNpc.gui.Scale > 0.0)
-                {
-                    yield return null;
-                }
-
-                birdNpc.Scene.Remove(birdNpc.gui);
-                birdNpc.gui = null;
+                while ((double) birdNpc.gui.Scale > 0.0)
+                    yield return (object) null;
+                birdNpc.Scene.Remove((Entity) birdNpc.gui);
+                birdNpc.gui = (BirdTutorialGui) null;
             }
         }
 
@@ -208,9 +178,9 @@ namespace Celeste
         {
             BirdNPC birdNpc = this;
             birdNpc.Depth = -1000000;
-            birdNpc.level.Session.SetFlag(FlownFlag + birdNpc.level.Session.Level);
-            yield return birdNpc.Startle("event:/game/general/bird_startle");
-            yield return birdNpc.FlyAway();
+            birdNpc.level.Session.SetFlag(BirdNPC.FlownFlag + birdNpc.level.Session.Level);
+            yield return (object) birdNpc.Startle("event:/game/general/bird_startle");
+            yield return (object) birdNpc.FlyAway();
         }
 
         public IEnumerator FlyAway(float upwardsMultiplier = 1f)
@@ -219,16 +189,16 @@ namespace Celeste
             if (birdNpc.staticMover != null)
             {
                 birdNpc.staticMover.RemoveSelf();
-                birdNpc.staticMover = null;
+                birdNpc.staticMover = (StaticMover) null;
             }
             birdNpc.Sprite.Play("fly");
-            birdNpc.Facing = (Facings)(-(int)birdNpc.Facing);
-            Vector2 speed = new((int)birdNpc.Facing * 20, -40f * upwardsMultiplier);
-            while (birdNpc.Y > birdNpc.level.Bounds.Top)
+            birdNpc.Facing = (Facings) (-(int) birdNpc.Facing);
+            Vector2 speed = new Vector2((float) ((int) birdNpc.Facing * 20), -40f * upwardsMultiplier);
+            while ((double) birdNpc.Y > (double) birdNpc.level.Bounds.Top)
             {
-                speed += new Vector2((int)birdNpc.Facing * 140, -120f * upwardsMultiplier) * Engine.DeltaTime;
-                birdNpc.Position += speed * Engine.DeltaTime;
-                yield return null;
+                speed += new Vector2((float) ((int) birdNpc.Facing * 140), -120f * upwardsMultiplier) * Engine.DeltaTime;
+                birdNpc.Position = birdNpc.Position + speed * Engine.DeltaTime;
+                yield return (object) null;
             }
             birdNpc.RemoveSelf();
         }
@@ -236,160 +206,141 @@ namespace Celeste
         private IEnumerator ClimbingTutorial()
         {
             BirdNPC birdNpc = this;
-            yield return 0.25f;
+            yield return (object) 0.25f;
             Player p = birdNpc.Scene.Tracker.GetEntity<Player>();
-            while (Math.Abs(p.X - birdNpc.X) > 120.0)
+            while ((double) Math.Abs(p.X - birdNpc.X) > 120.0)
+                yield return (object) null;
+            BirdTutorialGui tut1 = new BirdTutorialGui((Entity) birdNpc, new Vector2(0.0f, -16f), (object) Dialog.Clean("tutorial_climb"), new object[2]
             {
-                yield return null;
-            }
-
-            BirdTutorialGui tut1 = new(birdNpc, new Vector2(0.0f, -16f), Dialog.Clean("tutorial_climb"), new object[2]
-            {
-                 Dialog.Clean("tutorial_hold"),
-                 BirdTutorialGui.ButtonPrompt.Grab
+                (object) Dialog.Clean("tutorial_hold"),
+                (object) BirdTutorialGui.ButtonPrompt.Grab
             });
-            BirdTutorialGui tut2 = new(birdNpc, new Vector2(0.0f, -16f), Dialog.Clean("tutorial_climb"), new object[3]
+            BirdTutorialGui tut2 = new BirdTutorialGui((Entity) birdNpc, new Vector2(0.0f, -16f), (object) Dialog.Clean("tutorial_climb"), new object[3]
             {
-                 BirdTutorialGui.ButtonPrompt.Grab,
-                 "+",
-                 new Vector2(0.0f, -1f)
+                (object) BirdTutorialGui.ButtonPrompt.Grab,
+                (object) "+",
+                (object) new Vector2(0.0f, -1f)
             });
             bool first = true;
-            for (bool willEnd = false; !willEnd;)
+            bool willEnd;
+            do
             {
-                yield return birdNpc.ShowTutorial(tut1, first);
+                yield return (object) birdNpc.ShowTutorial(tut1, first);
                 first = false;
-                while (p.StateMachine.State != 1 && (double)p.Y > (double)birdNpc.Y)
+                while (p.StateMachine.State != 1 && (double) p.Y > (double) birdNpc.Y)
+                    yield return (object) null;
+                if ((double) p.Y > (double) birdNpc.Y)
                 {
-                    yield return null;
-                }
-
-                if ((double)p.Y > (double)birdNpc.Y)
-                {
-                    _ = Audio.Play("event:/ui/game/tutorial_note_flip_back");
-                    yield return birdNpc.HideTutorial();
-                    yield return birdNpc.ShowTutorial(tut2);
+                    Audio.Play("event:/ui/game/tutorial_note_flip_back");
+                    yield return (object) birdNpc.HideTutorial();
+                    yield return (object) birdNpc.ShowTutorial(tut2);
                 }
                 while (p.Scene != null && (!p.OnGround() || p.StateMachine.State == 1))
-                {
-                    yield return null;
-                }
-
-                willEnd = (double)p.Y <= (double)birdNpc.Y + 4.0;
+                    yield return (object) null;
+                willEnd = (double) p.Y <= (double) birdNpc.Y + 4.0;
                 if (!willEnd)
-                {
-                    _ = Audio.Play("event:/ui/game/tutorial_note_flip_front");
-                }
-
-                yield return birdNpc.HideTutorial();
+                    Audio.Play("event:/ui/game/tutorial_note_flip_front");
+                yield return (object) birdNpc.HideTutorial();
             }
-            yield return birdNpc.StartleAndFlyAway();
+            while (!willEnd);
+            yield return (object) birdNpc.StartleAndFlyAway();
         }
 
         private IEnumerator DashingTutorial()
         {
             BirdNPC bird = this;
-            bird.Y = bird.level.Bounds.Top;
+            bird.Y = (float) bird.level.Bounds.Top;
             bird.X += 32f;
-            yield return 1f;
+            yield return (object) 1f;
             Player player = bird.Scene.Tracker.GetEntity<Player>();
             Bridge bridge = bird.Scene.Entities.FindFirst<Bridge>();
-            while ((player == null || player.X <= bird.StartPosition.X - 92 || player.Y <= bird.StartPosition.Y - 20 || player.Y >= bird.StartPosition.Y - 10) && (!SaveData.Instance.Assists.Invincible || player == null || player.X <= bird.StartPosition.X - 60 || player.Y <= bird.StartPosition.Y || player.Y >= bird.StartPosition.Y + 34))
-            {
-                yield return null;
-            }
-
-            bird.Scene.Add(new CS00_Ending(player, bird, bridge));
+            while ((player == null || (double) player.X <= (double) bird.StartPosition.X - 92.0 || (double) player.Y <= (double) bird.StartPosition.Y - 20.0 || (double) player.Y >= (double) bird.StartPosition.Y - 10.0) && (!SaveData.Instance.Assists.Invincible || player == null || (double) player.X <= (double) bird.StartPosition.X - 60.0 || (double) player.Y <= (double) bird.StartPosition.Y || (double) player.Y >= (double) bird.StartPosition.Y + 34.0))
+                yield return (object) null;
+            bird.Scene.Add((Entity) new CS00_Ending(player, bird, bridge));
         }
 
         private IEnumerator DreamJumpTutorial()
         {
             BirdNPC birdNpc = this;
-            yield return birdNpc.ShowTutorial(new BirdTutorialGui(birdNpc, new Vector2(0.0f, -16f), Dialog.Clean("tutorial_dreamjump"), new object[3]
+            yield return (object) birdNpc.ShowTutorial(new BirdTutorialGui((Entity) birdNpc, new Vector2(0.0f, -16f), (object) Dialog.Clean("tutorial_dreamjump"), new object[3]
             {
-                 new Vector2(1f, 0.0f),
-                 "+",
-                 BirdTutorialGui.ButtonPrompt.Jump
+                (object) new Vector2(1f, 0.0f),
+                (object) "+",
+                (object) BirdTutorialGui.ButtonPrompt.Jump
             }), true);
             while (true)
             {
                 Player entity = birdNpc.Scene.Tracker.GetEntity<Player>();
-                if (entity == null || (entity.X <= birdNpc.X && (birdNpc.Position - entity.Position).Length() >= 32))
-                {
-                    yield return null;
-                }
+                if (entity == null || (double) entity.X <= (double) birdNpc.X && (double) (birdNpc.Position - entity.Position).Length() >= 32.0)
+                    yield return (object) null;
                 else
-                {
                     break;
-                }
             }
-            yield return birdNpc.HideTutorial();
+            yield return (object) birdNpc.HideTutorial();
             while (true)
             {
                 Player entity = birdNpc.Scene.Tracker.GetEntity<Player>();
-                if (entity == null || (birdNpc.Position - entity.Position).Length() >= 24)
-                {
-                    yield return null;
-                }
+                if (entity == null || (double) (birdNpc.Position - entity.Position).Length() >= 24.0)
+                    yield return (object) null;
                 else
-                {
                     break;
-                }
             }
-            yield return birdNpc.StartleAndFlyAway();
+            yield return (object) birdNpc.StartleAndFlyAway();
         }
 
         private IEnumerator SuperWallJumpTutorial()
         {
             BirdNPC birdNpc = this;
             birdNpc.Facing = Facings.Right;
-            yield return 0.25f;
+            yield return (object) 0.25f;
             bool caw = true;
-            BirdTutorialGui tut1 = new(birdNpc, new Vector2(0.0f, -16f), GFX.Gui["hyperjump/tutorial00"], new object[2]
+            BirdTutorialGui tut1 = new BirdTutorialGui((Entity) birdNpc, new Vector2(0.0f, -16f), (object) GFX.Gui["hyperjump/tutorial00"], new object[2]
             {
-                 Dialog.Clean("TUTORIAL_DASH"),
-                 new Vector2(0.0f, -1f)
+                (object) Dialog.Clean("TUTORIAL_DASH"),
+                (object) new Vector2(0.0f, -1f)
             });
-            BirdTutorialGui tut2 = new(birdNpc, new Vector2(0.0f, -16f), GFX.Gui["hyperjump/tutorial01"], new object[1]
+            BirdTutorialGui tut2 = new BirdTutorialGui((Entity) birdNpc, new Vector2(0.0f, -16f), (object) GFX.Gui["hyperjump/tutorial01"], new object[1]
             {
-                 Dialog.Clean("TUTORIAL_DREAMJUMP")
+                (object) Dialog.Clean("TUTORIAL_DREAMJUMP")
             });
-            for (Player entity = null; entity == null || entity.Y > birdNpc.Y || entity.X <= birdNpc.X + 144;)
+            Player entity;
+            do
             {
-                yield return birdNpc.ShowTutorial(tut1, caw);
+                yield return (object) birdNpc.ShowTutorial(tut1, caw);
                 birdNpc.Sprite.Play("idleRarePeck");
-                yield return 2f;
+                yield return (object) 2f;
                 birdNpc.gui = tut2;
                 birdNpc.gui.Open = true;
                 birdNpc.gui.Scale = 1f;
-                birdNpc.Scene.Add(birdNpc.gui);
-                yield return null;
+                birdNpc.Scene.Add((Entity) birdNpc.gui);
+                yield return (object) null;
                 tut1.Open = false;
                 tut1.Scale = 0.0f;
-                birdNpc.Scene.Remove(tut1);
-                yield return 2f;
-                yield return birdNpc.HideTutorial();
-                yield return 2f;
+                birdNpc.Scene.Remove((Entity) tut1);
+                yield return (object) 2f;
+                yield return (object) birdNpc.HideTutorial();
+                yield return (object) 2f;
                 caw = false;
                 entity = birdNpc.Scene.Tracker.GetEntity<Player>();
             }
-            yield return birdNpc.StartleAndFlyAway();
+            while (entity == null || (double) entity.Y > (double) birdNpc.Y || (double) entity.X <= (double) birdNpc.X + 144.0);
+            yield return (object) birdNpc.StartleAndFlyAway();
         }
 
         private IEnumerator HyperJumpTutorial()
         {
             BirdNPC birdNpc = this;
             birdNpc.Facing = Facings.Left;
-            BirdTutorialGui tut = new(birdNpc, new Vector2(0.0f, -16f), Dialog.Clean("TUTORIAL_DREAMJUMP"), new object[5]
+            BirdTutorialGui tut = new BirdTutorialGui((Entity) birdNpc, new Vector2(0.0f, -16f), (object) Dialog.Clean("TUTORIAL_DREAMJUMP"), new object[5]
             {
-                 new Vector2(1f, 1f),
-                 "+",
-                 BirdTutorialGui.ButtonPrompt.Dash,
-                 GFX.Gui["tinyarrow"],
-                 BirdTutorialGui.ButtonPrompt.Jump
+                (object) new Vector2(1f, 1f),
+                (object) "+",
+                (object) BirdTutorialGui.ButtonPrompt.Dash,
+                (object) GFX.Gui["tinyarrow"],
+                (object) BirdTutorialGui.ButtonPrompt.Jump
             });
-            yield return 0.3f;
-            yield return birdNpc.ShowTutorial(tut, true);
+            yield return (object) 0.3f;
+            yield return (object) birdNpc.ShowTutorial(tut, true);
         }
 
         private IEnumerator WaitRoutine()
@@ -398,63 +349,44 @@ namespace Celeste
             while (!birdNpc.AutoFly)
             {
                 Player entity = birdNpc.Scene.Tracker.GetEntity<Player>();
-                if (entity == null || Math.Abs(entity.X - birdNpc.X) >= 120)
-                {
-                    yield return null;
-                }
+                if (entity == null || (double) Math.Abs(entity.X - birdNpc.X) >= 120.0)
+                    yield return (object) null;
                 else
-                {
                     break;
-                }
             }
-            yield return birdNpc.Caw();
+            yield return (object) birdNpc.Caw();
             while (!birdNpc.AutoFly)
             {
                 Player entity = birdNpc.Scene.Tracker.GetEntity<Player>();
-                if (entity == null || (entity.Center - birdNpc.Position).Length() >= 32)
-                {
-                    yield return null;
-                }
+                if (entity == null || (double) (entity.Center - birdNpc.Position).Length() >= 32.0)
+                    yield return (object) null;
                 else
-                {
                     break;
-                }
             }
-            yield return birdNpc.StartleAndFlyAway();
+            yield return (object) birdNpc.StartleAndFlyAway();
         }
 
         public IEnumerator Startle(string startleSound, float duration = 0.8f, Vector2? multiplier = null)
         {
             BirdNPC birdNpc = this;
             if (!multiplier.HasValue)
-            {
                 multiplier = new Vector2?(new Vector2(1f, 1f));
-            }
-
             if (!string.IsNullOrWhiteSpace(startleSound))
-            {
-                _ = Audio.Play(startleSound, birdNpc.Position);
-            }
-
-            Dust.Burst(birdNpc.Position, (float)-Math.PI / 2, 8);
+                Audio.Play(startleSound, birdNpc.Position);
+            Dust.Burst(birdNpc.Position, -1.57079637f, 8);
             birdNpc.Sprite.Play("jump");
             Tween tween = Tween.Create(Tween.TweenMode.Oneshot, Ease.CubeOut, duration, true);
-            tween.OnUpdate = t =>
+            tween.OnUpdate = (Action<Tween>) (t =>
             {
-                if ((double)t.Eased < 0.5 && Scene.OnInterval(0.05f))
-                {
-                    level.Particles.Emit(P_Feather, 2, Position + (Vector2.UnitY * -6f), Vector2.One * 4f);
-                }
-
+                if ((double) t.Eased < 0.5 && this.Scene.OnInterval(0.05f))
+                    this.level.Particles.Emit(BirdNPC.P_Feather, 2, this.Position + Vector2.UnitY * -6f, Vector2.One * 4f);
                 Vector2 vector2 = Vector2.Lerp(new Vector2(100f, -100f) * multiplier.Value, new Vector2(20f, -20f) * multiplier.Value, t.Eased);
-                vector2.X *= -(int)Facing;
-                Position += vector2 * Engine.DeltaTime;
-            };
-            birdNpc.Add(tween);
+                vector2.X *= (float) -(int) this.Facing;
+                this.Position = this.Position + vector2 * Engine.DeltaTime;
+            });
+            birdNpc.Add((Component) tween);
             while (tween.Active)
-            {
-                yield return null;
-            }
+                yield return (object) null;
         }
 
         public IEnumerator FlyTo(Vector2 target, float durationMult = 1f, bool relocateSfx = true)
@@ -462,27 +394,21 @@ namespace Celeste
             BirdNPC birdNpc = this;
             birdNpc.Sprite.Play("fly");
             if (relocateSfx)
-            {
-                birdNpc.Add(new SoundSource().Play("event:/new_content/game/10_farewell/bird_relocate"));
-            }
-
-            Facings facing = (Facings)Math.Sign(target.X - birdNpc.X);
-            if (facing != 0)
-            {
-                birdNpc.Facing = facing;
-            }
-
+                birdNpc.Add((Component) new SoundSource().Play("event:/new_content/game/10_farewell/bird_relocate"));
+            int num = Math.Sign(target.X - birdNpc.X);
+            if (num != 0)
+                birdNpc.Facing = (Facings) num;
             Vector2 position = birdNpc.Position;
             Vector2 end = target;
-            SimpleCurve curve = new(position, end, position + ((end - position) * 0.75f) - (Vector2.UnitY * 30f));
+            SimpleCurve curve = new SimpleCurve(position, end, position + (end - position) * 0.75f - Vector2.UnitY * 30f);
             float duration = (end - position).Length() / 100f * durationMult;
-            for (float p = 0.0f; (double)p < 0.95f; p += Engine.DeltaTime / duration)
+            for (float p = 0.0f; (double) p < 0.949999988079071; p += Engine.DeltaTime / duration)
             {
                 birdNpc.Position = curve.GetPoint(Ease.SineInOut(p)).Floor();
-                birdNpc.Sprite.Rate = (float)(1.0 - ((double)p * 0.5));
-                yield return null;
+                birdNpc.Sprite.Rate = (float) (1.0 - (double) p * 0.5);
+                yield return (object) null;
             }
-            Dust.Burst(birdNpc.Position, (float)-Math.PI / 2, 8);
+            Dust.Burst(birdNpc.Position, -1.57079637f, 8);
             birdNpc.Position = target;
             birdNpc.Facing = Facings.Left;
             birdNpc.Sprite.Rate = 1f;
@@ -496,39 +422,36 @@ namespace Celeste
             while (true)
             {
                 Player entity = birdNpc.Scene.Tracker.GetEntity<Player>();
-                if (entity == null || (double)(entity.Center - birdNpc.Position).Length() >= 80.0)
+                if (entity == null || (double) (entity.Center - birdNpc.Position).Length() >= 80.0)
                 {
-                    yield return null;
+                    yield return (object) null;
                 }
                 else
                 {
                     birdNpc.Depth = -1000000;
-                    yield return birdNpc.Startle("event:/new_content/game/10_farewell/bird_startle", 0.2f);
+                    yield return (object) birdNpc.Startle("event:/new_content/game/10_farewell/bird_startle", 0.2f);
                     if (index < birdNpc.nodes.Length)
                     {
-                        yield return birdNpc.FlyTo(birdNpc.nodes[index], 0.6f);
+                        yield return (object) birdNpc.FlyTo(birdNpc.nodes[index], 0.6f);
                         ++index;
                     }
                     else
                     {
-                        birdNpc.Tag = Tags.Persistent;
-                        birdNpc.Add(new SoundSource().Play("event:/new_content/game/10_farewell/bird_relocate"));
+                        birdNpc.Tag = (int) Tags.Persistent;
+                        birdNpc.Add((Component) new SoundSource().Play("event:/new_content/game/10_farewell/bird_relocate"));
                         if (birdNpc.onlyOnce)
-                        {
-                            _ = birdNpc.level.Session.DoNotLoad.Add(birdNpc.EntityID);
-                        }
-
+                            birdNpc.level.Session.DoNotLoad.Add(birdNpc.EntityID);
                         birdNpc.Sprite.Play("fly");
                         birdNpc.Facing = Facings.Right;
-                        Vector2 speed = new((int)birdNpc.Facing * 20, -40f);
-                        while (birdNpc.Y > birdNpc.level.Bounds.Top - 200)
+                        Vector2 speed = new Vector2((float) ((int) birdNpc.Facing * 20), -40f);
+                        while ((double) birdNpc.Y > (double) (birdNpc.level.Bounds.Top - 200))
                         {
-                            speed += new Vector2((int)birdNpc.Facing * 140, -60f) * Engine.DeltaTime;
-                            birdNpc.Position += speed * Engine.DeltaTime;
-                            yield return null;
+                            speed += new Vector2((float) ((int) birdNpc.Facing * 140), -60f) * Engine.DeltaTime;
+                            birdNpc.Position = birdNpc.Position + speed * Engine.DeltaTime;
+                            yield return (object) null;
                         }
                         birdNpc.RemoveSelf();
-                        _ = new Vector2();
+                        speed = new Vector2();
                     }
                 }
             }
@@ -539,39 +462,33 @@ namespace Celeste
             BirdNPC birdNpc = this;
             birdNpc.Sprite.Play("hoverStressed");
             while (birdNpc.Scene.Entities.FindFirst<Lightning>() != null)
-            {
-                yield return null;
-            }
-
-            if (birdNpc.WaitForLightningPostDelay > 0.0)
-            {
-                yield return birdNpc.WaitForLightningPostDelay;
-            }
-
+                yield return (object) null;
+            if ((double) birdNpc.WaitForLightningPostDelay > 0.0)
+                yield return (object) birdNpc.WaitForLightningPostDelay;
             Vector2 speed;
             if (!birdNpc.FlyAwayUp)
             {
                 birdNpc.Sprite.Play("fly");
-                speed = new Vector2((int)birdNpc.Facing * 20, -10f);
-                while (birdNpc.Y > birdNpc.level.Bounds.Top)
+                speed = new Vector2((float) ((int) birdNpc.Facing * 20), -10f);
+                while ((double) birdNpc.Y > (double) birdNpc.level.Bounds.Top)
                 {
-                    speed += new Vector2((int)birdNpc.Facing * 140, -10f) * Engine.DeltaTime;
-                    birdNpc.Position += speed * Engine.DeltaTime;
-                    yield return null;
+                    speed += new Vector2((float) ((int) birdNpc.Facing * 140), -10f) * Engine.DeltaTime;
+                    birdNpc.Position = birdNpc.Position + speed * Engine.DeltaTime;
+                    yield return (object) null;
                 }
-                _ = new Vector2();
+                speed = new Vector2();
             }
             else
             {
                 birdNpc.Sprite.Play("flyup");
                 speed = new Vector2(0.0f, -32f);
-                while (birdNpc.Y > birdNpc.level.Bounds.Top)
+                while ((double) birdNpc.Y > (double) birdNpc.level.Bounds.Top)
                 {
                     speed += new Vector2(0.0f, -100f) * Engine.DeltaTime;
-                    birdNpc.Position += speed * Engine.DeltaTime;
-                    yield return null;
+                    birdNpc.Position = birdNpc.Position + speed * Engine.DeltaTime;
+                    yield return (object) null;
                 }
-                _ = new Vector2();
+                speed = new Vector2();
             }
             birdNpc.RemoveSelf();
         }
@@ -585,23 +502,20 @@ namespace Celeste
         public override void DebugRender(Camera camera)
         {
             base.DebugRender(camera);
-            if (mode != Modes.DashingTutorial)
-            {
+            if (this.mode != BirdNPC.Modes.DashingTutorial)
                 return;
-            }
-
-            float x1 = StartPosition.X - 92f;
-            float right1 = level.Bounds.Right;
-            float y1 = StartPosition.Y - 20f;
-            float y2 = StartPosition.Y - 10f;
+            float x1 = this.StartPosition.X - 92f;
+            float right1 = (float) this.level.Bounds.Right;
+            float y1 = this.StartPosition.Y - 20f;
+            float y2 = this.StartPosition.Y - 10f;
             Draw.Line(new Vector2(x1, y1), new Vector2(x1, y2), Color.Aqua);
             Draw.Line(new Vector2(x1, y1), new Vector2(right1, y1), Color.Aqua);
             Draw.Line(new Vector2(right1, y1), new Vector2(right1, y2), Color.Aqua);
             Draw.Line(new Vector2(x1, y2), new Vector2(right1, y2), Color.Aqua);
-            float x2 = StartPosition.X - 60f;
-            float right2 = level.Bounds.Right;
-            float y3 = StartPosition.Y;
-            float y4 = StartPosition.Y + 34f;
+            float x2 = this.StartPosition.X - 60f;
+            float right2 = (float) this.level.Bounds.Right;
+            float y3 = this.StartPosition.Y;
+            float y4 = this.StartPosition.Y + 34f;
             Draw.Line(new Vector2(x2, y3), new Vector2(x2, y4), Color.Aqua);
             Draw.Line(new Vector2(x2, y3), new Vector2(right2, y3), Color.Aqua);
             Draw.Line(new Vector2(right2, y3), new Vector2(right2, y4), Color.Aqua);
@@ -614,19 +528,14 @@ namespace Celeste
             {
                 Camera camera = (sprite.Entity.Scene as Level).Camera;
                 Vector2 renderPosition = sprite.RenderPosition;
-                if (renderPosition.X < camera.X - 32 || renderPosition.Y < camera.Y - 32 || renderPosition.X > camera.X + 320 + 32 || renderPosition.Y > camera.Y + 180 + 32)
-                {
+                if ((double) renderPosition.X < (double) camera.X - 32.0 || (double) renderPosition.Y < (double) camera.Y - 32.0 || (double) renderPosition.X > (double) camera.X + 320.0 + 32.0 || (double) renderPosition.Y > (double) camera.Y + 180.0 + 32.0)
                     return;
-                }
             }
             string currentAnimationId = sprite.CurrentAnimationID;
             int currentAnimationFrame = sprite.CurrentAnimationFrame;
             if ((!(currentAnimationId == "hover") || currentAnimationFrame != 0) && (!(currentAnimationId == "hoverStressed") || currentAnimationFrame != 0) && (!(currentAnimationId == "fly") || currentAnimationFrame != 0))
-            {
                 return;
-            }
-
-            _ = Audio.Play("event:/new_content/game/10_farewell/bird_wingflap", sprite.RenderPosition);
+            Audio.Play("event:/new_content/game/10_farewell/bird_wingflap", sprite.RenderPosition);
         }
 
         public enum Modes

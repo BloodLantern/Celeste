@@ -16,128 +16,113 @@ namespace Celeste
         public bool Dreamy;
         public Memorial Memorial;
         private float index;
-        private readonly string message;
+        private string message;
         private float alpha;
         private float timer;
-        private readonly float widestCharacter;
-        private readonly int firstLineLength;
-        private readonly SoundSource textSfx;
+        private float widestCharacter;
+        private int firstLineLength;
+        private SoundSource textSfx;
         private bool textSfxPlaying;
 
         public MemorialText(Memorial memorial, bool dreamy)
         {
-            AddTag((int)Tags.HUD);
-            AddTag((int)Tags.PauseUpdate);
-            Add(textSfx = new SoundSource());
-            Dreamy = dreamy;
-            Memorial = memorial;
-            message = Dialog.Clean(nameof(memorial));
-            firstLineLength = CountToNewline(0);
-            for (int index = 0; index < message.Length; ++index)
+            this.AddTag((int) Tags.HUD);
+            this.AddTag((int) Tags.PauseUpdate);
+            this.Add((Component) (this.textSfx = new SoundSource()));
+            this.Dreamy = dreamy;
+            this.Memorial = memorial;
+            this.message = Dialog.Clean(nameof (memorial));
+            this.firstLineLength = this.CountToNewline(0);
+            for (int index = 0; index < this.message.Length; ++index)
             {
-                float x = ActiveFont.Measure(message[index]).X;
-                if ((double)x > widestCharacter)
-                {
-                    widestCharacter = x;
-                }
+                float x = ActiveFont.Measure(this.message[index]).X;
+                if ((double) x > (double) this.widestCharacter)
+                    this.widestCharacter = x;
             }
-            widestCharacter *= 0.9f;
+            this.widestCharacter *= 0.9f;
         }
 
         public override void Update()
         {
             base.Update();
-            if ((Scene as Level).Paused)
+            if ((this.Scene as Level).Paused)
             {
-                _ = textSfx.Pause();
+                this.textSfx.Pause();
             }
             else
             {
-                timer += Engine.DeltaTime;
-                if (!Show)
+                this.timer += Engine.DeltaTime;
+                if (!this.Show)
                 {
-                    alpha = Calc.Approach(alpha, 0.0f, Engine.DeltaTime);
-                    if (alpha <= 0.0)
-                    {
-                        index = firstLineLength;
-                    }
+                    this.alpha = Calc.Approach(this.alpha, 0.0f, Engine.DeltaTime);
+                    if ((double) this.alpha <= 0.0)
+                        this.index = (float) this.firstLineLength;
                 }
                 else
                 {
-                    alpha = Calc.Approach(alpha, 1f, Engine.DeltaTime * 2f);
-                    if (alpha >= 1.0)
+                    this.alpha = Calc.Approach(this.alpha, 1f, Engine.DeltaTime * 2f);
+                    if ((double) this.alpha >= 1.0)
+                        this.index = Calc.Approach(this.index, (float) this.message.Length, 32f * Engine.DeltaTime);
+                }
+                if (this.Show && (double) this.alpha >= 1.0 && (double) this.index < (double) this.message.Length)
+                {
+                    if (!this.textSfxPlaying)
                     {
-                        index = Calc.Approach(index, message.Length, 32f * Engine.DeltaTime);
+                        this.textSfxPlaying = true;
+                        this.textSfx.Play(this.Dreamy ? "event:/ui/game/memorial_dream_text_loop" : "event:/ui/game/memorial_text_loop");
+                        this.textSfx.Param("end", 0.0f);
                     }
                 }
-                if (Show && alpha >= 1.0 && index < (double)message.Length)
+                else if (this.textSfxPlaying)
                 {
-                    if (!textSfxPlaying)
-                    {
-                        textSfxPlaying = true;
-                        _ = textSfx.Play(Dreamy ? "event:/ui/game/memorial_dream_text_loop" : "event:/ui/game/memorial_text_loop");
-                        _ = textSfx.Param("end", 0.0f);
-                    }
+                    this.textSfxPlaying = false;
+                    this.textSfx.Stop();
+                    this.textSfx.Param("end", 1f);
                 }
-                else if (textSfxPlaying)
-                {
-                    textSfxPlaying = false;
-                    _ = textSfx.Stop();
-                    _ = textSfx.Param("end", 1f);
-                }
-                _ = textSfx.Resume();
+                this.textSfx.Resume();
             }
         }
 
         private int CountToNewline(int start)
         {
             int index = start;
-            while (index < message.Length && message[index] != '\n')
-            {
+            while (index < this.message.Length && this.message[index] != '\n')
                 ++index;
-            }
-
             return index - start;
         }
 
         public override void Render()
         {
-            if ((Scene as Level).FrozenOrPaused || (Scene as Level).Completed || index <= 0.0 || alpha <= 0.0)
-            {
+            if ((this.Scene as Level).FrozenOrPaused || (this.Scene as Level).Completed || (double) this.index <= 0.0 || (double) this.alpha <= 0.0)
                 return;
-            }
-
-            Camera camera = SceneAs<Level>().Camera;
-            Vector2 vector2 = new((float)(((double)Memorial.X - (double)camera.X) * 6.0), (float)((((double)Memorial.Y - (double)camera.Y) * 6.0) - 350.0 - ((double)ActiveFont.LineHeight * 3.2999999523162842)));
+            Camera camera = this.SceneAs<Level>().Camera;
+            Vector2 vector2 = new Vector2((float) (((double) this.Memorial.X - (double) camera.X) * 6.0), (float) (((double) this.Memorial.Y - (double) camera.Y) * 6.0 - 350.0 - (double) ActiveFont.LineHeight * 3.2999999523162842));
             if (SaveData.Instance != null && SaveData.Instance.Assists.MirrorMode)
-            {
                 vector2.X = 1920f - vector2.X;
-            }
-
-            float num1 = Ease.CubeInOut(alpha);
-            int num2 = (int)Math.Min(message.Length, index);
+            float num1 = Ease.CubeInOut(this.alpha);
+            int num2 = (int) Math.Min((float) this.message.Length, this.index);
             int num3 = 0;
-            float num4 = (float)(64.0 * (1.0 - (double)num1));
-            int newline = CountToNewline(0);
+            float num4 = (float) (64.0 * (1.0 - (double) num1));
+            int newline = this.CountToNewline(0);
             for (int index = 0; index < num2; ++index)
             {
-                char character = message[index];
+                char character = this.message[index];
                 if (character == '\n')
                 {
                     num3 = 0;
-                    newline = CountToNewline(index + 1);
+                    newline = this.CountToNewline(index + 1);
                     num4 += ActiveFont.LineHeight * 1.1f;
                 }
                 else
                 {
                     float x1 = 1f;
-                    float x2 = (float)((-newline * (double)widestCharacter / 2.0) + ((num3 + 0.5) * widestCharacter));
+                    float x2 = (float) ((double) -newline * (double) this.widestCharacter / 2.0 + ((double) num3 + 0.5) * (double) this.widestCharacter);
                     float num5 = 0.0f;
-                    if (Dreamy && character != ' ' && character != '-' && character != '\n')
+                    if (this.Dreamy && character != ' ' && character != '-' && character != '\n')
                     {
-                        character = message[(index + (int)(Math.Sin((timer * 2.0) + (index / 8.0)) * 4.0) + message.Length) % message.Length];
-                        num5 = (float)Math.Sin((timer * 2.0) + (index / 8.0)) * 8f;
-                        x1 = Math.Sin((timer * 4.0) + (index / 16.0)) < 0.0 ? -1f : 1f;
+                        character = this.message[(index + (int) (Math.Sin((double) this.timer * 2.0 + (double) index / 8.0) * 4.0) + this.message.Length) % this.message.Length];
+                        num5 = (float) Math.Sin((double) this.timer * 2.0 + (double) index / 8.0) * 8f;
+                        x1 = Math.Sin((double) this.timer * 4.0 + (double) index / 16.0) < 0.0 ? -1f : 1f;
                     }
                     ActiveFont.Draw(character, vector2 + new Vector2(x2, num4 + num5), new Vector2(0.5f, 1f), new Vector2(x1, 1f), Color.White * num1);
                     ++num3;

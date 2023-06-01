@@ -17,7 +17,7 @@ namespace Celeste
         public DisplacementRenderHook(Action render)
             : base(false, true)
         {
-            RenderDisplacement = render;
+            this.RenderDisplacement = render;
         }
     }
 }

@@ -13,7 +13,7 @@ namespace Monocle
     {
         public bool RemoveOnComplete = true;
         public bool UseRawDeltaTime;
-        private readonly Stack<IEnumerator> enumerators;
+        private Stack<IEnumerator> enumerators;
         private float waitTimer;
         private bool ended;
 
@@ -22,96 +22,78 @@ namespace Monocle
         public Coroutine(IEnumerator functionCall, bool removeOnComplete = true)
             : base(true, false)
         {
-            enumerators = new Stack<IEnumerator>();
-            enumerators.Push(functionCall);
-            RemoveOnComplete = removeOnComplete;
+            this.enumerators = new Stack<IEnumerator>();
+            this.enumerators.Push(functionCall);
+            this.RemoveOnComplete = removeOnComplete;
         }
 
         public Coroutine(bool removeOnComplete = true)
             : base(false, false)
         {
-            RemoveOnComplete = removeOnComplete;
-            enumerators = new Stack<IEnumerator>();
+            this.RemoveOnComplete = removeOnComplete;
+            this.enumerators = new Stack<IEnumerator>();
         }
 
         public override void Update()
         {
-            ended = false;
-            if (waitTimer > 0.0)
+            this.ended = false;
+            if ((double) this.waitTimer > 0.0)
             {
-                waitTimer -= UseRawDeltaTime ? Engine.RawDeltaTime : Engine.DeltaTime;
+                this.waitTimer -= this.UseRawDeltaTime ? Engine.RawDeltaTime : Engine.DeltaTime;
             }
             else
             {
-                if (enumerators.Count <= 0)
-                {
+                if (this.enumerators.Count <= 0)
                     return;
-                }
-
-                IEnumerator enumerator = enumerators.Peek();
-                if (enumerator.MoveNext() && !ended)
+                IEnumerator enumerator = this.enumerators.Peek();
+                if (enumerator.MoveNext() && !this.ended)
                 {
                     if (enumerator.Current is int)
-                    {
-                        waitTimer = (int)enumerator.Current;
-                    }
-
+                        this.waitTimer = (float) (int) enumerator.Current;
                     if (enumerator.Current is float)
                     {
-                        waitTimer = (float)enumerator.Current;
+                        this.waitTimer = (float) enumerator.Current;
                     }
                     else
                     {
-                        if (enumerator.Current is not IEnumerator)
-                        {
+                        if (!(enumerator.Current is IEnumerator))
                             return;
-                        }
-
-                        enumerators.Push(enumerator.Current as IEnumerator);
+                        this.enumerators.Push(enumerator.Current as IEnumerator);
                     }
                 }
                 else
                 {
-                    if (ended)
-                    {
+                    if (this.ended)
                         return;
-                    }
-
-                    _ = enumerators.Pop();
-                    if (enumerators.Count != 0)
-                    {
+                    this.enumerators.Pop();
+                    if (this.enumerators.Count != 0)
                         return;
-                    }
-
-                    Finished = true;
-                    Active = false;
-                    if (!RemoveOnComplete)
-                    {
+                    this.Finished = true;
+                    this.Active = false;
+                    if (!this.RemoveOnComplete)
                         return;
-                    }
-
-                    RemoveSelf();
+                    this.RemoveSelf();
                 }
             }
         }
 
         public void Cancel()
         {
-            Active = false;
-            Finished = true;
-            waitTimer = 0.0f;
-            enumerators.Clear();
-            ended = true;
+            this.Active = false;
+            this.Finished = true;
+            this.waitTimer = 0.0f;
+            this.enumerators.Clear();
+            this.ended = true;
         }
 
         public void Replace(IEnumerator functionCall)
         {
-            Active = true;
-            Finished = false;
-            waitTimer = 0.0f;
-            enumerators.Clear();
-            enumerators.Push(functionCall);
-            ended = true;
+            this.Active = true;
+            this.Finished = false;
+            this.waitTimer = 0.0f;
+            this.enumerators.Clear();
+            this.enumerators.Push(functionCall);
+            this.ended = true;
         }
     }
 }

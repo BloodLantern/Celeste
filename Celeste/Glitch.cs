@@ -16,33 +16,30 @@ namespace Celeste
 
         public static void Apply(VirtualRenderTarget source, float timer, float seed, float amplitude)
         {
-            if (Value <= 0.0 || Settings.Instance.DisableFlashes)
-            {
+            if ((double) Glitch.Value <= 0.0 || Settings.Instance.DisableFlashes)
                 return;
-            }
-
             Effect fxGlitch = GFX.FxGlitch;
             Viewport viewport = Engine.Graphics.GraphicsDevice.Viewport;
-            double width = viewport.Width;
+            double width = (double) viewport.Width;
             viewport = Engine.Graphics.GraphicsDevice.Viewport;
-            double height = viewport.Height;
-            Vector2 local = new((float)width, (float)height);
+            double height = (double) viewport.Height;
+            Vector2 local = new Vector2((float) width, (float) height);
             fxGlitch.Parameters["dimensions"].SetValue(local);
-            fxGlitch.Parameters[nameof(amplitude)].SetValue(amplitude);
+            fxGlitch.Parameters[nameof (amplitude)].SetValue(amplitude);
             fxGlitch.Parameters["minimum"].SetValue(-1f);
             fxGlitch.Parameters["glitch"].SetValue(Glitch.Value);
-            fxGlitch.Parameters[nameof(timer)].SetValue(timer);
-            fxGlitch.Parameters[nameof(seed)].SetValue(seed);
+            fxGlitch.Parameters[nameof (timer)].SetValue(timer);
+            fxGlitch.Parameters[nameof (seed)].SetValue(seed);
             VirtualRenderTarget tempA = GameplayBuffers.TempA;
-            Engine.Instance.GraphicsDevice.SetRenderTarget((RenderTarget2D)tempA);
+            Engine.Instance.GraphicsDevice.SetRenderTarget((RenderTarget2D) tempA);
             Engine.Instance.GraphicsDevice.Clear(Color.Transparent);
             Draw.SpriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, SamplerState.PointClamp, DepthStencilState.Default, RasterizerState.CullNone, fxGlitch);
-            Draw.SpriteBatch.Draw((RenderTarget2D)source, Vector2.Zero, Color.White);
+            Draw.SpriteBatch.Draw((Texture2D) (RenderTarget2D) source, Vector2.Zero, Color.White);
             Draw.SpriteBatch.End();
-            Engine.Instance.GraphicsDevice.SetRenderTarget((RenderTarget2D)source);
+            Engine.Instance.GraphicsDevice.SetRenderTarget((RenderTarget2D) source);
             Engine.Instance.GraphicsDevice.Clear(Color.Transparent);
             Draw.SpriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, SamplerState.PointClamp, DepthStencilState.Default, RasterizerState.CullNone, fxGlitch);
-            Draw.SpriteBatch.Draw((RenderTarget2D)tempA, Vector2.Zero, Color.White);
+            Draw.SpriteBatch.Draw((Texture2D) (RenderTarget2D) tempA, Vector2.Zero, Color.White);
             Draw.SpriteBatch.End();
         }
     }

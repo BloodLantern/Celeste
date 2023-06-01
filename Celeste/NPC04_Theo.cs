@@ -16,31 +16,25 @@ namespace Celeste
         public NPC04_Theo(Vector2 position)
             : base(position)
         {
-            Add(Sprite = GFX.SpriteBank.Create("theo"));
-            IdleAnim = "idle";
-            MoveAnim = "walk";
-            Visible = false;
-            Maxspeed = 48f;
-            SetupTheoSpriteSounds();
+            this.Add((Component) (this.Sprite = GFX.SpriteBank.Create("theo")));
+            this.IdleAnim = "idle";
+            this.MoveAnim = "walk";
+            this.Visible = false;
+            this.Maxspeed = 48f;
+            this.SetupTheoSpriteSounds();
         }
 
         public override void Update()
         {
             base.Update();
-            if (started)
-            {
+            if (this.started)
                 return;
-            }
-
-            Gondola first = Scene.Entities.FindFirst<Gondola>();
-            Player entity = Scene.Tracker.GetEntity<Player>();
-            if (first == null || entity == null || (double)entity.X <= (double)first.Left - 16.0)
-            {
+            Gondola first = this.Scene.Entities.FindFirst<Gondola>();
+            Player entity = this.Scene.Tracker.GetEntity<Player>();
+            if (first == null || entity == null || (double) entity.X <= (double) first.Left - 16.0)
                 return;
-            }
-
-            started = true;
-            Scene.Add(new CS04_Gondola(this, first, entity));
+            this.started = true;
+            this.Scene.Add((Entity) new CS04_Gondola((NPC) this, first, entity));
         }
     }
 }

@@ -15,111 +15,87 @@ namespace Celeste
         private float playerDuckTimer;
         private bool enabled = true;
         private bool activated;
-        private readonly Monocle.Image sprite;
+        private Monocle.Image sprite;
         private Entity bgSolidTiles;
 
         public WhiteBlock(EntityData data, Vector2 offset)
             : base(data.Position + offset, 48, true)
         {
-            Add(sprite = new Monocle.Image(GFX.Game["objects/whiteblock"]));
-            Depth = 8990;
-            SurfaceSoundIndex = 27;
+            this.Add((Component) (this.sprite = new Monocle.Image(GFX.Game["objects/whiteblock"])));
+            this.Depth = 8990;
+            this.SurfaceSoundIndex = 27;
         }
 
         public override void Awake(Scene scene)
         {
             base.Awake(scene);
             if (!(scene as Level).Session.HeartGem)
-            {
                 return;
-            }
-
-            Disable();
+            this.Disable();
         }
 
         private void Disable()
         {
-            enabled = false;
-            sprite.Color = Color.White * 0.25f;
-            Collidable = false;
+            this.enabled = false;
+            this.sprite.Color = Color.White * 0.25f;
+            this.Collidable = false;
         }
 
         private void Activate(Player player)
         {
-            _ = Audio.Play("event:/game/04_cliffside/whiteblock_fallthru", Center);
-            activated = true;
-            Collidable = false;
+            Audio.Play("event:/game/04_cliffside/whiteblock_fallthru", this.Center);
+            this.activated = true;
+            this.Collidable = false;
             player.Depth = 10001;
-            Depth = -9000;
-            Level scene = Scene as Level;
-            Rectangle rectangle = new(scene.Bounds.Left / 8, scene.Bounds.Y / 8, scene.Bounds.Width / 8, scene.Bounds.Height / 8);
+            this.Depth = -9000;
+            Level scene = this.Scene as Level;
+            Rectangle rectangle = new Rectangle(scene.Bounds.Left / 8, scene.Bounds.Y / 8, scene.Bounds.Width / 8, scene.Bounds.Height / 8);
             Rectangle tileBounds = scene.Session.MapData.TileBounds;
             bool[,] data = new bool[rectangle.Width, rectangle.Height];
             for (int index1 = 0; index1 < rectangle.Width; ++index1)
             {
                 for (int index2 = 0; index2 < rectangle.Height; ++index2)
-                {
                     data[index1, index2] = scene.BgData[index1 + rectangle.Left - tileBounds.Left, index2 + rectangle.Top - tileBounds.Top] != '0';
-                }
             }
             Rectangle bounds = scene.Bounds;
-            double left = bounds.Left;
+            double left = (double) bounds.Left;
             bounds = scene.Bounds;
-            double top = bounds.Top;
-            bgSolidTiles = new Solid(new Vector2((float)left, (float)top), 1f, 1f, true)
-            {
-                Collider = new Grid(8f, 8f, data)
-            };
-            Scene.Add(bgSolidTiles);
+            double top = (double) bounds.Top;
+            this.bgSolidTiles = (Entity) new Solid(new Vector2((float) left, (float) top), 1f, 1f, true);
+            this.bgSolidTiles.Collider = (Collider) new Grid(8f, 8f, data);
+            this.Scene.Add(this.bgSolidTiles);
         }
 
         public override void Update()
         {
             base.Update();
-            if (!enabled)
-            {
+            if (!this.enabled)
                 return;
-            }
-
-            if (!activated)
+            if (!this.activated)
             {
-                Player entity = Scene.Tracker.GetEntity<Player>();
-                if (HasPlayerRider() && entity != null && entity.Ducking)
+                Player entity = this.Scene.Tracker.GetEntity<Player>();
+                if (this.HasPlayerRider() && entity != null && entity.Ducking)
                 {
-                    playerDuckTimer += Engine.DeltaTime;
-                    if (playerDuckTimer >= 3.0)
-                    {
-                        Activate(entity);
-                    }
+                    this.playerDuckTimer += Engine.DeltaTime;
+                    if ((double) this.playerDuckTimer >= 3.0)
+                        this.Activate(entity);
                 }
                 else
-                {
-                    playerDuckTimer = 0.0f;
-                }
-
-                if (!(Scene as Level).Session.HeartGem)
-                {
+                    this.playerDuckTimer = 0.0f;
+                if (!(this.Scene as Level).Session.HeartGem)
                     return;
-                }
-
-                Disable();
+                this.Disable();
             }
             else
             {
-                if (Scene.Tracker.GetEntity<HeartGem>() != null)
-                {
+                if (this.Scene.Tracker.GetEntity<HeartGem>() != null)
                     return;
-                }
-
-                Player entity = Scene.Tracker.GetEntity<Player>();
+                Player entity = this.Scene.Tracker.GetEntity<Player>();
                 if (entity == null)
-                {
                     return;
-                }
-
-                Disable();
+                this.Disable();
                 entity.Depth = 0;
-                Scene.Remove(bgSolidTiles);
+                this.Scene.Remove(this.bgSolidTiles);
             }
         }
     }

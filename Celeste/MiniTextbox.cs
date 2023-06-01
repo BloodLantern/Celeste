@@ -4,8 +4,10 @@
 // MVID: FAF6CA25-5C06-43EB-A08F-9CCF291FE6A3
 // Assembly location: C:\Program Files (x86)\Steam\steamapps\common\Celeste\orig\Celeste.exe
 
+using FMOD.Studio;
 using Microsoft.Xna.Framework;
 using Monocle;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Xml;
@@ -20,15 +22,15 @@ namespace Celeste
         public const float BoxHeight = 144f;
         public const float HudElementHeight = 180f;
         private int index;
-        private readonly FancyText.Text text;
-        private readonly MTexture box;
+        private FancyText.Text text;
+        private MTexture box;
         private float ease;
         private bool closing;
-        private readonly Coroutine routine;
-        private readonly Sprite portrait;
-        private readonly FancyText.Portrait portraitData;
-        private readonly float portraitSize;
-        private readonly float portraitScale;
+        private Coroutine routine;
+        private Sprite portrait;
+        private FancyText.Portrait portraitData;
+        private float portraitSize;
+        private float portraitScale;
         private SoundSource talkerSfx;
 
         public static bool Displayed
@@ -37,10 +39,8 @@ namespace Celeste
             {
                 foreach (MiniTextbox entity in Engine.Scene.Tracker.GetEntities<MiniTextbox>())
                 {
-                    if (!entity.closing && entity.ease > 0.25)
-                    {
+                    if (!entity.closing && (double) entity.ease > 0.25)
                         return true;
-                    }
                 }
                 return false;
             }
@@ -48,47 +48,38 @@ namespace Celeste
 
         public MiniTextbox(string dialogId)
         {
-            Tag = (int)Tags.HUD | (int)Tags.TransitionUpdate;
-            portraitSize = 112f;
-            box = GFX.Portraits["textbox/default_mini"];
-            text = FancyText.Parse(Dialog.Get(dialogId.Trim()), (int)(1688.0 - portraitSize - 32.0), 2);
-            foreach (FancyText.Node node in text.Nodes)
+            this.Tag = (int) Tags.HUD | (int) Tags.TransitionUpdate;
+            this.portraitSize = 112f;
+            this.box = GFX.Portraits["textbox/default_mini"];
+            this.text = FancyText.Parse(Dialog.Get(dialogId.Trim()), (int) (1688.0 - (double) this.portraitSize - 32.0), 2);
+            foreach (FancyText.Node node in this.text.Nodes)
             {
                 if (node is FancyText.Portrait)
                 {
                     FancyText.Portrait portrait = node as FancyText.Portrait;
-                    portraitData = portrait;
+                    this.portraitData = portrait;
                     this.portrait = GFX.PortraitsSpriteBank.Create("portrait_" + portrait.Sprite);
                     XmlElement xml = GFX.PortraitsSpriteBank.SpriteData["portrait_" + portrait.Sprite].Sources[0].XML;
-                    portraitScale = portraitSize / xml.AttrFloat("size", 160f);
+                    this.portraitScale = this.portraitSize / xml.AttrFloat("size", 160f);
                     string id = "textbox/" + xml.Attr("textbox", "default") + "_mini";
                     if (GFX.Portraits.Has(id))
-                    {
-                        box = GFX.Portraits[id];
-                    }
-
-                    Add(this.portrait);
+                        this.box = GFX.Portraits[id];
+                    this.Add((Component) this.portrait);
                 }
             }
-            Add(routine = new Coroutine(Routine()));
-            routine.UseRawDeltaTime = true;
-            Add(new TransitionListener()
+            this.Add((Component) (this.routine = new Coroutine(this.Routine())));
+            this.routine.UseRawDeltaTime = true;
+            this.Add((Component) new TransitionListener()
             {
-                OnOutBegin = () =>
+                OnOutBegin = (Action) (() =>
                 {
-                    if (closing)
-                    {
+                    if (this.closing)
                         return;
-                    }
-
-                    routine.Replace(Close());
-                }
+                    this.routine.Replace(this.Close());
+                })
             });
-            if (Level.DialogSnapshot == null)
-            {
+            if ((HandleBase) Level.DialogSnapshot == (HandleBase) null)
                 Level.DialogSnapshot = Audio.CreateSnapshot("snapshot:/dialogue_in_progress", false);
-            }
-
             Audio.ResumeSnapshot(Level.DialogSnapshot);
         }
 
@@ -99,20 +90,12 @@ namespace Celeste
             foreach (MiniTextbox miniTextbox2 in entities)
             {
                 if (miniTextbox2 != miniTextbox1)
-                {
-                    miniTextbox2.Add(new Coroutine(miniTextbox2.Close()));
-                }
+                    miniTextbox2.Add((Component) new Coroutine(miniTextbox2.Close()));
             }
             if (entities.Count > 0)
-            {
-                yield return 0.3f;
-            }
-
-            while ((double)(miniTextbox1.ease += Engine.DeltaTime * 4f) < 1.0)
-            {
-                yield return null;
-            }
-
+                yield return (object) 0.3f;
+            while ((double) (miniTextbox1.ease += Engine.DeltaTime * 4f) < 1.0)
+                yield return (object) null;
             miniTextbox1.ease = 1f;
             if (miniTextbox1.portrait != null)
             {
@@ -121,40 +104,37 @@ namespace Celeste
                 {
                     miniTextbox1.portrait.Play(beginAnim);
                     while (miniTextbox1.portrait.CurrentAnimationID == beginAnim && miniTextbox1.portrait.Animating)
-                    {
-                        yield return null;
-                    }
+                        yield return (object) null;
                 }
                 miniTextbox1.portrait.Play("talk_" + miniTextbox1.portraitData.Animation);
                 miniTextbox1.talkerSfx = new SoundSource().Play(miniTextbox1.portraitData.SfxEvent);
-                _ = miniTextbox1.talkerSfx.Param("dialogue_portrait", miniTextbox1.portraitData.SfxExpression);
-                _ = miniTextbox1.talkerSfx.Param("dialogue_end", 0.0f);
-                miniTextbox1.Add(miniTextbox1.talkerSfx);
+                miniTextbox1.talkerSfx.Param("dialogue_portrait", (float) miniTextbox1.portraitData.SfxExpression);
+                miniTextbox1.talkerSfx.Param("dialogue_end", 0.0f);
+                miniTextbox1.Add((Component) miniTextbox1.talkerSfx);
+                beginAnim = (string) null;
             }
             float num = 0.0f;
             while (miniTextbox1.index < miniTextbox1.text.Nodes.Count)
             {
                 if (miniTextbox1.text.Nodes[miniTextbox1.index] is FancyText.Char)
-                {
                     num += (miniTextbox1.text.Nodes[miniTextbox1.index] as FancyText.Char).Delay;
-                }
-
                 ++miniTextbox1.index;
-                if ((double)num > 0.016000000759959221)
+                if ((double) num > 0.016000000759959221)
                 {
-                    yield return num;
+                    yield return (object) num;
                     num = 0.0f;
                 }
             }
-            miniTextbox1.portrait?.Play("idle_" + miniTextbox1.portraitData.Animation);
+            if (miniTextbox1.portrait != null)
+                miniTextbox1.portrait.Play("idle_" + miniTextbox1.portraitData.Animation);
             if (miniTextbox1.talkerSfx != null)
             {
-                _ = miniTextbox1.talkerSfx.Param("dialogue_portrait", 0.0f);
-                _ = miniTextbox1.talkerSfx.Param("dialogue_end", 1f);
+                miniTextbox1.talkerSfx.Param("dialogue_portrait", 0.0f);
+                miniTextbox1.talkerSfx.Param("dialogue_end", 1f);
             }
             Audio.EndSnapshot(Level.DialogSnapshot);
-            yield return 3f;
-            yield return miniTextbox1.Close();
+            yield return (object) 3f;
+            yield return (object) miniTextbox1.Close();
         }
 
         private IEnumerator Close()
@@ -163,11 +143,8 @@ namespace Celeste
             if (!miniTextbox.closing)
             {
                 miniTextbox.closing = true;
-                while ((double)(miniTextbox.ease -= Engine.DeltaTime * 4f) > 0.0)
-                {
-                    yield return null;
-                }
-
+                while ((double) (miniTextbox.ease -= Engine.DeltaTime * 4f) > 0.0)
+                    yield return (object) null;
                 miniTextbox.ease = 0.0f;
                 miniTextbox.RemoveSelf();
             }
@@ -175,37 +152,28 @@ namespace Celeste
 
         public override void Update()
         {
-            if ((Scene as Level).RetryPlayerCorpse != null && !closing)
-            {
-                routine.Replace(Close());
-            }
-
+            if ((this.Scene as Level).RetryPlayerCorpse != null && !this.closing)
+                this.routine.Replace(this.Close());
             base.Update();
         }
 
         public override void Render()
         {
-            if (ease <= 0.0)
-            {
+            if ((double) this.ease <= 0.0)
                 return;
-            }
-
-            Level scene = Scene as Level;
+            Level scene = this.Scene as Level;
             if (scene.FrozenOrPaused || scene.RetryPlayerCorpse != null || scene.SkippingCutscene)
-            {
                 return;
-            }
-
-            Vector2 position = new(Engine.Width / 2, (float)(72.0 + ((Engine.Width - 1688.0) / 4.0)));
+            Vector2 position = new Vector2((float) (Engine.Width / 2), (float) (72.0 + ((double) Engine.Width - 1688.0) / 4.0));
             Vector2 vector2 = position + new Vector2(-828f, -56f);
-            box.DrawCentered(position, Color.White, new Vector2(1f, ease));
-            if (portrait != null)
+            this.box.DrawCentered(position, Color.White, new Vector2(1f, this.ease));
+            if (this.portrait != null)
             {
-                portrait.Scale = new Vector2(1f, ease) * portraitScale;
-                portrait.RenderPosition = vector2 + new Vector2(portraitSize / 2f, portraitSize / 2f);
-                portrait.Render();
+                this.portrait.Scale = new Vector2(1f, this.ease) * this.portraitScale;
+                this.portrait.RenderPosition = vector2 + new Vector2(this.portraitSize / 2f, this.portraitSize / 2f);
+                this.portrait.Render();
             }
-            text.Draw(new Vector2((float)(vector2.X + (double)portraitSize + 32.0), position.Y), new Vector2(0.0f, 0.5f), new Vector2(1f, ease) * 0.75f, 1f, end: index);
+            this.text.Draw(new Vector2((float) ((double) vector2.X + (double) this.portraitSize + 32.0), position.Y), new Vector2(0.0f, 0.5f), new Vector2(1f, this.ease) * 0.75f, 1f, end: this.index);
         }
 
         public override void Removed(Scene scene)

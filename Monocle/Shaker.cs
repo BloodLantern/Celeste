@@ -22,82 +22,65 @@ namespace Monocle
             : base(true, false)
         {
             this.on = on;
-            OnShake = onShake;
+            this.OnShake = onShake;
         }
 
         public Shaker(float time, bool removeOnFinish, Action<Vector2> onShake = null)
             : this(onShake: onShake)
         {
-            Timer = time;
-            RemoveOnFinish = removeOnFinish;
+            this.Timer = time;
+            this.RemoveOnFinish = removeOnFinish;
         }
 
         public bool On
         {
-            get => on;
+            get => this.on;
             set
             {
-                on = value;
-                if (on)
-                {
+                this.on = value;
+                if (this.on)
                     return;
-                }
-
-                Timer = 0.0f;
-                if (!(Value != Vector2.Zero))
-                {
+                this.Timer = 0.0f;
+                if (!(this.Value != Vector2.Zero))
                     return;
-                }
-
-                Value = Vector2.Zero;
-                if (OnShake == null)
-                {
+                this.Value = Vector2.Zero;
+                if (this.OnShake == null)
                     return;
-                }
-
-                OnShake(Vector2.Zero);
+                this.OnShake(Vector2.Zero);
             }
         }
 
         public Shaker ShakeFor(float seconds, bool removeOnFinish)
         {
-            on = true;
-            Timer = seconds;
-            RemoveOnFinish = removeOnFinish;
+            this.on = true;
+            this.Timer = seconds;
+            this.RemoveOnFinish = removeOnFinish;
             return this;
         }
 
         public override void Update()
         {
-            if (on && Timer > 0.0)
+            if (this.on && (double) this.Timer > 0.0)
             {
-                Timer -= Engine.DeltaTime;
-                if (Timer <= 0.0)
+                this.Timer -= Engine.DeltaTime;
+                if ((double) this.Timer <= 0.0)
                 {
-                    on = false;
-                    Value = Vector2.Zero;
-                    OnShake?.Invoke(Vector2.Zero);
-                    if (!RemoveOnFinish)
-                    {
+                    this.on = false;
+                    this.Value = Vector2.Zero;
+                    if (this.OnShake != null)
+                        this.OnShake(Vector2.Zero);
+                    if (!this.RemoveOnFinish)
                         return;
-                    }
-
-                    RemoveSelf();
+                    this.RemoveSelf();
                     return;
                 }
             }
-            if (!on || !Scene.OnInterval(Interval))
-            {
+            if (!this.on || !this.Scene.OnInterval(this.Interval))
                 return;
-            }
-
-            Value = Calc.Random.ShakeVector();
-            if (OnShake == null)
-            {
+            this.Value = Calc.Random.ShakeVector();
+            if (this.OnShake == null)
                 return;
-            }
-
-            OnShake(Value);
+            this.OnShake(this.Value);
         }
     }
 }

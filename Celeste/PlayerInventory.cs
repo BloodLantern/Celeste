@@ -11,13 +11,13 @@ namespace Celeste
     [Serializable]
     public struct PlayerInventory
     {
-        public static readonly PlayerInventory Prologue = new(0, false);
-        public static readonly PlayerInventory Default = new();
-        public static readonly PlayerInventory OldSite = new(dreamDash: false);
-        public static readonly PlayerInventory CH6End = new(2);
-        public static readonly PlayerInventory TheSummit = new(2, backpack: false);
-        public static readonly PlayerInventory Core = new(2, noRefills: true);
-        public static readonly PlayerInventory Farewell = new(backpack: false);
+        public static readonly PlayerInventory Prologue = new PlayerInventory(0, false);
+        public static readonly PlayerInventory Default = new PlayerInventory();
+        public static readonly PlayerInventory OldSite = new PlayerInventory(dreamDash: false);
+        public static readonly PlayerInventory CH6End = new PlayerInventory(2);
+        public static readonly PlayerInventory TheSummit = new PlayerInventory(2, backpack: false);
+        public static readonly PlayerInventory Core = new PlayerInventory(2, noRefills: true);
+        public static readonly PlayerInventory Farewell = new PlayerInventory(backpack: false);
         public int Dashes;
         public bool DreamDash;
         public bool Backpack;
@@ -25,10 +25,10 @@ namespace Celeste
 
         public PlayerInventory(int dashes = 1, bool dreamDash = true, bool backpack = true, bool noRefills = false)
         {
-            Dashes = dashes;
-            DreamDash = dreamDash;
-            Backpack = backpack;
-            NoRefills = noRefills;
+            this.Dashes = dashes;
+            this.DreamDash = dreamDash;
+            this.Backpack = backpack;
+            this.NoRefills = noRefills;
         }
     }
 }

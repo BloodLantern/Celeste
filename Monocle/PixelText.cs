@@ -11,7 +11,7 @@ namespace Monocle
 {
     public class PixelText : Component
     {
-        private readonly List<PixelText.Char> characters = new();
+        private List<PixelText.Char> characters = new List<PixelText.Char>();
         private PixelFont font;
         private PixelFontSize size;
         private string text;
@@ -22,43 +22,34 @@ namespace Monocle
 
         public PixelFont Font
         {
-            get => font;
+            get => this.font;
             set
             {
-                if (value != font)
-                {
-                    dirty = true;
-                }
-
-                font = value;
+                if (value != this.font)
+                    this.dirty = true;
+                this.font = value;
             }
         }
 
         public float Size
         {
-            get => size.Size;
+            get => this.size.Size;
             set
             {
-                if ((double)value != size.Size)
-                {
-                    dirty = true;
-                }
-
-                size = font.Get(value);
+                if ((double) value != (double) this.size.Size)
+                    this.dirty = true;
+                this.size = this.font.Get(value);
             }
         }
 
         public string Text
         {
-            get => text;
+            get => this.text;
             set
             {
-                if (value != text)
-                {
-                    dirty = true;
-                }
-
-                text = value;
+                if (value != this.text)
+                    this.dirty = true;
+                this.text = value;
             }
         }
 
@@ -69,61 +60,53 @@ namespace Monocle
         public PixelText(PixelFont font, string text, Color color)
             : base(false, true)
         {
-            Font = font;
-            Text = text;
-            Color = color;
-            Text = text;
-            size = Font.Sizes[0];
-            Refresh();
+            this.Font = font;
+            this.Text = text;
+            this.Color = color;
+            this.Text = text;
+            this.size = this.Font.Sizes[0];
+            this.Refresh();
         }
 
         public void Refresh()
         {
-            dirty = false;
-            characters.Clear();
+            this.dirty = false;
+            this.characters.Clear();
             int num1 = 0;
             int num2 = 1;
             Vector2 zero = Vector2.Zero;
-            for (int index = 0; index < text.Length; ++index)
+            for (int index = 0; index < this.text.Length; ++index)
             {
-                if (text[index] == '\n')
+                if (this.text[index] == '\n')
                 {
                     zero.X = 0.0f;
-                    zero.Y += size.LineHeight;
+                    zero.Y += (float) this.size.LineHeight;
                     ++num2;
                 }
-                PixelFontCharacter pixelFontCharacter = size.Get(text[index]);
+                PixelFontCharacter pixelFontCharacter = this.size.Get((int) this.text[index]);
                 if (pixelFontCharacter != null)
                 {
-                    characters.Add(new PixelText.Char()
+                    this.characters.Add(new PixelText.Char()
                     {
-                        Offset = zero + new Vector2(pixelFontCharacter.XOffset, pixelFontCharacter.YOffset),
+                        Offset = zero + new Vector2((float) pixelFontCharacter.XOffset, (float) pixelFontCharacter.YOffset),
                         CharData = pixelFontCharacter,
                         Bounds = pixelFontCharacter.Texture.ClipRect
                     });
-                    if (zero.X > (double)num1)
-                    {
-                        num1 = (int)zero.X;
-                    }
-
-                    zero.X += pixelFontCharacter.XAdvance;
+                    if ((double) zero.X > (double) num1)
+                        num1 = (int) zero.X;
+                    zero.X += (float) pixelFontCharacter.XAdvance;
                 }
             }
-            Width = num1;
-            Height = num2 * size.LineHeight;
+            this.Width = num1;
+            this.Height = num2 * this.size.LineHeight;
         }
 
         public override void Render()
         {
-            if (dirty)
-            {
-                Refresh();
-            }
-
-            for (int index = 0; index < characters.Count; ++index)
-            {
-                characters[index].CharData.Texture.Draw(Position + characters[index].Offset, Vector2.Zero, Color);
-            }
+            if (this.dirty)
+                this.Refresh();
+            for (int index = 0; index < this.characters.Count; ++index)
+                this.characters[index].CharData.Texture.Draw(this.Position + this.characters[index].Offset, Vector2.Zero, this.Color);
         }
 
         private struct Char

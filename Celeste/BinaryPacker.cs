@@ -14,12 +14,12 @@ namespace Celeste
 {
     public static class BinaryPacker
     {
-        public static readonly HashSet<string> IgnoreAttributes = new() {
+        public static readonly HashSet<string> IgnoreAttributes = new HashSet<string>() {
             "_eid"
         };
         public static string InnerTextAttributeName = "innerText";
         public static string OutputFileExtension = ".bin";
-        private static readonly Dictionary<string, short> stringValue = new();
+        private static Dictionary<string, short> stringValue = new Dictionary<string, short>();
         private static string[] stringLookup;
         private static short stringCounter;
 
@@ -27,14 +27,11 @@ namespace Celeste
         {
             string extension = Path.GetExtension(filename);
             if (outdir != null)
-            {
-                _ = Path.Combine(outdir + Path.GetFileName(filename));
-            }
-
-            _ = filename.Replace(extension, OutputFileExtension);
+                Path.Combine(outdir + Path.GetFileName(filename));
+            filename.Replace(extension, OutputFileExtension);
             XmlDocument xmlDocument = new();
             xmlDocument.Load(filename);
-            XmlElement rootElement = null;
+            XmlElement rootElement = (XmlElement)null;
             foreach (object childNode in xmlDocument.ChildNodes)
             {
                 if (childNode is XmlElement)
@@ -43,7 +40,6 @@ namespace Celeste
                     break;
                 }
             }
-
             ToBinary(rootElement, outdir);
         }
 
@@ -53,18 +49,17 @@ namespace Celeste
             stringCounter = 0;
             CreateLookupTable(rootElement);
             AddLookupValue(InnerTextAttributeName);
-            using FileStream output = new(outfilename, FileMode.Create);
-            BinaryWriter writer = new(output);
-            writer.Write("CELESTE MAP");
-            writer.Write(Path.GetFileNameWithoutExtension(outfilename));
-            writer.Write(stringValue.Count);
-            foreach (KeyValuePair<string, short> keyValuePair in stringValue)
+            using (FileStream output = new FileStream(outfilename, FileMode.Create))
             {
-                writer.Write(keyValuePair.Key);
+                BinaryWriter writer = new BinaryWriter(output);
+                writer.Write("CELESTE MAP");
+                writer.Write(Path.GetFileNameWithoutExtension(outfilename));
+                writer.Write(stringValue.Count);
+                foreach (KeyValuePair<string, short> keyValuePair in stringValue)
+                    writer.Write(keyValuePair.Key);
+                WriteElement(writer, rootElement);
+                writer.Flush();
             }
-
-            WriteElement(writer, rootElement);
-            writer.Flush();
         }
 
         private static void CreateLookupTable(XmlElement element)
@@ -76,28 +71,20 @@ namespace Celeste
                 {
                     AddLookupValue(attribute.Name);
                     if (ParseValue(attribute.Value, out byte type, out object _) && type == 5)
-                    {
                         AddLookupValue(attribute.Value);
-                    }
                 }
             }
-
             foreach (object childNode in element.ChildNodes)
             {
                 if (childNode is XmlElement)
-                {
                     CreateLookupTable(childNode as XmlElement);
-                }
             }
         }
 
         private static void AddLookupValue(string name)
         {
             if (stringValue.ContainsKey(name))
-            {
                 return;
-            }
-
             stringValue.Add(name, stringCounter);
             ++stringCounter;
         }
@@ -108,32 +95,23 @@ namespace Celeste
             foreach (object childNode in element.ChildNodes)
             {
                 if (childNode is XmlElement)
-                {
                     ++num1;
-                }
             }
-
             int num2 = 0;
             foreach (XmlAttribute attribute in (XmlNamedNodeMap)element.Attributes)
             {
                 if (!IgnoreAttributes.Contains(attribute.Name))
-                {
                     ++num2;
-                }
             }
-
             if (element.InnerText.Length > 0 && num1 == 0)
-            {
                 ++num2;
-            }
-
             writer.Write(stringValue[element.Name]);
             writer.Write(num2);
             foreach (XmlAttribute attribute in (XmlNamedNodeMap)element.Attributes)
             {
                 if (!IgnoreAttributes.Contains(attribute.Name))
                 {
-                    _ = ParseValue(attribute.Value, out byte type, out object result);
+                    ParseValue(attribute.Value, out byte type, out object result);
                     writer.Write(stringValue[attribute.Name]);
                     writer.Write(type);
                     switch (type)
@@ -161,11 +139,10 @@ namespace Celeste
                     }
                 }
             }
-
             if (element.InnerText.Length > 0 && num1 == 0)
             {
                 writer.Write(stringValue[InnerTextAttributeName]);
-                if (element.Name is "solids" or "bg")
+                if (element.Name == "solids" || element.Name == "bg")
                 {
                     byte[] buffer = RunLengthEncoding.Encode(element.InnerText);
                     writer.Write(7);
@@ -182,9 +159,7 @@ namespace Celeste
             foreach (object childNode in element.ChildNodes)
             {
                 if (childNode is XmlElement)
-                {
                     WriteElement(writer, childNode as XmlElement);
-                }
             }
         }
 
@@ -196,36 +171,38 @@ namespace Celeste
                 result = boolResult;
             }
             else
+            {
                 if (byte.TryParse(value, out byte byteResult))
-            {
-                type = 1;
-                result = byteResult;
-            }
-            else
-            {
-                if (short.TryParse(value, out short shortResult))
                 {
-                    type = 2;
-                    result = shortResult;
+                    type = 1;
+                    result = byteResult;
                 }
                 else
                 {
-                    if (int.TryParse(value, out int intResult))
+                    if (short.TryParse(value, out short shortResult))
                     {
-                        type = 3;
-                        result = intResult;
+                        type = 2;
+                        result = shortResult;
                     }
                     else
                     {
-                        if (float.TryParse(value, NumberStyles.Integer | NumberStyles.AllowDecimalPoint, CultureInfo.InvariantCulture, out float floatResult))
+                        if (int.TryParse(value, out int intResult))
                         {
-                            type = 4;
-                            result = floatResult;
+                            type = 3;
+                            result = intResult;
                         }
                         else
                         {
-                            type = 5;
-                            result = value;
+                            if (float.TryParse(value, NumberStyles.Integer | NumberStyles.AllowDecimalPoint, (IFormatProvider)CultureInfo.InvariantCulture, out float floatResult))
+                            {
+                                type = 4;
+                                result = floatResult;
+                            }
+                            else
+                            {
+                                type = 5;
+                                result = value;
+                            }
                         }
                     }
                 }
@@ -239,15 +216,12 @@ namespace Celeste
             using (FileStream input = File.OpenRead(filename))
             {
                 BinaryReader reader = new(input);
-                _ = reader.ReadString();
+                reader.ReadString();
                 string mapName = reader.ReadString();
                 short length = reader.ReadInt16();
                 stringLookup = new string[length];
                 for (int i = 0; i < length; ++i)
-                {
                     stringLookup[i] = reader.ReadString();
-                }
-
                 element = ReadElement(reader);
                 element.Package = mapName;
             }
@@ -263,9 +237,7 @@ namespace Celeste
 
             byte valueCount = reader.ReadByte();
             if (valueCount > 0)
-            {
                 element.Attributes = new Dictionary<string, object>();
-            }
 
             for (int i = 0; i < valueCount; ++i)
             {
@@ -305,14 +277,10 @@ namespace Celeste
 
             short childCount = reader.ReadInt16();
             if (childCount > 0)
-            {
                 element.Children = new List<Element>();
-            }
 
             for (int i = 0; i < childCount; ++i)
-            {
                 element.Children.Add(ReadElement(reader));
-            }
 
             return element;
         }
@@ -324,38 +292,26 @@ namespace Celeste
             public Dictionary<string, object> Attributes;
             public List<Element> Children;
 
-            public bool HasAttr(string name)
-            {
-                return Attributes != null && Attributes.ContainsKey(name);
-            }
+            public bool HasAttr(string name) => Attributes != null && Attributes.ContainsKey(name);
 
             public string Attr(string name, string defaultValue = "")
             {
                 if (Attributes == null || !Attributes.TryGetValue(name, out object obj))
-                {
                     obj = defaultValue;
-                }
-
                 return obj.ToString();
             }
 
             public bool AttrBool(string name, bool defaultValue = false)
             {
                 if (Attributes == null || !Attributes.TryGetValue(name, out object obj))
-                {
                     obj = defaultValue;
-                }
-
                 return obj is bool flag ? flag : bool.Parse(obj.ToString());
             }
 
             public float AttrFloat(string name, float defaultValue = 0.0f)
             {
                 if (Attributes == null || !Attributes.TryGetValue(name, out object obj))
-                {
                     obj = defaultValue;
-                }
-
                 return obj is float num ? num : float.Parse(obj.ToString(), CultureInfo.InvariantCulture);
             }
         }

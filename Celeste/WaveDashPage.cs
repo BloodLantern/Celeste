@@ -17,16 +17,13 @@ namespace Celeste
         public bool AutoProgress;
         public bool WaitingForInput;
 
-        public int Width => Presentation.ScreenWidth;
+        public int Width => this.Presentation.ScreenWidth;
 
-        public int Height => Presentation.ScreenHeight;
+        public int Height => this.Presentation.ScreenHeight;
 
         public abstract IEnumerator Routine();
 
-        public virtual void Added(WaveDashPresentation presentation)
-        {
-            Presentation = presentation;
-        }
+        public virtual void Added(WaveDashPresentation presentation) => this.Presentation = presentation;
 
         public virtual void Update()
         {
@@ -38,14 +35,11 @@ namespace Celeste
 
         protected IEnumerator PressButton()
         {
-            WaitingForInput = true;
+            this.WaitingForInput = true;
             while (!Input.MenuConfirm.Pressed)
-            {
-                yield return null;
-            }
-
-            WaitingForInput = false;
-            _ = Audio.Play("event:/new_content/game/10_farewell/ppt_mouseclick");
+                yield return (object) null;
+            this.WaitingForInput = false;
+            Audio.Play("event:/new_content/game/10_farewell/ppt_mouseclick");
         }
 
         public enum Transitions

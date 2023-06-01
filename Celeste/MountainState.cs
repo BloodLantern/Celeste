@@ -22,10 +22,10 @@ namespace Celeste
             VirtualTexture skyboxTexture,
             Color fogColor)
         {
-            TerrainTexture = terrainTexture;
-            BuildingsTexture = buildingsTexture;
-            Skybox = new Skybox(skyboxTexture);
-            FogColor = fogColor;
+            this.TerrainTexture = terrainTexture;
+            this.BuildingsTexture = buildingsTexture;
+            this.Skybox = new Skybox(skyboxTexture);
+            this.FogColor = fogColor;
         }
     }
 }

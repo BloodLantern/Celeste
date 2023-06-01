@@ -14,20 +14,20 @@ namespace Celeste
 {
     public class PicoConsole : Entity
     {
-        private readonly Monocle.Image sprite;
-        private readonly TalkComponent talk;
+        private Monocle.Image sprite;
+        private TalkComponent talk;
         private bool talking;
         private SoundSource sfx;
 
         public PicoConsole(Vector2 position)
             : base(position)
         {
-            Depth = 1000;
-            AddTag((int)Tags.TransitionUpdate);
-            AddTag((int)Tags.PauseUpdate);
-            Add(sprite = new Monocle.Image(GFX.Game["objects/pico8Console"]));
-            _ = sprite.JustifyOrigin(0.5f, 1f);
-            Add(talk = new TalkComponent(new Rectangle(-12, -8, 24, 8), new Vector2(0.0f, -24f), new Action<Player>(OnInteract)));
+            this.Depth = 1000;
+            this.AddTag((int) Tags.TransitionUpdate);
+            this.AddTag((int) Tags.PauseUpdate);
+            this.Add((Component) (this.sprite = new Monocle.Image(GFX.Game["objects/pico8Console"])));
+            this.sprite.JustifyOrigin(0.5f, 1f);
+            this.Add((Component) (this.talk = new TalkComponent(new Rectangle(-12, -8, 24, 8), new Vector2(0.0f, -24f), new Action<Player>(this.OnInteract))));
         }
 
         public PicoConsole(EntityData data, Vector2 position)
@@ -38,35 +38,28 @@ namespace Celeste
         public override void Update()
         {
             base.Update();
-            if (sfx != null)
-            {
+            if (this.sfx != null)
                 return;
-            }
-
-            Player entity = Scene.Tracker.GetEntity<Player>();
-            if (entity == null || (double)entity.Y >= (double)Y + 16.0)
-            {
+            Player entity = this.Scene.Tracker.GetEntity<Player>();
+            if (entity == null || (double) entity.Y >= (double) this.Y + 16.0)
                 return;
-            }
-
-            Add(sfx = new SoundSource("event:/env/local/03_resort/pico8_machine"));
+            this.Add((Component) (this.sfx = new SoundSource("event:/env/local/03_resort/pico8_machine")));
         }
 
         private void OnInteract(Player player)
         {
-            if (talking)
-            {
+            if (this.talking)
                 return;
-            } (Scene as Level).PauseLock = true;
-            talking = true;
-            Add(new Coroutine(InteractRoutine(player)));
+            (this.Scene as Level).PauseLock = true;
+            this.talking = true;
+            this.Add((Component) new Coroutine(this.InteractRoutine(player)));
         }
 
         private IEnumerator InteractRoutine(Player player)
         {
             PicoConsole picoConsole = this;
             player.StateMachine.State = 11;
-            yield return player.DummyWalkToExact((int)picoConsole.X - 6);
+            yield return (object) player.DummyWalkToExact((int) picoConsole.X - 6);
             player.Facing = Facings.Right;
             bool wasUnlocked = Settings.Instance.Pico8OnMainMenu;
             Settings.Instance.Pico8OnMainMenu = true;
@@ -74,36 +67,23 @@ namespace Celeste
             {
                 UserIO.SaveHandler(false, true);
                 while (UserIO.Saving)
-                {
-                    yield return null;
-                }
+                    yield return (object) null;
             }
             else
-            {
-                yield return 0.5f;
-            }
-
+                yield return (object) 0.5f;
             bool done = false;
             SpotlightWipe.FocusPoint = player.Position - (picoConsole.Scene as Level).Camera.Position + new Vector2(0.0f, -8f);
-            SpotlightWipe spotlightWipe = new(picoConsole.Scene, false, () =>
+            SpotlightWipe spotlightWipe = new SpotlightWipe(picoConsole.Scene, false, (Action) (() =>
             {
                 if (!wasUnlocked)
-                {
-                    Scene.Add(new UnlockedPico8Message(() => done = true));
-                }
+                    this.Scene.Add((Entity) new UnlockedPico8Message((Action) (() => done = true)));
                 else
-                {
                     done = true;
-                }
-
-                Engine.Scene = new Emulator(Scene as Level);
-            });
+                Engine.Scene = (Scene) new Emulator((Scene) (this.Scene as Level));
+            }));
             while (!done)
-            {
-                yield return null;
-            }
-
-            yield return 0.25f;
+                yield return (object) null;
+            yield return (object) 0.25f;
             picoConsole.talking = false;
             (picoConsole.Scene as Level).PauseLock = false;
             player.StateMachine.State = 0;
@@ -111,11 +91,11 @@ namespace Celeste
 
         public override void SceneEnd(Scene scene)
         {
-            if (sfx != null)
+            if (this.sfx != null)
             {
-                _ = sfx.Stop();
-                sfx.RemoveSelf();
-                sfx = null;
+                this.sfx.Stop();
+                this.sfx.RemoveSelf();
+                this.sfx = (SoundSource) null;
             }
             base.SceneEnd(scene);
         }

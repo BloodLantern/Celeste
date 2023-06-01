@@ -15,18 +15,15 @@ namespace Monocle
     public class PixelFont
     {
         public string Face;
-        public List<PixelFontSize> Sizes = new();
-        private readonly List<VirtualTexture> managedTextures = new();
+        public List<PixelFontSize> Sizes = new List<PixelFontSize>();
+        private List<VirtualTexture> managedTextures = new List<VirtualTexture>();
 
-        public PixelFont(string face)
-        {
-            Face = face;
-        }
+        public PixelFont(string face) => this.Face = face;
 
         public PixelFontSize AddFontSize(string path, Atlas atlas = null, bool outline = false)
         {
             XmlElement data = Calc.LoadXML(path)["font"];
-            return AddFontSize(path, data, atlas, outline);
+            return this.AddFontSize(path, data, atlas, outline);
         }
 
         public PixelFontSize AddFontSize(
@@ -36,15 +33,13 @@ namespace Monocle
             bool outline = false)
         {
             float num1 = data["info"].AttrFloat("size");
-            foreach (PixelFontSize siz in Sizes)
+            foreach (PixelFontSize siz in this.Sizes)
             {
-                if (siz.Size == (double)num1)
-                {
+                if ((double) siz.Size == (double) num1)
                     return siz;
-                }
             }
-            List<MTexture> mtextureList = new();
-            foreach (XmlElement xml in (XmlNode)data["pages"])
+            List<MTexture> mtextureList = new List<MTexture>();
+            foreach (XmlElement xml in (XmlNode) data["pages"])
             {
                 string str = xml.Attr("file");
                 string withoutExtension = Path.GetFileNameWithoutExtension(str);
@@ -56,10 +51,10 @@ namespace Monocle
                 {
                     VirtualTexture texture = VirtualContent.CreateTexture(Path.Combine(Path.GetDirectoryName(path).Substring(Engine.ContentDirectory.Length + 1), str));
                     mtextureList.Add(new MTexture(texture));
-                    managedTextures.Add(texture);
+                    this.managedTextures.Add(texture);
                 }
             }
-            PixelFontSize pixelFontSize = new()
+            PixelFontSize pixelFontSize = new PixelFontSize()
             {
                 Textures = mtextureList,
                 Characters = new Dictionary<int, PixelFontCharacter>(),
@@ -67,7 +62,7 @@ namespace Monocle
                 Size = num1,
                 Outline = outline
             };
-            foreach (XmlElement xml in (XmlNode)data["chars"])
+            foreach (XmlElement xml in (XmlNode) data["chars"])
             {
                 int num2 = xml.AttrInt("id");
                 int index = xml.AttrInt("page", 0);
@@ -75,44 +70,39 @@ namespace Monocle
             }
             if (data["kernings"] != null)
             {
-                foreach (XmlElement xml in (XmlNode)data["kernings"])
+                foreach (XmlElement xml in (XmlNode) data["kernings"])
                 {
                     int key1 = xml.AttrInt("first");
                     int key2 = xml.AttrInt("second");
                     int num3 = xml.AttrInt("amount");
-                    if (pixelFontSize.Characters.TryGetValue(key1, out PixelFontCharacter pixelFontCharacter))
-                    {
+                    PixelFontCharacter pixelFontCharacter = (PixelFontCharacter) null;
+                    if (pixelFontSize.Characters.TryGetValue(key1, out pixelFontCharacter))
                         pixelFontCharacter.Kerning.Add(key2, num3);
-                    }
                 }
             }
-            Sizes.Add(pixelFontSize);
-            Sizes.Sort((a, b) => Math.Sign(a.Size - b.Size));
+            this.Sizes.Add(pixelFontSize);
+            this.Sizes.Sort((Comparison<PixelFontSize>) ((a, b) => Math.Sign(a.Size - b.Size)));
             return pixelFontSize;
         }
 
         public PixelFontSize Get(float size)
         {
             int index1 = 0;
-            for (int index2 = Sizes.Count - 1; index1 < index2; ++index1)
+            for (int index2 = this.Sizes.Count - 1; index1 < index2; ++index1)
             {
-                if (Sizes[index1].Size >= (double)size)
-                {
-                    return Sizes[index1];
-                }
+                if ((double) this.Sizes[index1].Size >= (double) size)
+                    return this.Sizes[index1];
             }
-            return Sizes[Sizes.Count - 1];
+            return this.Sizes[this.Sizes.Count - 1];
         }
 
         public bool Has(float size)
         {
             int index1 = 0;
-            for (int index2 = Sizes.Count - 1; index1 < index2; ++index1)
+            for (int index2 = this.Sizes.Count - 1; index1 < index2; ++index1)
             {
-                if (Sizes[index1].Size == (double)size)
-                {
+                if ((double) this.Sizes[index1].Size == (double) size)
                     return true;
-                }
             }
             return false;
         }
@@ -125,7 +115,7 @@ namespace Monocle
             Vector2 scale,
             Color color)
         {
-            PixelFontSize pixelFontSize = Get(baseSize * Math.Max(scale.X, scale.Y));
+            PixelFontSize pixelFontSize = this.Get(baseSize * Math.Max(scale.X, scale.Y));
             scale *= baseSize / pixelFontSize.Size;
             pixelFontSize.Draw(character, position, justify, scale, color);
         }
@@ -142,7 +132,7 @@ namespace Monocle
             float stroke,
             Color strokeColor)
         {
-            PixelFontSize pixelFontSize = Get(baseSize * Math.Max(scale.X, scale.Y));
+            PixelFontSize pixelFontSize = this.Get(baseSize * Math.Max(scale.X, scale.Y));
             scale *= baseSize / pixelFontSize.Size;
             pixelFontSize.Draw(text, position, justify, scale, color, edgeDepth, edgeColor, stroke, strokeColor);
         }
@@ -150,8 +140,8 @@ namespace Monocle
         public void Draw(float baseSize, string text, Vector2 position, Color color)
         {
             Vector2 one = Vector2.One;
-            PixelFontSize pixelFontSize = Get(baseSize * Math.Max(one.X, one.Y));
-            _ = one * (baseSize / pixelFontSize.Size);
+            PixelFontSize pixelFontSize = this.Get(baseSize * Math.Max(one.X, one.Y));
+            Vector2 vector2 = one * (baseSize / pixelFontSize.Size);
             pixelFontSize.Draw(text, position, Vector2.Zero, Vector2.One, color, 0.0f, Color.Transparent, 0.0f, Color.Transparent);
         }
 
@@ -163,7 +153,7 @@ namespace Monocle
             Vector2 scale,
             Color color)
         {
-            PixelFontSize pixelFontSize = Get(baseSize * Math.Max(scale.X, scale.Y));
+            PixelFontSize pixelFontSize = this.Get(baseSize * Math.Max(scale.X, scale.Y));
             scale *= baseSize / pixelFontSize.Size;
             pixelFontSize.Draw(text, position, justify, scale, color, 0.0f, Color.Transparent, 0.0f, Color.Transparent);
         }
@@ -178,7 +168,7 @@ namespace Monocle
             float stroke,
             Color strokeColor)
         {
-            PixelFontSize pixelFontSize = Get(baseSize * Math.Max(scale.X, scale.Y));
+            PixelFontSize pixelFontSize = this.Get(baseSize * Math.Max(scale.X, scale.Y));
             scale *= baseSize / pixelFontSize.Size;
             pixelFontSize.Draw(text, position, justify, scale, color, 0.0f, Color.Transparent, stroke, strokeColor);
         }
@@ -193,21 +183,18 @@ namespace Monocle
             float edgeDepth,
             Color edgeColor,
             float stroke = 0.0f,
-            Color strokeColor = default)
+            Color strokeColor = default (Color))
         {
-            PixelFontSize pixelFontSize = Get(baseSize * Math.Max(scale.X, scale.Y));
+            PixelFontSize pixelFontSize = this.Get(baseSize * Math.Max(scale.X, scale.Y));
             scale *= baseSize / pixelFontSize.Size;
             pixelFontSize.Draw(text, position, justify, scale, color, edgeDepth, edgeColor, stroke, strokeColor);
         }
 
         public void Dispose()
         {
-            foreach (VirtualAsset managedTexture in managedTextures)
-            {
+            foreach (VirtualAsset managedTexture in this.managedTextures)
                 managedTexture.Dispose();
-            }
-
-            Sizes.Clear();
+            this.Sizes.Clear();
         }
     }
 }

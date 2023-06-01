@@ -32,77 +32,53 @@ namespace Celeste
 
         public ScreenWipe(Scene scene, bool wipeIn, Action onComplete = null)
         {
-            Scene = scene;
-            WipeIn = wipeIn;
-            if (Scene is Level)
-            {
-                (Scene as Level).Wipe = this;
-            }
-
-            Scene.Add(this);
-            OnComplete = onComplete;
+            this.Scene = scene;
+            this.WipeIn = wipeIn;
+            if (this.Scene is Level)
+                (this.Scene as Level).Wipe = this;
+            this.Scene.Add((Monocle.Renderer) this);
+            this.OnComplete = onComplete;
         }
 
         public IEnumerator Wait()
         {
-            while (Percent < 1.0)
-            {
-                yield return null;
-            }
+            while ((double) this.Percent < 1.0)
+                yield return (object) null;
         }
 
         public override void Update(Scene scene)
         {
-            if (!Completed)
+            if (!this.Completed)
             {
-                if (Percent < 1.0)
-                {
-                    Percent = Calc.Approach(Percent, 1f, Engine.RawDeltaTime / Duration);
-                }
-                else if (EndTimer > 0.0)
-                {
-                    EndTimer -= Engine.RawDeltaTime;
-                }
+                if ((double) this.Percent < 1.0)
+                    this.Percent = Calc.Approach(this.Percent, 1f, Engine.RawDeltaTime / this.Duration);
+                else if ((double) this.EndTimer > 0.0)
+                    this.EndTimer -= Engine.RawDeltaTime;
                 else
-                {
-                    Completed = true;
-                }
+                    this.Completed = true;
             }
             else
             {
-                if (ending)
-                {
+                if (this.ending)
                     return;
-                }
-
-                ending = true;
-                scene.Remove(this);
+                this.ending = true;
+                scene.Remove((Monocle.Renderer) this);
                 if (scene is Level && (scene as Level).Wipe == this)
-                {
-                    (scene as Level).Wipe = null;
-                }
-
-                if (OnComplete == null)
-                {
+                    (scene as Level).Wipe = (ScreenWipe) null;
+                if (this.OnComplete == null)
                     return;
-                }
-
-                OnComplete();
+                this.OnComplete();
             }
         }
 
         public virtual void Cancel()
         {
-            Scene.Remove(this);
-            if (Scene is not Level)
-            {
+            this.Scene.Remove((Monocle.Renderer) this);
+            if (!(this.Scene is Level))
                 return;
-            } (Scene as Level).Wipe = null;
+            (this.Scene as Level).Wipe = (ScreenWipe) null;
         }
 
-        public static void DrawPrimitives(VertexPositionColor[] vertices)
-        {
-            GFX.DrawVertices<VertexPositionColor>(Matrix.CreateScale(Engine.Graphics.GraphicsDevice.Viewport.Width / 1920f), vertices, vertices.Length);
-        }
+        public static void DrawPrimitives(VertexPositionColor[] vertices) => GFX.DrawVertices<VertexPositionColor>(Matrix.CreateScale((float) Engine.Graphics.GraphicsDevice.Viewport.Width / 1920f), vertices, vertices.Length);
     }
 }

@@ -17,7 +17,7 @@ namespace Celeste
         public LevelEndingHook(Action onEnd)
             : base(false, false)
         {
-            OnEnd = onEnd;
+            this.OnEnd = onEnd;
         }
     }
 }

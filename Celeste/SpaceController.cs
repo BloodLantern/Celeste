@@ -15,30 +15,24 @@ namespace Celeste
         public override void Added(Scene scene)
         {
             base.Added(scene);
-            level = SceneAs<Level>();
+            this.level = this.SceneAs<Level>();
         }
 
         public override void Update()
         {
             base.Update();
-            Player entity = Scene.Tracker.GetEntity<Player>();
+            Player entity = this.Scene.Tracker.GetEntity<Player>();
             if (entity == null)
-            {
                 return;
-            }
-
-            if ((double)entity.Top > (double)level.Camera.Bottom + 12.0)
+            if ((double) entity.Top > (double) this.level.Camera.Bottom + 12.0)
             {
-                entity.Bottom = level.Camera.Top - 4f;
+                entity.Bottom = this.level.Camera.Top - 4f;
             }
             else
             {
-                if ((double)entity.Bottom >= (double)level.Camera.Top - 4.0)
-                {
+                if ((double) entity.Bottom >= (double) this.level.Camera.Top - 4.0)
                     return;
-                }
-
-                entity.Top = level.Camera.Bottom + 12f;
+                entity.Top = this.level.Camera.Bottom + 12f;
             }
         }
     }

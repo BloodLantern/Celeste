@@ -11,29 +11,31 @@ namespace Monocle
 {
     public class CounterSet<T> : Component
     {
-        private readonly Dictionary<T, float> counters;
+        private Dictionary<T, float> counters;
         private float timer;
 
         public CounterSet()
             : base(true, false)
         {
-            counters = new Dictionary<T, float>();
+            this.counters = new Dictionary<T, float>();
         }
 
         public float this[T index]
         {
-            get => counters.TryGetValue(index, out float num) ? Math.Max(num - timer, 0.0f) : 0.0f;
-            set => counters[index] = timer + value;
+            get
+            {
+                float num;
+                return this.counters.TryGetValue(index, out num) ? Math.Max(num - this.timer, 0.0f) : 0.0f;
+            }
+            set => this.counters[index] = this.timer + value;
         }
 
         public bool Check(T index)
         {
-            return counters.TryGetValue(index, out float num) && (double)num - timer > 0.0;
+            float num;
+            return this.counters.TryGetValue(index, out num) && (double) num - (double) this.timer > 0.0;
         }
 
-        public override void Update()
-        {
-            timer += Engine.DeltaTime;
-        }
+        public override void Update() => this.timer += Engine.DeltaTime;
     }
 }

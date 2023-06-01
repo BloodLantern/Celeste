@@ -24,89 +24,68 @@ namespace Celeste
         public float Width;
         public float Height;
 
-        private Matrix Matrix => Matrix.CreateScale(1920f / ScreenWidth) * Engine.ScreenMatrix;
+        private Matrix Matrix => Matrix.CreateScale(1920f / this.ScreenWidth) * Engine.ScreenMatrix;
 
         public PreviewRecording(string filename)
         {
-            Filename = filename;
-            Timeline = PlaybackData.Import(File.ReadAllBytes(filename));
+            this.Filename = filename;
+            this.Timeline = PlaybackData.Import(File.ReadAllBytes(filename));
             float val2_1 = float.MaxValue;
             float val2_2 = float.MinValue;
             float val2_3 = float.MinValue;
             float val2_4 = float.MaxValue;
-            foreach (Player.ChaserState chaserState in Timeline)
+            foreach (Player.ChaserState chaserState in this.Timeline)
             {
                 val2_1 = Math.Min(chaserState.Position.X, val2_1);
                 val2_2 = Math.Max(chaserState.Position.X, val2_2);
                 val2_4 = Math.Min(chaserState.Position.Y, val2_4);
                 val2_3 = Math.Max(chaserState.Position.Y, val2_3);
             }
-            Width = (int)((double)val2_2 - (double)val2_1);
-            Height = (int)((double)val2_3 - (double)val2_4);
-            Add(entity = new PlayerPlayback(new Vector2((float)((ScreenWidth - (double)Width) / 2.0) - val2_1, (float)((ScreenHeight - (double)Height) / 2.0) - val2_4), PlayerSpriteMode.Madeline, Timeline));
+            this.Width = (float) (int) ((double) val2_2 - (double) val2_1);
+            this.Height = (float) (int) ((double) val2_3 - (double) val2_4);
+            this.Add((Entity) (this.entity = new PlayerPlayback(new Vector2((float) (((double) this.ScreenWidth - (double) this.Width) / 2.0) - val2_1, (float) (((double) this.ScreenHeight - (double) this.Height) / 2.0) - val2_4), PlayerSpriteMode.Madeline, this.Timeline)));
         }
 
         public override void Update()
         {
             if (MInput.Keyboard.Check(Keys.A))
-            {
-                entity.TrimStart = Math.Max(0.0f, entity.TrimStart -= Engine.DeltaTime);
-            }
-
+                this.entity.TrimStart = Math.Max(0.0f, this.entity.TrimStart -= Engine.DeltaTime);
             if (MInput.Keyboard.Check(Keys.D))
-            {
-                entity.TrimStart = Math.Min(entity.Duration, entity.TrimStart += Engine.DeltaTime);
-            }
-
+                this.entity.TrimStart = Math.Min(this.entity.Duration, this.entity.TrimStart += Engine.DeltaTime);
             if (MInput.Keyboard.Check(Keys.Left))
-            {
-                entity.TrimEnd = Math.Max(0.0f, entity.TrimEnd -= Engine.DeltaTime);
-            }
-
+                this.entity.TrimEnd = Math.Max(0.0f, this.entity.TrimEnd -= Engine.DeltaTime);
             if (MInput.Keyboard.Check(Keys.Right))
-            {
-                entity.TrimEnd = Math.Min(entity.Duration, entity.TrimEnd += Engine.DeltaTime);
-            }
-
+                this.entity.TrimEnd = Math.Min(this.entity.Duration, this.entity.TrimEnd += Engine.DeltaTime);
             if (MInput.Keyboard.Check(Keys.LeftControl) && MInput.Keyboard.Pressed(Keys.S))
             {
-                while (Timeline[0].TimeStamp < (double)entity.TrimStart)
-                {
-                    Timeline.RemoveAt(0);
-                }
-
-                while (Timeline[Timeline.Count - 1].TimeStamp > (double)entity.TrimEnd)
-                {
-                    Timeline.RemoveAt(Timeline.Count - 1);
-                }
-
-                PlaybackData.Export(Timeline, Filename);
-                Engine.Scene = new PreviewRecording(Filename);
+                while ((double) this.Timeline[0].TimeStamp < (double) this.entity.TrimStart)
+                    this.Timeline.RemoveAt(0);
+                while ((double) this.Timeline[this.Timeline.Count - 1].TimeStamp > (double) this.entity.TrimEnd)
+                    this.Timeline.RemoveAt(this.Timeline.Count - 1);
+                PlaybackData.Export(this.Timeline, this.Filename);
+                Engine.Scene = (Scene) new PreviewRecording(this.Filename);
             }
             base.Update();
-            entity.Hair.AfterUpdate();
+            this.entity.Hair.AfterUpdate();
         }
 
         public override void Render()
         {
-            Draw.SpriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, SamplerState.LinearClamp, null, RasterizerState.CullNone, null, Engine.ScreenMatrix);
+            Draw.SpriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, SamplerState.LinearClamp, (DepthStencilState) null, RasterizerState.CullNone, (Effect) null, Engine.ScreenMatrix);
             ActiveFont.Draw("A/D:        Move Start Trim", new Vector2(8f, 8f), new Vector2(0.0f, 0.0f), Vector2.One * 0.5f, Color.White);
             ActiveFont.Draw("Left/Right: Move End Trim", new Vector2(8f, 32f), new Vector2(0.0f, 0.0f), Vector2.One * 0.5f, Color.White);
             ActiveFont.Draw("CTRL+S: Save New Trim", new Vector2(8f, 56f), new Vector2(0.0f, 0.0f), Vector2.One * 0.5f, Color.White);
             Draw.SpriteBatch.End();
-            Draw.SpriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, SamplerState.PointClamp, null, RasterizerState.CullNone, null, Matrix);
-            Draw.HollowRect((float)(((ScreenWidth - (double)Width) / 2.0) - 16.0), (float)(((ScreenHeight - (double)Height) / 2.0) - 16.0), Width + 32f, Height + 32f, Color.Red * 0.6f);
-            Draw.HollowRect((float)((ScreenWidth - 320.0) / 2.0), (float)((ScreenHeight - 180.0) / 2.0), 320f, 180f, Color.White * 0.6f);
-            if (entity.Visible)
-            {
-                entity.Render();
-            }
-
-            Draw.Rect(32f, ScreenHeight - 48f, ScreenWidth - 64f, 16f, Color.DarkGray);
-            Draw.Rect(32f, ScreenHeight - 48f, (float)((ScreenWidth - 64.0) * ((double)entity.Time / entity.Duration)), 16f, Color.White);
-            Draw.Rect((float)(32.0 + ((ScreenWidth - 64.0) * ((double)entity.Time / entity.Duration)) - 2.0), ScreenHeight - 48f, 4f, 16f, Color.LimeGreen);
-            Draw.Rect((float)(32.0 + ((ScreenWidth - 64.0) * (entity.TrimStart / (double)entity.Duration)) - 2.0), ScreenHeight - 48f, 4f, 16f, Color.Red);
-            Draw.Rect((float)(32.0 + ((ScreenWidth - 64.0) * (entity.TrimEnd / (double)entity.Duration)) - 2.0), ScreenHeight - 48f, 4f, 16f, Color.Red);
+            Draw.SpriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, SamplerState.PointClamp, (DepthStencilState) null, RasterizerState.CullNone, (Effect) null, this.Matrix);
+            Draw.HollowRect((float) (((double) this.ScreenWidth - (double) this.Width) / 2.0 - 16.0), (float) (((double) this.ScreenHeight - (double) this.Height) / 2.0 - 16.0), this.Width + 32f, this.Height + 32f, Color.Red * 0.6f);
+            Draw.HollowRect((float) (((double) this.ScreenWidth - 320.0) / 2.0), (float) (((double) this.ScreenHeight - 180.0) / 2.0), 320f, 180f, Color.White * 0.6f);
+            if (this.entity.Visible)
+                this.entity.Render();
+            Draw.Rect(32f, this.ScreenHeight - 48f, this.ScreenWidth - 64f, 16f, Color.DarkGray);
+            Draw.Rect(32f, this.ScreenHeight - 48f, (float) (((double) this.ScreenWidth - 64.0) * ((double) this.entity.Time / (double) this.entity.Duration)), 16f, Color.White);
+            Draw.Rect((float) (32.0 + ((double) this.ScreenWidth - 64.0) * ((double) this.entity.Time / (double) this.entity.Duration) - 2.0), this.ScreenHeight - 48f, 4f, 16f, Color.LimeGreen);
+            Draw.Rect((float) (32.0 + ((double) this.ScreenWidth - 64.0) * ((double) this.entity.TrimStart / (double) this.entity.Duration) - 2.0), this.ScreenHeight - 48f, 4f, 16f, Color.Red);
+            Draw.Rect((float) (32.0 + ((double) this.ScreenWidth - 64.0) * ((double) this.entity.TrimEnd / (double) this.entity.Duration) - 2.0), this.ScreenHeight - 48f, 4f, 16f, Color.Red);
             Draw.SpriteBatch.End();
         }
     }

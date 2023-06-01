@@ -24,41 +24,35 @@ namespace Celeste
         public override void Added(Entity entity)
         {
             base.Added(entity);
-            level = SceneAs<Level>();
-            player = EntityAs<Player>();
-            drawStamina = player.Stamina;
+            this.level = this.SceneAs<Level>();
+            this.player = this.EntityAs<Player>();
+            this.drawStamina = this.player.Stamina;
         }
 
         public override void Update()
         {
             base.Update();
-            drawStamina = Calc.Approach(drawStamina, player.Stamina, 300f * Engine.DeltaTime);
-            if ((double)drawStamina is < 110.0 and > 0.0)
+            this.drawStamina = Calc.Approach(this.drawStamina, this.player.Stamina, 300f * Engine.DeltaTime);
+            if ((double) this.drawStamina < 110.0 && (double) this.drawStamina > 0.0)
             {
-                displayTimer = 0.75f;
+                this.displayTimer = 0.75f;
             }
             else
             {
-                if (displayTimer <= 0.0)
-                {
+                if ((double) this.displayTimer <= 0.0)
                     return;
-                }
-
-                displayTimer -= Engine.DeltaTime;
+                this.displayTimer -= Engine.DeltaTime;
             }
         }
 
         public void RenderHUD()
         {
-            if (displayTimer <= 0.0)
-            {
+            if ((double) this.displayTimer <= 0.0)
                 return;
-            }
-
-            Vector2 vector2 = level.Camera.CameraToScreen(player.Position + new Vector2(0.0f, -18f)) * 6f;
-            Color color = drawStamina >= 20.0 ? Color.Lime : Color.Red;
-            Draw.Rect((float)(vector2.X - 48.0 - 1.0), (float)(vector2.Y - 6.0 - 1.0), 98f, 14f, Color.Black);
-            Draw.Rect(vector2.X - 48f, vector2.Y - 6f, (float)(96.0 * (drawStamina / 110.0)), 12f, color);
+            Vector2 vector2 = this.level.Camera.CameraToScreen(this.player.Position + new Vector2(0.0f, -18f)) * 6f;
+            Color color = (double) this.drawStamina >= 20.0 ? Color.Lime : Color.Red;
+            Draw.Rect((float) ((double) vector2.X - 48.0 - 1.0), (float) ((double) vector2.Y - 6.0 - 1.0), 98f, 14f, Color.Black);
+            Draw.Rect(vector2.X - 48f, vector2.Y - 6f, (float) (96.0 * ((double) this.drawStamina / 110.0)), 12f, color);
         }
     }
 }

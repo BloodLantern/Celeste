@@ -18,29 +18,20 @@ namespace Celeste
         public SeekerCollider(Action<Seeker> onCollide, Collider collider = null)
             : base(false, false)
         {
-            OnCollide = onCollide;
-            Collider = null;
+            this.OnCollide = onCollide;
+            this.Collider = (Collider) null;
         }
 
         public void Check(Seeker seeker)
         {
-            if (OnCollide == null)
-            {
+            if (this.OnCollide == null)
                 return;
-            }
-
-            Collider collider = Entity.Collider;
-            if (Collider != null)
-            {
-                Entity.Collider = Collider;
-            }
-
-            if (seeker.CollideCheck(Entity))
-            {
-                OnCollide(seeker);
-            }
-
-            Entity.Collider = collider;
+            Collider collider = this.Entity.Collider;
+            if (this.Collider != null)
+                this.Entity.Collider = this.Collider;
+            if (seeker.CollideCheck(this.Entity))
+                this.OnCollide(seeker);
+            this.Entity.Collider = collider;
         }
     }
 }

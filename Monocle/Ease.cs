@@ -1,6 +1,6 @@
 ﻿// Decompiled with JetBrains decompiler
 // Type: Monocle.Ease
-// Assembly: Celeste, Version=1, Culture=neutral, PublicKeyToken=null
+// Assembly: Celeste, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null
 // MVID: FAF6CA25-5C06-43EB-A08F-9CCF291FE6A3
 // Assembly location: C:\Program Files (x86)\Steam\steamapps\common\Celeste\orig\Celeste.exe
 
@@ -10,97 +10,88 @@ namespace Monocle
 {
     public static class Ease
     {
-        public static readonly Easer Linear = t => t;
-        public static readonly Easer SineIn = t => (float)-Math.Cos(Math.PI / 2 * t) + 1;
-        public static readonly Easer SineOut = t => (float)Math.Sin(Math.PI / 2 * t);
-        public static readonly Easer SineInOut = t => ((float)-Math.Cos(Math.PI * t) / 2) + 0.5f;
-        public static readonly Easer QuadIn = t => t * t;
-        public static readonly Easer QuadOut = Invert(QuadIn);
-        public static readonly Easer QuadInOut = Follow(QuadIn, QuadOut);
-        public static readonly Easer CubeIn = t => t * t * t;
-        public static readonly Easer CubeOut = Invert(CubeIn);
-        public static readonly Easer CubeInOut = Follow(CubeIn, CubeOut);
-        public static readonly Easer QuintIn = t => t * t * t * t * t;
-        public static readonly Easer QuintOut = Invert(QuintIn);
-        public static readonly Easer QuintInOut = Follow(QuintIn, QuintOut);
-        public static readonly Easer ExpoIn = t => (float)Math.Pow(2, 10 * (t - 1));
-        public static readonly Easer ExpoOut = Invert(ExpoIn);
-        public static readonly Easer ExpoInOut = Follow(ExpoIn, ExpoOut);
-        public static readonly Easer BackIn = t => t * t * ((2.7f * t) - 1.7f);
-        public static readonly Easer BackOut = Invert(BackIn);
-        public static readonly Easer BackInOut = Follow(BackIn, BackOut);
-        public static readonly Easer BigBackIn = t => t * t * ((4 * t) - 3);
-        public static readonly Easer BigBackOut = Invert(BigBackIn);
-        public static readonly Easer BigBackInOut = Follow(BigBackIn, BigBackOut);
-        public static readonly Easer ElasticIn = t =>
+        public static readonly Ease.Easer Linear = (Ease.Easer) (t => t);
+        public static readonly Ease.Easer SineIn = (Ease.Easer) (t => (float) (-Math.Cos(1.5707963705062866 * (double) t) + 1.0));
+        public static readonly Ease.Easer SineOut = (Ease.Easer) (t => (float) Math.Sin(1.5707963705062866 * (double) t));
+        public static readonly Ease.Easer SineInOut = (Ease.Easer) (t => (float) (-Math.Cos(3.1415927410125732 * (double) t) / 2.0 + 0.5));
+        public static readonly Ease.Easer QuadIn = (Ease.Easer) (t => t * t);
+        public static readonly Ease.Easer QuadOut = Ease.Invert(Ease.QuadIn);
+        public static readonly Ease.Easer QuadInOut = Ease.Follow(Ease.QuadIn, Ease.QuadOut);
+        public static readonly Ease.Easer CubeIn = (Ease.Easer) (t => t * t * t);
+        public static readonly Ease.Easer CubeOut = Ease.Invert(Ease.CubeIn);
+        public static readonly Ease.Easer CubeInOut = Ease.Follow(Ease.CubeIn, Ease.CubeOut);
+        public static readonly Ease.Easer QuintIn = (Ease.Easer) (t => t * t * t * t * t);
+        public static readonly Ease.Easer QuintOut = Ease.Invert(Ease.QuintIn);
+        public static readonly Ease.Easer QuintInOut = Ease.Follow(Ease.QuintIn, Ease.QuintOut);
+        public static readonly Ease.Easer ExpoIn = (Ease.Easer) (t => (float) Math.Pow(2.0, 10.0 * ((double) t - 1.0)));
+        public static readonly Ease.Easer ExpoOut = Ease.Invert(Ease.ExpoIn);
+        public static readonly Ease.Easer ExpoInOut = Ease.Follow(Ease.ExpoIn, Ease.ExpoOut);
+        public static readonly Ease.Easer BackIn = (Ease.Easer) (t => (float) ((double) t * (double) t * (2.7015800476074219 * (double) t - 1.7015800476074219)));
+        public static readonly Ease.Easer BackOut = Ease.Invert(Ease.BackIn);
+        public static readonly Ease.Easer BackInOut = Ease.Follow(Ease.BackIn, Ease.BackOut);
+        public static readonly Ease.Easer BigBackIn = (Ease.Easer) (t => (float) ((double) t * (double) t * (4.0 * (double) t - 3.0)));
+        public static readonly Ease.Easer BigBackOut = Ease.Invert(Ease.BigBackIn);
+        public static readonly Ease.Easer BigBackInOut = Ease.Follow(Ease.BigBackIn, Ease.BigBackOut);
+        public static readonly Ease.Easer ElasticIn = (Ease.Easer) (t =>
         {
-            float sqr = t * t;
-            float cubic = sqr * t;
-            return (33 * cubic * sqr) + (-59 * sqr * sqr) + (32 * cubic) + (-5 * sqr);
-        };
-        public static readonly Easer ElasticOut = t =>
+            float num1 = t * t;
+            float num2 = num1 * t;
+            return (float) (33.0 * (double) num2 * (double) num1 + -59.0 * (double) num1 * (double) num1 + 32.0 * (double) num2 + -5.0 * (double) num1);
+        });
+        public static readonly Ease.Easer ElasticOut = (Ease.Easer) (t =>
         {
-            float sqr = t * t;
-            float cubic = sqr * t;
-            return (33 * cubic * sqr) + (-106 * sqr * sqr) + (126 * cubic) + (-67 * sqr) + (15 * t);
-        };
-        public static readonly Easer ElasticInOut = Follow(ElasticIn, ElasticOut);
+            float num3 = t * t;
+            float num4 = num3 * t;
+            return (float) (33.0 * (double) num4 * (double) num3 + -106.0 * (double) num3 * (double) num3 + 126.0 * (double) num4 + -67.0 * (double) num3 + 15.0 * (double) t);
+        });
+        public static readonly Ease.Easer ElasticInOut = Ease.Follow(Ease.ElasticIn, Ease.ElasticOut);
         private const float B1 = 0.363636374f;
         private const float B2 = 0.727272749f;
         private const float B3 = 0.545454562f;
         private const float B4 = 0.909090936f;
         private const float B5 = 0.8181818f;
         private const float B6 = 0.954545438f;
-        public static readonly Easer BounceIn = t =>
+        public static readonly Ease.Easer BounceIn = (Ease.Easer) (t =>
         {
             t = 1f - t;
-            return t < B1
-                ? (1 - (121 / 16 * t * t))
-                : t < B2
-                ? (1 - ((121 / 16 * (t - B3) * (t - B3)) + 0.75f))
-                : t < B4 ? (1 - ((121 / 16 * (t - B5) * (t - B5)) + (15 / 16))) : (1 - ((121 / 16 * (t - B6) * (t - B6)) + (63 / 64)));
-        };
-        public static readonly Easer BounceOut = t =>
+            if ((double) t < 0.36363637447357178)
+                return (float) (1.0 - 121.0 / 16.0 * (double) t * (double) t);
+            if ((double) t < 0.72727274894714355)
+                return (float) (1.0 - (121.0 / 16.0 * ((double) t - 0.54545456171035767) * ((double) t - 0.54545456171035767) + 0.75));
+            return (double) t < 0.90909093618392944 ? (float) (1.0 - (121.0 / 16.0 * ((double) t - 0.81818181276321411) * ((double) t - 0.81818181276321411) + 15.0 / 16.0)) : (float) (1.0 - (121.0 / 16.0 * ((double) t - 0.95454543828964233) * ((double) t - 0.95454543828964233) + 63.0 / 64.0));
+        });
+        public static readonly Ease.Easer BounceOut = (Ease.Easer) (t =>
         {
-            return t < B1
-                ? 121f / 16f * t * t
-                : t < B2
-                ? ((121 / 16 * (t - B3) * (t - B3)) + 0.75f)
-                : t < B4 ? ((121 / 16 * (t - B5) * (t - B5)) + (15 / 16)) : ((121 / 16 * (t - B6) * (t - B6)) + (63 / 64));
-        };
-        public static readonly Easer BounceInOut = t =>
+            if ((double) t < 0.36363637447357178)
+                return 121f / 16f * t * t;
+            if ((double) t < 0.72727274894714355)
+                return (float) (121.0 / 16.0 * ((double) t - 0.54545456171035767) * ((double) t - 0.54545456171035767) + 0.75);
+            return (double) t < 0.90909093618392944 ? (float) (121.0 / 16.0 * ((double) t - 0.81818181276321411) * ((double) t - 0.81818181276321411) + 15.0 / 16.0) : (float) (121.0 / 16.0 * ((double) t - 0.95454543828964233) * ((double) t - 0.95454543828964233) + 63.0 / 64.0);
+        });
+        public static readonly Ease.Easer BounceInOut = (Ease.Easer) (t =>
         {
-            if (t < 0.5)
+            if ((double) t < 0.5)
             {
-                t = 1 - (t * 2);
-                return t < B1
-                    ? ((1 - (121 / 16 * t * t)) / 2)
-                    : t < B2
-                    ? ((1 - ((121 / 16 * (t - B3) * (t - B3)) + 0.75f)) / 2)
-                    : t < B4 ? ((1 - ((121 / 16 * (t - B5) * (t - B5)) + (15 / 16))) / 2) : ((1 - ((121 / 16 * (t - B6) * (t - B6)) + (63 / 64))) / 2);
+                t = (float) (1.0 - (double) t * 2.0);
+                if ((double) t < 0.36363637447357178)
+                    return (float) ((1.0 - 121.0 / 16.0 * (double) t * (double) t) / 2.0);
+                if ((double) t < 0.72727274894714355)
+                    return (float) ((1.0 - (121.0 / 16.0 * ((double) t - 0.54545456171035767) * ((double) t - 0.54545456171035767) + 0.75)) / 2.0);
+                return (double) t < 0.90909093618392944 ? (float) ((1.0 - (121.0 / 16.0 * ((double) t - 0.81818181276321411) * ((double) t - 0.81818181276321411) + 15.0 / 16.0)) / 2.0) : (float) ((1.0 - (121.0 / 16.0 * ((double) t - 0.95454543828964233) * ((double) t - 0.95454543828964233) + 63.0 / 64.0)) / 2.0);
             }
-            t = (t * 2) - 1;
-            return t < B1
-                ? ((121 / 16 * t * t / 2) + 0.5f)
-                : t < B2
-                ? ((((121 / 16 * (t - B3) * (t - B3)) + 0.75f) / 2) + 0.5f)
-                : t < B4 ? ((((121 / 16 * (t - B5) * (t - B5)) + (15 / 16)) / 2) + 0.5f) : ((((121 / 16 * (t - B6) * (t - B6)) + (63 / 64)) / 2) + 0.5f);
-        };
+            t = (float) ((double) t * 2.0 - 1.0);
+            if ((double) t < 0.36363637447357178)
+                return (float) (121.0 / 16.0 * (double) t * (double) t / 2.0 + 0.5);
+            if ((double) t < 0.72727274894714355)
+                return (float) ((121.0 / 16.0 * ((double) t - 0.54545456171035767) * ((double) t - 0.54545456171035767) + 0.75) / 2.0 + 0.5);
+            return (double) t < 0.90909093618392944 ? (float) ((121.0 / 16.0 * ((double) t - 0.81818181276321411) * ((double) t - 0.81818181276321411) + 15.0 / 16.0) / 2.0 + 0.5) : (float) ((121.0 / 16.0 * ((double) t - 0.95454543828964233) * ((double) t - 0.95454543828964233) + 63.0 / 64.0) / 2.0 + 0.5);
+        });
 
-        public static Easer Invert(Easer easer)
-        {
-            return t => 1f - easer(1f - t);
-        }
+        public static Ease.Easer Invert(Ease.Easer easer) => (Ease.Easer) (t => 1f - easer(1f - t));
 
-        public static Easer Follow(Easer first, Easer second)
-        {
-            return t => t > 0.5f ? (second((t * 2) - 1) / 2) + 0.5f : first(t * 2f) / 2f;
-        }
+        public static Ease.Easer Follow(Ease.Easer first, Ease.Easer second) => (Ease.Easer) (t => (double) t > 0.5 ? (float) ((double) second((float) ((double) t * 2.0 - 1.0)) / 2.0 + 0.5) : first(t * 2f) / 2f);
 
-        public static float UpDown(float eased)
-        {
-            return eased <= 0.5f ? eased * 2f : 1 - ((eased - 0.5f) * 2);
-        }
+        public static float UpDown(float eased) => (double) eased <= 0.5 ? eased * 2f : (float) (1.0 - ((double) eased - 0.5) * 2.0);
 
         public delegate float Easer(float t);
     }

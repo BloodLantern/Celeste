@@ -14,17 +14,17 @@ namespace FMOD
         public int length;
         public int numchannels;
         [MarshalAs(UnmanagedType.ByValArray, SizeConst = 32)]
-        private readonly IntPtr[] spectrum_internal;
+        private IntPtr[] spectrum_internal;
 
         public float[][] spectrum
         {
             get
             {
-                float[][] spectrum = new float[numchannels][];
-                for (int index = 0; index < numchannels; ++index)
+                float[][] spectrum = new float[this.numchannels][];
+                for (int index = 0; index < this.numchannels; ++index)
                 {
-                    spectrum[index] = new float[length];
-                    Marshal.Copy(spectrum_internal[index], spectrum[index], 0, length);
+                    spectrum[index] = new float[this.length];
+                    Marshal.Copy(this.spectrum_internal[index], spectrum[index], 0, this.length);
                 }
                 return spectrum;
             }

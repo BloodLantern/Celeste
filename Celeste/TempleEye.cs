@@ -6,6 +6,7 @@
 
 using Microsoft.Xna.Framework;
 using Monocle;
+using System;
 
 namespace Celeste
 {
@@ -28,65 +29,57 @@ namespace Celeste
         public override void Added(Scene scene)
         {
             base.Added(scene);
-            isBG = !scene.CollideCheck<Solid>(Position);
-            if (isBG)
+            this.isBG = !scene.CollideCheck<Solid>(this.Position);
+            if (this.isBG)
             {
-                eyeTexture = GFX.Game["scenery/temple/eye/bg_eye"];
-                pupilTexture = GFX.Game["scenery/temple/eye/bg_pupil"];
-                Add(eyelid = new Sprite(GFX.Game, "scenery/temple/eye/bg_lid"));
-                Depth = 8990;
+                this.eyeTexture = GFX.Game["scenery/temple/eye/bg_eye"];
+                this.pupilTexture = GFX.Game["scenery/temple/eye/bg_pupil"];
+                this.Add((Component) (this.eyelid = new Sprite(GFX.Game, "scenery/temple/eye/bg_lid")));
+                this.Depth = 8990;
             }
             else
             {
-                eyeTexture = GFX.Game["scenery/temple/eye/fg_eye"];
-                pupilTexture = GFX.Game["scenery/temple/eye/fg_pupil"];
-                Add(eyelid = new Sprite(GFX.Game, "scenery/temple/eye/fg_lid"));
-                Depth = -10001;
+                this.eyeTexture = GFX.Game["scenery/temple/eye/fg_eye"];
+                this.pupilTexture = GFX.Game["scenery/temple/eye/fg_pupil"];
+                this.Add((Component) (this.eyelid = new Sprite(GFX.Game, "scenery/temple/eye/fg_lid")));
+                this.Depth = -10001;
             }
-            eyelid.AddLoop("open", "", 0.0f, new int[1]);
-            eyelid.Add("blink", "", 0.08f, "open", 0, 1, 1, 2, 3, 0);
-            eyelid.Play("open");
-            _ = eyelid.CenterOrigin();
-            SetBlinkTimer();
+            this.eyelid.AddLoop("open", "", 0.0f, new int[1]);
+            this.eyelid.Add("blink", "", 0.08f, "open", 0, 1, 1, 2, 3, 0);
+            this.eyelid.Play("open");
+            this.eyelid.CenterOrigin();
+            this.SetBlinkTimer();
         }
 
-        private void SetBlinkTimer()
-        {
-            blinkTimer = Calc.Random.Range(1f, 15f);
-        }
+        private void SetBlinkTimer() => this.blinkTimer = Calc.Random.Range(1f, 15f);
 
         public override void Awake(Scene scene)
         {
             base.Awake(scene);
-            TheoCrystal entity = Scene.Tracker.GetEntity<TheoCrystal>();
+            TheoCrystal entity = this.Scene.Tracker.GetEntity<TheoCrystal>();
             if (entity == null)
-            {
                 return;
-            }
-
-            pupilTarget = (entity.Center - Position).SafeNormalize();
-            pupilPosition = pupilTarget * 3f;
+            this.pupilTarget = (entity.Center - this.Position).SafeNormalize();
+            this.pupilPosition = this.pupilTarget * 3f;
         }
 
         public override void Update()
         {
-            if (!bursting)
+            if (!this.bursting)
             {
-                pupilPosition = Calc.Approach(pupilPosition, pupilTarget * 3f, Engine.DeltaTime * 16f);
-                TheoCrystal entity = Scene.Tracker.GetEntity<TheoCrystal>();
+                this.pupilPosition = Calc.Approach(this.pupilPosition, this.pupilTarget * 3f, Engine.DeltaTime * 16f);
+                TheoCrystal entity = this.Scene.Tracker.GetEntity<TheoCrystal>();
                 if (entity != null)
                 {
-                    pupilTarget = (entity.Center - Position).SafeNormalize();
-                    if (Scene.OnInterval(0.25f) && Calc.Random.Chance(0.01f))
-                    {
-                        eyelid.Play("blink");
-                    }
+                    this.pupilTarget = (entity.Center - this.Position).SafeNormalize();
+                    if (this.Scene.OnInterval(0.25f) && Calc.Random.Chance(0.01f))
+                        this.eyelid.Play("blink");
                 }
-                blinkTimer -= Engine.DeltaTime;
-                if (blinkTimer <= 0.0)
+                this.blinkTimer -= Engine.DeltaTime;
+                if ((double) this.blinkTimer <= 0.0)
                 {
-                    SetBlinkTimer();
-                    eyelid.Play("blink");
+                    this.SetBlinkTimer();
+                    this.eyelid.Play("blink");
                 }
             }
             base.Update();
@@ -94,22 +87,22 @@ namespace Celeste
 
         public void Burst()
         {
-            bursting = true;
-            Sprite sprite = new(GFX.Game, isBG ? "scenery/temple/eye/bg_burst" : "scenery/temple/eye/fg_burst");
+            this.bursting = true;
+            Sprite sprite = new Sprite(GFX.Game, this.isBG ? "scenery/temple/eye/bg_burst" : "scenery/temple/eye/fg_burst");
             sprite.Add("burst", "", 0.08f);
             sprite.Play("burst");
-            sprite.OnLastFrame = f => RemoveSelf();
-            _ = sprite.CenterOrigin();
-            Add(sprite);
-            Remove(eyelid);
+            sprite.OnLastFrame = (Action<string>) (f => this.RemoveSelf());
+            sprite.CenterOrigin();
+            this.Add((Component) sprite);
+            this.Remove((Component) this.eyelid);
         }
 
         public override void Render()
         {
-            if (!bursting)
+            if (!this.bursting)
             {
-                eyeTexture.DrawCentered(Position);
-                pupilTexture.DrawCentered(Position + pupilPosition);
+                this.eyeTexture.DrawCentered(this.Position);
+                this.pupilTexture.DrawCentered(this.Position + this.pupilPosition);
             }
             base.Render();
         }

@@ -31,11 +31,11 @@ namespace Monocle
             float threshold,
             VirtualInput.OverlapBehaviors overlapBehavior = VirtualInput.OverlapBehaviors.TakeNewer)
         {
-            Positive = positive;
-            Negative = negative;
-            Threshold = threshold;
-            GamepadIndex = gamepadIndex;
-            OverlapBehavior = overlapBehavior;
+            this.Positive = positive;
+            this.Negative = negative;
+            this.Threshold = threshold;
+            this.GamepadIndex = gamepadIndex;
+            this.OverlapBehavior = overlapBehavior;
         }
 
         public VirtualIntegerAxis(
@@ -47,40 +47,37 @@ namespace Monocle
             float threshold,
             VirtualInput.OverlapBehaviors overlapBehavior = VirtualInput.OverlapBehaviors.TakeNewer)
         {
-            Positive = positive;
-            Negative = negative;
-            PositiveAlt = positiveAlt;
-            NegativeAlt = negativeAlt;
-            Threshold = threshold;
-            GamepadIndex = gamepadIndex;
-            OverlapBehavior = overlapBehavior;
+            this.Positive = positive;
+            this.Negative = negative;
+            this.PositiveAlt = positiveAlt;
+            this.NegativeAlt = negativeAlt;
+            this.Threshold = threshold;
+            this.GamepadIndex = gamepadIndex;
+            this.OverlapBehavior = overlapBehavior;
         }
 
         public override void Update()
         {
-            PreviousValue = Value;
+            this.PreviousValue = this.Value;
             if (MInput.Disabled)
-            {
                 return;
-            }
-
-            bool flag1 = (double)Positive.Axis(GamepadIndex, Threshold) > 0.0 || (PositiveAlt != null && (double)PositiveAlt.Axis(GamepadIndex, Threshold) > 0.0);
-            bool flag2 = (double)Negative.Axis(GamepadIndex, Threshold) > 0.0 || (NegativeAlt != null && (double)NegativeAlt.Axis(GamepadIndex, Threshold) > 0.0);
+            bool flag1 = (double) this.Positive.Axis(this.GamepadIndex, this.Threshold) > 0.0 || this.PositiveAlt != null && (double) this.PositiveAlt.Axis(this.GamepadIndex, this.Threshold) > 0.0;
+            bool flag2 = (double) this.Negative.Axis(this.GamepadIndex, this.Threshold) > 0.0 || this.NegativeAlt != null && (double) this.NegativeAlt.Axis(this.GamepadIndex, this.Threshold) > 0.0;
             if (flag1 & flag2)
             {
-                switch (OverlapBehavior)
+                switch (this.OverlapBehavior)
                 {
                     case VirtualInput.OverlapBehaviors.CancelOut:
-                        Value = 0;
+                        this.Value = 0;
                         break;
                     case VirtualInput.OverlapBehaviors.TakeOlder:
-                        Value = PreviousValue;
+                        this.Value = this.PreviousValue;
                         break;
                     case VirtualInput.OverlapBehaviors.TakeNewer:
-                        if (!turned)
+                        if (!this.turned)
                         {
-                            Value *= -1;
-                            turned = true;
+                            this.Value *= -1;
+                            this.turned = true;
                             break;
                         }
                         break;
@@ -88,30 +85,24 @@ namespace Monocle
             }
             else if (flag1)
             {
-                turned = false;
-                Value = 1;
+                this.turned = false;
+                this.Value = 1;
             }
             else if (flag2)
             {
-                turned = false;
-                Value = -1;
+                this.turned = false;
+                this.Value = -1;
             }
             else
             {
-                turned = false;
-                Value = 0;
+                this.turned = false;
+                this.Value = 0;
             }
-            if (!Inverted)
-            {
+            if (!this.Inverted)
                 return;
-            }
-
-            Value = -Value;
+            this.Value = -this.Value;
         }
 
-        public static implicit operator float(VirtualIntegerAxis axis)
-        {
-            return axis.Value;
-        }
+        public static implicit operator float(VirtualIntegerAxis axis) => (float) axis.Value;
     }
 }

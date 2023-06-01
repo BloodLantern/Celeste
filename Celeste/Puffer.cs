@@ -21,24 +21,24 @@ namespace Celeste
         private const float StunnedAccel = 320f;
         private const float AlertedRadius = 60f;
         private const float CantExplodeTime = 0.5f;
-        private readonly Sprite sprite;
+        private Sprite sprite;
         private Puffer.States state;
         private Vector2 startPosition;
         private Vector2 anchorPosition;
         private Vector2 lastSpeedPosition;
         private Vector2 lastSinePosition;
-        private readonly Monocle.Circle pushRadius;
-        private readonly Monocle.Circle breakWallsRadius;
-        private readonly Monocle.Circle detectRadius;
-        private readonly SineWave idleSine;
+        private Monocle.Circle pushRadius;
+        private Monocle.Circle breakWallsRadius;
+        private Monocle.Circle detectRadius;
+        private SineWave idleSine;
         private Vector2 hitSpeed;
         private float goneTimer;
         private float cannotHitTimer;
-        private readonly Collision onCollideV;
-        private readonly Collision onCollideH;
+        private Collision onCollideV;
+        private Collision onCollideH;
         private float alertTimer;
-        private readonly Wiggler bounceWiggler;
-        private readonly Wiggler inflateWiggler;
+        private Wiggler bounceWiggler;
+        private Wiggler inflateWiggler;
         private Vector2 scale;
         private SimpleCurve returnCurve;
         private float cantExplodeTimer;
@@ -50,32 +50,29 @@ namespace Celeste
         public Puffer(Vector2 position, bool faceRight)
             : base(position)
         {
-            Collider = new Hitbox(12f, 10f, -6f, -5f);
-            Add(new PlayerCollider(new Action<Player>(OnPlayer), new Hitbox(14f, 12f, -7f, -7f)));
-            Add(sprite = GFX.SpriteBank.Create("pufferFish"));
-            sprite.Play("idle");
+            this.Collider = (Collider) new Hitbox(12f, 10f, -6f, -5f);
+            this.Add((Component) new PlayerCollider(new Action<Player>(this.OnPlayer), (Collider) new Hitbox(14f, 12f, -7f, -7f)));
+            this.Add((Component) (this.sprite = GFX.SpriteBank.Create("pufferFish")));
+            this.sprite.Play("idle");
             if (!faceRight)
-            {
-                facing.X = -1f;
-            }
-
-            idleSine = new SineWave(0.5f);
-            _ = idleSine.Randomize();
-            Add(idleSine);
-            anchorPosition = Position;
-            Position += new Vector2(idleSine.Value * 3f, idleSine.ValueOverTwo * 2f);
-            state = Puffer.States.Idle;
-            startPosition = lastSinePosition = lastSpeedPosition = Position;
-            pushRadius = new Monocle.Circle(40f);
-            detectRadius = new Monocle.Circle(32f);
-            breakWallsRadius = new Monocle.Circle(16f);
-            onCollideV = new Collision(OnCollideV);
-            onCollideH = new Collision(OnCollideH);
-            scale = Vector2.One;
-            bounceWiggler = Wiggler.Create(0.6f, 2.5f, v => sprite.Rotation = (float)((double)v * 20.0 * (Math.PI / 180.0)));
-            Add(bounceWiggler);
-            inflateWiggler = Wiggler.Create(0.6f, 2f);
-            Add(inflateWiggler);
+                this.facing.X = -1f;
+            this.idleSine = new SineWave(0.5f);
+            this.idleSine.Randomize();
+            this.Add((Component) this.idleSine);
+            this.anchorPosition = this.Position;
+            this.Position = this.Position + new Vector2(this.idleSine.Value * 3f, this.idleSine.ValueOverTwo * 2f);
+            this.state = Puffer.States.Idle;
+            this.startPosition = this.lastSinePosition = this.lastSpeedPosition = this.Position;
+            this.pushRadius = new Monocle.Circle(40f);
+            this.detectRadius = new Monocle.Circle(32f);
+            this.breakWallsRadius = new Monocle.Circle(16f);
+            this.onCollideV = new Collision(this.OnCollideV);
+            this.onCollideH = new Collision(this.OnCollideH);
+            this.scale = Vector2.One;
+            this.bounceWiggler = Wiggler.Create(0.6f, 2.5f, (Action<float>) (v => this.sprite.Rotation = (float) ((double) v * 20.0 * (Math.PI / 180.0))));
+            this.Add((Component) this.bounceWiggler);
+            this.inflateWiggler = Wiggler.Create(0.6f, 2f);
+            this.Add((Component) this.inflateWiggler);
         }
 
         public Puffer(EntityData data, Vector2 offset)
@@ -83,364 +80,286 @@ namespace Celeste
         {
         }
 
-        public override bool IsRiding(JumpThru jumpThru)
-        {
-            return false;
-        }
+        public override bool IsRiding(JumpThru jumpThru) => false;
 
-        public override bool IsRiding(Solid solid)
-        {
-            return false;
-        }
+        public override bool IsRiding(Solid solid) => false;
 
         protected override void OnSquish(CollisionData data)
         {
-            Explode();
-            GotoGone();
+            this.Explode();
+            this.GotoGone();
         }
 
-        private void OnCollideH(CollisionData data)
-        {
-            hitSpeed.X *= -0.8f;
-        }
+        private void OnCollideH(CollisionData data) => this.hitSpeed.X *= -0.8f;
 
         private void OnCollideV(CollisionData data)
         {
-            if (data.Direction.Y <= 0.0)
-            {
+            if ((double) data.Direction.Y <= 0.0)
                 return;
-            }
-
             for (int index1 = -1; index1 <= 1; index1 += 2)
             {
                 for (int index2 = 1; index2 <= 2; ++index2)
                 {
-                    Vector2 at = Position + (Vector2.UnitX * index2 * index1);
-                    if (!CollideCheck<Solid>(at) && !OnGround(at))
+                    Vector2 at = this.Position + Vector2.UnitX * (float) index2 * (float) index1;
+                    if (!this.CollideCheck<Solid>(at) && !this.OnGround(at))
                     {
-                        Position = at;
+                        this.Position = at;
                         return;
                     }
                 }
             }
-            hitSpeed.Y *= -0.2f;
+            this.hitSpeed.Y *= -0.2f;
         }
 
         private void GotoIdle()
         {
-            if (state == Puffer.States.Gone)
+            if (this.state == Puffer.States.Gone)
             {
-                Position = startPosition;
-                cantExplodeTimer = 0.5f;
-                sprite.Play("recover");
-                _ = Audio.Play("event:/new_content/game/10_farewell/puffer_reform", Position);
+                this.Position = this.startPosition;
+                this.cantExplodeTimer = 0.5f;
+                this.sprite.Play("recover");
+                Audio.Play("event:/new_content/game/10_farewell/puffer_reform", this.Position);
             }
-            lastSinePosition = lastSpeedPosition = anchorPosition = Position;
-            hitSpeed = Vector2.Zero;
-            idleSine.Reset();
-            state = Puffer.States.Idle;
+            this.lastSinePosition = this.lastSpeedPosition = this.anchorPosition = this.Position;
+            this.hitSpeed = Vector2.Zero;
+            this.idleSine.Reset();
+            this.state = Puffer.States.Idle;
         }
 
         private void GotoHit(Vector2 from)
         {
-            scale = new Vector2(1.2f, 0.8f);
-            hitSpeed = Vector2.UnitY * 200f;
-            state = Puffer.States.Hit;
-            bounceWiggler.Start();
-            Alert(true, false);
-            _ = Audio.Play("event:/new_content/game/10_farewell/puffer_boop", Position);
+            this.scale = new Vector2(1.2f, 0.8f);
+            this.hitSpeed = Vector2.UnitY * 200f;
+            this.state = Puffer.States.Hit;
+            this.bounceWiggler.Start();
+            this.Alert(true, false);
+            Audio.Play("event:/new_content/game/10_farewell/puffer_boop", this.Position);
         }
 
         private void GotoHitSpeed(Vector2 speed)
         {
-            hitSpeed = speed;
-            state = Puffer.States.Hit;
+            this.hitSpeed = speed;
+            this.state = Puffer.States.Hit;
         }
 
         private void GotoGone()
         {
-            Vector2 control = Position + ((startPosition - Position) * 0.5f);
-            if ((double)(startPosition - Position).LengthSquared() > 100.0)
+            Vector2 control = this.Position + (this.startPosition - this.Position) * 0.5f;
+            if ((double) (this.startPosition - this.Position).LengthSquared() > 100.0)
             {
-                if ((double)Math.Abs(Position.Y - startPosition.Y) > (double)Math.Abs(Position.X - startPosition.X))
+                if ((double) Math.Abs(this.Position.Y - this.startPosition.Y) > (double) Math.Abs(this.Position.X - this.startPosition.X))
                 {
-                    if (Position.X > (double)startPosition.X)
-                    {
+                    if ((double) this.Position.X > (double) this.startPosition.X)
                         control += Vector2.UnitX * -24f;
-                    }
                     else
-                    {
                         control += Vector2.UnitX * 24f;
-                    }
                 }
-                else if (Position.Y > (double)startPosition.Y)
-                {
+                else if ((double) this.Position.Y > (double) this.startPosition.Y)
                     control += Vector2.UnitY * -24f;
-                }
                 else
-                {
                     control += Vector2.UnitY * 24f;
-                }
             }
-            returnCurve = new SimpleCurve(Position, startPosition, control);
-            Collidable = false;
-            goneTimer = 2.5f;
-            state = Puffer.States.Gone;
+            this.returnCurve = new SimpleCurve(this.Position, this.startPosition, control);
+            this.Collidable = false;
+            this.goneTimer = 2.5f;
+            this.state = Puffer.States.Gone;
         }
 
         private void Explode()
         {
-            Collider collider = Collider;
-            Collider = pushRadius;
-            _ = Audio.Play("event:/new_content/game/10_farewell/puffer_splode", Position);
-            sprite.Play("explode");
-            Player player = CollideFirst<Player>();
-            if (player != null && !Scene.CollideCheck<Solid>(Position, player.Center))
+            Collider collider = this.Collider;
+            this.Collider = (Collider) this.pushRadius;
+            Audio.Play("event:/new_content/game/10_farewell/puffer_splode", this.Position);
+            this.sprite.Play("explode");
+            Player player = this.CollideFirst<Player>();
+            if (player != null && !this.Scene.CollideCheck<Solid>(this.Position, player.Center))
+                player.ExplodeLaunch(this.Position, false, true);
+            TheoCrystal theoCrystal = this.CollideFirst<TheoCrystal>();
+            if (theoCrystal != null && !this.Scene.CollideCheck<Solid>(this.Position, theoCrystal.Center))
+                theoCrystal.ExplodeLaunch(this.Position);
+            foreach (TempleCrackedBlock entity in this.Scene.Tracker.GetEntities<TempleCrackedBlock>())
             {
-                _ = player.ExplodeLaunch(Position, false, true);
+                if (this.CollideCheck((Entity) entity))
+                    entity.Break(this.Position);
             }
-
-            TheoCrystal theoCrystal = CollideFirst<TheoCrystal>();
-            if (theoCrystal != null && !Scene.CollideCheck<Solid>(Position, theoCrystal.Center))
+            foreach (TouchSwitch entity in this.Scene.Tracker.GetEntities<TouchSwitch>())
             {
-                theoCrystal.ExplodeLaunch(Position);
-            }
-
-            foreach (TempleCrackedBlock entity in Scene.Tracker.GetEntities<TempleCrackedBlock>())
-            {
-                if (CollideCheck(entity))
-                {
-                    entity.Break(Position);
-                }
-            }
-            foreach (TouchSwitch entity in Scene.Tracker.GetEntities<TouchSwitch>())
-            {
-                if (CollideCheck(entity))
-                {
+                if (this.CollideCheck((Entity) entity))
                     entity.TurnOn();
-                }
             }
-            foreach (FloatingDebris entity in Scene.Tracker.GetEntities<FloatingDebris>())
+            foreach (FloatingDebris entity in this.Scene.Tracker.GetEntities<FloatingDebris>())
             {
-                if (CollideCheck(entity))
-                {
-                    entity.OnExplode(Position);
-                }
+                if (this.CollideCheck((Entity) entity))
+                    entity.OnExplode(this.Position);
             }
-            Collider = collider;
-            Level level = SceneAs<Level>();
+            this.Collider = collider;
+            Level level = this.SceneAs<Level>();
             level.Shake();
-            _ = level.Displacement.AddBurst(Position, 0.4f, 12f, 36f, 0.5f);
-            _ = level.Displacement.AddBurst(Position, 0.4f, 24f, 48f, 0.5f);
-            _ = level.Displacement.AddBurst(Position, 0.4f, 36f, 60f, 0.5f);
-            for (float direction = 0.0f; (double)direction < 6.2831854820251465; direction += 0.17453292f)
+            level.Displacement.AddBurst(this.Position, 0.4f, 12f, 36f, 0.5f);
+            level.Displacement.AddBurst(this.Position, 0.4f, 24f, 48f, 0.5f);
+            level.Displacement.AddBurst(this.Position, 0.4f, 36f, 60f, 0.5f);
+            for (float direction = 0.0f; (double) direction < 6.2831854820251465; direction += 0.17453292f)
             {
-                Vector2 position = Center + Calc.AngleToVector(direction + Calc.Random.Range(-1f * (float)Math.PI / 90f, (float)Math.PI / 90f), Calc.Random.Range(12, 18));
+                Vector2 position = this.Center + Calc.AngleToVector(direction + Calc.Random.Range(-1f * (float) Math.PI / 90f, (float) Math.PI / 90f), (float) Calc.Random.Range(12, 18));
                 level.Particles.Emit(Seeker.P_Regen, position, direction);
             }
         }
 
         public override void Render()
         {
-            sprite.Scale = scale * (float)(1.0 + ((double)inflateWiggler.Value * 0.40000000596046448));
-            Sprite sprite1 = sprite;
-            sprite1.Scale *= facing;
+            this.sprite.Scale = this.scale * (float) (1.0 + (double) this.inflateWiggler.Value * 0.40000000596046448);
+            Sprite sprite1 = this.sprite;
+            sprite1.Scale = sprite1.Scale * this.facing;
             bool flag1 = false;
-            if (sprite.CurrentAnimationID is not "hidden" and not "explode" and not "recover")
-            {
+            if (this.sprite.CurrentAnimationID != "hidden" && this.sprite.CurrentAnimationID != "explode" && this.sprite.CurrentAnimationID != "recover")
                 flag1 = true;
-            }
-            else if (sprite.CurrentAnimationID == "explode" && sprite.CurrentAnimationFrame <= 1)
-            {
+            else if (this.sprite.CurrentAnimationID == "explode" && this.sprite.CurrentAnimationFrame <= 1)
                 flag1 = true;
-            }
-            else if (sprite.CurrentAnimationID == "recover" && sprite.CurrentAnimationFrame >= 4)
-            {
+            else if (this.sprite.CurrentAnimationID == "recover" && this.sprite.CurrentAnimationFrame >= 4)
                 flag1 = true;
-            }
-
             if (flag1)
-            {
-                sprite.DrawSimpleOutline();
-            }
-
-            float num1 = playerAliveFade * Calc.ClampedMap((Position - lastPlayerPos).Length(), 128f, 96f);
-            if ((double)num1 > 0.0 && state != Puffer.States.Gone)
+                this.sprite.DrawSimpleOutline();
+            float num1 = this.playerAliveFade * Calc.ClampedMap((this.Position - this.lastPlayerPos).Length(), 128f, 96f);
+            if ((double) num1 > 0.0 && this.state != Puffer.States.Gone)
             {
                 bool flag2 = false;
                 Vector2 lastPlayerPos = this.lastPlayerPos;
-                if (lastPlayerPos.Y < (double)Y)
+                if ((double) lastPlayerPos.Y < (double) this.Y)
                 {
-                    lastPlayerPos.Y = Y - (float)((lastPlayerPos.Y - (double)Y) * 0.5);
-                    lastPlayerPos.X += lastPlayerPos.X - X;
+                    lastPlayerPos.Y = this.Y - (float) (((double) lastPlayerPos.Y - (double) this.Y) * 0.5);
+                    lastPlayerPos.X += lastPlayerPos.X - this.X;
                     flag2 = true;
                 }
-                float radiansB = (lastPlayerPos - Position).Angle();
+                float radiansB = (lastPlayerPos - this.Position).Angle();
                 for (int index = 0; index < 28; ++index)
                 {
-                    float num2 = (float)Math.Sin(Scene.TimeActive * 0.5) * 0.02f;
-                    float num3 = Calc.Map((index / 28f) + num2, 0.0f, 1f, -1f * (float)Math.PI / 30f, 3.24631262f) + (float)((double)bounceWiggler.Value * 20.0 * (Math.PI / 180.0));
+                    float num2 = (float) Math.Sin((double) this.Scene.TimeActive * 0.5) * 0.02f;
+                    float num3 = Calc.Map((float) index / 28f + num2, 0.0f, 1f, -1f * (float) Math.PI / 30f, 3.24631262f) + (float) ((double) this.bounceWiggler.Value * 20.0 * (Math.PI / 180.0));
                     Vector2 vector = Calc.AngleToVector(num3, 1f);
-                    Vector2 start = Position + (vector * 32f);
+                    Vector2 start = this.Position + vector * 32f;
                     float t = Calc.ClampedMap(Calc.AbsAngleDiff(num3, radiansB), 1.57079637f, 0.17453292f);
                     float num4 = Ease.CubeOut(t) * 0.8f * num1;
-                    if ((double)num4 > 0.0)
+                    if ((double) num4 > 0.0)
                     {
-                        if (index is 0 or 27)
+                        if (index == 0 || index == 27)
                         {
-                            Draw.Line(start, start - (vector * 10f), Color.White * num4);
+                            Draw.Line(start, start - vector * 10f, Color.White * num4);
                         }
                         else
                         {
-                            Vector2 vector2_1 = vector * (float)Math.Sin((Scene.TimeActive * 2.0) + (index * 0.60000002384185791));
+                            Vector2 vector2_1 = vector * (float) Math.Sin((double) this.Scene.TimeActive * 2.0 + (double) index * 0.60000002384185791);
                             if (index % 2 == 0)
-                            {
                                 vector2_1 *= -1f;
-                            }
-
                             Vector2 vector2_2 = start + vector2_1;
-                            if (!flag2 && (double)Calc.AbsAngleDiff(num3, radiansB) <= 0.17453292012214661)
-                            {
-                                Draw.Line(vector2_2, vector2_2 - (vector * 3f), Color.White * num4);
-                            }
+                            if (!flag2 && (double) Calc.AbsAngleDiff(num3, radiansB) <= 0.17453292012214661)
+                                Draw.Line(vector2_2, vector2_2 - vector * 3f, Color.White * num4);
                             else
-                            {
                                 Draw.Point(vector2_2, Color.White * num4);
-                            }
                         }
                     }
                 }
             }
             base.Render();
-            if (sprite.CurrentAnimationID == "alerted")
+            if (this.sprite.CurrentAnimationID == "alerted")
             {
-                Vector2 from = Position + (new Vector2(3f, facing.X < 0.0 ? -5f : -4f) * sprite.Scale);
-                Vector2 vector = Calc.AngleToVector(Calc.Angle(from, lastPlayerPos + new Vector2(0.0f, -4f)) + (float)(eyeSpin * 6.2831854820251465 * 2.0), 1f);
-                Vector2 vector2 = from + new Vector2((float)Math.Round(vector.X), (float)Math.Round((double)Calc.ClampedMap(vector.Y, -1f, 1f, -1f, 2f)));
+                Vector2 from = this.Position + new Vector2(3f, (double) this.facing.X < 0.0 ? -5f : -4f) * this.sprite.Scale;
+                Vector2 vector = Calc.AngleToVector(Calc.Angle(from, this.lastPlayerPos + new Vector2(0.0f, -4f)) + (float) ((double) this.eyeSpin * 6.2831854820251465 * 2.0), 1f);
+                Vector2 vector2 = from + new Vector2((float) Math.Round((double) vector.X), (float) Math.Round((double) Calc.ClampedMap(vector.Y, -1f, 1f, -1f, 2f)));
                 Draw.Rect(vector2.X, vector2.Y, 1f, 1f, Color.Black);
             }
-            Sprite sprite2 = sprite;
-            sprite2.Scale /= facing;
+            Sprite sprite2 = this.sprite;
+            sprite2.Scale = sprite2.Scale / this.facing;
         }
 
         public override void Update()
         {
             base.Update();
-            eyeSpin = Calc.Approach(eyeSpin, 0.0f, Engine.DeltaTime * 1.5f);
-            scale = Calc.Approach(scale, Vector2.One, 1f * Engine.DeltaTime);
-            if (cannotHitTimer > 0.0)
-            {
-                cannotHitTimer -= Engine.DeltaTime;
-            }
-
-            if (state != Puffer.States.Gone && cantExplodeTimer > 0.0)
-            {
-                cantExplodeTimer -= Engine.DeltaTime;
-            }
-
-            if (alertTimer > 0.0)
-            {
-                alertTimer -= Engine.DeltaTime;
-            }
-
-            Player entity = Scene.Tracker.GetEntity<Player>();
+            this.eyeSpin = Calc.Approach(this.eyeSpin, 0.0f, Engine.DeltaTime * 1.5f);
+            this.scale = Calc.Approach(this.scale, Vector2.One, 1f * Engine.DeltaTime);
+            if ((double) this.cannotHitTimer > 0.0)
+                this.cannotHitTimer -= Engine.DeltaTime;
+            if (this.state != Puffer.States.Gone && (double) this.cantExplodeTimer > 0.0)
+                this.cantExplodeTimer -= Engine.DeltaTime;
+            if ((double) this.alertTimer > 0.0)
+                this.alertTimer -= Engine.DeltaTime;
+            Player entity = this.Scene.Tracker.GetEntity<Player>();
             if (entity == null)
             {
-                playerAliveFade = Calc.Approach(playerAliveFade, 0.0f, 1f * Engine.DeltaTime);
+                this.playerAliveFade = Calc.Approach(this.playerAliveFade, 0.0f, 1f * Engine.DeltaTime);
             }
             else
             {
-                playerAliveFade = Calc.Approach(playerAliveFade, 1f, 1f * Engine.DeltaTime);
-                lastPlayerPos = entity.Center;
+                this.playerAliveFade = Calc.Approach(this.playerAliveFade, 1f, 1f * Engine.DeltaTime);
+                this.lastPlayerPos = entity.Center;
             }
-            switch (state)
+            switch (this.state)
             {
                 case Puffer.States.Idle:
-                    if (Position != lastSinePosition)
+                    if (this.Position != this.lastSinePosition)
+                        this.anchorPosition += this.Position - this.lastSinePosition;
+                    Vector2 vector2 = this.anchorPosition + new Vector2(this.idleSine.Value * 3f, this.idleSine.ValueOverTwo * 2f);
+                    this.MoveToX(vector2.X);
+                    this.MoveToY(vector2.Y);
+                    this.lastSinePosition = this.Position;
+                    if (this.ProximityExplodeCheck())
                     {
-                        anchorPosition += Position - lastSinePosition;
-                    }
-
-                    Vector2 vector2 = anchorPosition + new Vector2(idleSine.Value * 3f, idleSine.ValueOverTwo * 2f);
-                    MoveToX(vector2.X);
-                    MoveToY(vector2.Y);
-                    lastSinePosition = Position;
-                    if (ProximityExplodeCheck())
-                    {
-                        Explode();
-                        GotoGone();
+                        this.Explode();
+                        this.GotoGone();
                         break;
                     }
-                    if (AlertedCheck())
+                    if (this.AlertedCheck())
+                        this.Alert(false, true);
+                    else if (this.sprite.CurrentAnimationID == "alerted" && (double) this.alertTimer <= 0.0)
                     {
-                        Alert(false, true);
+                        Audio.Play("event:/new_content/game/10_farewell/puffer_shrink", this.Position);
+                        this.sprite.Play("unalert");
                     }
-                    else if (sprite.CurrentAnimationID == "alerted" && alertTimer <= 0.0)
-                    {
-                        _ = Audio.Play("event:/new_content/game/10_farewell/puffer_shrink", Position);
-                        sprite.Play("unalert");
-                    }
-                    using (List<Component>.Enumerator enumerator = Scene.Tracker.GetComponents<PufferCollider>().GetEnumerator())
+                    using (List<Component>.Enumerator enumerator = this.Scene.Tracker.GetComponents<PufferCollider>().GetEnumerator())
                     {
                         while (enumerator.MoveNext())
-                        {
-                            ((PufferCollider)enumerator.Current).Check(this);
-                        }
-
+                            ((PufferCollider) enumerator.Current).Check(this);
                         break;
                     }
                 case Puffer.States.Hit:
-                    lastSpeedPosition = Position;
-                    _ = MoveH(hitSpeed.X * Engine.DeltaTime, onCollideH);
-                    _ = MoveV(hitSpeed.Y * Engine.DeltaTime, new Collision(OnCollideV));
-                    anchorPosition = Position;
-                    hitSpeed.X = Calc.Approach(hitSpeed.X, 0.0f, 150f * Engine.DeltaTime);
-                    hitSpeed = Calc.Approach(hitSpeed, Vector2.Zero, 320f * Engine.DeltaTime);
-                    if (ProximityExplodeCheck())
+                    this.lastSpeedPosition = this.Position;
+                    this.MoveH(this.hitSpeed.X * Engine.DeltaTime, this.onCollideH);
+                    this.MoveV(this.hitSpeed.Y * Engine.DeltaTime, new Collision(this.OnCollideV));
+                    this.anchorPosition = this.Position;
+                    this.hitSpeed.X = Calc.Approach(this.hitSpeed.X, 0.0f, 150f * Engine.DeltaTime);
+                    this.hitSpeed = Calc.Approach(this.hitSpeed, Vector2.Zero, 320f * Engine.DeltaTime);
+                    if (this.ProximityExplodeCheck())
                     {
-                        Explode();
-                        GotoGone();
+                        this.Explode();
+                        this.GotoGone();
                         break;
                     }
-                    if ((double)Top >= SceneAs<Level>().Bounds.Bottom + 5)
+                    if ((double) this.Top >= (double) (this.SceneAs<Level>().Bounds.Bottom + 5))
                     {
-                        sprite.Play("hidden");
-                        GotoGone();
+                        this.sprite.Play("hidden");
+                        this.GotoGone();
                         break;
                     }
-                    foreach (PufferCollider component in Scene.Tracker.GetComponents<PufferCollider>())
-                    {
+                    foreach (PufferCollider component in this.Scene.Tracker.GetComponents<PufferCollider>())
                         component.Check(this);
-                    }
-
-                    if (!(hitSpeed == Vector2.Zero))
-                    {
+                    if (!(this.hitSpeed == Vector2.Zero))
                         break;
-                    }
-
-                    ZeroRemainderX();
-                    ZeroRemainderY();
-                    GotoIdle();
+                    this.ZeroRemainderX();
+                    this.ZeroRemainderY();
+                    this.GotoIdle();
                     break;
                 case Puffer.States.Gone:
                     float goneTimer = this.goneTimer;
                     this.goneTimer -= Engine.DeltaTime;
-                    if (this.goneTimer <= 0.5)
+                    if ((double) this.goneTimer <= 0.5)
                     {
-                        if ((double)goneTimer > 0.5 && (double)returnCurve.GetLengthParametric(8) > 8.0)
-                        {
-                            _ = Audio.Play("event:/new_content/game/10_farewell/puffer_return", Position);
-                        }
-
-                        Position = returnCurve.GetPoint(Ease.CubeInOut(Calc.ClampedMap(this.goneTimer, 0.5f, 0.0f)));
+                        if ((double) goneTimer > 0.5 && (double) this.returnCurve.GetLengthParametric(8) > 8.0)
+                            Audio.Play("event:/new_content/game/10_farewell/puffer_return", this.Position);
+                        this.Position = this.returnCurve.GetPoint(Ease.CubeInOut(Calc.ClampedMap(this.goneTimer, 0.5f, 0.0f)));
                     }
-                    if (this.goneTimer > 0.0)
-                    {
+                    if ((double) this.goneTimer > 0.0)
                         break;
-                    }
-
-                    Visible = Collidable = true;
-                    GotoIdle();
+                    this.Visible = this.Collidable = true;
+                    this.GotoIdle();
                     break;
             }
         }
@@ -450,114 +369,90 @@ namespace Celeste
             switch (spring.Orientation)
             {
                 case Spring.Orientations.WallLeft:
-                    if (hitSpeed.X > 60.0)
-                    {
+                    if ((double) this.hitSpeed.X > 60.0)
                         return false;
-                    }
-
-                    facing.X = 1f;
-                    GotoHitSpeed(280f * Vector2.UnitX);
-                    MoveTowardsY(spring.CenterY, 4f);
-                    bounceWiggler.Start();
-                    Alert(true, false);
+                    this.facing.X = 1f;
+                    this.GotoHitSpeed(280f * Vector2.UnitX);
+                    this.MoveTowardsY(spring.CenterY, 4f);
+                    this.bounceWiggler.Start();
+                    this.Alert(true, false);
                     return true;
                 case Spring.Orientations.WallRight:
-                    if (hitSpeed.X < -60.0)
-                    {
+                    if ((double) this.hitSpeed.X < -60.0)
                         return false;
-                    }
-
-                    facing.X = -1f;
-                    GotoHitSpeed(280f * -Vector2.UnitX);
-                    MoveTowardsY(spring.CenterY, 4f);
-                    bounceWiggler.Start();
-                    Alert(true, false);
+                    this.facing.X = -1f;
+                    this.GotoHitSpeed(280f * -Vector2.UnitX);
+                    this.MoveTowardsY(spring.CenterY, 4f);
+                    this.bounceWiggler.Start();
+                    this.Alert(true, false);
                     return true;
                 default:
-                    if (hitSpeed.Y < 0.0)
-                    {
+                    if ((double) this.hitSpeed.Y < 0.0)
                         return false;
-                    }
-
-                    GotoHitSpeed(224f * -Vector2.UnitY);
-                    MoveTowardsX(spring.CenterX, 4f);
-                    bounceWiggler.Start();
-                    Alert(true, false);
+                    this.GotoHitSpeed(224f * -Vector2.UnitY);
+                    this.MoveTowardsX(spring.CenterX, 4f);
+                    this.bounceWiggler.Start();
+                    this.Alert(true, false);
                     return true;
             }
         }
 
         private bool ProximityExplodeCheck()
         {
-            if (cantExplodeTimer > 0.0)
-            {
+            if ((double) this.cantExplodeTimer > 0.0)
                 return false;
-            }
-
             bool flag = false;
-            Collider collider = Collider;
-            Collider = detectRadius;
+            Collider collider = this.Collider;
+            this.Collider = (Collider) this.detectRadius;
             Player player;
-            if ((player = CollideFirst<Player>()) != null && (double)player.CenterY >= (double)Y + (double)collider.Bottom - 4.0 && !Scene.CollideCheck<Solid>(Position, player.Center))
-            {
+            if ((player = this.CollideFirst<Player>()) != null && (double) player.CenterY >= (double) this.Y + (double) collider.Bottom - 4.0 && !this.Scene.CollideCheck<Solid>(this.Position, player.Center))
                 flag = true;
-            }
-
-            Collider = collider;
+            this.Collider = collider;
             return flag;
         }
 
         private bool AlertedCheck()
         {
-            Player entity = Scene.Tracker.GetEntity<Player>();
-            return entity != null && (double)(entity.Center - Center).Length() < 60.0;
+            Player entity = this.Scene.Tracker.GetEntity<Player>();
+            return entity != null && (double) (entity.Center - this.Center).Length() < 60.0;
         }
 
         private void Alert(bool restart, bool playSfx)
         {
-            if (sprite.CurrentAnimationID == "idle")
+            if (this.sprite.CurrentAnimationID == "idle")
             {
                 if (playSfx)
-                {
-                    _ = Audio.Play("event:/new_content/game/10_farewell/puffer_expand", Position);
-                }
-
-                sprite.Play("alert");
-                inflateWiggler.Start();
+                    Audio.Play("event:/new_content/game/10_farewell/puffer_expand", this.Position);
+                this.sprite.Play("alert");
+                this.inflateWiggler.Start();
             }
             else if (restart && playSfx)
-            {
-                _ = Audio.Play("event:/new_content/game/10_farewell/puffer_expand", Position);
-            }
-
-            alertTimer = 2f;
+                Audio.Play("event:/new_content/game/10_farewell/puffer_expand", this.Position);
+            this.alertTimer = 2f;
         }
 
         private void OnPlayer(Player player)
         {
-            if (state == Puffer.States.Gone || cantExplodeTimer > 0.0)
-            {
+            if (this.state == Puffer.States.Gone || (double) this.cantExplodeTimer > 0.0)
                 return;
-            }
-
-            if (cannotHitTimer <= 0.0)
+            if ((double) this.cannotHitTimer <= 0.0)
             {
-                if ((double)player.Bottom > lastSpeedPosition.Y + 3.0)
+                if ((double) player.Bottom > (double) this.lastSpeedPosition.Y + 3.0)
                 {
-                    Explode();
-                    GotoGone();
+                    this.Explode();
+                    this.GotoGone();
                 }
                 else
                 {
-                    player.Bounce(Top);
-                    GotoHit(player.Center);
-                    MoveToX(anchorPosition.X);
-                    idleSine.Reset();
-                    anchorPosition = lastSinePosition = Position;
-                    eyeSpin = 1f;
+                    player.Bounce(this.Top);
+                    this.GotoHit(player.Center);
+                    this.MoveToX(this.anchorPosition.X);
+                    this.idleSine.Reset();
+                    this.anchorPosition = this.lastSinePosition = this.Position;
+                    this.eyeSpin = 1f;
                 }
             }
-            cannotHitTimer = 0.1f;
+            this.cannotHitTimer = 0.1f;
         }
 
         private enum States

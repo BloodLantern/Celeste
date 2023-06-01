@@ -11,23 +11,23 @@ namespace Celeste
 {
     public class SoundSourceEntity : Entity
     {
-        private readonly string eventName;
-        private readonly SoundSource sfx;
+        private string eventName;
+        private SoundSource sfx;
 
         public SoundSourceEntity(EntityData data, Vector2 offset)
             : base(data.Position + offset)
         {
-            Tag = (int)Tags.TransitionUpdate;
-            Add(sfx = new SoundSource());
-            eventName = SFX.EventnameByHandle(data.Attr("sound"));
-            Visible = true;
-            Depth = -8500;
+            this.Tag = (int) Tags.TransitionUpdate;
+            this.Add((Component) (this.sfx = new SoundSource()));
+            this.eventName = SFX.EventnameByHandle(data.Attr("sound"));
+            this.Visible = true;
+            this.Depth = -8500;
         }
 
         public override void Awake(Scene scene)
         {
             base.Awake(scene);
-            _ = sfx.Play(eventName);
+            this.sfx.Play(this.eventName);
         }
     }
 }

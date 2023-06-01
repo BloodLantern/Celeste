@@ -13,11 +13,11 @@ namespace FMOD
     {
         public TAGTYPE type;
         public TAGDATATYPE datatype;
-        private readonly IntPtr name_internal;
+        private IntPtr name_internal;
         public IntPtr data;
         public uint datalen;
         public bool updated;
 
-        public string name => Marshal.PtrToStringAnsi(name_internal);
+        public string name => Marshal.PtrToStringAnsi(this.name_internal);
     }
 }

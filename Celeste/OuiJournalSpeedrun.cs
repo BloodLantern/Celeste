@@ -11,26 +11,20 @@ namespace Celeste
 {
     public class OuiJournalSpeedrun : OuiJournalPage
     {
-        private readonly OuiJournalPage.Table table;
+        private OuiJournalPage.Table table;
 
         public OuiJournalSpeedrun(OuiJournal journal)
             : base(journal)
         {
-            PageTexture = "page";
-            Vector2 justify = new(0.5f, 0.5f);
+            this.PageTexture = "page";
+            Vector2 justify = new Vector2(0.5f, 0.5f);
             float scale = 0.5f;
             Color color = Color.Black * 0.6f;
-            table = new OuiJournalPage.Table().AddColumn(new OuiJournalPage.TextCell(Dialog.Clean("journal_speedruns"), new Vector2(1f, 0.5f), 0.7f, Color.Black * 0.7f)).AddColumn(new OuiJournalPage.TextCell(Dialog.Clean("journal_mode_normal"), justify, scale + 0.1f, color, 240f)).AddColumn(new OuiJournalPage.TextCell(Dialog.Clean("journal_mode_normal_fullclear"), justify, scale + 0.1f, color, 240f));
+            this.table = new OuiJournalPage.Table().AddColumn((OuiJournalPage.Cell) new OuiJournalPage.TextCell(Dialog.Clean("journal_speedruns"), new Vector2(1f, 0.5f), 0.7f, Color.Black * 0.7f)).AddColumn((OuiJournalPage.Cell) new OuiJournalPage.TextCell(Dialog.Clean("journal_mode_normal"), justify, scale + 0.1f, color, 240f)).AddColumn((OuiJournalPage.Cell) new OuiJournalPage.TextCell(Dialog.Clean("journal_mode_normal_fullclear"), justify, scale + 0.1f, color, 240f));
             if (SaveData.Instance.UnlockedModes >= 2)
-            {
-                _ = table.AddColumn(new OuiJournalPage.TextCell(Dialog.Clean("journal_mode_bside"), justify, scale + 0.1f, color, 240f));
-            }
-
+                this.table.AddColumn((OuiJournalPage.Cell) new OuiJournalPage.TextCell(Dialog.Clean("journal_mode_bside"), justify, scale + 0.1f, color, 240f));
             if (SaveData.Instance.UnlockedModes >= 3)
-            {
-                _ = table.AddColumn(new OuiJournalPage.TextCell(Dialog.Clean("journal_mode_cside"), justify, scale + 0.1f, color, 240f));
-            }
-
+                this.table.AddColumn((OuiJournalPage.Cell) new OuiJournalPage.TextCell(Dialog.Clean("journal_mode_cside"), justify, scale + 0.1f, color, 240f));
             foreach (AreaStats area in SaveData.Instance.Areas)
             {
                 AreaData areaData = AreaData.Get(area.ID);
@@ -38,38 +32,47 @@ namespace Celeste
                 {
                     if (areaData.ID <= SaveData.Instance.UnlockedAreas)
                     {
-                        OuiJournalPage.Row row = table.AddRow().Add(new OuiJournalPage.TextCell(Dialog.Clean(areaData.Name), new Vector2(1f, 0.5f), scale + 0.1f, color));
-                        _ = area.Modes[0].BestTime > 0L
-                            ? row.Add(new OuiJournalPage.TextCell(Dialog.Time(area.Modes[0].BestTime), justify, scale, color))
-                            : row.Add(new OuiJournalPage.IconCell("dot"));
-
-                        _ = areaData.CanFullClear
-                            ? area.Modes[0].BestFullClearTime > 0L
-                                ? row.Add(new OuiJournalPage.TextCell(Dialog.Time(area.Modes[0].BestFullClearTime), justify, scale, color))
-                                : row.Add(new OuiJournalPage.IconCell("dot"))
-                            : row.Add(new OuiJournalPage.TextCell("-", TextJustify, 0.5f, TextColor));
-
+                        OuiJournalPage.Row row = this.table.AddRow().Add((OuiJournalPage.Cell) new OuiJournalPage.TextCell(Dialog.Clean(areaData.Name), new Vector2(1f, 0.5f), scale + 0.1f, color));
+                        if (area.Modes[0].BestTime > 0L)
+                            row.Add((OuiJournalPage.Cell) new OuiJournalPage.TextCell(Dialog.Time(area.Modes[0].BestTime), justify, scale, color));
+                        else
+                            row.Add((OuiJournalPage.Cell) new OuiJournalPage.IconCell("dot"));
+                        if (areaData.CanFullClear)
+                        {
+                            if (area.Modes[0].BestFullClearTime > 0L)
+                                row.Add((OuiJournalPage.Cell) new OuiJournalPage.TextCell(Dialog.Time(area.Modes[0].BestFullClearTime), justify, scale, color));
+                            else
+                                row.Add((OuiJournalPage.Cell) new OuiJournalPage.IconCell("dot"));
+                        }
+                        else
+                            row.Add((OuiJournalPage.Cell) new OuiJournalPage.TextCell("-", this.TextJustify, 0.5f, this.TextColor));
                         if (SaveData.Instance.UnlockedModes >= 2)
                         {
-                            _ = areaData.HasMode(AreaMode.BSide)
-                                ? area.Modes[1].BestTime > 0L
-                                    ? row.Add(new OuiJournalPage.TextCell(Dialog.Time(area.Modes[1].BestTime), justify, scale, color))
-                                    : row.Add(new OuiJournalPage.IconCell("dot"))
-                                : row.Add(new OuiJournalPage.TextCell("-", TextJustify, 0.5f, TextColor));
+                            if (areaData.HasMode(AreaMode.BSide))
+                            {
+                                if (area.Modes[1].BestTime > 0L)
+                                    row.Add((OuiJournalPage.Cell) new OuiJournalPage.TextCell(Dialog.Time(area.Modes[1].BestTime), justify, scale, color));
+                                else
+                                    row.Add((OuiJournalPage.Cell) new OuiJournalPage.IconCell("dot"));
+                            }
+                            else
+                                row.Add((OuiJournalPage.Cell) new OuiJournalPage.TextCell("-", this.TextJustify, 0.5f, this.TextColor));
                         }
                         if (SaveData.Instance.UnlockedModes >= 3)
                         {
-                            _ = areaData.HasMode(AreaMode.CSide)
-                                ? area.Modes[2].BestTime > 0L
-                                    ? row.Add(new OuiJournalPage.TextCell(Dialog.Time(area.Modes[2].BestTime), justify, scale, color))
-                                    : row.Add(new OuiJournalPage.IconCell("dot"))
-                                : row.Add(new OuiJournalPage.TextCell("-", TextJustify, 0.5f, TextColor));
+                            if (areaData.HasMode(AreaMode.CSide))
+                            {
+                                if (area.Modes[2].BestTime > 0L)
+                                    row.Add((OuiJournalPage.Cell) new OuiJournalPage.TextCell(Dialog.Time(area.Modes[2].BestTime), justify, scale, color));
+                                else
+                                    row.Add((OuiJournalPage.Cell) new OuiJournalPage.IconCell("dot"));
+                            }
+                            else
+                                row.Add((OuiJournalPage.Cell) new OuiJournalPage.TextCell("-", this.TextJustify, 0.5f, this.TextColor));
                         }
                     }
                     else
-                    {
                         break;
-                    }
                 }
             }
             bool flag1 = true;
@@ -99,51 +102,42 @@ namespace Celeste
                     ticks3 += area.Modes[1].BestTime;
                     ticks4 += area.Modes[2].BestTime;
                     if (area.Modes[0].BestTime <= 0L)
-                    {
                         flag1 = false;
-                    }
-
                     if (areaData.CanFullClear && area.Modes[0].BestFullClearTime <= 0L)
-                    {
                         flag2 = false;
-                    }
-
                     if (areaData.HasMode(AreaMode.BSide) && area.Modes[1].BestTime <= 0L)
-                    {
                         flag3 = false;
-                    }
-
                     if (areaData.HasMode(AreaMode.CSide) && area.Modes[2].BestTime <= 0L)
-                    {
                         flag4 = false;
-                    }
                 }
             }
             if (flag1 | flag2 | flag3 | flag4)
             {
-                _ = table.AddRow();
-                OuiJournalPage.Row row = table.AddRow().Add(new OuiJournalPage.TextCell(Dialog.Clean("journal_totals"), new Vector2(1f, 0.5f), scale + 0.2f, color));
-                _ = flag1
-                    ? row.Add(new OuiJournalPage.TextCell(Dialog.Time(ticks1), justify, scale + 0.1f, color))
-                    : row.Add(new OuiJournalPage.IconCell("dot"));
-
-                _ = flag2
-                    ? row.Add(new OuiJournalPage.TextCell(Dialog.Time(ticks2), justify, scale + 0.1f, color))
-                    : row.Add(new OuiJournalPage.IconCell("dot"));
-
+                this.table.AddRow();
+                OuiJournalPage.Row row = this.table.AddRow().Add((OuiJournalPage.Cell) new OuiJournalPage.TextCell(Dialog.Clean("journal_totals"), new Vector2(1f, 0.5f), scale + 0.2f, color));
+                if (flag1)
+                    row.Add((OuiJournalPage.Cell) new OuiJournalPage.TextCell(Dialog.Time(ticks1), justify, scale + 0.1f, color));
+                else
+                    row.Add((OuiJournalPage.Cell) new OuiJournalPage.IconCell("dot"));
+                if (flag2)
+                    row.Add((OuiJournalPage.Cell) new OuiJournalPage.TextCell(Dialog.Time(ticks2), justify, scale + 0.1f, color));
+                else
+                    row.Add((OuiJournalPage.Cell) new OuiJournalPage.IconCell("dot"));
                 if (SaveData.Instance.UnlockedModes >= 2)
                 {
-                    _ = flag3
-                        ? row.Add(new OuiJournalPage.TextCell(Dialog.Time(ticks3), justify, scale + 0.1f, color))
-                        : row.Add(new OuiJournalPage.IconCell("dot"));
+                    if (flag3)
+                        row.Add((OuiJournalPage.Cell) new OuiJournalPage.TextCell(Dialog.Time(ticks3), justify, scale + 0.1f, color));
+                    else
+                        row.Add((OuiJournalPage.Cell) new OuiJournalPage.IconCell("dot"));
                 }
                 if (SaveData.Instance.UnlockedModes >= 3)
                 {
-                    _ = flag4
-                        ? row.Add(new OuiJournalPage.TextCell(Dialog.Time(ticks4), justify, scale + 0.1f, color))
-                        : row.Add(new OuiJournalPage.IconCell("dot"));
+                    if (flag4)
+                        row.Add((OuiJournalPage.Cell) new OuiJournalPage.TextCell(Dialog.Time(ticks4), justify, scale + 0.1f, color));
+                    else
+                        row.Add((OuiJournalPage.Cell) new OuiJournalPage.IconCell("dot"));
                 }
-                _ = table.AddRow();
+                this.table.AddRow();
             }
             long num1 = 0;
             foreach (AreaStats area in SaveData.Instance.Areas)
@@ -154,38 +148,31 @@ namespace Celeste
                     if (areaData.ID <= SaveData.Instance.UnlockedAreas)
                     {
                         num1 += area.Modes[0].BestTime;
-                        OuiJournalPage.Row row = table.AddRow().Add(new OuiJournalPage.TextCell(Dialog.Clean(areaData.Name), new Vector2(1f, 0.5f), scale + 0.1f, color));
-                        _ = row.Add(null);
+                        OuiJournalPage.Row row = this.table.AddRow().Add((OuiJournalPage.Cell) new OuiJournalPage.TextCell(Dialog.Clean(areaData.Name), new Vector2(1f, 0.5f), scale + 0.1f, color));
+                        row.Add((OuiJournalPage.Cell) null);
                         OuiJournalPage.Cell cell;
-                        _ = area.Modes[0].BestTime > 0L
-                            ? row.Add(cell = new OuiJournalPage.TextCell(Dialog.Time(area.Modes[0].BestTime), justify, scale, color))
-                            : row.Add(cell = new OuiJournalPage.IconCell("dot"));
-
-                        _ = table.AddRow();
+                        if (area.Modes[0].BestTime > 0L)
+                            row.Add(cell = (OuiJournalPage.Cell) new OuiJournalPage.TextCell(Dialog.Time(area.Modes[0].BestTime), justify, scale, color));
+                        else
+                            row.Add(cell = (OuiJournalPage.Cell) new OuiJournalPage.IconCell("dot"));
+                        this.table.AddRow();
                     }
                     else
-                    {
                         break;
-                    }
                 }
             }
             if (!(flag1 & flag2 & flag3 & flag4))
-            {
                 return;
-            }
-
-            OuiJournalPage.TextCell entry = new(Dialog.Time(ticks1 + ticks2 + ticks3 + ticks4 + num1), justify, scale + 0.2f, color)
-            {
-                SpreadOverColumns = 1 + SaveData.Instance.UnlockedModes
-            };
-            _ = table.AddRow().Add(new OuiJournalPage.TextCell(Dialog.Clean("journal_grandtotal"), new Vector2(1f, 0.5f), scale + 0.3f, color)).Add(entry);
+            OuiJournalPage.TextCell entry = new OuiJournalPage.TextCell(Dialog.Time(ticks1 + ticks2 + ticks3 + ticks4 + num1), justify, scale + 0.2f, color);
+            entry.SpreadOverColumns = 1 + SaveData.Instance.UnlockedModes;
+            this.table.AddRow().Add((OuiJournalPage.Cell) new OuiJournalPage.TextCell(Dialog.Clean("journal_grandtotal"), new Vector2(1f, 0.5f), scale + 0.3f, color)).Add((OuiJournalPage.Cell) entry);
         }
 
         public override void Redraw(VirtualRenderTarget buffer)
         {
             base.Redraw(buffer);
             Draw.SpriteBatch.Begin();
-            table.Render(new Vector2(60f, 20f));
+            this.table.Render(new Vector2(60f, 20f));
             Draw.SpriteBatch.End();
         }
     }

@@ -14,14 +14,11 @@ namespace FMOD
     {
         public RESULT release()
         {
-            int num = (int)ChannelGroup.FMOD_ChannelGroup_Release(getRaw());
+            int num = (int) ChannelGroup.FMOD_ChannelGroup_Release(this.getRaw());
             if (num != 0)
-            {
-                return (RESULT)num;
-            }
-
-            rawPtr = IntPtr.Zero;
-            return (RESULT)num;
+                return (RESULT) num;
+            this.rawPtr = IntPtr.Zero;
+            return (RESULT) num;
         }
 
         public RESULT addGroup(
@@ -29,49 +26,51 @@ namespace FMOD
             bool propagatedspclock,
             out DSPConnection connection)
         {
-            int num = (int)ChannelGroup.FMOD_ChannelGroup_AddGroup(getRaw(), group.getRaw(), propagatedspclock, out IntPtr connection1);
+            connection = (DSPConnection) null;
+            IntPtr connection1;
+            int num = (int) ChannelGroup.FMOD_ChannelGroup_AddGroup(this.getRaw(), group.getRaw(), propagatedspclock, out connection1);
             connection = new DSPConnection(connection1);
-            return (RESULT)num;
+            return (RESULT) num;
         }
 
-        public RESULT getNumGroups(out int numgroups)
-        {
-            return ChannelGroup.FMOD_ChannelGroup_GetNumGroups(getRaw(), out numgroups);
-        }
+        public RESULT getNumGroups(out int numgroups) => ChannelGroup.FMOD_ChannelGroup_GetNumGroups(this.getRaw(), out numgroups);
 
         public RESULT getGroup(int index, out ChannelGroup group)
         {
-            int group2 = (int)ChannelGroup.FMOD_ChannelGroup_GetGroup(getRaw(), index, out IntPtr group1);
+            group = (ChannelGroup) null;
+            IntPtr group1;
+            int group2 = (int) ChannelGroup.FMOD_ChannelGroup_GetGroup(this.getRaw(), index, out group1);
             group = new ChannelGroup(group1);
-            return (RESULT)group2;
+            return (RESULT) group2;
         }
 
         public RESULT getParentGroup(out ChannelGroup group)
         {
-            int parentGroup = (int)ChannelGroup.FMOD_ChannelGroup_GetParentGroup(getRaw(), out IntPtr group1);
+            group = (ChannelGroup) null;
+            IntPtr group1;
+            int parentGroup = (int) ChannelGroup.FMOD_ChannelGroup_GetParentGroup(this.getRaw(), out group1);
             group = new ChannelGroup(group1);
-            return (RESULT)parentGroup;
+            return (RESULT) parentGroup;
         }
 
         public RESULT getName(StringBuilder name, int namelen)
         {
             IntPtr num = Marshal.AllocHGlobal(name.Capacity);
-            int name1 = (int)ChannelGroup.FMOD_ChannelGroup_GetName(getRaw(), num, namelen);
+            int name1 = (int) ChannelGroup.FMOD_ChannelGroup_GetName(this.getRaw(), num, namelen);
             StringMarshalHelper.NativeToBuilder(name, num);
             Marshal.FreeHGlobal(num);
-            return (RESULT)name1;
+            return (RESULT) name1;
         }
 
-        public RESULT getNumChannels(out int numchannels)
-        {
-            return ChannelGroup.FMOD_ChannelGroup_GetNumChannels(getRaw(), out numchannels);
-        }
+        public RESULT getNumChannels(out int numchannels) => ChannelGroup.FMOD_ChannelGroup_GetNumChannels(this.getRaw(), out numchannels);
 
         public RESULT getChannel(int index, out Channel channel)
         {
-            int channel2 = (int)ChannelGroup.FMOD_ChannelGroup_GetChannel(getRaw(), index, out IntPtr channel1);
+            channel = (Channel) null;
+            IntPtr channel1;
+            int channel2 = (int) ChannelGroup.FMOD_ChannelGroup_GetChannel(this.getRaw(), index, out channel1);
             channel = new Channel(channel1);
-            return (RESULT)channel2;
+            return (RESULT) channel2;
         }
 
         [DllImport("fmod")]

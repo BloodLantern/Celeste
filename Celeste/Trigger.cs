@@ -20,36 +20,37 @@ namespace Celeste
         public Trigger(EntityData data, Vector2 offset)
             : base(data.Position + offset)
         {
-            Collider = new Hitbox(data.Width, data.Height);
-            Visible = false;
+            this.Collider = (Collider) new Hitbox((float) data.Width, (float) data.Height);
+            this.Visible = false;
         }
 
-        public virtual void OnEnter(Player player)
-        {
-            PlayerIsInside = true;
-        }
+        public virtual void OnEnter(Player player) => this.PlayerIsInside = true;
 
         public virtual void OnStay(Player player)
         {
         }
 
-        public virtual void OnLeave(Player player)
-        {
-            PlayerIsInside = false;
-        }
+        public virtual void OnLeave(Player player) => this.PlayerIsInside = false;
 
         protected float GetPositionLerp(Player player, Trigger.PositionModes mode)
         {
-            return mode switch
+            switch (mode)
             {
-                Trigger.PositionModes.HorizontalCenter => Math.Min(Calc.ClampedMap(player.CenterX, Left, CenterX), Calc.ClampedMap(player.CenterX, Right, CenterX)),
-                Trigger.PositionModes.VerticalCenter => Math.Min(Calc.ClampedMap(player.CenterY, Top, CenterY), Calc.ClampedMap(player.CenterY, Bottom, CenterY)),
-                Trigger.PositionModes.TopToBottom => Calc.ClampedMap(player.CenterY, Top, Bottom),
-                Trigger.PositionModes.BottomToTop => Calc.ClampedMap(player.CenterY, Bottom, Top),
-                Trigger.PositionModes.LeftToRight => Calc.ClampedMap(player.CenterX, Left, Right),
-                Trigger.PositionModes.RightToLeft => Calc.ClampedMap(player.CenterX, Right, Left),
-                _ => 1f,
-            };
+                case Trigger.PositionModes.HorizontalCenter:
+                    return Math.Min(Calc.ClampedMap(player.CenterX, this.Left, this.CenterX), Calc.ClampedMap(player.CenterX, this.Right, this.CenterX));
+                case Trigger.PositionModes.VerticalCenter:
+                    return Math.Min(Calc.ClampedMap(player.CenterY, this.Top, this.CenterY), Calc.ClampedMap(player.CenterY, this.Bottom, this.CenterY));
+                case Trigger.PositionModes.TopToBottom:
+                    return Calc.ClampedMap(player.CenterY, this.Top, this.Bottom);
+                case Trigger.PositionModes.BottomToTop:
+                    return Calc.ClampedMap(player.CenterY, this.Bottom, this.Top);
+                case Trigger.PositionModes.LeftToRight:
+                    return Calc.ClampedMap(player.CenterX, this.Left, this.Right);
+                case Trigger.PositionModes.RightToLeft:
+                    return Calc.ClampedMap(player.CenterX, this.Right, this.Left);
+                default:
+                    return 1f;
+            }
         }
 
         public enum PositionModes

@@ -6,6 +6,7 @@
 
 using Microsoft.Xna.Framework;
 using Monocle;
+using System;
 
 namespace Celeste
 {
@@ -29,62 +30,53 @@ namespace Celeste
         private float startRadius = 16f;
         private float endRadius = 32f;
 
-        public Vector2 Center => Entity.Position + position;
+        public Vector2 Center => this.Entity.Position + this.position;
 
         public float X
         {
-            get => position.X;
-            set => Position = new Vector2(value, position.Y);
+            get => this.position.X;
+            set => this.Position = new Vector2(value, this.position.Y);
         }
 
         public float Y
         {
-            get => position.Y;
-            set => Position = new Vector2(position.X, value);
+            get => this.position.Y;
+            set => this.Position = new Vector2(this.position.X, value);
         }
 
         public Vector2 Position
         {
-            get => position;
+            get => this.position;
             set
             {
-                if (!(position != value))
-                {
+                if (!(this.position != value))
                     return;
-                }
-
-                Dirty = true;
-                position = value;
+                this.Dirty = true;
+                this.position = value;
             }
         }
 
         public float StartRadius
         {
-            get => startRadius;
+            get => this.startRadius;
             set
             {
-                if (startRadius == (double)value)
-                {
+                if ((double) this.startRadius == (double) value)
                     return;
-                }
-
-                Dirty = true;
-                startRadius = value;
+                this.Dirty = true;
+                this.startRadius = value;
             }
         }
 
         public float EndRadius
         {
-            get => endRadius;
+            get => this.endRadius;
             set
             {
-                if (endRadius == (double)value)
-                {
+                if ((double) this.endRadius == (double) value)
                     return;
-                }
-
-                Dirty = true;
-                endRadius = value;
+                this.Dirty = true;
+                this.endRadius = value;
             }
         }
 
@@ -101,55 +93,55 @@ namespace Celeste
         public VertexLight(Vector2 position, Color color, float alpha, int startFade, int endFade)
             : base(true, true)
         {
-            Position = position;
-            Color = color;
-            Alpha = alpha;
-            StartRadius = startFade;
-            EndRadius = endFade;
+            this.Position = position;
+            this.Color = color;
+            this.Alpha = alpha;
+            this.StartRadius = (float) startFade;
+            this.EndRadius = (float) endFade;
         }
 
         public override void Added(Entity entity)
         {
             base.Added(entity);
-            LastNonSolidPosition = Center;
-            LastEntityPosition = Entity.Position;
-            LastPosition = Position;
+            this.LastNonSolidPosition = this.Center;
+            this.LastEntityPosition = this.Entity.Position;
+            this.LastPosition = this.Position;
         }
 
         public override void Update()
         {
-            InSolidAlphaMultiplier = Calc.Approach(InSolidAlphaMultiplier, InSolid ? 0.0f : 1f, Engine.DeltaTime * 4f);
+            this.InSolidAlphaMultiplier = Calc.Approach(this.InSolidAlphaMultiplier, this.InSolid ? 0.0f : 1f, Engine.DeltaTime * 4f);
             base.Update();
         }
 
         public override void HandleGraphicsReset()
         {
-            Dirty = true;
+            this.Dirty = true;
             base.HandleGraphicsReset();
         }
 
         public Tween CreatePulseTween()
         {
-            float startA = StartRadius;
+            float startA = this.StartRadius;
             float startB = startA + 6f;
-            float endA = EndRadius;
+            float endA = this.EndRadius;
             float endB = endA + 12f;
             Tween pulseTween = Tween.Create(Tween.TweenMode.Persist, duration: 0.5f);
-            pulseTween.OnUpdate = t =>
+            pulseTween.OnUpdate = (Action<Tween>) (t =>
             {
-                StartRadius = (int)MathHelper.Lerp(startB, startA, t.Eased);
-                EndRadius = (int)MathHelper.Lerp(endB, endA, t.Eased);
-            };
+                this.StartRadius = (float) (int) MathHelper.Lerp(startB, startA, t.Eased);
+                this.EndRadius = (float) (int) MathHelper.Lerp(endB, endA, t.Eased);
+            });
             return pulseTween;
         }
 
         public Tween CreateFadeInTween(float time)
         {
             float from = 0.0f;
-            float to = Alpha;
-            Alpha = 0.0f;
+            float to = this.Alpha;
+            this.Alpha = 0.0f;
             Tween fadeInTween = Tween.Create(Tween.TweenMode.Persist, Ease.CubeOut, time);
-            fadeInTween.OnUpdate = t => Alpha = MathHelper.Lerp(from, to, t.Eased);
+            fadeInTween.OnUpdate = (Action<Tween>) (t => this.Alpha = MathHelper.Lerp(from, to, t.Eased));
             return fadeInTween;
         }
 
@@ -157,27 +149,24 @@ namespace Celeste
         {
             time += 0.8f;
             float delay = (time - 0.8f) / time;
-            float startA = StartRadius;
+            float startA = this.StartRadius;
             float startB = startA + 6f;
-            float endA = EndRadius;
+            float endA = this.EndRadius;
             float endB = endA + 12f;
             Tween burstTween = Tween.Create(Tween.TweenMode.Persist, duration: time);
-            burstTween.OnUpdate = t =>
+            burstTween.OnUpdate = (Action<Tween>) (t =>
             {
                 float amount;
-                if ((double)t.Percent >= (double)delay)
+                if ((double) t.Percent >= (double) delay)
                 {
-                    float t1 = MathHelper.Clamp((float)(((double)t.Percent - (double)delay) / (1.0 - (double)delay)), 0.0f, 1f);
+                    float t1 = MathHelper.Clamp((float) (((double) t.Percent - (double) delay) / (1.0 - (double) delay)), 0.0f, 1f);
                     amount = Ease.CubeIn(t1);
                 }
                 else
-                {
                     amount = 0.0f;
-                }
-
-                StartRadius = (int)MathHelper.Lerp(startB, startA, amount);
-                EndRadius = (int)MathHelper.Lerp(endB, endA, amount);
-            };
+                this.StartRadius = (float) (int) MathHelper.Lerp(startB, startA, amount);
+                this.EndRadius = (float) (int) MathHelper.Lerp(endB, endA, amount);
+            });
             return burstTween;
         }
     }

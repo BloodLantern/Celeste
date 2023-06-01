@@ -24,97 +24,91 @@ namespace Celeste
         private WindController.Patterns pattern;
         private Vector2 targetSpeed;
         private Coroutine coroutine;
-        private readonly WindController.Patterns startPattern;
+        private WindController.Patterns startPattern;
         private bool everSetPattern;
 
         public WindController(WindController.Patterns pattern)
         {
-            Tag = (int)Tags.TransitionUpdate;
-            startPattern = pattern;
+            this.Tag = (int) Tags.TransitionUpdate;
+            this.startPattern = pattern;
         }
 
         public override void Added(Scene scene)
         {
             base.Added(scene);
-            level = SceneAs<Level>();
+            this.level = this.SceneAs<Level>();
         }
 
         public void SetStartPattern()
         {
-            if (everSetPattern)
-            {
+            if (this.everSetPattern)
                 return;
-            }
-
-            SetPattern(startPattern);
+            this.SetPattern(this.startPattern);
         }
 
         public void SetPattern(WindController.Patterns pattern)
         {
-            if (this.pattern == pattern && everSetPattern)
-            {
+            if (this.pattern == pattern && this.everSetPattern)
                 return;
-            }
-
-            everSetPattern = true;
+            this.everSetPattern = true;
             this.pattern = pattern;
-            if (coroutine != null)
+            if (this.coroutine != null)
             {
-                Remove(coroutine);
-                coroutine = null;
+                this.Remove((Component) this.coroutine);
+                this.coroutine = (Coroutine) null;
             }
             switch (pattern)
             {
                 case WindController.Patterns.None:
-                    targetSpeed = Vector2.Zero;
-                    SetAmbienceStrength(false);
+                    this.targetSpeed = Vector2.Zero;
+                    this.SetAmbienceStrength(false);
                     break;
                 case WindController.Patterns.Left:
-                    targetSpeed.X = -400f;
-                    SetAmbienceStrength(false);
+                    this.targetSpeed.X = -400f;
+                    this.SetAmbienceStrength(false);
                     break;
                 case WindController.Patterns.Right:
-                    targetSpeed.X = 400f;
-                    SetAmbienceStrength(false);
+                    this.targetSpeed.X = 400f;
+                    this.SetAmbienceStrength(false);
                     break;
                 case WindController.Patterns.LeftStrong:
-                    targetSpeed.X = -800f;
-                    SetAmbienceStrength(true);
+                    this.targetSpeed.X = -800f;
+                    this.SetAmbienceStrength(true);
                     break;
                 case WindController.Patterns.RightStrong:
-                    targetSpeed.X = 800f;
-                    SetAmbienceStrength(true);
+                    this.targetSpeed.X = 800f;
+                    this.SetAmbienceStrength(true);
                     break;
                 case WindController.Patterns.LeftOnOff:
-                    Add(coroutine = new Coroutine(LeftOnOffSequence()));
+                    this.Add((Component) (this.coroutine = new Coroutine(this.LeftOnOffSequence())));
                     break;
                 case WindController.Patterns.RightOnOff:
-                    Add(coroutine = new Coroutine(RightOnOffSequence()));
+                    this.Add((Component) (this.coroutine = new Coroutine(this.RightOnOffSequence())));
                     break;
                 case WindController.Patterns.LeftOnOffFast:
-                    Add(coroutine = new Coroutine(LeftOnOffFastSequence()));
+                    this.Add((Component) (this.coroutine = new Coroutine(this.LeftOnOffFastSequence())));
                     break;
                 case WindController.Patterns.RightOnOffFast:
-                    Add(coroutine = new Coroutine(RightOnOffFastSequence()));
+                    this.Add((Component) (this.coroutine = new Coroutine(this.RightOnOffFastSequence())));
                     break;
                 case WindController.Patterns.Alternating:
-                    Add(coroutine = new Coroutine(AlternatingSequence()));
+                    this.Add((Component) (this.coroutine = new Coroutine(this.AlternatingSequence())));
                     break;
                 case WindController.Patterns.RightCrazy:
-                    targetSpeed.X = 1200f;
-                    SetAmbienceStrength(true);
+                    this.targetSpeed.X = 1200f;
+                    this.SetAmbienceStrength(true);
                     break;
                 case WindController.Patterns.Down:
-                    targetSpeed.Y = 300f;
-                    SetAmbienceStrength(false);
+                    this.targetSpeed.Y = 300f;
+                    this.SetAmbienceStrength(false);
                     break;
                 case WindController.Patterns.Up:
-                    targetSpeed.Y = -400f;
-                    SetAmbienceStrength(false);
+                    this.targetSpeed.Y = -400f;
+                    this.SetAmbienceStrength(false);
                     break;
                 case WindController.Patterns.Space:
-                    targetSpeed.Y = -600f;
-                    SetAmbienceStrength(false);
+                    this.targetSpeed.Y = -600f;
+                    this.SetAmbienceStrength(false);
                     break;
             }
         }
@@ -122,36 +116,28 @@ namespace Celeste
         private void SetAmbienceStrength(bool strong)
         {
             int num = 0;
-            if (targetSpeed.X != 0.0)
-            {
-                num = Math.Sign(targetSpeed.X);
-            }
-            else if (targetSpeed.Y != 0.0)
-            {
-                num = Math.Sign(targetSpeed.Y);
-            }
-
-            Audio.SetParameter(Audio.CurrentAmbienceEventInstance, "wind_direction", num);
+            if ((double) this.targetSpeed.X != 0.0)
+                num = Math.Sign(this.targetSpeed.X);
+            else if ((double) this.targetSpeed.Y != 0.0)
+                num = Math.Sign(this.targetSpeed.Y);
+            Audio.SetParameter(Audio.CurrentAmbienceEventInstance, "wind_direction", (float) num);
             Audio.SetParameter(Audio.CurrentAmbienceEventInstance, "strong_wind", strong ? 1f : 0.0f);
         }
 
         public void SnapWind()
         {
-            if (coroutine != null && coroutine.Active)
-            {
-                coroutine.Update();
-            }
-
-            level.Wind = targetSpeed;
+            if (this.coroutine != null && this.coroutine.Active)
+                this.coroutine.Update();
+            this.level.Wind = this.targetSpeed;
         }
 
         public override void Update()
         {
             base.Update();
-            if (pattern == WindController.Patterns.LeftGemsOnly)
+            if (this.pattern == WindController.Patterns.LeftGemsOnly)
             {
                 bool flag = false;
-                foreach (StrawberrySeed entity in Scene.Tracker.GetEntities<StrawberrySeed>())
+                foreach (StrawberrySeed entity in this.Scene.Tracker.GetEntities<StrawberrySeed>())
                 {
                     if (entity.Collected)
                     {
@@ -161,43 +147,38 @@ namespace Celeste
                 }
                 if (flag)
                 {
-                    targetSpeed.X = -400f;
-                    SetAmbienceStrength(false);
+                    this.targetSpeed.X = -400f;
+                    this.SetAmbienceStrength(false);
                 }
                 else
                 {
-                    targetSpeed.X = 0.0f;
-                    SetAmbienceStrength(false);
+                    this.targetSpeed.X = 0.0f;
+                    this.SetAmbienceStrength(false);
                 }
             }
-            level.Wind = Calc.Approach(level.Wind, targetSpeed, 1000f * Engine.DeltaTime);
-            if (!(level.Wind != Vector2.Zero) || level.Transitioning)
-            {
+            this.level.Wind = Calc.Approach(this.level.Wind, this.targetSpeed, 1000f * Engine.DeltaTime);
+            if (!(this.level.Wind != Vector2.Zero) || this.level.Transitioning)
                 return;
-            }
-
-            foreach (WindMover component in Scene.Tracker.GetComponents<WindMover>())
-            {
-                component.Move(level.Wind * 0.1f * Engine.DeltaTime);
-            }
+            foreach (WindMover component in this.Scene.Tracker.GetComponents<WindMover>())
+                component.Move(this.level.Wind * 0.1f * Engine.DeltaTime);
         }
 
         private IEnumerator AlternatingSequence()
         {
             while (true)
             {
-                targetSpeed.X = -400f;
-                SetAmbienceStrength(false);
-                yield return 3f;
-                targetSpeed.X = 0.0f;
-                SetAmbienceStrength(false);
-                yield return 2f;
-                targetSpeed.X = 400f;
-                SetAmbienceStrength(false);
-                yield return 3f;
-                targetSpeed.X = 0.0f;
-                SetAmbienceStrength(false);
-                yield return 2f;
+                this.targetSpeed.X = -400f;
+                this.SetAmbienceStrength(false);
+                yield return (object) 3f;
+                this.targetSpeed.X = 0.0f;
+                this.SetAmbienceStrength(false);
+                yield return (object) 2f;
+                this.targetSpeed.X = 400f;
+                this.SetAmbienceStrength(false);
+                yield return (object) 3f;
+                this.targetSpeed.X = 0.0f;
+                this.SetAmbienceStrength(false);
+                yield return (object) 2f;
             }
         }
 
@@ -205,12 +186,12 @@ namespace Celeste
         {
             while (true)
             {
-                targetSpeed.X = 800f;
-                SetAmbienceStrength(true);
-                yield return 3f;
-                targetSpeed.X = 0.0f;
-                SetAmbienceStrength(false);
-                yield return 3f;
+                this.targetSpeed.X = 800f;
+                this.SetAmbienceStrength(true);
+                yield return (object) 3f;
+                this.targetSpeed.X = 0.0f;
+                this.SetAmbienceStrength(false);
+                yield return (object) 3f;
             }
         }
 
@@ -218,12 +199,12 @@ namespace Celeste
         {
             while (true)
             {
-                targetSpeed.X = -800f;
-                SetAmbienceStrength(true);
-                yield return 3f;
-                targetSpeed.X = 0.0f;
-                SetAmbienceStrength(false);
-                yield return 3f;
+                this.targetSpeed.X = -800f;
+                this.SetAmbienceStrength(true);
+                yield return (object) 3f;
+                this.targetSpeed.X = 0.0f;
+                this.SetAmbienceStrength(false);
+                yield return (object) 3f;
             }
         }
 
@@ -231,12 +212,12 @@ namespace Celeste
         {
             while (true)
             {
-                targetSpeed.X = 800f;
-                SetAmbienceStrength(true);
-                yield return 2f;
-                targetSpeed.X = 0.0f;
-                SetAmbienceStrength(false);
-                yield return 2f;
+                this.targetSpeed.X = 800f;
+                this.SetAmbienceStrength(true);
+                yield return (object) 2f;
+                this.targetSpeed.X = 0.0f;
+                this.SetAmbienceStrength(false);
+                yield return (object) 2f;
             }
         }
 
@@ -244,12 +225,12 @@ namespace Celeste
         {
             while (true)
             {
-                targetSpeed.X = -800f;
-                SetAmbienceStrength(true);
-                yield return 2f;
-                targetSpeed.X = 0.0f;
-                SetAmbienceStrength(false);
-                yield return 2f;
+                this.targetSpeed.X = -800f;
+                this.SetAmbienceStrength(true);
+                yield return (object) 2f;
+                this.targetSpeed.X = 0.0f;
+                this.SetAmbienceStrength(false);
+                yield return (object) 2f;
             }
         }
 

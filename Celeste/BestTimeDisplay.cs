@@ -17,99 +17,82 @@ namespace Celeste
         public Vector2 Position;
         private TimeSpan time;
         private string sTime;
-        private readonly Wiggler wiggler;
-        private readonly MTexture icon;
+        private Wiggler wiggler;
+        private MTexture icon;
         private float flashTimer;
         private Color iconColor;
 
-        public BestTimeDisplay(Modes mode, TimeSpan time)
+        public BestTimeDisplay(BestTimeDisplay.Modes mode, TimeSpan time)
             : base(true, true)
         {
             this.time = time;
-            UpdateString();
-            wiggler = Wiggler.Create(0.5f, 3f);
-            wiggler.UseRawDeltaTime = true;
+            this.UpdateString();
+            this.wiggler = Wiggler.Create(0.5f, 3f);
+            this.wiggler.UseRawDeltaTime = true;
             switch (mode)
             {
-                case Modes.BestFullClear:
-                    icon = GFX.Game["gui/bestFullClearTime"];
-                    iconColor = FullClearColor;
+                case BestTimeDisplay.Modes.BestFullClear:
+                    this.icon = GFX.Game["gui/bestFullClearTime"];
+                    this.iconColor = BestTimeDisplay.FullClearColor;
                     break;
-                case Modes.Current:
-                    icon = null;
+                case BestTimeDisplay.Modes.Current:
+                    this.icon = (MTexture) null;
                     break;
                 default:
-                    icon = GFX.Game["gui/bestTime"];
-                    iconColor = IconColor;
+                    this.icon = GFX.Game["gui/bestTime"];
+                    this.iconColor = BestTimeDisplay.IconColor;
                     break;
             }
         }
 
-        private void UpdateString()
-        {
-            sTime = time.ShortGameplayFormat();
-        }
+        private void UpdateString() => this.sTime = this.time.ShortGameplayFormat();
 
         public void Wiggle()
         {
-            wiggler.Start();
-            flashTimer = 0.5f;
+            this.wiggler.Start();
+            this.flashTimer = 0.5f;
         }
 
         public TimeSpan Time
         {
-            get => time;
+            get => this.time;
             set
             {
-                if (!(time != value))
-                {
+                if (!(this.time != value))
                     return;
-                }
-
-                time = value;
-                UpdateString();
-                wiggler.Start();
-                flashTimer = 0.5f;
+                this.time = value;
+                this.UpdateString();
+                this.wiggler.Start();
+                this.flashTimer = 0.5f;
             }
         }
 
         public override void Update()
         {
             base.Update();
-            if (wiggler.Active)
-            {
-                wiggler.Update();
-            }
-
-            if (flashTimer <= 0.0)
-            {
+            if (this.wiggler.Active)
+                this.wiggler.Update();
+            if ((double) this.flashTimer <= 0.0)
                 return;
-            }
-
-            flashTimer -= Engine.RawDeltaTime;
+            this.flashTimer -= Engine.RawDeltaTime;
         }
 
         public override void Render()
         {
-            if (!WillRender)
-            {
+            if (!this.WillRender)
                 return;
-            }
-
-            Vector2 vector2 = RenderPosition - (Vector2.UnitY * wiggler.Value * 3f);
+            Vector2 vector2 = this.RenderPosition - Vector2.UnitY * this.wiggler.Value * 3f;
             Color color = Color.White;
-            if (flashTimer > 0.0 && Scene.BetweenRawInterval(0.05f))
-            {
+            if ((double) this.flashTimer > 0.0 && this.Scene.BetweenRawInterval(0.05f))
                 color = StrawberriesCounter.FlashColor;
-            }
-
-            icon?.DrawOutlineCentered(vector2 + new Vector2(-4f, -3f), iconColor);
-            ActiveFont.DrawOutline(sTime, vector2 + new Vector2(0.0f, 4f), new Vector2(0.5f, 0.0f), Vector2.One, color, 2f, Color.Black);
+            if (this.icon != null)
+                this.icon.DrawOutlineCentered(vector2 + new Vector2(-4f, -3f), this.iconColor);
+            ActiveFont.DrawOutline(this.sTime, vector2 + new Vector2(0.0f, 4f), new Vector2(0.5f, 0.0f), Vector2.One, color, 2f, Color.Black);
         }
 
-        public Vector2 RenderPosition => (Entity.Position + Position).Round();
+        public Vector2 RenderPosition => (this.Entity.Position + this.Position).Round();
 
-        public bool WillRender => time > TimeSpan.Zero;
+        public bool WillRender => this.time > TimeSpan.Zero;
 
         public enum Modes
         {

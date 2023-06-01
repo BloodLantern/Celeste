@@ -6,53 +6,48 @@
 
 using Microsoft.Xna.Framework;
 using Monocle;
+using System;
 
 namespace Celeste
 {
     public class MrOshiroDoor : Solid
     {
-        private readonly Sprite sprite;
-        private readonly Wiggler wiggler;
+        private Sprite sprite;
+        private Wiggler wiggler;
 
         public MrOshiroDoor(EntityData data, Vector2 offset)
             : base(data.Position + offset, 32f, 32f, false)
         {
-            Add(sprite = GFX.SpriteBank.Create("ghost_door"));
-            sprite.Position = new Vector2(Width, Height) / 2f;
-            sprite.Play("idle");
-            OnDashCollide = new DashCollision(OnDashed);
-            Add(wiggler = Wiggler.Create(0.6f, 3f, f => sprite.Scale = Vector2.One * (float)(1.0 - ((double)f * 0.20000000298023224))));
-            SurfaceSoundIndex = 20;
+            this.Add((Component) (this.sprite = GFX.SpriteBank.Create("ghost_door")));
+            this.sprite.Position = new Vector2(this.Width, this.Height) / 2f;
+            this.sprite.Play("idle");
+            this.OnDashCollide = new DashCollision(this.OnDashed);
+            this.Add((Component) (this.wiggler = Wiggler.Create(0.6f, 3f, (Action<float>) (f => this.sprite.Scale = Vector2.One * (float) (1.0 - (double) f * 0.20000000298023224)))));
+            this.SurfaceSoundIndex = 20;
         }
 
         public override void Added(Scene scene)
         {
             base.Added(scene);
-            Visible = Collidable = !SceneAs<Level>().Session.GetFlag("oshiro_resort_talked_1");
+            this.Visible = this.Collidable = !this.SceneAs<Level>().Session.GetFlag("oshiro_resort_talked_1");
         }
 
         public void Open()
         {
-            if (!Collidable)
-            {
+            if (!this.Collidable)
                 return;
-            }
-
             Input.Rumble(RumbleStrength.Medium, RumbleLength.Medium);
-            _ = Audio.Play("event:/game/03_resort/forcefield_vanish", Position);
-            sprite.Play("open");
-            Collidable = false;
+            Audio.Play("event:/game/03_resort/forcefield_vanish", this.Position);
+            this.sprite.Play("open");
+            this.Collidable = false;
         }
 
-        public void InstantOpen()
-        {
-            Collidable = Visible = false;
-        }
+        public void InstantOpen() => this.Collidable = this.Visible = false;
 
         private DashCollisionResults OnDashed(Player player, Vector2 direction)
         {
-            _ = Audio.Play("event:/game/03_resort/forcefield_bump", Position);
-            wiggler.Start();
+            Audio.Play("event:/game/03_resort/forcefield_bump", this.Position);
+            this.wiggler.Start();
             return DashCollisionResults.Bounce;
         }
     }

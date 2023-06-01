@@ -8,16 +8,15 @@ using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Monocle;
 using System.Collections.Generic;
-using System.Linq;
 
 namespace Celeste
 {
-    public class BloomRenderer : Renderer
+    public class BloomRenderer : Monocle.Renderer
     {
         public float Strength = 1f;
         public float Base;
-        private readonly MTexture gradient;
-        public static readonly BlendState BlurredScreenToMask = new()
+        private MTexture gradient;
+        public static readonly BlendState BlurredScreenToMask = new BlendState()
         {
             ColorSourceBlend = Blend.One,
             ColorDestinationBlend = Blend.Zero,
@@ -26,7 +25,7 @@ namespace Celeste
             AlphaDestinationBlend = Blend.One,
             AlphaBlendFunction = BlendFunction.Add
         };
-        public static readonly BlendState AdditiveMaskToScreen = new()
+        public static readonly BlendState AdditiveMaskToScreen = new BlendState()
         {
             ColorSourceBlend = Blend.SourceAlpha,
             ColorDestinationBlend = Blend.One,
@@ -35,7 +34,7 @@ namespace Celeste
             AlphaDestinationBlend = Blend.One,
             AlphaBlendFunction = BlendFunction.Add
         };
-        public static readonly BlendState CutoutBlendstate = new()
+        public static readonly BlendState CutoutBlendstate = new BlendState()
         {
             ColorSourceBlend = Blend.One,
             ColorDestinationBlend = Blend.One,
@@ -45,77 +44,61 @@ namespace Celeste
             AlphaBlendFunction = BlendFunction.Min
         };
 
-        public BloomRenderer()
-        {
-            gradient = GFX.Game["util/bloomgradient"];
-        }
+        public BloomRenderer() => this.gradient = GFX.Game["util/bloomgradient"];
 
         public void Apply(VirtualRenderTarget target, Scene scene)
         {
-            if (Strength <= 0)
-            {
+            if ((double) this.Strength <= 0.0)
                 return;
-            }
-
             VirtualRenderTarget tempA = GameplayBuffers.TempA;
-            Texture2D texture = GaussianBlur.Blur((RenderTarget2D)target, GameplayBuffers.TempA, GameplayBuffers.TempB);
+            Texture2D texture = GaussianBlur.Blur((Texture2D) (RenderTarget2D) target, GameplayBuffers.TempA, GameplayBuffers.TempB);
             List<Component> components1 = scene.Tracker.GetComponents<BloomPoint>();
             List<Component> components2 = scene.Tracker.GetComponents<EffectCutout>();
-            Engine.Instance.GraphicsDevice.SetRenderTarget((RenderTarget2D)tempA);
+            Engine.Instance.GraphicsDevice.SetRenderTarget((RenderTarget2D) tempA);
             Engine.Instance.GraphicsDevice.Clear(Color.Transparent);
-            if (Base < 1)
+            if ((double) this.Base < 1.0)
             {
                 Camera camera = (scene as Level).Camera;
-                Draw.SpriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, SamplerState.PointClamp, DepthStencilState.None, RasterizerState.CullNone, null, camera.Matrix);
-                float num = 1f / gradient.Width;
+                Draw.SpriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, SamplerState.PointClamp, DepthStencilState.None, RasterizerState.CullNone, (Effect) null, camera.Matrix);
+                float num = 1f / (float) this.gradient.Width;
                 foreach (Component component in components1)
                 {
                     BloomPoint bloomPoint = component as BloomPoint;
-                    if (bloomPoint.Visible && bloomPoint.Radius > 0 && bloomPoint.Alpha > 0)
-                    {
-                        gradient.DrawCentered(bloomPoint.Entity.Position + bloomPoint.Position, Color.White * bloomPoint.Alpha, bloomPoint.Radius * 2f * num);
-                    }
+                    if (bloomPoint.Visible && (double) bloomPoint.Radius > 0.0 && (double) bloomPoint.Alpha > 0.0)
+                        this.gradient.DrawCentered(bloomPoint.Entity.Position + bloomPoint.Position, Color.White * bloomPoint.Alpha, bloomPoint.Radius * 2f * num);
                 }
-                foreach (CustomBloom component in scene.Tracker.GetComponents<CustomBloom>().Cast<CustomBloom>())
+                foreach (CustomBloom component in scene.Tracker.GetComponents<CustomBloom>())
                 {
                     if (component.Visible && component.OnRenderBloom != null)
-                    {
                         component.OnRenderBloom();
-                    }
                 }
-
                 foreach (Entity entity in scene.Tracker.GetEntities<SeekerBarrier>())
-                {
                     Draw.Rect(entity.Collider, Color.White);
-                }
-
                 Draw.SpriteBatch.End();
                 if (components2.Count > 0)
                 {
-                    Draw.SpriteBatch.Begin(SpriteSortMode.Deferred, CutoutBlendstate, SamplerState.PointClamp, null, null, null, camera.Matrix);
+                    Draw.SpriteBatch.Begin(SpriteSortMode.Deferred, BloomRenderer.CutoutBlendstate, SamplerState.PointClamp, (DepthStencilState) null, (RasterizerState) null, (Effect) null, camera.Matrix);
                     foreach (Component component in components2)
                     {
                         EffectCutout effectCutout = component as EffectCutout;
                         if (effectCutout.Visible)
-                        {
-                            Draw.Rect(effectCutout.Left, effectCutout.Top, effectCutout.Right - effectCutout.Left, effectCutout.Bottom - effectCutout.Top, Color.White * (1f - effectCutout.Alpha));
-                        }
+                            Draw.Rect((float) effectCutout.Left, (float) effectCutout.Top, (float) (effectCutout.Right - effectCutout.Left), (float) (effectCutout.Bottom - effectCutout.Top), Color.White * (1f - effectCutout.Alpha));
                     }
                     Draw.SpriteBatch.End();
                 }
             }
             Draw.SpriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend);
-            Draw.Rect(-10f, -10f, 340f, 200f, Color.White * Base);
+            Draw.Rect(-10f, -10f, 340f, 200f, Color.White * this.Base);
             Draw.SpriteBatch.End();
-            Draw.SpriteBatch.Begin(SpriteSortMode.Deferred, BlurredScreenToMask);
+            Draw.SpriteBatch.Begin(SpriteSortMode.Deferred, BloomRenderer.BlurredScreenToMask);
             Draw.SpriteBatch.Draw(texture, Vector2.Zero, Color.White);
             Draw.SpriteBatch.End();
-            Engine.Instance.GraphicsDevice.SetRenderTarget((RenderTarget2D)target);
-            Draw.SpriteBatch.Begin(SpriteSortMode.Deferred, AdditiveMaskToScreen);
-            for (int i = 0; i < Strength; ++i)
+            Engine.Instance.GraphicsDevice.SetRenderTarget((RenderTarget2D) target);
+            Draw.SpriteBatch.Begin(SpriteSortMode.Deferred, BloomRenderer.AdditiveMaskToScreen);
+            for (int index = 0; (double) index < (double) this.Strength; ++index)
             {
-                float num = i < Strength - 1 ? 1f : Strength - i;
-                Draw.SpriteBatch.Draw((RenderTarget2D)tempA, Vector2.Zero, Color.White * num);
+                float num = (double) index < (double) this.Strength - 1.0 ? 1f : this.Strength - (float) index;
+                Draw.SpriteBatch.Draw((Texture2D) (RenderTarget2D) tempA, Vector2.Zero, Color.White * num);
             }
             Draw.SpriteBatch.End();
         }

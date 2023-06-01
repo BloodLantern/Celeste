@@ -13,101 +13,90 @@ namespace Celeste
     public class Snowball : Entity
     {
         private const float ResetTime = 0.8f;
-        private readonly Sprite sprite;
+        private Sprite sprite;
         private float resetTimer;
         private Level level;
-        private readonly SineWave sine;
+        private SineWave sine;
         private float atY;
-        private readonly SoundSource spawnSfx;
-        private readonly Collider bounceCollider;
+        private SoundSource spawnSfx;
+        private Collider bounceCollider;
 
         public Snowball()
         {
-            Depth = -12500;
-            Collider = new Hitbox(12f, 9f, -5f, -2f);
-            bounceCollider = new Hitbox(16f, 6f, -6f, -8f);
-            Add(new PlayerCollider(new Action<Player>(OnPlayer)));
-            Add(new PlayerCollider(new Action<Player>(OnPlayerBounce), bounceCollider));
-            Add(sine = new SineWave(0.5f));
-            Add(sprite = GFX.SpriteBank.Create("snowball"));
-            sprite.Play("spin");
-            Add(spawnSfx = new SoundSource());
+            this.Depth = -12500;
+            this.Collider = (Collider) new Hitbox(12f, 9f, -5f, -2f);
+            this.bounceCollider = (Collider) new Hitbox(16f, 6f, -6f, -8f);
+            this.Add((Component) new PlayerCollider(new Action<Player>(this.OnPlayer)));
+            this.Add((Component) new PlayerCollider(new Action<Player>(this.OnPlayerBounce), this.bounceCollider));
+            this.Add((Component) (this.sine = new SineWave(0.5f)));
+            this.Add((Component) (this.sprite = GFX.SpriteBank.Create("snowball")));
+            this.sprite.Play("spin");
+            this.Add((Component) (this.spawnSfx = new SoundSource()));
         }
 
         public override void Added(Scene scene)
         {
             base.Added(scene);
-            level = SceneAs<Level>();
-            ResetPosition();
+            this.level = this.SceneAs<Level>();
+            this.ResetPosition();
         }
 
         private void ResetPosition()
         {
-            Player entity = level.Tracker.GetEntity<Player>();
-            if (entity != null && (double)entity.Right < level.Bounds.Right - 64)
+            Player entity = this.level.Tracker.GetEntity<Player>();
+            if (entity != null && (double) entity.Right < (double) (this.level.Bounds.Right - 64))
             {
-                _ = spawnSfx.Play("event:/game/04_cliffside/snowball_spawn");
-                Collidable = Visible = true;
-                resetTimer = 0.0f;
-                X = level.Camera.Right + 10f;
-                atY = Y = entity.CenterY;
-                sine.Reset();
-                sprite.Play("spin");
+                this.spawnSfx.Play("event:/game/04_cliffside/snowball_spawn");
+                this.Collidable = this.Visible = true;
+                this.resetTimer = 0.0f;
+                this.X = this.level.Camera.Right + 10f;
+                this.atY = this.Y = entity.CenterY;
+                this.sine.Reset();
+                this.sprite.Play("spin");
             }
             else
-            {
-                resetTimer = 0.05f;
-            }
+                this.resetTimer = 0.05f;
         }
 
         private void Destroy()
         {
-            Collidable = false;
-            sprite.Play("break");
+            this.Collidable = false;
+            this.sprite.Play("break");
         }
 
         private void OnPlayer(Player player)
         {
-            _ = player.Die(new Vector2(-1f, 0.0f));
-            Destroy();
-            _ = Audio.Play("event:/game/04_cliffside/snowball_impact", Position);
+            player.Die(new Vector2(-1f, 0.0f));
+            this.Destroy();
+            Audio.Play("event:/game/04_cliffside/snowball_impact", this.Position);
         }
 
         private void OnPlayerBounce(Player player)
         {
-            if (CollideCheck(player))
-            {
+            if (this.CollideCheck((Entity) player))
                 return;
-            }
-
             Celeste.Freeze(0.1f);
-            player.Bounce(Top - 2f);
-            Destroy();
-            _ = Audio.Play("event:/game/general/thing_booped", Position);
+            player.Bounce(this.Top - 2f);
+            this.Destroy();
+            Audio.Play("event:/game/general/thing_booped", this.Position);
         }
 
         public override void Update()
         {
             base.Update();
-            X -= 200f * Engine.DeltaTime;
-            Y = atY + (4f * sine.Value);
-            if ((double)X >= (double)level.Camera.Left - 60.0)
-            {
+            this.X -= 200f * Engine.DeltaTime;
+            this.Y = this.atY + 4f * this.sine.Value;
+            if ((double) this.X >= (double) this.level.Camera.Left - 60.0)
                 return;
-            }
-
-            resetTimer += Engine.DeltaTime;
-            if (resetTimer < 0.800000011920929)
-            {
+            this.resetTimer += Engine.DeltaTime;
+            if ((double) this.resetTimer < 0.800000011920929)
                 return;
-            }
-
-            ResetPosition();
+            this.ResetPosition();
         }
 
         public override void Render()
         {
-            sprite.DrawOutline();
+            this.sprite.DrawOutline();
             base.Render();
         }
     }

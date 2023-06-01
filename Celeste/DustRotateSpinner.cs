@@ -11,43 +11,37 @@ namespace Celeste
 {
     public class DustRotateSpinner : RotateSpinner
     {
-        private readonly DustGraphic dusty;
+        private DustGraphic dusty;
 
         public DustRotateSpinner(EntityData data, Vector2 offset)
             : base(data, offset)
         {
-            Add(dusty = new DustGraphic(true));
+            this.Add((Component) (this.dusty = new DustGraphic(true)));
         }
 
         public override void Update()
         {
             base.Update();
-            if (!Moving)
-            {
+            if (!this.Moving)
                 return;
-            }
-
-            DustGraphic dusty1 = dusty;
-            DustGraphic dusty2 = dusty;
-            double angle = (double)Angle;
-            double num = 1.5707963705062866 * (Clockwise ? 1.0 : -1.0);
+            DustGraphic dusty1 = this.dusty;
+            DustGraphic dusty2 = this.dusty;
+            double angle = (double) this.Angle;
+            double num = 1.5707963705062866 * (this.Clockwise ? 1.0 : -1.0);
             Vector2 vector;
-            Vector2 vector2_1 = vector = Calc.AngleToVector((float)(angle + num), 1f);
+            Vector2 vector2_1 = vector = Calc.AngleToVector((float) (angle + num), 1f);
             dusty2.EyeTargetDirection = vector;
             Vector2 vector2_2 = vector2_1;
             dusty1.EyeDirection = vector2_2;
-            if (!Scene.OnInterval(0.02f))
-            {
+            if (!this.Scene.OnInterval(0.02f))
                 return;
-            }
-
-            SceneAs<Level>().ParticlesBG.Emit(DustStaticSpinner.P_Move, 1, Position, Vector2.One * 4f);
+            this.SceneAs<Level>().ParticlesBG.Emit(DustStaticSpinner.P_Move, 1, this.Position, Vector2.One * 4f);
         }
 
         public override void OnPlayer(Player player)
         {
             base.OnPlayer(player);
-            dusty.OnHitPlayer();
+            this.dusty.OnHitPlayer();
         }
     }
 }

@@ -4,6 +4,7 @@
 // MVID: FAF6CA25-5C06-43EB-A08F-9CCF291FE6A3
 // Assembly location: C:\Program Files (x86)\Steam\steamapps\common\Celeste\orig\Celeste.exe
 
+using FMOD.Studio;
 using System;
 
 namespace Celeste
@@ -24,8 +25,8 @@ namespace Celeste
             "layer8",
             "layer9"
         };
-        public AudioTrackState Music = new();
-        public AudioTrackState Ambience = new();
+        public AudioTrackState Music = new AudioTrackState();
+        public AudioTrackState Ambience = new AudioTrackState();
 
         public AudioState()
         {
@@ -34,73 +35,53 @@ namespace Celeste
         public AudioState(AudioTrackState music, AudioTrackState ambience)
         {
             if (music != null)
-            {
-                Music = music.Clone();
-            }
-
+                this.Music = music.Clone();
             if (ambience == null)
-            {
                 return;
-            }
-
-            Ambience = ambience.Clone();
+            this.Ambience = ambience.Clone();
         }
 
         public AudioState(string music, string ambience)
         {
-            Music.Event = music;
-            Ambience.Event = ambience;
+            this.Music.Event = music;
+            this.Ambience.Event = ambience;
         }
 
         public void Apply(bool forceSixteenthNoteHack = false)
         {
-            bool flag1 = Audio.SetMusic(Music.Event, false);
-            if (Audio.CurrentMusicEventInstance != null)
+            bool flag1 = Audio.SetMusic(this.Music.Event, false);
+            if ((HandleBase) Audio.CurrentMusicEventInstance != (HandleBase) null)
             {
-                foreach (MEP parameter in Music.Parameters)
+                foreach (MEP parameter in this.Music.Parameters)
                 {
                     if (!(parameter.Key == "sixteenth_note") || forceSixteenthNoteHack)
-                    {
                         Audio.SetParameter(Audio.CurrentMusicEventInstance, parameter.Key, parameter.Value);
-                    }
                 }
                 if (flag1)
                 {
-                    _ = (int)Audio.CurrentMusicEventInstance.start();
+                    int num = (int) Audio.CurrentMusicEventInstance.start();
                 }
             }
-            bool flag2 = Audio.SetAmbience(Ambience.Event, false);
-            if (!(Audio.CurrentAmbienceEventInstance != null))
-            {
+            bool flag2 = Audio.SetAmbience(this.Ambience.Event, false);
+            if (!((HandleBase) Audio.CurrentAmbienceEventInstance != (HandleBase) null))
                 return;
-            }
-
-            foreach (MEP parameter in Ambience.Parameters)
-            {
+            foreach (MEP parameter in this.Ambience.Parameters)
                 Audio.SetParameter(Audio.CurrentAmbienceEventInstance, parameter.Key, parameter.Value);
-            }
-
             if (!flag2)
-            {
                 return;
-            }
-
-            _ = (int)Audio.CurrentAmbienceEventInstance.start();
+            int num1 = (int) Audio.CurrentAmbienceEventInstance.start();
         }
 
         public void Stop(bool allowFadeOut = true)
         {
-            _ = Audio.SetMusic(null, false, allowFadeOut);
-            _ = Audio.SetAmbience(null);
+            Audio.SetMusic((string) null, false, allowFadeOut);
+            Audio.SetAmbience((string) null);
         }
 
-        public AudioState Clone()
+        public AudioState Clone() => new AudioState()
         {
-            return new AudioState()
-            {
-                Music = Music.Clone(),
-                Ambience = Ambience.Clone()
-            };
-        }
+            Music = this.Music.Clone(),
+            Ambience = this.Ambience.Clone()
+        };
     }
 }

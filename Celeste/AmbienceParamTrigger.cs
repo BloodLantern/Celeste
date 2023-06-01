@@ -19,17 +19,17 @@ namespace Celeste
         public AmbienceParamTrigger(EntityData data, Vector2 offset)
             : base(data, offset)
         {
-            Parameter = data.Attr("parameter");
-            From = data.Float("from");
-            To = data.Float("to");
-            PositionMode = data.Enum<Trigger.PositionModes>("direction");
+            this.Parameter = data.Attr("parameter");
+            this.From = data.Float("from");
+            this.To = data.Float("to");
+            this.PositionMode = data.Enum<Trigger.PositionModes>("direction");
         }
 
         public override void OnStay(Player player)
         {
-            float num = Calc.ClampedMap(GetPositionLerp(player, PositionMode), 0.0f, 1f, From, To);
-            Level scene = Scene as Level;
-            _ = scene.Session.Audio.Ambience.Param(Parameter, num);
+            float num = Calc.ClampedMap(this.GetPositionLerp(player, this.PositionMode), 0.0f, 1f, this.From, this.To);
+            Level scene = this.Scene as Level;
+            scene.Session.Audio.Ambience.Param(this.Parameter, num);
             scene.Session.Audio.Apply();
         }
     }

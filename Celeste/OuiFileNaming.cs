@@ -9,6 +9,7 @@ using Microsoft.Xna.Framework.Input;
 using Monocle;
 using System;
 using System.Collections;
+using System.Collections.Generic;
 using System.Linq;
 
 namespace Celeste
@@ -47,8 +48,8 @@ namespace Celeste
         private float pressedTimer;
         private float timer;
         private float ease;
-        private readonly Wiggler wiggler;
-        private static readonly int[] dakuten_able = new int[40]
+        private Wiggler wiggler;
+        private static int[] dakuten_able = new int[40]
         {
             12363,
             12365,
@@ -91,7 +92,7 @@ namespace Celeste
             12504,
             12507
         };
-        private static readonly int[] handakuten_able = new int[10]
+        private static int[] handakuten_able = new int[10]
         {
             12400,
             12403,
@@ -111,31 +112,28 @@ namespace Celeste
 
         public string Name
         {
-            get => FileSlot.Name;
-            set => FileSlot.Name = value;
+            get => this.FileSlot.Name;
+            set => this.FileSlot.Name = value;
         }
 
-        public int MaxNameLength => !Japanese ? 12 : 8;
+        public int MaxNameLength => !this.Japanese ? 12 : 8;
 
         public bool Japanese => Settings.Instance.Language == "japanese";
 
-        private Vector2 boxtopleft => Position + new Vector2((float)((1920.0 - boxWidth) / 2.0), (float)(360.0 + ((680.0 - boxHeight) / 2.0)));
+        private Vector2 boxtopleft => this.Position + new Vector2((float) ((1920.0 - (double) this.boxWidth) / 2.0), (float) (360.0 + (680.0 - (double) this.boxHeight) / 2.0));
 
         public OuiFileNaming()
         {
-            wiggler = Wiggler.Create(0.25f, 4f);
-            Position = new Vector2(0.0f, 1080f);
-            Visible = false;
+            this.wiggler = Wiggler.Create(0.25f, 4f);
+            this.Position = new Vector2(0.0f, 1080f);
+            this.Visible = false;
         }
 
         public override IEnumerator Enter(Oui from)
         {
             OuiFileNaming ouiFileNaming = this;
-            if (ouiFileNaming.Name == Dialog.Clean("FILE_DEFAULT") || (Settings.Instance != null && ouiFileNaming.Name == Settings.Instance.DefaultFileName))
-            {
+            if (ouiFileNaming.Name == Dialog.Clean("FILE_DEFAULT") || Settings.Instance != null && ouiFileNaming.Name == Settings.Instance.DefaultFileName)
                 ouiFileNaming.Name = "";
-            }
-
             ouiFileNaming.Overworld.ShowInputUI = false;
             ouiFileNaming.selectingOptions = false;
             ouiFileNaming.optionsIndex = 0;
@@ -150,57 +148,50 @@ namespace Celeste
             ouiFileNaming.cancelWidth = ActiveFont.Measure(ouiFileNaming.cancel).X * ouiFileNaming.optionsScale;
             ouiFileNaming.spaceWidth = ActiveFont.Measure(ouiFileNaming.space).X * ouiFileNaming.optionsScale;
             ouiFileNaming.backspaceWidth = ActiveFont.Measure(ouiFileNaming.backspace).X * ouiFileNaming.optionsScale;
-            ouiFileNaming.beginWidth = (float)(ActiveFont.Measure(ouiFileNaming.accept).X * (double)ouiFileNaming.optionsScale * 1.25);
-            ouiFileNaming.optionsWidth = (float)(ouiFileNaming.cancelWidth + (double)ouiFileNaming.spaceWidth + ouiFileNaming.backspaceWidth + ouiFileNaming.beginWidth + (ouiFileNaming.widestLetter * 3.0));
+            ouiFileNaming.beginWidth = (float) ((double) ActiveFont.Measure(ouiFileNaming.accept).X * (double) ouiFileNaming.optionsScale * 1.25);
+            ouiFileNaming.optionsWidth = (float) ((double) ouiFileNaming.cancelWidth + (double) ouiFileNaming.spaceWidth + (double) ouiFileNaming.backspaceWidth + (double) ouiFileNaming.beginWidth + (double) ouiFileNaming.widestLetter * 3.0);
             ouiFileNaming.Visible = true;
             Vector2 posFrom = ouiFileNaming.Position;
             Vector2 posTo = Vector2.Zero;
-            for (float t = 0.0f; (double)t < 1.0; t += Engine.DeltaTime * 3f)
+            for (float t = 0.0f; (double) t < 1.0; t += Engine.DeltaTime * 3f)
             {
                 ouiFileNaming.ease = Ease.CubeIn(t);
-                ouiFileNaming.Position = posFrom + ((posTo - posFrom) * Ease.CubeInOut(t));
-                yield return null;
+                ouiFileNaming.Position = posFrom + (posTo - posFrom) * Ease.CubeInOut(t);
+                yield return (object) null;
             }
             ouiFileNaming.ease = 1f;
-            _ = new Vector2();
-            _ = new Vector2();
-            yield return 0.05f;
+            posFrom = new Vector2();
+            posTo = new Vector2();
+            yield return (object) 0.05f;
             ouiFileNaming.Focused = true;
-            yield return 0.05f;
+            yield return (object) 0.05f;
             ouiFileNaming.wiggler.Start();
         }
 
         private void ReloadLetters(string chars)
         {
-            letters = chars.Split('\n');
-            widestLetter = 0.0f;
+            this.letters = chars.Split('\n');
+            this.widestLetter = 0.0f;
             foreach (char text in chars)
             {
                 float x = ActiveFont.Measure(text).X;
-                if ((double)x > widestLetter)
-                {
-                    widestLetter = x;
-                }
+                if ((double) x > (double) this.widestLetter)
+                    this.widestLetter = x;
             }
-            if (Japanese)
+            if (this.Japanese)
+                this.widestLetter *= 1.5f;
+            this.widestLineCount = 0;
+            foreach (string letter in this.letters)
             {
-                widestLetter *= 1.5f;
+                if (letter.Length > this.widestLineCount)
+                    this.widestLineCount = letter.Length;
             }
-
-            widestLineCount = 0;
-            foreach (string letter in letters)
-            {
-                if (letter.Length > widestLineCount)
-                {
-                    widestLineCount = letter.Length;
-                }
-            }
-            widestLine = widestLineCount * widestLetter;
-            lineHeight = ActiveFont.LineHeight;
-            lineSpacing = ActiveFont.LineHeight * 0.1f;
-            boxPadding = widestLetter;
-            boxWidth = Math.Max(widestLine, optionsWidth) + (boxPadding * 2f);
-            boxHeight = (float)(((letters.Length + 1) * (double)lineHeight) + (letters.Length * (double)lineSpacing) + (boxPadding * 3.0));
+            this.widestLine = (float) this.widestLineCount * this.widestLetter;
+            this.lineHeight = ActiveFont.LineHeight;
+            this.lineSpacing = ActiveFont.LineHeight * 0.1f;
+            this.boxPadding = this.widestLetter;
+            this.boxWidth = Math.Max(this.widestLine, this.optionsWidth) + this.boxPadding * 2f;
+            this.boxHeight = (float) ((double) (this.letters.Length + 1) * (double) this.lineHeight + (double) this.letters.Length * (double) this.lineSpacing + (double) this.boxPadding * 3.0);
         }
 
         public override IEnumerator Leave(Oui next)
@@ -209,12 +200,12 @@ namespace Celeste
             ouiFileNaming.Overworld.ShowInputUI = true;
             ouiFileNaming.Focused = false;
             Vector2 posFrom = ouiFileNaming.Position;
-            Vector2 posTo = new(0.0f, 1080f);
-            for (float t = 0.0f; (double)t < 1.0; t += Engine.DeltaTime * 2f)
+            Vector2 posTo = new Vector2(0.0f, 1080f);
+            for (float t = 0.0f; (double) t < 1.0; t += Engine.DeltaTime * 2f)
             {
                 ouiFileNaming.ease = 1f - Ease.CubeIn(t);
-                ouiFileNaming.Position = posFrom + ((posTo - posFrom) * Ease.CubeInOut(t));
-                yield return null;
+                ouiFileNaming.Position = posFrom + (posTo - posFrom) * Ease.CubeInOut(t);
+                yield return (object) null;
             }
             ouiFileNaming.Visible = false;
         }
@@ -222,304 +213,246 @@ namespace Celeste
         public override void Update()
         {
             base.Update();
-            if (Selected && Focused)
+            if (this.Selected && this.Focused)
             {
-                if (!string.IsNullOrWhiteSpace(Name) && MInput.Keyboard.Check(Keys.LeftControl) && MInput.Keyboard.Pressed(Keys.S))
+                if (!string.IsNullOrWhiteSpace(this.Name) && MInput.Keyboard.Check(Keys.LeftControl) && MInput.Keyboard.Pressed(Keys.S))
+                    this.ResetDefaultName();
+                if (Input.MenuJournal.Pressed && this.Japanese)
+                    this.SwapType();
+                if (Input.MenuRight.Pressed && (this.optionsIndex < 3 || !this.selectingOptions) && (this.Name.Length > 0 || !this.selectingOptions))
                 {
-                    ResetDefaultName();
-                }
-
-                if (Input.MenuJournal.Pressed && Japanese)
-                {
-                    SwapType();
-                }
-
-                if (Input.MenuRight.Pressed && (optionsIndex < 3 || !selectingOptions) && (Name.Length > 0 || !selectingOptions))
-                {
-                    if (selectingOptions)
+                    if (this.selectingOptions)
                     {
-                        optionsIndex = Math.Min(optionsIndex + 1, 3);
+                        this.optionsIndex = Math.Min(this.optionsIndex + 1, 3);
                     }
                     else
                     {
                         do
                         {
-                            index = (index + 1) % letters[line].Length;
+                            this.index = (this.index + 1) % this.letters[this.line].Length;
                         }
-                        while (letters[line][index] == ' ');
+                        while (this.letters[this.line][this.index] == ' ');
                     }
-                    wiggler.Start();
-                    _ = Audio.Play("event:/ui/main/rename_entry_rollover");
+                    this.wiggler.Start();
+                    Audio.Play("event:/ui/main/rename_entry_rollover");
                 }
-                else if (Input.MenuLeft.Pressed && (optionsIndex > 0 || !selectingOptions))
+                else if (Input.MenuLeft.Pressed && (this.optionsIndex > 0 || !this.selectingOptions))
                 {
-                    if (selectingOptions)
+                    if (this.selectingOptions)
                     {
-                        optionsIndex = Math.Max(optionsIndex - 1, 0);
+                        this.optionsIndex = Math.Max(this.optionsIndex - 1, 0);
                     }
                     else
                     {
                         do
                         {
-                            index = (index + letters[line].Length - 1) % letters[line].Length;
+                            this.index = (this.index + this.letters[this.line].Length - 1) % this.letters[this.line].Length;
                         }
-                        while (letters[line][index] == ' ');
+                        while (this.letters[this.line][this.index] == ' ');
                     }
-                    wiggler.Start();
-                    _ = Audio.Play("event:/ui/main/rename_entry_rollover");
+                    this.wiggler.Start();
+                    Audio.Play("event:/ui/main/rename_entry_rollover");
                 }
-                else if (Input.MenuDown.Pressed && !selectingOptions)
+                else if (Input.MenuDown.Pressed && !this.selectingOptions)
                 {
-                    for (int index = line + 1; index < letters.Length; ++index)
+                    for (int index = this.line + 1; index < this.letters.Length; ++index)
                     {
-                        if (this.index < letters[index].Length && letters[index][this.index] != ' ')
+                        if (this.index < this.letters[index].Length && this.letters[index][this.index] != ' ')
                         {
-                            line = index;
+                            this.line = index;
                             goto label_22;
                         }
                     }
-                    selectingOptions = true;
-                label_22:
-                    if (selectingOptions)
+                    this.selectingOptions = true;
+label_22:
+                    if (this.selectingOptions)
                     {
-                        float num1 = index * widestLetter;
-                        float num2 = boxWidth - (boxPadding * 2f);
-                        optionsIndex = Name.Length == 0 || (double)num1 < cancelWidth + (((double)num2 - cancelWidth - beginWidth - backspaceWidth - spaceWidth - (widestLetter * 3.0)) / 2.0) ? 0 : ((double)num1 >= (double)num2 - beginWidth - backspaceWidth - (widestLetter * 2.0) ? ((double)num1 >= (double)num2 - beginWidth - widestLetter ? 3 : 2) : 1);
+                        float num1 = (float) this.index * this.widestLetter;
+                        float num2 = this.boxWidth - this.boxPadding * 2f;
+                        this.optionsIndex = this.Name.Length == 0 || (double) num1 < (double) this.cancelWidth + ((double) num2 - (double) this.cancelWidth - (double) this.beginWidth - (double) this.backspaceWidth - (double) this.spaceWidth - (double) this.widestLetter * 3.0) / 2.0 ? 0 : ((double) num1 >= (double) num2 - (double) this.beginWidth - (double) this.backspaceWidth - (double) this.widestLetter * 2.0 ? ((double) num1 >= (double) num2 - (double) this.beginWidth - (double) this.widestLetter ? 3 : 2) : 1);
                     }
-                    wiggler.Start();
-                    _ = Audio.Play("event:/ui/main/rename_entry_rollover");
+                    this.wiggler.Start();
+                    Audio.Play("event:/ui/main/rename_entry_rollover");
                 }
-                else if ((Input.MenuUp.Pressed || (selectingOptions && Name.Length <= 0 && optionsIndex > 0)) && (line > 0 || selectingOptions))
+                else if ((Input.MenuUp.Pressed || this.selectingOptions && this.Name.Length <= 0 && this.optionsIndex > 0) && (this.line > 0 || this.selectingOptions))
                 {
-                    if (selectingOptions)
+                    if (this.selectingOptions)
                     {
-                        line = letters.Length;
-                        selectingOptions = false;
-                        float num = boxWidth - (boxPadding * 2f);
-                        if (optionsIndex == 0)
-                        {
-                            index = (int)(cancelWidth / 2.0 / widestLetter);
-                        }
-                        else if (optionsIndex == 1)
-                        {
-                            index = (int)(((double)num - beginWidth - backspaceWidth - (spaceWidth / 2.0) - (widestLetter * 2.0)) / widestLetter);
-                        }
-                        else if (optionsIndex == 2)
-                        {
-                            index = (int)(((double)num - beginWidth - (backspaceWidth / 2.0) - widestLetter) / widestLetter);
-                        }
-                        else if (optionsIndex == 3)
-                        {
-                            index = (int)(((double)num - (beginWidth / 2.0)) / widestLetter);
-                        }
+                        this.line = this.letters.Length;
+                        this.selectingOptions = false;
+                        float num = this.boxWidth - this.boxPadding * 2f;
+                        if (this.optionsIndex == 0)
+                            this.index = (int) ((double) this.cancelWidth / 2.0 / (double) this.widestLetter);
+                        else if (this.optionsIndex == 1)
+                            this.index = (int) (((double) num - (double) this.beginWidth - (double) this.backspaceWidth - (double) this.spaceWidth / 2.0 - (double) this.widestLetter * 2.0) / (double) this.widestLetter);
+                        else if (this.optionsIndex == 2)
+                            this.index = (int) (((double) num - (double) this.beginWidth - (double) this.backspaceWidth / 2.0 - (double) this.widestLetter) / (double) this.widestLetter);
+                        else if (this.optionsIndex == 3)
+                            this.index = (int) (((double) num - (double) this.beginWidth / 2.0) / (double) this.widestLetter);
                     }
-                    --line;
-                    while (line > 0 && (index >= letters[line].Length || letters[line][index] == ' '))
-                    {
-                        --line;
-                    }
-
-                    while (index >= letters[line].Length || letters[line][index] == ' ')
-                    {
-                        --index;
-                    }
-
-                    wiggler.Start();
-                    _ = Audio.Play("event:/ui/main/rename_entry_rollover");
+                    --this.line;
+                    while (this.line > 0 && (this.index >= this.letters[this.line].Length || this.letters[this.line][this.index] == ' '))
+                        --this.line;
+                    while (this.index >= this.letters[this.line].Length || this.letters[this.line][this.index] == ' ')
+                        --this.index;
+                    this.wiggler.Start();
+                    Audio.Play("event:/ui/main/rename_entry_rollover");
                 }
                 else if (Input.MenuConfirm.Pressed)
                 {
-                    if (selectingOptions)
+                    if (this.selectingOptions)
                     {
-                        if (optionsIndex == 0)
-                        {
-                            Cancel();
-                        }
-                        else if (optionsIndex == 1 && Name.Length > 0)
-                        {
-                            Space();
-                        }
-                        else if (optionsIndex == 2)
-                        {
-                            Backspace();
-                        }
-                        else if (optionsIndex == 3)
-                        {
-                            Finish();
-                        }
+                        if (this.optionsIndex == 0)
+                            this.Cancel();
+                        else if (this.optionsIndex == 1 && this.Name.Length > 0)
+                            this.Space();
+                        else if (this.optionsIndex == 2)
+                            this.Backspace();
+                        else if (this.optionsIndex == 3)
+                            this.Finish();
                     }
-                    else if (Japanese && letters[line][index] == '゛' && Name.Length > 0 && dakuten_able.Contains<int>(Name.Last<char>()))
+                    else if (this.Japanese && this.letters[this.line][this.index] == '゛' && this.Name.Length > 0 && ((IEnumerable<int>) OuiFileNaming.dakuten_able).Contains<int>((int) this.Name.Last<char>()))
                     {
-                        int num = Name[Name.Length - 1] + 1;
-                        Name = Name.Substring(0, Name.Length - 1);
-                        Name += ((char)num).ToString();
-                        wiggler.Start();
-                        _ = Audio.Play("event:/ui/main/rename_entry_char");
+                        int num = (int) this.Name[this.Name.Length - 1] + 1;
+                        this.Name = this.Name.Substring(0, this.Name.Length - 1);
+                        this.Name += ((char) num).ToString();
+                        this.wiggler.Start();
+                        Audio.Play("event:/ui/main/rename_entry_char");
                     }
-                    else if (Japanese && letters[line][index] == '゜' && Name.Length > 0 && (handakuten_able.Contains<int>(Name.Last<char>()) || handakuten_able.Contains<int>(Name.Last<char>() + 1)))
+                    else if (this.Japanese && this.letters[this.line][this.index] == '゜' && this.Name.Length > 0 && (((IEnumerable<int>) OuiFileNaming.handakuten_able).Contains<int>((int) this.Name.Last<char>()) || ((IEnumerable<int>) OuiFileNaming.handakuten_able).Contains<int>((int) this.Name.Last<char>() + 1)))
                     {
-                        int num3 = Name[Name.Length - 1];
-                        int num4 = !handakuten_able.Contains<int>(num3) ? num3 + 2 : num3 + 1;
-                        Name = Name.Substring(0, Name.Length - 1);
-                        Name += ((char)num4).ToString();
-                        wiggler.Start();
-                        _ = Audio.Play("event:/ui/main/rename_entry_char");
+                        int num3 = (int) this.Name[this.Name.Length - 1];
+                        int num4 = !((IEnumerable<int>) OuiFileNaming.handakuten_able).Contains<int>(num3) ? num3 + 2 : num3 + 1;
+                        this.Name = this.Name.Substring(0, this.Name.Length - 1);
+                        this.Name += ((char) num4).ToString();
+                        this.wiggler.Start();
+                        Audio.Play("event:/ui/main/rename_entry_char");
                     }
-                    else if (Name.Length < MaxNameLength)
+                    else if (this.Name.Length < this.MaxNameLength)
                     {
-                        Name += letters[line][index].ToString();
-                        wiggler.Start();
-                        _ = Audio.Play("event:/ui/main/rename_entry_char");
+                        this.Name += this.letters[this.line][this.index].ToString();
+                        this.wiggler.Start();
+                        Audio.Play("event:/ui/main/rename_entry_char");
                     }
                     else
-                    {
-                        _ = Audio.Play("event:/ui/main/button_invalid");
-                    }
+                        Audio.Play("event:/ui/main/button_invalid");
                 }
                 else if (Input.MenuCancel.Pressed)
                 {
-                    if (Name.Length > 0)
-                    {
-                        Backspace();
-                    }
+                    if (this.Name.Length > 0)
+                        this.Backspace();
                     else
-                    {
-                        Cancel();
-                    }
+                        this.Cancel();
                 }
                 else if (Input.Pause.Pressed)
-                {
-                    Finish();
-                }
+                    this.Finish();
             }
-            pressedTimer -= Engine.DeltaTime;
-            timer += Engine.DeltaTime;
-            wiggler.Update();
+            this.pressedTimer -= Engine.DeltaTime;
+            this.timer += Engine.DeltaTime;
+            this.wiggler.Update();
         }
 
         private void ResetDefaultName()
         {
-            if (StartingName == Settings.Instance.DefaultFileName || StartingName == Dialog.Clean("FILE_DEFAULT"))
-            {
-                StartingName = Name;
-            }
-
-            Settings.Instance.DefaultFileName = Name;
-            _ = Audio.Play("event:/new_content/ui/rename_entry_accept_locked");
+            if (this.StartingName == Settings.Instance.DefaultFileName || this.StartingName == Dialog.Clean("FILE_DEFAULT"))
+                this.StartingName = this.Name;
+            Settings.Instance.DefaultFileName = this.Name;
+            Audio.Play("event:/new_content/ui/rename_entry_accept_locked");
         }
 
         private void Space()
         {
-            if (Name.Length < MaxNameLength && Name.Length > 0)
+            if (this.Name.Length < this.MaxNameLength && this.Name.Length > 0)
             {
-                Name += " ";
-                wiggler.Start();
-                _ = Audio.Play("event:/ui/main/rename_entry_char");
+                this.Name += " ";
+                this.wiggler.Start();
+                Audio.Play("event:/ui/main/rename_entry_char");
             }
             else
-            {
-                _ = Audio.Play("event:/ui/main/button_invalid");
-            }
+                Audio.Play("event:/ui/main/button_invalid");
         }
 
         private void Backspace()
         {
-            if (Name.Length > 0)
+            if (this.Name.Length > 0)
             {
-                Name = Name.Substring(0, Name.Length - 1);
-                _ = Audio.Play("event:/ui/main/rename_entry_backspace");
+                this.Name = this.Name.Substring(0, this.Name.Length - 1);
+                Audio.Play("event:/ui/main/rename_entry_backspace");
             }
             else
-            {
-                _ = Audio.Play("event:/ui/main/button_invalid");
-            }
+                Audio.Play("event:/ui/main/button_invalid");
         }
 
         private void Finish()
         {
-            if (Name.Length >= 1)
+            if (this.Name.Length >= 1)
             {
                 if (MInput.GamePads.Length != 0 && MInput.GamePads[0] != null && (MInput.GamePads[0].Check(Buttons.LeftTrigger) || MInput.GamePads[0].Check(Buttons.LeftShoulder)) && (MInput.GamePads[0].Check(Buttons.RightTrigger) || MInput.GamePads[0].Check(Buttons.RightShoulder)))
-                {
-                    ResetDefaultName();
-                }
-
-                Focused = false;
-                _ = Overworld.Goto<OuiFileSelect>();
-                _ = Audio.Play("event:/ui/main/rename_entry_accept");
+                    this.ResetDefaultName();
+                this.Focused = false;
+                this.Overworld.Goto<OuiFileSelect>();
+                Audio.Play("event:/ui/main/rename_entry_accept");
             }
             else
-            {
-                _ = Audio.Play("event:/ui/main/button_invalid");
-            }
+                Audio.Play("event:/ui/main/button_invalid");
         }
 
         private void SwapType()
         {
-            hiragana = !hiragana;
-            if (hiragana)
-            {
-                ReloadLetters(Dialog.Clean("name_letters"));
-            }
+            this.hiragana = !this.hiragana;
+            if (this.hiragana)
+                this.ReloadLetters(Dialog.Clean("name_letters"));
             else
-            {
-                ReloadLetters(Dialog.Clean("name_letters_katakana"));
-            }
+                this.ReloadLetters(Dialog.Clean("name_letters_katakana"));
         }
 
         private void Cancel()
         {
-            FileSlot.Name = StartingName;
-            Focused = false;
-            _ = Overworld.Goto<OuiFileSelect>();
-            _ = Audio.Play("event:/ui/main/button_back");
+            this.FileSlot.Name = this.StartingName;
+            this.Focused = false;
+            this.Overworld.Goto<OuiFileSelect>();
+            Audio.Play("event:/ui/main/button_back");
         }
 
         public override void Render()
         {
-            Draw.Rect(-10f, -10f, 1940f, 1100f, Color.Black * 0.8f * ease);
-            Vector2 vector2 = boxtopleft + new Vector2(boxPadding, boxPadding);
+            Draw.Rect(-10f, -10f, 1940f, 1100f, Color.Black * 0.8f * this.ease);
+            Vector2 vector2 = this.boxtopleft + new Vector2(this.boxPadding, this.boxPadding);
             int num1 = 0;
-            foreach (string letter in letters)
+            foreach (string letter in this.letters)
             {
                 for (int index = 0; index < letter.Length; ++index)
                 {
-                    bool selected = num1 == line && index == this.index && !selectingOptions;
+                    bool selected = num1 == this.line && index == this.index && !this.selectingOptions;
                     Vector2 scale = Vector2.One * (selected ? 1.2f : 1f);
-                    Vector2 at = vector2 + (new Vector2(widestLetter, lineHeight) / 2f);
+                    Vector2 at = vector2 + new Vector2(this.widestLetter, this.lineHeight) / 2f;
                     if (selected)
-                    {
-                        at += new Vector2(0.0f, wiggler.Value) * 8f;
-                    }
-
-                    DrawOptionText(letter[index].ToString(), at, new Vector2(0.5f, 0.5f), scale, selected);
-                    vector2.X += widestLetter;
+                        at += new Vector2(0.0f, this.wiggler.Value) * 8f;
+                    this.DrawOptionText(letter[index].ToString(), at, new Vector2(0.5f, 0.5f), scale, selected);
+                    vector2.X += this.widestLetter;
                 }
-                vector2.X = boxtopleft.X + boxPadding;
-                vector2.Y += lineHeight + lineSpacing;
+                vector2.X = this.boxtopleft.X + this.boxPadding;
+                vector2.Y += this.lineHeight + this.lineSpacing;
                 ++num1;
             }
-            float num2 = wiggler.Value * 8f;
-            vector2.Y = boxtopleft.Y + boxHeight - lineHeight - boxPadding;
-            Draw.Rect(vector2.X, vector2.Y - (boxPadding * 0.5f), boxWidth - (boxPadding * 2f), 4f, Color.White);
-            DrawOptionText(cancel, vector2 + new Vector2(0.0f, lineHeight + (!selectingOptions || optionsIndex != 0 ? 0.0f : num2)), new Vector2(0.0f, 1f), Vector2.One * optionsScale, selectingOptions && optionsIndex == 0);
-            vector2.X = boxtopleft.X + boxWidth - backspaceWidth - widestLetter - spaceWidth - widestLetter - beginWidth - boxPadding;
-            DrawOptionText(space, vector2 + new Vector2(0.0f, lineHeight + (!selectingOptions || optionsIndex != 1 ? 0.0f : num2)), new Vector2(0.0f, 1f), Vector2.One * optionsScale, selectingOptions && optionsIndex == 1, Name.Length == 0 || !Focused);
-            vector2.X += spaceWidth + widestLetter;
-            DrawOptionText(backspace, vector2 + new Vector2(0.0f, lineHeight + (!selectingOptions || optionsIndex != 2 ? 0.0f : num2)), new Vector2(0.0f, 1f), Vector2.One * optionsScale, selectingOptions && optionsIndex == 2, Name.Length <= 0 || !Focused);
-            vector2.X += backspaceWidth + widestLetter;
-            DrawOptionText(accept, vector2 + new Vector2(0.0f, lineHeight + (!selectingOptions || optionsIndex != 3 ? 0.0f : num2)), new Vector2(0.0f, 1f), Vector2.One * optionsScale * 1.25f, selectingOptions && optionsIndex == 3, Name.Length < 1 || !Focused);
-            if (!Japanese)
-            {
+            float num2 = this.wiggler.Value * 8f;
+            vector2.Y = this.boxtopleft.Y + this.boxHeight - this.lineHeight - this.boxPadding;
+            Draw.Rect(vector2.X, vector2.Y - this.boxPadding * 0.5f, this.boxWidth - this.boxPadding * 2f, 4f, Color.White);
+            this.DrawOptionText(this.cancel, vector2 + new Vector2(0.0f, this.lineHeight + (!this.selectingOptions || this.optionsIndex != 0 ? 0.0f : num2)), new Vector2(0.0f, 1f), Vector2.One * this.optionsScale, this.selectingOptions && this.optionsIndex == 0);
+            vector2.X = this.boxtopleft.X + this.boxWidth - this.backspaceWidth - this.widestLetter - this.spaceWidth - this.widestLetter - this.beginWidth - this.boxPadding;
+            this.DrawOptionText(this.space, vector2 + new Vector2(0.0f, this.lineHeight + (!this.selectingOptions || this.optionsIndex != 1 ? 0.0f : num2)), new Vector2(0.0f, 1f), Vector2.One * this.optionsScale, this.selectingOptions && this.optionsIndex == 1, this.Name.Length == 0 || !this.Focused);
+            vector2.X += this.spaceWidth + this.widestLetter;
+            this.DrawOptionText(this.backspace, vector2 + new Vector2(0.0f, this.lineHeight + (!this.selectingOptions || this.optionsIndex != 2 ? 0.0f : num2)), new Vector2(0.0f, 1f), Vector2.One * this.optionsScale, this.selectingOptions && this.optionsIndex == 2, this.Name.Length <= 0 || !this.Focused);
+            vector2.X += this.backspaceWidth + this.widestLetter;
+            this.DrawOptionText(this.accept, vector2 + new Vector2(0.0f, this.lineHeight + (!this.selectingOptions || this.optionsIndex != 3 ? 0.0f : num2)), new Vector2(0.0f, 1f), Vector2.One * this.optionsScale * 1.25f, this.selectingOptions && this.optionsIndex == 3, this.Name.Length < 1 || !this.Focused);
+            if (!this.Japanese)
                 return;
-            }
-
             float scale1 = 1f;
-            string text = Dialog.Clean(hiragana ? "NAME_LETTERS_SWAP_KATAKANA" : "NAME_LETTERS_SWAP_HIRAGANA");
+            string text = Dialog.Clean(this.hiragana ? "NAME_LETTERS_SWAP_KATAKANA" : "NAME_LETTERS_SWAP_HIRAGANA");
             MTexture mtexture = Input.GuiButton(Input.MenuJournal);
-            _ = ActiveFont.Measure(text);
-            float num3 = mtexture.Width * scale1;
-            Vector2 position = new(70f, (float)(1144.0 - (154.0 * ease)));
+            ActiveFont.Measure(text);
+            float num3 = (float) mtexture.Width * scale1;
+            Vector2 position = new Vector2(70f, (float) (1144.0 - 154.0 * (double) this.ease));
             mtexture.DrawJustified(position, new Vector2(0.0f, 0.5f), Color.White, scale1, 0.0f);
             ActiveFont.DrawOutline(text, position + new Vector2(16f + num3, 0.0f), new Vector2(0.0f, 0.5f), Vector2.One * scale1, Color.White, 2f, Color.Black);
         }
@@ -532,24 +465,20 @@ namespace Celeste
             bool selected,
             bool disabled = false)
         {
-            int num = !selected ? 0 : (pressedTimer > 0.0 ? 1 : 0);
-            Color color = disabled ? disableColor : GetTextColor(selected);
-            Color edgeColor = disabled ? Color.Lerp(disableColor, Color.Black, 0.7f) : Color.Gray;
+            int num = !selected ? 0 : ((double) this.pressedTimer > 0.0 ? 1 : 0);
+            Color color = disabled ? this.disableColor : this.GetTextColor(selected);
+            Color edgeColor = disabled ? Color.Lerp(this.disableColor, Color.Black, 0.7f) : Color.Gray;
             if (num != 0)
-            {
                 ActiveFont.Draw(text, at + Vector2.UnitY, justify, scale, color);
-            }
             else
-            {
                 ActiveFont.DrawEdgeOutline(text, at, justify, scale, color, 4f, edgeColor);
-            }
         }
 
         private Color GetTextColor(bool selected)
         {
-            return !selected
-                ? unselectColor
-                : Settings.Instance.DisableFlashes || Calc.BetweenInterval(timer, 0.1f) ? selectColorA : selectColorB;
+            if (!selected)
+                return this.unselectColor;
+            return Settings.Instance.DisableFlashes || Calc.BetweenInterval(this.timer, 0.1f) ? this.selectColorA : this.selectColorB;
         }
     }
 }

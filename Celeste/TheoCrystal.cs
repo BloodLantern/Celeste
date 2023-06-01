@@ -18,11 +18,11 @@ namespace Celeste
         public Vector2 Speed;
         public bool OnPedestal;
         public Holdable Hold;
-        private readonly Sprite sprite;
+        private Sprite sprite;
         private bool dead;
         private Level Level;
-        private readonly Collision onCollideH;
-        private readonly Collision onCollideV;
+        private Collision onCollideH;
+        private Collision onCollideV;
         private float noGravityTimer;
         private Vector2 prevLiftSpeed;
         private Vector2 previousPosition;
@@ -36,29 +36,29 @@ namespace Celeste
         public TheoCrystal(Vector2 position)
             : base(position)
         {
-            previousPosition = position;
-            Depth = 100;
-            Collider = new Hitbox(8f, 10f, -4f, -10f);
-            Add(sprite = GFX.SpriteBank.Create("theo_crystal"));
-            sprite.Scale.X = -1f;
-            Add(Hold = new Holdable());
-            Hold.PickupCollider = new Hitbox(16f, 22f, -8f, -16f);
-            Hold.SlowFall = false;
-            Hold.SlowRun = true;
-            Hold.OnPickup = new Action(OnPickup);
-            Hold.OnRelease = new Action<Vector2>(OnRelease);
-            Hold.DangerousCheck = new Func<HoldableCollider, bool>(Dangerous);
-            Hold.OnHitSeeker = new Action<Seeker>(HitSeeker);
-            Hold.OnSwat = new Action<HoldableCollider, int>(Swat);
-            Hold.OnHitSpring = new Func<Spring, bool>(HitSpring);
-            Hold.OnHitSpinner = new Action<Entity>(HitSpinner);
-            Hold.SpeedGetter = () => Speed;
-            onCollideH = new Collision(OnCollideH);
-            onCollideV = new Collision(OnCollideV);
-            LiftSpeedGraceTime = 0.1f;
-            Add(new VertexLight(Collider.Center, Color.White, 1f, 32, 64));
-            Tag = (int)Tags.TransitionUpdate;
-            Add(new MirrorReflection());
+            this.previousPosition = position;
+            this.Depth = 100;
+            this.Collider = (Collider) new Hitbox(8f, 10f, -4f, -10f);
+            this.Add((Component) (this.sprite = GFX.SpriteBank.Create("theo_crystal")));
+            this.sprite.Scale.X = -1f;
+            this.Add((Component) (this.Hold = new Holdable()));
+            this.Hold.PickupCollider = (Collider) new Hitbox(16f, 22f, -8f, -16f);
+            this.Hold.SlowFall = false;
+            this.Hold.SlowRun = true;
+            this.Hold.OnPickup = new Action(this.OnPickup);
+            this.Hold.OnRelease = new Action<Vector2>(this.OnRelease);
+            this.Hold.DangerousCheck = new Func<HoldableCollider, bool>(this.Dangerous);
+            this.Hold.OnHitSeeker = new Action<Seeker>(this.HitSeeker);
+            this.Hold.OnSwat = new Action<HoldableCollider, int>(this.Swat);
+            this.Hold.OnHitSpring = new Func<Spring, bool>(this.HitSpring);
+            this.Hold.OnHitSpinner = new Action<Entity>(this.HitSpinner);
+            this.Hold.SpeedGetter = (Func<Vector2>) (() => this.Speed);
+            this.onCollideH = new Collision(this.OnCollideH);
+            this.onCollideV = new Collision(this.OnCollideV);
+            this.LiftSpeedGraceTime = 0.1f;
+            this.Add((Component) new VertexLight(this.Collider.Center, Color.White, 1f, 32, 64));
+            this.Tag = (int) Tags.TransitionUpdate;
+            this.Add((Component) new MirrorReflection());
         }
 
         public TheoCrystal(EntityData e, Vector2 offset)
@@ -69,180 +69,128 @@ namespace Celeste
         public override void Added(Scene scene)
         {
             base.Added(scene);
-            Level = SceneAs<Level>();
-            foreach (TheoCrystal entity in Level.Tracker.GetEntities<TheoCrystal>())
+            this.Level = this.SceneAs<Level>();
+            foreach (TheoCrystal entity in this.Level.Tracker.GetEntities<TheoCrystal>())
             {
                 if (entity != this && entity.Hold.IsHeld)
-                {
-                    RemoveSelf();
-                }
+                    this.RemoveSelf();
             }
-            if (!(Level.Session.Level == "e-00"))
-            {
+            if (!(this.Level.Session.Level == "e-00"))
                 return;
-            }
-
-            tutorialGui = new BirdTutorialGui(this, new Vector2(0.0f, -24f), Dialog.Clean("tutorial_carry"), new object[2]
+            this.tutorialGui = new BirdTutorialGui((Entity) this, new Vector2(0.0f, -24f), (object) Dialog.Clean("tutorial_carry"), new object[2]
             {
-                 Dialog.Clean("tutorial_hold"),
-                 BirdTutorialGui.ButtonPrompt.Grab
-            })
-            {
-                Open = false
-            };
-            Scene.Add(tutorialGui);
+                (object) Dialog.Clean("tutorial_hold"),
+                (object) BirdTutorialGui.ButtonPrompt.Grab
+            });
+            this.tutorialGui.Open = false;
+            this.Scene.Add((Entity) this.tutorialGui);
         }
 
         public override void Update()
         {
             base.Update();
-            if (shattering || dead)
-            {
+            if (this.shattering || this.dead)
                 return;
-            }
-
-            if (swatTimer > 0.0)
+            if ((double) this.swatTimer > 0.0)
+                this.swatTimer -= Engine.DeltaTime;
+            this.hardVerticalHitSoundCooldown -= Engine.DeltaTime;
+            if (this.OnPedestal)
             {
-                swatTimer -= Engine.DeltaTime;
-            }
-
-            hardVerticalHitSoundCooldown -= Engine.DeltaTime;
-            if (OnPedestal)
-            {
-                Depth = 8999;
+                this.Depth = 8999;
             }
             else
             {
-                Depth = 100;
-                if (Hold.IsHeld)
+                this.Depth = 100;
+                if (this.Hold.IsHeld)
                 {
-                    prevLiftSpeed = Vector2.Zero;
+                    this.prevLiftSpeed = Vector2.Zero;
                 }
                 else
                 {
-                    if (OnGround())
+                    if (this.OnGround())
                     {
-                        Speed.X = Calc.Approach(Speed.X, OnGround(Position + (Vector2.UnitX * 3f)) ? (OnGround(Position - (Vector2.UnitX * 3f)) ? 0.0f : -20f) : 20f, 800f * Engine.DeltaTime);
-                        Vector2 liftSpeed = LiftSpeed;
-                        if (liftSpeed == Vector2.Zero && prevLiftSpeed != Vector2.Zero)
+                        this.Speed.X = Calc.Approach(this.Speed.X, this.OnGround(this.Position + Vector2.UnitX * 3f) ? (this.OnGround(this.Position - Vector2.UnitX * 3f) ? 0.0f : -20f) : 20f, 800f * Engine.DeltaTime);
+                        Vector2 liftSpeed = this.LiftSpeed;
+                        if (liftSpeed == Vector2.Zero && this.prevLiftSpeed != Vector2.Zero)
                         {
-                            Speed = prevLiftSpeed;
-                            prevLiftSpeed = Vector2.Zero;
-                            Speed.Y = Math.Min(Speed.Y * 0.6f, 0.0f);
-                            if (Speed.X != 0.0 && Speed.Y == 0.0)
-                            {
-                                Speed.Y = -60f;
-                            }
-
-                            if (Speed.Y < 0.0)
-                            {
-                                noGravityTimer = 0.15f;
-                            }
+                            this.Speed = this.prevLiftSpeed;
+                            this.prevLiftSpeed = Vector2.Zero;
+                            this.Speed.Y = Math.Min(this.Speed.Y * 0.6f, 0.0f);
+                            if ((double) this.Speed.X != 0.0 && (double) this.Speed.Y == 0.0)
+                                this.Speed.Y = -60f;
+                            if ((double) this.Speed.Y < 0.0)
+                                this.noGravityTimer = 0.15f;
                         }
                         else
                         {
-                            prevLiftSpeed = liftSpeed;
-                            if (liftSpeed.Y < 0.0 && Speed.Y < 0.0)
-                            {
-                                Speed.Y = 0.0f;
-                            }
+                            this.prevLiftSpeed = liftSpeed;
+                            if ((double) liftSpeed.Y < 0.0 && (double) this.Speed.Y < 0.0)
+                                this.Speed.Y = 0.0f;
                         }
                     }
-                    else if (Hold.ShouldHaveGravity)
+                    else if (this.Hold.ShouldHaveGravity)
                     {
                         float num1 = 800f;
-                        if ((double)Math.Abs(Speed.Y) <= 30.0)
-                        {
+                        if ((double) Math.Abs(this.Speed.Y) <= 30.0)
                             num1 *= 0.5f;
-                        }
-
                         float num2 = 350f;
-                        if (Speed.Y < 0.0)
-                        {
+                        if ((double) this.Speed.Y < 0.0)
                             num2 *= 0.5f;
-                        }
-
-                        Speed.X = Calc.Approach(Speed.X, 0.0f, num2 * Engine.DeltaTime);
-                        if (noGravityTimer > 0.0)
-                        {
-                            noGravityTimer -= Engine.DeltaTime;
-                        }
+                        this.Speed.X = Calc.Approach(this.Speed.X, 0.0f, num2 * Engine.DeltaTime);
+                        if ((double) this.noGravityTimer > 0.0)
+                            this.noGravityTimer -= Engine.DeltaTime;
                         else
-                        {
-                            Speed.Y = Calc.Approach(Speed.Y, 200f, num1 * Engine.DeltaTime);
-                        }
+                            this.Speed.Y = Calc.Approach(this.Speed.Y, 200f, num1 * Engine.DeltaTime);
                     }
-                    previousPosition = ExactPosition;
-                    _ = MoveH(Speed.X * Engine.DeltaTime, onCollideH);
-                    _ = MoveV(Speed.Y * Engine.DeltaTime, onCollideV);
-                    if (Center.X > (double)Level.Bounds.Right)
+                    this.previousPosition = this.ExactPosition;
+                    this.MoveH(this.Speed.X * Engine.DeltaTime, this.onCollideH);
+                    this.MoveV(this.Speed.Y * Engine.DeltaTime, this.onCollideV);
+                    if ((double) this.Center.X > (double) this.Level.Bounds.Right)
                     {
-                        _ = MoveH(32f * Engine.DeltaTime);
-                        if ((double)Left - 8.0 > Level.Bounds.Right)
-                        {
-                            RemoveSelf();
-                        }
+                        this.MoveH(32f * Engine.DeltaTime);
+                        if ((double) this.Left - 8.0 > (double) this.Level.Bounds.Right)
+                            this.RemoveSelf();
                     }
-                    else if ((double)Left < Level.Bounds.Left)
+                    else if ((double) this.Left < (double) this.Level.Bounds.Left)
                     {
-                        Left = Level.Bounds.Left;
-                        Speed.X *= -0.4f;
+                        this.Left = (float) this.Level.Bounds.Left;
+                        this.Speed.X *= -0.4f;
                     }
-                    else if ((double)Top < Level.Bounds.Top - 4)
+                    else if ((double) this.Top < (double) (this.Level.Bounds.Top - 4))
                     {
-                        Top = Level.Bounds.Top + 4;
-                        Speed.Y = 0.0f;
+                        this.Top = (float) (this.Level.Bounds.Top + 4);
+                        this.Speed.Y = 0.0f;
                     }
-                    else if ((double)Bottom > Level.Bounds.Bottom && SaveData.Instance.Assists.Invincible)
+                    else if ((double) this.Bottom > (double) this.Level.Bounds.Bottom && SaveData.Instance.Assists.Invincible)
                     {
-                        Bottom = Level.Bounds.Bottom;
-                        Speed.Y = -300f;
-                        _ = Audio.Play("event:/game/general/assist_screenbottom", Position);
+                        this.Bottom = (float) this.Level.Bounds.Bottom;
+                        this.Speed.Y = -300f;
+                        Audio.Play("event:/game/general/assist_screenbottom", this.Position);
                     }
-                    else if ((double)Top > Level.Bounds.Bottom)
-                    {
-                        Die();
-                    }
-
-                    if ((double)X < Level.Bounds.Left + 10)
-                    {
-                        _ = MoveH(32f * Engine.DeltaTime);
-                    }
-
-                    Player entity = Scene.Tracker.GetEntity<Player>();
-                    TempleGate templeGate = CollideFirst<TempleGate>();
+                    else if ((double) this.Top > (double) this.Level.Bounds.Bottom)
+                        this.Die();
+                    if ((double) this.X < (double) (this.Level.Bounds.Left + 10))
+                        this.MoveH(32f * Engine.DeltaTime);
+                    Player entity = this.Scene.Tracker.GetEntity<Player>();
+                    TempleGate templeGate = this.CollideFirst<TempleGate>();
                     if (templeGate != null && entity != null)
                     {
                         templeGate.Collidable = false;
-                        _ = MoveH(Math.Sign(entity.X - X) * 32 * Engine.DeltaTime);
+                        this.MoveH((float) (Math.Sign(entity.X - this.X) * 32) * Engine.DeltaTime);
                         templeGate.Collidable = true;
                     }
                 }
-                if (!dead)
-                {
-                    Hold.CheckAgainstColliders();
-                }
-
-                if (hitSeeker != null && swatTimer <= 0.0 && !hitSeeker.Check(Hold))
-                {
-                    hitSeeker = null;
-                }
-
-                if (tutorialGui == null)
-                {
+                if (!this.dead)
+                    this.Hold.CheckAgainstColliders();
+                if (this.hitSeeker != null && (double) this.swatTimer <= 0.0 && !this.hitSeeker.Check(this.Hold))
+                    this.hitSeeker = (HoldableCollider) null;
+                if (this.tutorialGui == null)
                     return;
-                }
-
-                if (!OnPedestal && !Hold.IsHeld && OnGround() && Level.Session.GetFlag("foundTheoInCrystal"))
-                {
-                    tutorialTimer += Engine.DeltaTime;
-                }
+                if (!this.OnPedestal && !this.Hold.IsHeld && this.OnGround() && this.Level.Session.GetFlag("foundTheoInCrystal"))
+                    this.tutorialTimer += Engine.DeltaTime;
                 else
-                {
-                    tutorialTimer = 0.0f;
-                }
-
-                tutorialGui.Open = tutorialTimer > 0.25;
+                    this.tutorialTimer = 0.0f;
+                this.tutorialGui.Open = (double) this.tutorialTimer > 0.25;
             }
         }
 
@@ -250,117 +198,93 @@ namespace Celeste
         {
             TheoCrystal theoCrystal = this;
             theoCrystal.shattering = true;
-            BloomPoint bloom = new(0.0f, 32f);
-            VertexLight light = new(Color.AliceBlue, 0.0f, 64, 200);
-            theoCrystal.Add(bloom);
-            theoCrystal.Add(light);
-            for (float p = 0.0f; (double)p < 1.0; p += Engine.DeltaTime)
+            BloomPoint bloom = new BloomPoint(0.0f, 32f);
+            VertexLight light = new VertexLight(Color.AliceBlue, 0.0f, 64, 200);
+            theoCrystal.Add((Component) bloom);
+            theoCrystal.Add((Component) light);
+            for (float p = 0.0f; (double) p < 1.0; p += Engine.DeltaTime)
             {
-                theoCrystal.Position += theoCrystal.Speed * (1f - p) * Engine.DeltaTime;
+                theoCrystal.Position = theoCrystal.Position + theoCrystal.Speed * (1f - p) * Engine.DeltaTime;
                 theoCrystal.Level.ZoomFocusPoint = theoCrystal.TopCenter - theoCrystal.Level.Camera.Position;
                 light.Alpha = p;
                 bloom.Alpha = p;
-                yield return null;
+                yield return (object) null;
             }
-            yield return 0.5f;
+            yield return (object) 0.5f;
             theoCrystal.Level.Shake();
             theoCrystal.sprite.Play("shatter");
-            yield return 1f;
+            yield return (object) 1f;
             theoCrystal.Level.Shake();
         }
 
         public void ExplodeLaunch(Vector2 from)
         {
-            if (Hold.IsHeld)
-            {
+            if (this.Hold.IsHeld)
                 return;
-            }
-
-            Speed = (Center - from).SafeNormalize(120f);
-            _ = SlashFx.Burst(Center, Speed.Angle());
+            this.Speed = (this.Center - from).SafeNormalize(120f);
+            SlashFx.Burst(this.Center, this.Speed.Angle());
         }
 
         public void Swat(HoldableCollider hc, int dir)
         {
-            if (!Hold.IsHeld || hitSeeker != null)
-            {
+            if (!this.Hold.IsHeld || this.hitSeeker != null)
                 return;
-            }
-
-            swatTimer = 0.1f;
-            hitSeeker = hc;
-            Hold.Holder.Swat(dir);
+            this.swatTimer = 0.1f;
+            this.hitSeeker = hc;
+            this.Hold.Holder.Swat(dir);
         }
 
-        public bool Dangerous(HoldableCollider holdableCollider)
-        {
-            return !Hold.IsHeld && Speed != Vector2.Zero && hitSeeker != holdableCollider;
-        }
+        public bool Dangerous(HoldableCollider holdableCollider) => !this.Hold.IsHeld && this.Speed != Vector2.Zero && this.hitSeeker != holdableCollider;
 
         public void HitSeeker(Seeker seeker)
         {
-            if (!Hold.IsHeld)
-            {
-                Speed = (Center - seeker.Center).SafeNormalize(120f);
-            }
-
-            _ = Audio.Play("event:/game/05_mirror_temple/crystaltheo_hit_side", Position);
+            if (!this.Hold.IsHeld)
+                this.Speed = (this.Center - seeker.Center).SafeNormalize(120f);
+            Audio.Play("event:/game/05_mirror_temple/crystaltheo_hit_side", this.Position);
         }
 
         public void HitSpinner(Entity spinner)
         {
-            if (Hold.IsHeld || (double)Speed.Length() >= 0.0099999997764825821)
-            {
+            if (this.Hold.IsHeld || (double) this.Speed.Length() >= 0.0099999997764825821)
                 return;
-            }
-
-            Vector2 vector2 = LiftSpeed;
-            if ((double)vector2.Length() >= 0.0099999997764825821)
-            {
+            Vector2 vector2 = this.LiftSpeed;
+            if ((double) vector2.Length() >= 0.0099999997764825821)
                 return;
-            }
-
-            vector2 = previousPosition - ExactPosition;
-            if ((double)vector2.Length() >= 0.0099999997764825821 || !OnGround())
-            {
+            vector2 = this.previousPosition - this.ExactPosition;
+            if ((double) vector2.Length() >= 0.0099999997764825821 || !this.OnGround())
                 return;
-            }
-
-            int num = Math.Sign(X - spinner.X);
+            int num = Math.Sign(this.X - spinner.X);
             if (num == 0)
-            {
                 num = 1;
-            }
-
-            Speed.X = num * 120f;
-            Speed.Y = -30f;
+            this.Speed.X = (float) num * 120f;
+            this.Speed.Y = -30f;
         }
 
         public bool HitSpring(Spring spring)
         {
-            if (!Hold.IsHeld)
+            if (!this.Hold.IsHeld)
             {
-                if (spring.Orientation == Spring.Orientations.Floor && Speed.Y >= 0.0)
+                if (spring.Orientation == Spring.Orientations.Floor && (double) this.Speed.Y >= 0.0)
                 {
-                    Speed.X *= 0.5f;
-                    Speed.Y = -160f;
-                    noGravityTimer = 0.15f;
+                    this.Speed.X *= 0.5f;
+                    this.Speed.Y = -160f;
+                    this.noGravityTimer = 0.15f;
                     return true;
                 }
-                if (spring.Orientation == Spring.Orientations.WallLeft && Speed.X <= 0.0)
+                if (spring.Orientation == Spring.Orientations.WallLeft && (double) this.Speed.X <= 0.0)
                 {
-                    MoveTowardsY(spring.CenterY + 5f, 4f);
-                    Speed.X = 220f;
-                    Speed.Y = -80f;
-                    noGravityTimer = 0.1f;
+                    this.MoveTowardsY(spring.CenterY + 5f, 4f);
+                    this.Speed.X = 220f;
+                    this.Speed.Y = -80f;
+                    this.noGravityTimer = 0.1f;
                     return true;
                 }
-                if (spring.Orientation == Spring.Orientations.WallRight && Speed.X >= 0.0)
+                if (spring.Orientation == Spring.Orientations.WallRight && (double) this.Speed.X >= 0.0)
                 {
-                    MoveTowardsY(spring.CenterY + 5f, 4f);
-                    Speed.X = -220f;
-                    Speed.Y = -80f;
-                    noGravityTimer = 0.1f;
+                    this.MoveTowardsY(spring.CenterY + 5f, 4f);
+                    this.Speed.X = -220f;
+                    this.Speed.Y = -80f;
+                    this.noGravityTimer = 0.1f;
                     return true;
                 }
             }
@@ -371,48 +295,36 @@ namespace Celeste
         {
             if (data.Hit is DashSwitch)
             {
-                _ = (int)(data.Hit as DashSwitch).OnDashCollide(null, Vector2.UnitX * Math.Sign(Speed.X));
+                int num = (int) (data.Hit as DashSwitch).OnDashCollide((Player) null, Vector2.UnitX * (float) Math.Sign(this.Speed.X));
             }
-            _ = Audio.Play("event:/game/05_mirror_temple/crystaltheo_hit_side", Position);
-            if ((double)Math.Abs(Speed.X) > 100.0)
-            {
-                ImpactParticles(data.Direction);
-            }
-
-            Speed.X *= -0.4f;
+            Audio.Play("event:/game/05_mirror_temple/crystaltheo_hit_side", this.Position);
+            if ((double) Math.Abs(this.Speed.X) > 100.0)
+                this.ImpactParticles(data.Direction);
+            this.Speed.X *= -0.4f;
         }
 
         private void OnCollideV(CollisionData data)
         {
             if (data.Hit is DashSwitch)
             {
-                _ = (int)(data.Hit as DashSwitch).OnDashCollide(null, Vector2.UnitY * Math.Sign(Speed.Y));
+                int num = (int) (data.Hit as DashSwitch).OnDashCollide((Player) null, Vector2.UnitY * (float) Math.Sign(this.Speed.Y));
             }
-            if (Speed.Y > 0.0)
+            if ((double) this.Speed.Y > 0.0)
             {
-                if (hardVerticalHitSoundCooldown <= 0.0)
+                if ((double) this.hardVerticalHitSoundCooldown <= 0.0)
                 {
-                    _ = Audio.Play("event:/game/05_mirror_temple/crystaltheo_hit_ground", Position, "crystal_velocity", Calc.ClampedMap(Speed.Y, 0.0f, 200f));
-                    hardVerticalHitSoundCooldown = 0.5f;
+                    Audio.Play("event:/game/05_mirror_temple/crystaltheo_hit_ground", this.Position, "crystal_velocity", Calc.ClampedMap(this.Speed.Y, 0.0f, 200f));
+                    this.hardVerticalHitSoundCooldown = 0.5f;
                 }
                 else
-                {
-                    _ = Audio.Play("event:/game/05_mirror_temple/crystaltheo_hit_ground", Position, "crystal_velocity", 0.0f);
-                }
+                    Audio.Play("event:/game/05_mirror_temple/crystaltheo_hit_ground", this.Position, "crystal_velocity", 0.0f);
             }
-            if (Speed.Y > 160.0)
-            {
-                ImpactParticles(data.Direction);
-            }
-
-            if (Speed.Y > 140.0 && data.Hit is not SwapBlock && data.Hit is not DashSwitch)
-            {
-                Speed.Y *= -0.6f;
-            }
+            if ((double) this.Speed.Y > 160.0)
+                this.ImpactParticles(data.Direction);
+            if ((double) this.Speed.Y > 140.0 && !(data.Hit is SwapBlock) && !(data.Hit is DashSwitch))
+                this.Speed.Y *= -0.6f;
             else
-            {
-                Speed.Y = 0.0f;
-            }
+                this.Speed.Y = 0.0f;
         }
 
         private void ImpactParticles(Vector2 dir)
@@ -420,86 +332,71 @@ namespace Celeste
             float direction;
             Vector2 position;
             Vector2 positionRange;
-            if (dir.X > 0.0)
+            if ((double) dir.X > 0.0)
             {
                 direction = 3.14159274f;
-                position = new Vector2(Right, Y - 4f);
+                position = new Vector2(this.Right, this.Y - 4f);
                 positionRange = Vector2.UnitY * 6f;
             }
-            else if (dir.X < 0.0)
+            else if ((double) dir.X < 0.0)
             {
                 direction = 0.0f;
-                position = new Vector2(Left, Y - 4f);
+                position = new Vector2(this.Left, this.Y - 4f);
                 positionRange = Vector2.UnitY * 6f;
             }
-            else if (dir.Y > 0.0)
+            else if ((double) dir.Y > 0.0)
             {
                 direction = -1.57079637f;
-                position = new Vector2(X, Bottom);
+                position = new Vector2(this.X, this.Bottom);
                 positionRange = Vector2.UnitX * 6f;
             }
             else
             {
                 direction = 1.57079637f;
-                position = new Vector2(X, Top);
+                position = new Vector2(this.X, this.Top);
                 positionRange = Vector2.UnitX * 6f;
             }
-            Level.Particles.Emit(TheoCrystal.P_Impact, 12, position, positionRange, direction);
+            this.Level.Particles.Emit(TheoCrystal.P_Impact, 12, position, positionRange, direction);
         }
 
-        public override bool IsRiding(Solid solid)
-        {
-            return Speed.Y == 0.0 && base.IsRiding(solid);
-        }
+        public override bool IsRiding(Solid solid) => (double) this.Speed.Y == 0.0 && base.IsRiding(solid);
 
         protected override void OnSquish(CollisionData data)
         {
-            if (TrySquishWiggle(data) || SaveData.Instance.Assists.Invincible)
-            {
+            if (this.TrySquishWiggle(data) || SaveData.Instance.Assists.Invincible)
                 return;
-            }
-
-            Die();
+            this.Die();
         }
 
         private void OnPickup()
         {
-            Speed = Vector2.Zero;
-            AddTag((int)Tags.Persistent);
+            this.Speed = Vector2.Zero;
+            this.AddTag((int) Tags.Persistent);
         }
 
         private void OnRelease(Vector2 force)
         {
-            RemoveTag((int)Tags.Persistent);
-            if (force.X != 0.0 && force.Y == 0.0)
-            {
+            this.RemoveTag((int) Tags.Persistent);
+            if ((double) force.X != 0.0 && (double) force.Y == 0.0)
                 force.Y = -0.4f;
-            }
-
-            Speed = force * 200f;
-            if (!(Speed != Vector2.Zero))
-            {
+            this.Speed = force * 200f;
+            if (!(this.Speed != Vector2.Zero))
                 return;
-            }
-
-            noGravityTimer = 0.1f;
+            this.noGravityTimer = 0.1f;
         }
 
         public void Die()
         {
-            if (dead)
-            {
+            if (this.dead)
                 return;
-            }
-
-            dead = true;
-            Player entity = Level.Tracker.GetEntity<Player>();
-            _ = (entity?.Die(-Vector2.UnitX * (float)entity.Facing));
-            _ = Audio.Play("event:/char/madeline/death", Position);
-            Add(new DeathEffect(Color.ForestGreen, new Vector2?(Center - Position)));
-            sprite.Visible = false;
-            Depth = -1000000;
-            AllowPushing = false;
+            this.dead = true;
+            Player entity = this.Level.Tracker.GetEntity<Player>();
+            entity?.Die(-Vector2.UnitX * (float) entity.Facing);
+            Audio.Play("event:/char/madeline/death", this.Position);
+            this.Add((Component) new DeathEffect(Color.ForestGreen, new Vector2?(this.Center - this.Position)));
+            this.sprite.Visible = false;
+            this.Depth = -1000000;
+            this.AllowPushing = false;
         }
     }
 }

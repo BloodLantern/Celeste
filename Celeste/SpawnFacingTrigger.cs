@@ -17,9 +17,9 @@ namespace Celeste
         public SpawnFacingTrigger(EntityData data, Vector2 offset)
             : base(data.Position + offset)
         {
-            Collider = new Hitbox(data.Width, data.Height);
-            Facing = data.Enum<Facings>("facing");
-            Visible = Active = false;
+            this.Collider = (Collider) new Hitbox((float) data.Width, (float) data.Height);
+            this.Facing = data.Enum<Facings>("facing");
+            this.Visible = this.Active = false;
         }
     }
 }

@@ -13,58 +13,34 @@ namespace FMOD
     {
         public RESULT release()
         {
-            int num = (int)Reverb3D.FMOD_Reverb3D_Release(getRaw());
+            int num = (int) Reverb3D.FMOD_Reverb3D_Release(this.getRaw());
             if (num != 0)
-            {
-                return (RESULT)num;
-            }
-
-            rawPtr = IntPtr.Zero;
-            return (RESULT)num;
+                return (RESULT) num;
+            this.rawPtr = IntPtr.Zero;
+            return (RESULT) num;
         }
 
-        public RESULT set3DAttributes(ref VECTOR position, float mindistance, float maxdistance)
-        {
-            return Reverb3D.FMOD_Reverb3D_Set3DAttributes(rawPtr, ref position, mindistance, maxdistance);
-        }
+        public RESULT set3DAttributes(ref VECTOR position, float mindistance, float maxdistance) => Reverb3D.FMOD_Reverb3D_Set3DAttributes(this.rawPtr, ref position, mindistance, maxdistance);
 
         public RESULT get3DAttributes(
             ref VECTOR position,
             ref float mindistance,
             ref float maxdistance)
         {
-            return Reverb3D.FMOD_Reverb3D_Get3DAttributes(rawPtr, ref position, ref mindistance, ref maxdistance);
+            return Reverb3D.FMOD_Reverb3D_Get3DAttributes(this.rawPtr, ref position, ref mindistance, ref maxdistance);
         }
 
-        public RESULT setProperties(ref REVERB_PROPERTIES properties)
-        {
-            return Reverb3D.FMOD_Reverb3D_SetProperties(rawPtr, ref properties);
-        }
+        public RESULT setProperties(ref REVERB_PROPERTIES properties) => Reverb3D.FMOD_Reverb3D_SetProperties(this.rawPtr, ref properties);
 
-        public RESULT getProperties(ref REVERB_PROPERTIES properties)
-        {
-            return Reverb3D.FMOD_Reverb3D_GetProperties(rawPtr, ref properties);
-        }
+        public RESULT getProperties(ref REVERB_PROPERTIES properties) => Reverb3D.FMOD_Reverb3D_GetProperties(this.rawPtr, ref properties);
 
-        public RESULT setActive(bool active)
-        {
-            return Reverb3D.FMOD_Reverb3D_SetActive(rawPtr, active);
-        }
+        public RESULT setActive(bool active) => Reverb3D.FMOD_Reverb3D_SetActive(this.rawPtr, active);
 
-        public RESULT getActive(out bool active)
-        {
-            return Reverb3D.FMOD_Reverb3D_GetActive(rawPtr, out active);
-        }
+        public RESULT getActive(out bool active) => Reverb3D.FMOD_Reverb3D_GetActive(this.rawPtr, out active);
 
-        public RESULT setUserData(IntPtr userdata)
-        {
-            return Reverb3D.FMOD_Reverb3D_SetUserData(rawPtr, userdata);
-        }
+        public RESULT setUserData(IntPtr userdata) => Reverb3D.FMOD_Reverb3D_SetUserData(this.rawPtr, userdata);
 
-        public RESULT getUserData(out IntPtr userdata)
-        {
-            return Reverb3D.FMOD_Reverb3D_GetUserData(rawPtr, out userdata);
-        }
+        public RESULT getUserData(out IntPtr userdata) => Reverb3D.FMOD_Reverb3D_GetUserData(this.rawPtr, out userdata);
 
         [DllImport("fmod")]
         private static extern RESULT FMOD_Reverb3D_Release(IntPtr reverb);

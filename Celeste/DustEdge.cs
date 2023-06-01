@@ -17,7 +17,7 @@ namespace Celeste
         public DustEdge(Action onRenderDust)
             : base(false, true)
         {
-            RenderDust = onRenderDust;
+            this.RenderDust = onRenderDust;
         }
     }
 }

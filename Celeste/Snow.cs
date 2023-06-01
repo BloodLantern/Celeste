@@ -25,64 +25,50 @@ namespace Celeste
         public float Alpha = 1f;
         private float visibleFade = 1f;
         private float linearFade = 1f;
-        private readonly Color[] colors;
-        private readonly Color[] blendedColors;
-        private readonly Snow.Particle[] particles = new Snow.Particle[60];
+        private Color[] colors;
+        private Color[] blendedColors;
+        private Snow.Particle[] particles = new Snow.Particle[60];
 
         public Snow(bool foreground)
         {
-            colors = foreground ? Snow.ForegroundColors : Snow.BackgroundColors;
-            blendedColors = new Color[colors.Length];
+            this.colors = foreground ? Snow.ForegroundColors : Snow.BackgroundColors;
+            this.blendedColors = new Color[this.colors.Length];
             int speedMin = foreground ? 120 : 40;
             int speedMax = foreground ? 300 : 100;
-            for (int index = 0; index < particles.Length; ++index)
-            {
-                particles[index].Init(colors.Length, speedMin, speedMax);
-            }
+            for (int index = 0; index < this.particles.Length; ++index)
+                this.particles[index].Init(this.colors.Length, (float) speedMin, (float) speedMax);
         }
 
         public override void Update(Scene scene)
         {
             base.Update(scene);
-            visibleFade = Calc.Approach(visibleFade, IsVisible(scene as Level) ? 1f : 0.0f, Engine.DeltaTime * 2f);
-            if (FadeX != null)
+            this.visibleFade = Calc.Approach(this.visibleFade, this.IsVisible(scene as Level) ? 1f : 0.0f, Engine.DeltaTime * 2f);
+            if (this.FadeX != null)
+                this.linearFade = this.FadeX.Value((scene as Level).Camera.X + 160f);
+            for (int index = 0; index < this.particles.Length; ++index)
             {
-                linearFade = FadeX.Value((scene as Level).Camera.X + 160f);
-            }
-
-            for (int index = 0; index < particles.Length; ++index)
-            {
-                particles[index].Position.X -= particles[index].Speed * Engine.DeltaTime;
-                particles[index].Position.Y += (float)(Math.Sin(particles[index].Sin) * particles[index].Speed * 0.20000000298023224) * Engine.DeltaTime;
-                particles[index].Sin += Engine.DeltaTime;
+                this.particles[index].Position.X -= this.particles[index].Speed * Engine.DeltaTime;
+                this.particles[index].Position.Y += (float) (Math.Sin((double) this.particles[index].Sin) * (double) this.particles[index].Speed * 0.20000000298023224) * Engine.DeltaTime;
+                this.particles[index].Sin += Engine.DeltaTime;
             }
         }
 
         public override void Render(Scene scene)
         {
-            if (Alpha <= 0.0 || visibleFade <= 0.0 || linearFade <= 0.0)
-            {
+            if ((double) this.Alpha <= 0.0 || (double) this.visibleFade <= 0.0 || (double) this.linearFade <= 0.0)
                 return;
-            }
-
-            for (int index = 0; index < blendedColors.Length; ++index)
-            {
-                blendedColors[index] = colors[index] * (Alpha * visibleFade * linearFade);
-            }
-
+            for (int index = 0; index < this.blendedColors.Length; ++index)
+                this.blendedColors[index] = this.colors[index] * (this.Alpha * this.visibleFade * this.linearFade);
             Camera camera = (scene as Level).Camera;
-            for (int index = 0; index < particles.Length; ++index)
+            for (int index = 0; index < this.particles.Length; ++index)
             {
-                Vector2 position = new(mod(particles[index].Position.X - camera.X, 320f), mod(particles[index].Position.Y - camera.Y, 180f));
-                Color blendedColor = blendedColors[particles[index].Color];
+                Vector2 position = new Vector2(this.mod(this.particles[index].Position.X - camera.X, 320f), this.mod(this.particles[index].Position.Y - camera.Y, 180f));
+                Color blendedColor = this.blendedColors[this.particles[index].Color];
                 Draw.Pixel.DrawCentered(position, blendedColor);
             }
         }
 
-        private float mod(float x, float m)
-        {
-            return ((x % m) + m) % m;
-        }
+        private float mod(float x, float m) => (x % m + m) % m;
 
         private struct Particle
         {
@@ -93,10 +79,10 @@ namespace Celeste
 
             public void Init(int maxColors, float speedMin, float speedMax)
             {
-                Position = new Vector2(Calc.Random.NextFloat(320f), Calc.Random.NextFloat(180f));
-                Color = Calc.Random.Next(maxColors);
-                Speed = Calc.Random.Range(speedMin, speedMax);
-                Sin = Calc.Random.NextFloat(6.28318548f);
+                this.Position = new Vector2(Calc.Random.NextFloat(320f), Calc.Random.NextFloat(180f));
+                this.Color = Calc.Random.Next(maxColors);
+                this.Speed = Calc.Random.Range(speedMin, speedMax);
+                this.Sin = Calc.Random.NextFloat(6.28318548f);
             }
         }
     }

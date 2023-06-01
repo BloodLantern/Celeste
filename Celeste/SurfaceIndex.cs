@@ -47,7 +47,7 @@ namespace Celeste
         public const int StoneBridge = 6;
         public const int ResortBasementTile = 16;
         public const int ResortMagicButton = 21;
-        public static Dictionary<char, int> TileToIndex = new()
+        public static Dictionary<char, int> TileToIndex = new Dictionary<char, int>()
         {
             {
                 '1',
@@ -145,13 +145,11 @@ namespace Celeste
 
         public static Platform GetPlatformByPriority(List<Entity> platforms)
         {
-            Platform platformByPriority = null;
+            Platform platformByPriority = (Platform) null;
             foreach (Entity platform in platforms)
             {
                 if (platform is Platform && (platformByPriority == null || (platform as Platform).SurfaceSoundPriority > platformByPriority.SurfaceSoundPriority))
-                {
                     platformByPriority = platform as Platform;
-                }
             }
             return platformByPriority;
         }

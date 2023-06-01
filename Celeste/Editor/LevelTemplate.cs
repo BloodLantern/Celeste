@@ -72,10 +72,7 @@ namespace Celeste.Editor
                 {
                     int width = 0;
                     while (x + width < Width && Back[x + width, y] && !Grid[x + width, y])
-                    {
                         ++width;
-                    }
-
                     if (width > 0)
                     {
                         backs.Add(new Rectangle(x, y, width, 1));
@@ -86,10 +83,7 @@ namespace Celeste.Editor
                 {
                     int width = 0;
                     while (x + width < Width && Grid[x + width, y])
-                    {
                         ++width;
-                    }
-
                     if (width > 0)
                     {
                         solids.Add(new Rectangle(x, y, width, 1));
@@ -99,10 +93,7 @@ namespace Celeste.Editor
             }
             Spawns = new List<Vector2>();
             foreach (Vector2 spawn in data.Spawns)
-            {
-                Spawns.Add((spawn / 8f) - new Vector2(X, Y));
-            }
-
+                Spawns.Add(spawn / 8f - new Vector2(X, Y));
             Strawberries = new List<Vector2>();
             StrawberryMetadata = new List<string>();
             Checkpoints = new List<Vector2>();
@@ -115,13 +106,9 @@ namespace Celeste.Editor
                     StrawberryMetadata.Add(entity.Int("checkpointID").ToString() + ":" + entity.Int("order"));
                 }
                 else if (entity.Name.Equals("checkpoint"))
-                {
                     Checkpoints.Add(entity.Position / 8f);
-                }
                 else if (entity.Name.Equals("jumpThru"))
-                {
                     Jumpthrus.Add(new Rectangle((int)(entity.Position.X / 8.0), (int)(entity.Position.Y / 8.0), entity.Width / 8, 1));
-                }
             }
             Dummy = data.Dummy;
             Type = LevelTemplateType.Level;
@@ -162,39 +149,22 @@ namespace Celeste.Editor
                 }
                 Draw.Rect(X, Y, Width, Height, (flag ? Color.Red : Color.Black) * 0.5f);
                 foreach (Rectangle back in backs)
-                {
-                    Draw.Rect(X + back.X, Y + back.Y, back.Width, back.Height, Dummy ? dummyBgTilesColor : bgTilesColor);
-                }
-
+                    Draw.Rect((X + back.X), (Y + back.Y), back.Width, back.Height, Dummy ? dummyBgTilesColor : bgTilesColor);
                 foreach (Rectangle solid in solids)
-                {
-                    Draw.Rect(X + solid.X, Y + solid.Y, solid.Width, solid.Height, Dummy ? dummyFgTilesColor : fgTilesColor[EditorColorIndex]);
-                }
-
+                    Draw.Rect((X + solid.X), (Y + solid.Y), solid.Width, solid.Height, Dummy ? dummyFgTilesColor : fgTilesColor[EditorColorIndex]);
                 foreach (Vector2 spawn in Spawns)
-                {
                     Draw.Rect(X + spawn.X, (float)(Y + spawn.Y - 1.0), 1f, 1f, Color.Red);
-                }
-
                 foreach (Vector2 strawberry in Strawberries)
-                {
                     Draw.HollowRect((float)(X + strawberry.X - 1.0), (float)(Y + strawberry.Y - 2.0), 3f, 3f, Color.LightPink);
-                }
-
                 foreach (Vector2 checkpoint in Checkpoints)
-                {
                     Draw.HollowRect((float)(X + checkpoint.X - 1.0), (float)(Y + checkpoint.Y - 2.0), 3f, 3f, Color.Lime);
-                }
-
                 foreach (Rectangle jumpthru in Jumpthrus)
-                {
-                    Draw.Rect(X + jumpthru.X, Y + jumpthru.Y, jumpthru.Width, 1f, Color.Yellow);
-                }
+                    Draw.Rect((X + jumpthru.X), (Y + jumpthru.Y), jumpthru.Width, 1f, Color.Yellow);
             }
             else
             {
                 Draw.Rect(X, Y, Width, Height, dummyFgTilesColor);
-                Draw.Rect(X + Width - ResizeHoldSize.X, Y + Height - ResizeHoldSize.Y, ResizeHoldSize.X, ResizeHoldSize.Y, Color.Orange);
+                Draw.Rect((X + Width) - ResizeHoldSize.X, (Y + Height) - ResizeHoldSize.Y, ResizeHoldSize.X, ResizeHoldSize.Y, Color.Orange);
             }
         }
 
@@ -202,20 +172,14 @@ namespace Celeste.Editor
         {
             float t = (float)(1.0 / (double)camera.Zoom * 2.0);
             if (Check(Vector2.Zero))
-            {
-                Outline(X + 1, Y + 1, Width - 2, Height - 2, t, firstBorderColor);
-            }
-
+                Outline((X + 1), (Y + 1), (Width - 2), (Height - 2), t, firstBorderColor);
             Outline(X, Y, Width, Height, t, Dummy ? dummyInactiveBorderColor : inactiveBorderColor);
         }
 
         public void RenderHighlight(Camera camera, bool hovered, bool selected)
         {
             if (!(selected | hovered))
-            {
                 return;
-            }
-
             Outline(X, Y, Width, Height, (float)(1.0 / (double)camera.Zoom * 2.0), hovered ? hoveredBorderColor : selectedBorderColor);
         }
 
@@ -227,30 +191,18 @@ namespace Celeste.Editor
             Draw.Line(x, y, x, y + h, color, t);
         }
 
-        public bool Check(Vector2 point)
-        {
-            return point.X >= Left && point.Y >= Top && point.X < Right && point.Y < Bottom;
-        }
+        public bool Check(Vector2 point) => point.X >= Left && point.Y >= Top && point.X < Right && point.Y < Bottom;
 
-        public bool Check(Rectangle rect)
-        {
-            return Rect.Intersects(rect);
-        }
+        public bool Check(Rectangle rect) => Rect.Intersects(rect);
 
-        public void StartMoving()
-        {
-            moveAnchor = new Vector2(X, Y);
-        }
+        public void StartMoving() => moveAnchor = new Vector2(X, Y);
 
         public void Move(Vector2 relativeMove, List<LevelTemplate> allLevels, bool snap)
         {
             X = (int)(moveAnchor.X + relativeMove.X);
             Y = (int)(moveAnchor.Y + relativeMove.Y);
             if (!snap)
-            {
                 return;
-            }
-
             foreach (LevelTemplate allLevel in allLevels)
             {
                 if (allLevel != this)
@@ -260,24 +212,15 @@ namespace Celeste.Editor
                         int num = Math.Abs(Left - allLevel.Right) < 3 ? 1 : 0;
                         bool flag = Math.Abs(Right - allLevel.Left) < 3;
                         if (num != 0)
-                        {
                             Left = allLevel.Right;
-                        }
                         else if (flag)
-                        {
                             Right = allLevel.Left;
-                        }
-
                         if ((num | (flag ? 1 : 0)) != 0)
                         {
                             if (Math.Abs(Top - allLevel.Top) < 3)
-                            {
                                 Top = allLevel.Top;
-                            }
                             else if (Math.Abs(Bottom - allLevel.Bottom) < 3)
-                            {
                                 Bottom = allLevel.Bottom;
-                            }
                         }
                     }
                     if (Right >= allLevel.Left && Left <= allLevel.Right)
@@ -285,34 +228,22 @@ namespace Celeste.Editor
                         int num = Math.Abs(Top - allLevel.Bottom) < 5 ? 1 : 0;
                         bool flag = Math.Abs(Bottom - allLevel.Top) < 5;
                         if (num != 0)
-                        {
                             Top = allLevel.Bottom;
-                        }
                         else if (flag)
-                        {
                             Bottom = allLevel.Top;
-                        }
-
                         if ((num | (flag ? 1 : 0)) != 0)
                         {
                             if (Math.Abs(Left - allLevel.Left) < 3)
-                            {
                                 Left = allLevel.Left;
-                            }
                             else if (Math.Abs(Right - allLevel.Right) < 3)
-                            {
                                 Right = allLevel.Right;
-                            }
                         }
                     }
                 }
             }
         }
 
-        public void StartResizing()
-        {
-            resizeAnchor = new Vector2(Width, Height);
-        }
+        public void StartResizing() => resizeAnchor = new Vector2(Width, Height);
 
         public void Resize(Vector2 relativeMove)
         {
@@ -322,10 +253,7 @@ namespace Celeste.Editor
             ActualHeight = Height * 8;
         }
 
-        public bool ResizePosition(Vector2 mouse)
-        {
-            return mouse.X > X + Width - ResizeHoldSize.X && mouse.Y > Y + Height - ResizeHoldSize.Y && mouse.X < (X + Width) && mouse.Y < (Y + Height);
-        }
+        public bool ResizePosition(Vector2 mouse) => mouse.X > (X + Width) - ResizeHoldSize.X && mouse.Y > (Y + Height) - ResizeHoldSize.Y && mouse.X < (X + Width) && mouse.Y < (Y + Height);
 
         public Rectangle Rect => new(X, Y, Width, Height);
 

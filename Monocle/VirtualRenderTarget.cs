@@ -18,9 +18,9 @@ namespace Monocle
 
         public bool Preserve { get; private set; }
 
-        public bool IsDisposed => Target == null || Target.IsDisposed || Target.GraphicsDevice.IsDisposed;
+        public bool IsDisposed => this.Target == null || this.Target.IsDisposed || this.Target.GraphicsDevice.IsDisposed;
 
-        public Rectangle Bounds => Target.Bounds;
+        public Rectangle Bounds => this.Target.Bounds;
 
         internal VirtualRenderTarget(
             string name,
@@ -30,41 +30,35 @@ namespace Monocle
             bool depth,
             bool preserve)
         {
-            Name = name;
-            Width = width;
-            Height = height;
-            MultiSampleCount = multiSampleCount;
-            Depth = depth;
-            Preserve = preserve;
-            Reload();
+            this.Name = name;
+            this.Width = width;
+            this.Height = height;
+            this.MultiSampleCount = multiSampleCount;
+            this.Depth = depth;
+            this.Preserve = preserve;
+            this.Reload();
         }
 
         internal override void Unload()
         {
-            if (Target == null || Target.IsDisposed)
-            {
+            if (this.Target == null || this.Target.IsDisposed)
                 return;
-            }
-
-            Target.Dispose();
+            this.Target.Dispose();
         }
 
         internal override void Reload()
         {
-            Unload();
-            Target = new RenderTarget2D(Engine.Instance.GraphicsDevice, Width, Height, false, SurfaceFormat.Color, Depth ? DepthFormat.Depth24Stencil8 : DepthFormat.None, MultiSampleCount, Preserve ? RenderTargetUsage.PreserveContents : RenderTargetUsage.DiscardContents);
+            this.Unload();
+            this.Target = new RenderTarget2D(Engine.Instance.GraphicsDevice, this.Width, this.Height, false, SurfaceFormat.Color, this.Depth ? DepthFormat.Depth24Stencil8 : DepthFormat.None, this.MultiSampleCount, this.Preserve ? RenderTargetUsage.PreserveContents : RenderTargetUsage.DiscardContents);
         }
 
         public override void Dispose()
         {
-            Unload();
-            Target = null;
-            VirtualContent.Remove(this);
+            this.Unload();
+            this.Target = (RenderTarget2D) null;
+            VirtualContent.Remove((VirtualAsset) this);
         }
 
-        public static implicit operator RenderTarget2D(VirtualRenderTarget target)
-        {
-            return target.Target;
-        }
+        public static implicit operator RenderTarget2D(VirtualRenderTarget target) => target.Target;
     }
 }

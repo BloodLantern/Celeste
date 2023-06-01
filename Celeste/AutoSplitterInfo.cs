@@ -28,20 +28,20 @@ namespace Celeste
         public void Update()
         {
             Level scene = Engine.Scene as Level;
-            ChapterStarted = scene != null;
-            ChapterComplete = ChapterStarted && scene.Completed;
-            TimerActive = ChapterStarted && !scene.Completed;
-            Chapter = ChapterStarted ? scene.Session.Area.ID : -1;
-            Mode = ChapterStarted ? (int)scene.Session.Area.Mode : -1;
-            Level = ChapterStarted ? scene.Session.Level : "";
-            ChapterTime = ChapterStarted ? scene.Session.Time : 0L;
-            FileTime = SaveData.Instance != null ? SaveData.Instance.Time : 0L;
-            ChapterStrawberries = ChapterStarted ? scene.Session.Strawberries.Count : 0;
-            FileStrawberries = SaveData.Instance != null ? SaveData.Instance.TotalStrawberries : 0;
-            ChapterHeart = ChapterStarted && scene.Session.HeartGem;
-            FileHearts = SaveData.Instance != null ? SaveData.Instance.TotalHeartGems : 0;
-            ChapterCassette = ChapterStarted && scene.Session.Cassette;
-            FileCassettes = SaveData.Instance != null ? SaveData.Instance.TotalCassettes : 0;
+            this.ChapterStarted = scene != null;
+            this.ChapterComplete = this.ChapterStarted && scene.Completed;
+            this.TimerActive = this.ChapterStarted && !scene.Completed;
+            this.Chapter = this.ChapterStarted ? scene.Session.Area.ID : -1;
+            this.Mode = this.ChapterStarted ? (int) scene.Session.Area.Mode : -1;
+            this.Level = this.ChapterStarted ? scene.Session.Level : "";
+            this.ChapterTime = this.ChapterStarted ? scene.Session.Time : 0L;
+            this.FileTime = SaveData.Instance != null ? SaveData.Instance.Time : 0L;
+            this.ChapterStrawberries = this.ChapterStarted ? scene.Session.Strawberries.Count : 0;
+            this.FileStrawberries = SaveData.Instance != null ? SaveData.Instance.TotalStrawberries : 0;
+            this.ChapterHeart = this.ChapterStarted && scene.Session.HeartGem;
+            this.FileHearts = SaveData.Instance != null ? SaveData.Instance.TotalHeartGems : 0;
+            this.ChapterCassette = this.ChapterStarted && scene.Session.Cassette;
+            this.FileCassettes = SaveData.Instance != null ? SaveData.Instance.TotalCassettes : 0;
         }
     }
 }

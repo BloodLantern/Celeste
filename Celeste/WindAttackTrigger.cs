@@ -19,12 +19,9 @@ namespace Celeste
         public override void OnEnter(Player player)
         {
             base.OnEnter(player);
-            if (Scene.Entities.FindFirst<Snowball>() == null)
-            {
-                Scene.Add(new Snowball());
-            }
-
-            RemoveSelf();
+            if (this.Scene.Entities.FindFirst<Snowball>() == null)
+                this.Scene.Add((Entity) new Snowball());
+            this.RemoveSelf();
         }
     }
 }

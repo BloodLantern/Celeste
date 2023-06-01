@@ -28,11 +28,11 @@ namespace Celeste
             Vector2? scale = null)
             : base(true, true)
         {
-            Texture = texture;
-            Position = position;
-            Size = size ?? Vector2.One;
-            Color = color ?? Color.White;
-            Scale = scale ?? Vector2.One;
+            this.Texture = texture;
+            this.Position = position;
+            this.Size = size.HasValue ? size.Value : Vector2.One;
+            this.Color = color.HasValue ? color.Value : Color.White;
+            this.Scale = scale.HasValue ? scale.Value : Vector2.One;
         }
     }
 }

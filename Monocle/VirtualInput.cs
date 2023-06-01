@@ -8,15 +8,9 @@ namespace Monocle
 {
     public abstract class VirtualInput
     {
-        public VirtualInput()
-        {
-            MInput.VirtualInputs.Add(this);
-        }
+        public VirtualInput() => MInput.VirtualInputs.Add(this);
 
-        public void Deregister()
-        {
-            _ = MInput.VirtualInputs.Remove(this);
-        }
+        public void Deregister() => MInput.VirtualInputs.Remove(this);
 
         public abstract void Update();
 

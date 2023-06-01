@@ -15,8 +15,8 @@ namespace Monocle
 
         public Command(string name, string help)
         {
-            Name = name;
-            Help = help;
+            this.Name = name;
+            this.Help = help;
         }
     }
 }

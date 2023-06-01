@@ -14,7 +14,7 @@ namespace Celeste
         public static float Width(string label, VirtualButton button)
         {
             MTexture mtexture = Input.GuiButton(button);
-            return ActiveFont.Measure(label).X + 8f + mtexture.Width;
+            return ActiveFont.Measure(label).X + 8f + (float) mtexture.Width;
         }
 
         public static void Render(
@@ -23,14 +23,14 @@ namespace Celeste
             VirtualButton button,
             float scale,
             float justifyX = 0.5f,
-            float wiggle = 0f,
+            float wiggle = 0.0f,
             float alpha = 1f)
         {
             MTexture mtexture = Input.GuiButton(button);
-            float num = Width(label, button);
-            position.X -= scale * num * (justifyX - 0.5f);
-            mtexture.Draw(position, new Vector2(mtexture.Width - (num / 2f), mtexture.Height / 2f), Color.White * alpha, scale + wiggle);
-            DrawText(label, position, num / 2f, scale + wiggle, alpha);
+            float num = ButtonUI.Width(label, button);
+            position.X -= (float) ((double) scale * (double) num * ((double) justifyX - 0.5));
+            mtexture.Draw(position, new Vector2((float) mtexture.Width - num / 2f, (float) mtexture.Height / 2f), Color.White * alpha, scale + wiggle);
+            ButtonUI.DrawText(label, position, num / 2f, scale + wiggle, alpha);
         }
 
         private static void DrawText(

@@ -17,19 +17,19 @@ namespace Celeste
         public LightFadeTrigger(EntityData data, Vector2 offset)
             : base(data, offset)
         {
-            AddTag((int)Tags.TransitionUpdate);
-            LightAddFrom = data.Float("lightAddFrom");
-            LightAddTo = data.Float("lightAddTo");
-            PositionMode = data.Enum<Trigger.PositionModes>("positionMode");
+            this.AddTag((int) Tags.TransitionUpdate);
+            this.LightAddFrom = data.Float("lightAddFrom");
+            this.LightAddTo = data.Float("lightAddTo");
+            this.PositionMode = data.Enum<Trigger.PositionModes>("positionMode");
         }
 
         public override void OnStay(Player player)
         {
-            Level scene = Scene as Level;
+            Level scene = this.Scene as Level;
             Session session = scene.Session;
-            float num1 = LightAddFrom + ((LightAddTo - LightAddFrom) * MathHelper.Clamp(GetPositionLerp(player, PositionMode), 0.0f, 1f));
-            double num2 = (double)num1;
-            session.LightingAlphaAdd = (float)num2;
+            float num1 = this.LightAddFrom + (this.LightAddTo - this.LightAddFrom) * MathHelper.Clamp(this.GetPositionLerp(player, this.PositionMode), 0.0f, 1f);
+            double num2 = (double) num1;
+            session.LightingAlphaAdd = (float) num2;
             scene.Lighting.Alpha = scene.BaseLightingAlpha + num1;
         }
     }

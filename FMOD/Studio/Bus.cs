@@ -12,84 +12,49 @@ namespace FMOD.Studio
 {
     public class Bus : HandleBase
     {
-        public RESULT getID(out Guid id)
-        {
-            return Bus.FMOD_Studio_Bus_GetID(rawPtr, out id);
-        }
+        public RESULT getID(out Guid id) => Bus.FMOD_Studio_Bus_GetID(this.rawPtr, out id);
 
         public RESULT getPath(out string path)
         {
-            path = null;
+            path = (string) null;
             byte[] numArray = new byte[256];
-            RESULT path1 = Bus.FMOD_Studio_Bus_GetPath(rawPtr, numArray, numArray.Length, out int retrieved);
+            int retrieved = 0;
+            RESULT path1 = Bus.FMOD_Studio_Bus_GetPath(this.rawPtr, numArray, numArray.Length, out retrieved);
             if (path1 == RESULT.ERR_TRUNCATED)
             {
                 numArray = new byte[retrieved];
-                path1 = Bus.FMOD_Studio_Bus_GetPath(rawPtr, numArray, numArray.Length, out retrieved);
+                path1 = Bus.FMOD_Studio_Bus_GetPath(this.rawPtr, numArray, numArray.Length, out retrieved);
             }
             if (path1 == RESULT.OK)
-            {
                 path = Encoding.UTF8.GetString(numArray, 0, retrieved - 1);
-            }
-
             return path1;
         }
 
-        public RESULT getVolume(out float volume, out float finalvolume)
-        {
-            return Bus.FMOD_Studio_Bus_GetVolume(rawPtr, out volume, out finalvolume);
-        }
+        public RESULT getVolume(out float volume, out float finalvolume) => Bus.FMOD_Studio_Bus_GetVolume(this.rawPtr, out volume, out finalvolume);
 
-        public RESULT setVolume(float volume)
-        {
-            return Bus.FMOD_Studio_Bus_SetVolume(rawPtr, volume);
-        }
+        public RESULT setVolume(float volume) => Bus.FMOD_Studio_Bus_SetVolume(this.rawPtr, volume);
 
-        public RESULT getPaused(out bool paused)
-        {
-            return Bus.FMOD_Studio_Bus_GetPaused(rawPtr, out paused);
-        }
+        public RESULT getPaused(out bool paused) => Bus.FMOD_Studio_Bus_GetPaused(this.rawPtr, out paused);
 
-        public RESULT setPaused(bool paused)
-        {
-            return Bus.FMOD_Studio_Bus_SetPaused(rawPtr, paused);
-        }
+        public RESULT setPaused(bool paused) => Bus.FMOD_Studio_Bus_SetPaused(this.rawPtr, paused);
 
-        public RESULT getMute(out bool mute)
-        {
-            return Bus.FMOD_Studio_Bus_GetMute(rawPtr, out mute);
-        }
+        public RESULT getMute(out bool mute) => Bus.FMOD_Studio_Bus_GetMute(this.rawPtr, out mute);
 
-        public RESULT setMute(bool mute)
-        {
-            return Bus.FMOD_Studio_Bus_SetMute(rawPtr, mute);
-        }
+        public RESULT setMute(bool mute) => Bus.FMOD_Studio_Bus_SetMute(this.rawPtr, mute);
 
-        public RESULT stopAllEvents(STOP_MODE mode)
-        {
-            return Bus.FMOD_Studio_Bus_StopAllEvents(rawPtr, mode);
-        }
+        public RESULT stopAllEvents(STOP_MODE mode) => Bus.FMOD_Studio_Bus_StopAllEvents(this.rawPtr, mode);
 
-        public RESULT lockChannelGroup()
-        {
-            return Bus.FMOD_Studio_Bus_LockChannelGroup(rawPtr);
-        }
+        public RESULT lockChannelGroup() => Bus.FMOD_Studio_Bus_LockChannelGroup(this.rawPtr);
 
-        public RESULT unlockChannelGroup()
-        {
-            return Bus.FMOD_Studio_Bus_UnlockChannelGroup(rawPtr);
-        }
+        public RESULT unlockChannelGroup() => Bus.FMOD_Studio_Bus_UnlockChannelGroup(this.rawPtr);
 
         public RESULT getChannelGroup(out ChannelGroup group)
         {
-            group = null;
-            _ = new IntPtr();
-            RESULT channelGroup = Bus.FMOD_Studio_Bus_GetChannelGroup(rawPtr, out IntPtr group1);
+            group = (ChannelGroup) null;
+            IntPtr group1 = new IntPtr();
+            RESULT channelGroup = Bus.FMOD_Studio_Bus_GetChannelGroup(this.rawPtr, out group1);
             if (channelGroup != RESULT.OK)
-            {
                 return channelGroup;
-            }
-
             group = new ChannelGroup(group1);
             return channelGroup;
         }
@@ -145,9 +110,6 @@ namespace FMOD.Studio
         {
         }
 
-        protected override bool isValidInternal()
-        {
-            return Bus.FMOD_Studio_Bus_IsValid(rawPtr);
-        }
+        protected override bool isValidInternal() => Bus.FMOD_Studio_Bus_IsValid(this.rawPtr);
     }
 }

@@ -12,17 +12,17 @@ namespace Celeste
     [Tracked(false)]
     public class ClutterCabinet : Entity
     {
-        private readonly Sprite sprite;
+        private Sprite sprite;
 
         public bool Opened { get; private set; }
 
         public ClutterCabinet(Vector2 position)
             : base(position)
         {
-            Add(sprite = GFX.SpriteBank.Create("clutterCabinet"));
-            sprite.Position = new Vector2(8f);
-            sprite.Play("idle");
-            Depth = -10001;
+            this.Add((Component) (this.sprite = GFX.SpriteBank.Create("clutterCabinet")));
+            this.sprite.Position = new Vector2(8f);
+            this.sprite.Play("idle");
+            this.Depth = -10001;
         }
 
         public ClutterCabinet(EntityData data, Vector2 offset)
@@ -32,14 +32,14 @@ namespace Celeste
 
         public void Open()
         {
-            sprite.Play("open");
-            Opened = true;
+            this.sprite.Play("open");
+            this.Opened = true;
         }
 
         public void Close()
         {
-            sprite.Play("close");
-            Opened = false;
+            this.sprite.Play("close");
+            this.Opened = false;
         }
     }
 }

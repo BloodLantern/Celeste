@@ -25,74 +25,71 @@ namespace Monocle
 
         public float X
         {
-            get => Position.X;
-            set => Position.X = value;
+            get => this.Position.X;
+            set => this.Position.X = value;
         }
 
         public float Y
         {
-            get => Position.Y;
-            set => Position.Y = value;
+            get => this.Position.Y;
+            set => this.Position.Y = value;
         }
 
         public bool FlipX
         {
-            get => (Effects & SpriteEffects.FlipHorizontally) == SpriteEffects.FlipHorizontally;
-            set => Effects = value ? Effects | SpriteEffects.FlipHorizontally : Effects & ~SpriteEffects.FlipHorizontally;
+            get => (this.Effects & SpriteEffects.FlipHorizontally) == SpriteEffects.FlipHorizontally;
+            set => this.Effects = value ? this.Effects | SpriteEffects.FlipHorizontally : this.Effects & ~SpriteEffects.FlipHorizontally;
         }
 
         public bool FlipY
         {
-            get => (Effects & SpriteEffects.FlipVertically) == SpriteEffects.FlipVertically;
-            set => Effects = value ? Effects | SpriteEffects.FlipVertically : Effects & ~SpriteEffects.FlipVertically;
+            get => (this.Effects & SpriteEffects.FlipVertically) == SpriteEffects.FlipVertically;
+            set => this.Effects = value ? this.Effects | SpriteEffects.FlipVertically : this.Effects & ~SpriteEffects.FlipVertically;
         }
 
         public Vector2 RenderPosition
         {
-            get => (Entity == null ? Vector2.Zero : Entity.Position) + Position;
-            set => Position = value - (Entity == null ? Vector2.Zero : Entity.Position);
+            get => (this.Entity == null ? Vector2.Zero : this.Entity.Position) + this.Position;
+            set => this.Position = value - (this.Entity == null ? Vector2.Zero : this.Entity.Position);
         }
 
-        public void DrawOutline(int offset = 1)
-        {
-            DrawOutline(Color.Black, offset);
-        }
+        public void DrawOutline(int offset = 1) => this.DrawOutline(Color.Black, offset);
 
         public void DrawOutline(Color color, int offset = 1)
         {
-            Vector2 position = Position;
-            Color color1 = Color;
-            Color = color;
+            Vector2 position = this.Position;
+            Color color1 = this.Color;
+            this.Color = color;
             for (int index1 = -1; index1 < 2; ++index1)
             {
                 for (int index2 = -1; index2 < 2; ++index2)
                 {
                     if (index1 != 0 || index2 != 0)
                     {
-                        Position = position + new Vector2(index1 * offset, index2 * offset);
-                        Render();
+                        this.Position = position + new Vector2((float) (index1 * offset), (float) (index2 * offset));
+                        this.Render();
                     }
                 }
             }
-            Position = position;
-            Color = color1;
+            this.Position = position;
+            this.Color = color1;
         }
 
         public void DrawSimpleOutline()
         {
-            Vector2 position = Position;
-            Color color = Color;
-            Color = Color.Black;
-            Position = position + new Vector2(-1f, 0.0f);
-            Render();
-            Position = position + new Vector2(0.0f, -1f);
-            Render();
-            Position = position + new Vector2(1f, 0.0f);
-            Render();
-            Position = position + new Vector2(0.0f, 1f);
-            Render();
-            Position = position;
-            Color = color;
+            Vector2 position = this.Position;
+            Color color = this.Color;
+            this.Color = Color.Black;
+            this.Position = position + new Vector2(-1f, 0.0f);
+            this.Render();
+            this.Position = position + new Vector2(0.0f, -1f);
+            this.Render();
+            this.Position = position + new Vector2(1f, 0.0f);
+            this.Render();
+            this.Position = position + new Vector2(0.0f, 1f);
+            this.Render();
+            this.Position = position;
+            this.Color = color;
         }
     }
 }

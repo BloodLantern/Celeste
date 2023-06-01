@@ -35,202 +35,172 @@ namespace Celeste
         private BirdNPC bird;
         private float timer;
         private bool collected;
-        private readonly bool autoPulse = true;
+        private bool autoPulse = true;
         private float bounceSfxDelay;
-        private readonly bool removeCameraTriggers;
+        private bool removeCameraTriggers;
         private SoundEmitter sfx;
-        private readonly List<InvisibleBarrier> walls = new();
-        private readonly HoldableCollider holdableCollider;
+        private List<InvisibleBarrier> walls = new List<InvisibleBarrier>();
+        private HoldableCollider holdableCollider;
         private EntityID entityID;
         private InvisibleBarrier fakeRightWall;
 
         public HeartGem(Vector2 position)
             : base(position)
         {
-            Add(holdableCollider = new HoldableCollider(new Action<Holdable>(OnHoldable)));
-            Add(new MirrorReflection());
+            this.Add((Component) (this.holdableCollider = new HoldableCollider(new Action<Holdable>(this.OnHoldable))));
+            this.Add((Component) new MirrorReflection());
         }
 
         public HeartGem(EntityData data, Vector2 offset)
             : this(data.Position + offset)
         {
-            removeCameraTriggers = data.Bool(nameof(removeCameraTriggers));
-            IsFake = data.Bool("fake");
-            entityID = new EntityID(data.Level.Name, data.ID);
+            this.removeCameraTriggers = data.Bool(nameof (removeCameraTriggers));
+            this.IsFake = data.Bool("fake");
+            this.entityID = new EntityID(data.Level.Name, data.ID);
         }
 
         public override void Awake(Scene scene)
         {
             base.Awake(scene);
-            AreaKey area = (Scene as Level).Session.Area;
-            IsGhost = !IsFake && SaveData.Instance.Areas[area.ID].Modes[(int)area.Mode].HeartGem;
-            string id = !IsFake ? (!IsGhost ? "heartgem" + (int)area.Mode : "heartGemGhost") : "heartgem3";
-            Add(sprite = GFX.SpriteBank.Create(id));
-            sprite.Play("spin");
-            sprite.OnLoop = anim =>
+            AreaKey area = (this.Scene as Level).Session.Area;
+            this.IsGhost = !this.IsFake && SaveData.Instance.Areas[area.ID].Modes[(int) area.Mode].HeartGem;
+            string id = !this.IsFake ? (!this.IsGhost ? "heartgem" + (object) (int) area.Mode : "heartGemGhost") : "heartgem3";
+            this.Add((Component) (this.sprite = GFX.SpriteBank.Create(id)));
+            this.sprite.Play("spin");
+            this.sprite.OnLoop = (Action<string>) (anim =>
             {
-                if (!Visible || !(anim == "spin") || !autoPulse)
-                {
+                if (!this.Visible || !(anim == "spin") || !this.autoPulse)
                     return;
-                }
-
-                _ = IsFake
-                    ? Audio.Play("event:/new_content/game/10_farewell/fakeheart_pulse", Position)
-                    : Audio.Play("event:/game/general/crystalheart_pulse", Position);
-
-                ScaleWiggler.Start();
-                _ = (Scene as Level).Displacement.AddBurst(Position, 0.35f, 8f, 48f, 0.25f);
-            };
-            if (IsGhost)
-            {
-                sprite.Color = Color.White * 0.8f;
-            }
-
-            Collider = new Hitbox(16f, 16f, -8f, -8f);
-            Add(new PlayerCollider(new Action<Player>(OnPlayer)));
-            Add(ScaleWiggler = Wiggler.Create(0.5f, 4f, f => sprite.Scale = Vector2.One * (float)(1.0 + ((double)f * 0.25))));
-            Add(bloom = new BloomPoint(0.75f, 16f));
+                if (this.IsFake)
+                    Audio.Play("event:/new_content/game/10_farewell/fakeheart_pulse", this.Position);
+                else
+                    Audio.Play("event:/game/general/crystalheart_pulse", this.Position);
+                this.ScaleWiggler.Start();
+                (this.Scene as Level).Displacement.AddBurst(this.Position, 0.35f, 8f, 48f, 0.25f);
+            });
+            if (this.IsGhost)
+                this.sprite.Color = Color.White * 0.8f;
+            this.Collider = (Collider) new Hitbox(16f, 16f, -8f, -8f);
+            this.Add((Component) new PlayerCollider(new Action<Player>(this.OnPlayer)));
+            this.Add((Component) (this.ScaleWiggler = Wiggler.Create(0.5f, 4f, (Action<float>) (f => this.sprite.Scale = Vector2.One * (float) (1.0 + (double) f * 0.25)))));
+            this.Add((Component) (this.bloom = new BloomPoint(0.75f, 16f)));
             Color color;
-            if (IsFake)
+            if (this.IsFake)
             {
                 color = Calc.HexToColor("dad8cc");
-                shineParticle = HeartGem.P_FakeShine;
+                this.shineParticle = HeartGem.P_FakeShine;
             }
             else if (area.Mode == AreaMode.Normal)
             {
                 color = Color.Aqua;
-                shineParticle = HeartGem.P_BlueShine;
+                this.shineParticle = HeartGem.P_BlueShine;
             }
             else if (area.Mode == AreaMode.BSide)
             {
                 color = Color.Red;
-                shineParticle = HeartGem.P_RedShine;
+                this.shineParticle = HeartGem.P_RedShine;
             }
             else
             {
                 color = Color.Gold;
-                shineParticle = HeartGem.P_GoldShine;
+                this.shineParticle = HeartGem.P_GoldShine;
             }
-            Add(light = new VertexLight(Color.Lerp(color, Color.White, 0.5f), 1f, 32, 64));
-            if (IsFake)
+            this.Add((Component) (this.light = new VertexLight(Color.Lerp(color, Color.White, 0.5f), 1f, 32, 64)));
+            if (this.IsFake)
             {
-                bloom.Alpha = 0.0f;
-                light.Alpha = 0.0f;
+                this.bloom.Alpha = 0.0f;
+                this.light.Alpha = 0.0f;
             }
-            moveWiggler = Wiggler.Create(0.8f, 2f);
-            moveWiggler.StartZero = true;
-            Add(moveWiggler);
-            if (!IsFake)
-            {
+            this.moveWiggler = Wiggler.Create(0.8f, 2f);
+            this.moveWiggler.StartZero = true;
+            this.Add((Component) this.moveWiggler);
+            if (!this.IsFake)
                 return;
-            }
-
-            Player entity = Scene.Tracker.GetEntity<Player>();
-            if ((entity != null && (double)entity.X > (double)X) || (scene as Level).Session.GetFlag("fake_heart"))
+            Player entity = this.Scene.Tracker.GetEntity<Player>();
+            if (entity != null && (double) entity.X > (double) this.X || (scene as Level).Session.GetFlag("fake_heart"))
             {
-                Visible = false;
-                _ = Alarm.Set(this, 0.0001f, () =>
+                this.Visible = false;
+                Alarm.Set((Entity) this, 0.0001f, (Action) (() =>
                 {
-                    FakeRemoveCameraTrigger();
-                    RemoveSelf();
-                });
+                    this.FakeRemoveCameraTrigger();
+                    this.RemoveSelf();
+                }));
             }
             else
-            {
-                scene.Add(fakeRightWall = new InvisibleBarrier(new Vector2(X + 160f, Y - 200f), 8f, 400f));
-            }
+                scene.Add((Entity) (this.fakeRightWall = new InvisibleBarrier(new Vector2(this.X + 160f, this.Y - 200f), 8f, 400f)));
         }
 
         public override void Update()
         {
-            bounceSfxDelay -= Engine.DeltaTime;
-            timer += Engine.DeltaTime;
-            sprite.Position = (Vector2.UnitY * (float)Math.Sin(timer * 2.0) * 2f) + (moveWiggleDir * moveWiggler.Value * -8f);
-            if (white != null)
+            this.bounceSfxDelay -= Engine.DeltaTime;
+            this.timer += Engine.DeltaTime;
+            this.sprite.Position = Vector2.UnitY * (float) Math.Sin((double) this.timer * 2.0) * 2f + this.moveWiggleDir * this.moveWiggler.Value * -8f;
+            if (this.white != null)
             {
-                white.Position = sprite.Position;
-                white.Scale = sprite.Scale;
-                if (white.CurrentAnimationID != sprite.CurrentAnimationID)
-                {
-                    white.Play(sprite.CurrentAnimationID);
-                }
-
-                white.SetAnimationFrame(sprite.CurrentAnimationFrame);
+                this.white.Position = this.sprite.Position;
+                this.white.Scale = this.sprite.Scale;
+                if (this.white.CurrentAnimationID != this.sprite.CurrentAnimationID)
+                    this.white.Play(this.sprite.CurrentAnimationID);
+                this.white.SetAnimationFrame(this.sprite.CurrentAnimationFrame);
             }
-            if (collected)
+            if (this.collected)
             {
-                Player entity = Scene.Tracker.GetEntity<Player>();
+                Player entity = this.Scene.Tracker.GetEntity<Player>();
                 if (entity == null || entity.Dead)
-                {
-                    EndCutscene();
-                }
+                    this.EndCutscene();
             }
             base.Update();
-            if (collected || !Scene.OnInterval(0.1f))
-            {
+            if (this.collected || !this.Scene.OnInterval(0.1f))
                 return;
-            }
-
-            SceneAs<Level>().Particles.Emit(shineParticle, 1, Center, Vector2.One * 8f);
+            this.SceneAs<Level>().Particles.Emit(this.shineParticle, 1, this.Center, Vector2.One * 8f);
         }
 
         public void OnHoldable(Holdable h)
         {
-            Player entity = Scene.Tracker.GetEntity<Player>();
-            if (collected || entity == null || !h.Dangerous(holdableCollider))
-            {
+            Player entity = this.Scene.Tracker.GetEntity<Player>();
+            if (this.collected || entity == null || !h.Dangerous(this.holdableCollider))
                 return;
-            }
-
-            Collect(entity);
+            this.Collect(entity);
         }
 
         public void OnPlayer(Player player)
         {
-            if (collected || (Scene as Level).Frozen)
-            {
+            if (this.collected || (this.Scene as Level).Frozen)
                 return;
-            }
-
             if (player.DashAttacking)
             {
-                Collect(player);
+                this.Collect(player);
             }
             else
             {
-                if (bounceSfxDelay <= 0.0)
+                if ((double) this.bounceSfxDelay <= 0.0)
                 {
-                    _ = IsFake
-                        ? Audio.Play("event:/new_content/game/10_farewell/fakeheart_bounce", Position)
-                        : Audio.Play("event:/game/general/crystalheart_bounce", Position);
-
-                    bounceSfxDelay = 0.1f;
+                    if (this.IsFake)
+                        Audio.Play("event:/new_content/game/10_farewell/fakeheart_bounce", this.Position);
+                    else
+                        Audio.Play("event:/game/general/crystalheart_bounce", this.Position);
+                    this.bounceSfxDelay = 0.1f;
                 }
-                player.PointBounce(Center);
-                moveWiggler.Start();
-                ScaleWiggler.Start();
-                moveWiggleDir = (Center - player.Center).SafeNormalize(Vector2.UnitY);
+                player.PointBounce(this.Center);
+                this.moveWiggler.Start();
+                this.ScaleWiggler.Start();
+                this.moveWiggleDir = (this.Center - player.Center).SafeNormalize(Vector2.UnitY);
                 Input.Rumble(RumbleStrength.Medium, RumbleLength.Medium);
             }
         }
 
         private void Collect(Player player)
         {
-            Scene.Tracker.GetEntity<AngryOshiro>()?.StopControllingTime();
-            Add(new Coroutine(CollectRoutine(player))
+            this.Scene.Tracker.GetEntity<AngryOshiro>()?.StopControllingTime();
+            this.Add((Component) new Coroutine(this.CollectRoutine(player))
             {
                 UseRawDeltaTime = true
             });
-            collected = true;
-            if (!removeCameraTriggers)
-            {
+            this.collected = true;
+            if (!this.removeCameraTriggers)
                 return;
-            }
-
-            foreach (Entity entity in Scene.Entities.FindAll<CameraOffsetTrigger>())
-            {
+            foreach (Entity entity in this.Scene.Entities.FindAll<CameraOffsetTrigger>())
                 entity.RemoveSelf();
-            }
         }
 
         private IEnumerator CollectRoutine(Player player)
@@ -238,89 +208,67 @@ namespace Celeste
             HeartGem follow = this;
             Level level = follow.Scene as Level;
             AreaKey area = level.Session.Area;
-            string poemID = AreaData.Get(level).Mode[(int)area.Mode].PoemID;
+            string poemID = AreaData.Get((Scene) level).Mode[(int) area.Mode].PoemID;
             bool completeArea = !follow.IsFake && (area.Mode != AreaMode.Normal || area.ID == 9);
             if (follow.IsFake)
-            {
                 level.StartCutscene(new Action<Level>(follow.SkipFakeHeartCutscene));
-            }
             else
-            {
                 level.CanRetry = false;
-            }
-
             if (completeArea || follow.IsFake)
             {
-                _ = Audio.SetMusic(null);
-                _ = Audio.SetAmbience(null);
+                Audio.SetMusic((string) null);
+                Audio.SetAmbience((string) null);
             }
             if (completeArea)
             {
-                List<Strawberry> strawberryList = new();
+                List<Strawberry> strawberryList = new List<Strawberry>();
                 foreach (Follower follower in player.Leader.Followers)
                 {
                     if (follower.Entity is Strawberry)
-                    {
                         strawberryList.Add(follower.Entity as Strawberry);
-                    }
                 }
                 foreach (Strawberry strawberry in strawberryList)
-                {
                     strawberry.OnCollect();
-                }
             }
             string sfx = "event:/game/general/crystalheart_blue_get";
             if (follow.IsFake)
-            {
                 sfx = "event:/new_content/game/10_farewell/fakeheart_get";
-            }
             else if (area.Mode == AreaMode.BSide)
-            {
                 sfx = "event:/game/general/crystalheart_red_get";
-            }
             else if (area.Mode == AreaMode.CSide)
-            {
                 sfx = "event:/game/general/crystalheart_gold_get";
-            }
-
-            follow.sfx = SoundEmitter.Play(sfx, follow);
+            follow.sfx = SoundEmitter.Play(sfx, (Entity) follow);
             // ISSUE: reference to a compiler-generated method
             follow.Add(new LevelEndingHook(delegate ()
             {
-                _ = this.sfx.Source.Stop(true);
+                    this.sfx.Source.Stop(true);
             }));
-            follow.walls.Add(new InvisibleBarrier(new Vector2(level.Bounds.Right, level.Bounds.Top), 8f, level.Bounds.Height));
+            follow.walls.Add(new InvisibleBarrier(new Vector2((float) level.Bounds.Right, (float) level.Bounds.Top), 8f, (float) level.Bounds.Height));
             List<InvisibleBarrier> walls1 = follow.walls;
             Rectangle bounds = level.Bounds;
-            double x = bounds.Left - 8;
+            double x = (double) (bounds.Left - 8);
             bounds = level.Bounds;
-            double top = bounds.Top;
-            InvisibleBarrier invisibleBarrier1 = new(new Vector2((float)x, (float)top), 8f, level.Bounds.Height);
+            double top = (double) bounds.Top;
+            InvisibleBarrier invisibleBarrier1 = new InvisibleBarrier(new Vector2((float) x, (float) top), 8f, (float) level.Bounds.Height);
             walls1.Add(invisibleBarrier1);
             List<InvisibleBarrier> walls2 = follow.walls;
             bounds = level.Bounds;
-            double left = bounds.Left;
+            double left = (double) bounds.Left;
             bounds = level.Bounds;
-            double y = bounds.Top - 8;
-            InvisibleBarrier invisibleBarrier2 = new(new Vector2((float)left, (float)y), level.Bounds.Width, 8f);
+            double y = (double) (bounds.Top - 8);
+            InvisibleBarrier invisibleBarrier2 = new InvisibleBarrier(new Vector2((float) left, (float) y), (float) level.Bounds.Width, 8f);
             walls2.Add(invisibleBarrier2);
             foreach (InvisibleBarrier wall in follow.walls)
-            {
-                follow.Scene.Add(wall);
-            }
-
-            follow.Add(follow.white = GFX.SpriteBank.Create("heartGemWhite"));
+                follow.Scene.Add((Entity) wall);
+            follow.Add((Component) (follow.white = GFX.SpriteBank.Create("heartGemWhite")));
             follow.Depth = -2000000;
-            yield return null;
+            yield return (object) null;
             Celeste.Freeze(0.2f);
-            yield return null;
+            yield return (object) null;
             Engine.TimeRate = 0.5f;
             player.Depth = -2000000;
             for (int index = 0; index < 10; ++index)
-            {
-                follow.Scene.Add(new AbsorbOrb(follow.Position));
-            }
-
+                follow.Scene.Add((Entity) new AbsorbOrb(follow.Position));
             level.Shake();
             Input.Rumble(RumbleStrength.Strong, RumbleLength.Medium);
             level.Flash(Color.White);
@@ -329,19 +277,16 @@ namespace Celeste
             follow.light.Alpha = follow.bloom.Alpha = 0.0f;
             follow.Visible = false;
             float t;
-            for (t = 0.0f; (double)t < 2.0; t += Engine.RawDeltaTime)
+            for (t = 0.0f; (double) t < 2.0; t += Engine.RawDeltaTime)
             {
                 Engine.TimeRate = Calc.Approach(Engine.TimeRate, 0.0f, Engine.RawDeltaTime * 0.25f);
-                yield return null;
+                yield return (object) null;
             }
-            yield return null;
+            yield return (object) null;
             if (player.Dead)
-            {
-                yield return 100f;
-            }
-
+                yield return (object) 100f;
             Engine.TimeRate = 1f;
-            follow.Tag = (int)Tags.FrozenUpdate;
+            follow.Tag = (int) Tags.FrozenUpdate;
             level.Frozen = true;
             if (!follow.IsFake)
             {
@@ -352,71 +297,59 @@ namespace Celeste
                     level.RegisterAreaComplete();
                 }
             }
-            string text = null;
+            string text = (string) null;
             if (!string.IsNullOrEmpty(poemID))
-            {
                 text = Dialog.Clean("poem_" + poemID);
-            }
-
-            follow.poem = new Poem(text, follow.IsFake ? 3 : (int)area.Mode, area.Mode == AreaMode.CSide || follow.IsFake ? 1f : 0.6f)
-            {
-                Alpha = 0.0f
-            };
-            follow.Scene.Add(follow.poem);
-            for (t = 0.0f; (double)t < 1.0; t += Engine.RawDeltaTime)
+            follow.poem = new Poem(text, follow.IsFake ? 3 : (int) area.Mode, area.Mode == AreaMode.CSide || follow.IsFake ? 1f : 0.6f);
+            follow.poem.Alpha = 0.0f;
+            follow.Scene.Add((Entity) follow.poem);
+            for (t = 0.0f; (double) t < 1.0; t += Engine.RawDeltaTime)
             {
                 follow.poem.Alpha = Ease.CubeOut(t);
-                yield return null;
+                yield return (object) null;
             }
             if (follow.IsFake)
             {
-                yield return follow.DoFakeRoutineWithBird(player);
+                yield return (object) follow.DoFakeRoutineWithBird(player);
             }
             else
             {
                 while (!Input.MenuConfirm.Pressed && !Input.MenuCancel.Pressed)
-                {
-                    yield return null;
-                }
-
-                _ = follow.sfx.Source.Param("end", 1f);
+                    yield return (object) null;
+                follow.sfx.Source.Param("end", 1f);
                 if (!completeArea)
                 {
                     level.FormationBackdrop.Display = false;
-                    for (t = 0.0f; (double)t < 1.0; t += Engine.RawDeltaTime * 2f)
+                    for (t = 0.0f; (double) t < 1.0; t += Engine.RawDeltaTime * 2f)
                     {
                         follow.poem.Alpha = Ease.CubeIn(1f - t);
-                        yield return null;
+                        yield return (object) null;
                     }
                     player.Depth = 0;
                     follow.EndCutscene();
                 }
                 else
                 {
-                    FadeWipe fadeWipe = new(level, false)
-                    {
-                        Duration = 3.25f
-                    };
-                    yield return fadeWipe.Duration;
-                    _ = level.CompleteArea(false, true);
+                    FadeWipe fadeWipe = new FadeWipe((Scene) level, false);
+                    fadeWipe.Duration = 3.25f;
+                    yield return (object) fadeWipe.Duration;
+                    level.CompleteArea(false, true);
                 }
             }
         }
 
         private void EndCutscene()
         {
-            Level scene = Scene as Level;
+            Level scene = this.Scene as Level;
             scene.Frozen = false;
             scene.CanRetry = true;
             scene.FormationBackdrop.Display = false;
             Engine.TimeRate = 1f;
-            poem?.RemoveSelf();
-            foreach (Entity wall in walls)
-            {
+            if (this.poem != null)
+                this.poem.RemoveSelf();
+            foreach (Entity wall in this.walls)
                 wall.RemoveSelf();
-            }
-
-            RemoveSelf();
+            this.RemoveSelf();
         }
 
         private void RegisterAsCollected(Level level, string poemID)
@@ -426,19 +359,11 @@ namespace Celeste
             int unlockedModes = SaveData.Instance.UnlockedModes;
             SaveData.Instance.RegisterHeartGem(level.Session.Area);
             if (!string.IsNullOrEmpty(poemID))
-            {
-                _ = SaveData.Instance.RegisterPoemEntry(poemID);
-            }
-
+                SaveData.Instance.RegisterPoemEntry(poemID);
             if (unlockedModes < 3 && SaveData.Instance.UnlockedModes >= 3)
-            {
                 level.Session.UnlockedCSide = true;
-            }
-
             if (SaveData.Instance.TotalHeartGems < 24)
-            {
                 return;
-            }
             //Achievements.Register(Achievement.CSIDES);
         }
 
@@ -448,117 +373,111 @@ namespace Celeste
             Level level = heartGem.Scene as Level;
             int panAmount = 64;
             Vector2 panFrom = level.Camera.Position;
-            Vector2 panTo = level.Camera.Position + new Vector2(-panAmount, 0.0f);
-            Vector2 birdFrom = new(panTo.X - 16f, player.Y - 20f);
-            Vector2 birdTo = new((float)(panFrom.X + 320.0 + 16.0), player.Y - 20f);
-            yield return 2f;
+            Vector2 panTo = level.Camera.Position + new Vector2((float) -panAmount, 0.0f);
+            Vector2 birdFrom = new Vector2(panTo.X - 16f, player.Y - 20f);
+            Vector2 birdTo = new Vector2((float) ((double) panFrom.X + 320.0 + 16.0), player.Y - 20f);
+            yield return (object) 2f;
             Glitch.Value = 0.75f;
-            while (Glitch.Value > 0.0)
+            while ((double) Glitch.Value > 0.0)
             {
                 Glitch.Value = Calc.Approach(Glitch.Value, 0.0f, Engine.RawDeltaTime * 4f);
                 level.Shake();
-                yield return null;
+                yield return (object) null;
             }
-            yield return 1.1f;
+            yield return (object) 1.1f;
             Glitch.Value = 0.75f;
-            while (Glitch.Value > 0.0)
+            while ((double) Glitch.Value > 0.0)
             {
                 Glitch.Value = Calc.Approach(Glitch.Value, 0.0f, Engine.RawDeltaTime * 4f);
                 level.Shake();
-                yield return null;
+                yield return (object) null;
             }
-            yield return 0.4f;
+            yield return (object) 0.4f;
             float p;
-            for (p = 0.0f; (double)p < 1.0; p += Engine.RawDeltaTime / 2f)
+            for (p = 0.0f; (double) p < 1.0; p += Engine.RawDeltaTime / 2f)
             {
-                level.Camera.Position = panFrom + ((panTo - panFrom) * Ease.CubeInOut(p));
-                heartGem.poem.Offset = new Vector2(panAmount * 8, 0.0f) * Ease.CubeInOut(p);
-                yield return null;
+                level.Camera.Position = panFrom + (panTo - panFrom) * Ease.CubeInOut(p);
+                heartGem.poem.Offset = new Vector2((float) (panAmount * 8), 0.0f) * Ease.CubeInOut(p);
+                yield return (object) null;
             }
             heartGem.bird = new BirdNPC(birdFrom, BirdNPC.Modes.None);
             heartGem.bird.Sprite.Play("fly");
             heartGem.bird.Sprite.UseRawDeltaTime = true;
             heartGem.bird.Facing = Facings.Right;
             heartGem.bird.Depth = -2000100;
-            heartGem.bird.Tag = (int)Tags.FrozenUpdate;
-            heartGem.bird.Add(new VertexLight(Color.White, 0.5f, 8, 32));
-            heartGem.bird.Add(new BloomPoint(0.5f, 12f));
-            level.Add(heartGem.bird);
-            for (p = 0.0f; (double)p < 1.0; p += Engine.RawDeltaTime / 2.6f)
+            heartGem.bird.Tag = (int) Tags.FrozenUpdate;
+            heartGem.bird.Add((Component) new VertexLight(Color.White, 0.5f, 8, 32));
+            heartGem.bird.Add((Component) new BloomPoint(0.5f, 12f));
+            level.Add((Entity) heartGem.bird);
+            for (p = 0.0f; (double) p < 1.0; p += Engine.RawDeltaTime / 2.6f)
             {
-                level.Camera.Position = panTo + ((panFrom - panTo) * Ease.CubeInOut(p));
-                heartGem.poem.Offset = new Vector2(panAmount * 8, 0.0f) * Ease.CubeInOut(1f - p);
+                level.Camera.Position = panTo + (panFrom - panTo) * Ease.CubeInOut(p);
+                heartGem.poem.Offset = new Vector2((float) (panAmount * 8), 0.0f) * Ease.CubeInOut(1f - p);
                 float num1 = 0.1f;
                 float num2 = 0.9f;
-                if ((double)p > (double)num1 && (double)p <= (double)num2)
+                if ((double) p > (double) num1 && (double) p <= (double) num2)
                 {
-                    float num3 = (float)(((double)p - (double)num1) / ((double)num2 - (double)num1));
-                    heartGem.bird.Position = birdFrom + ((birdTo - birdFrom) * num3) + (Vector2.UnitY * (float)Math.Sin((double)num3 * 8.0) * 8f);
+                    float num3 = (float) (((double) p - (double) num1) / ((double) num2 - (double) num1));
+                    heartGem.bird.Position = birdFrom + (birdTo - birdFrom) * num3 + Vector2.UnitY * (float) Math.Sin((double) num3 * 8.0) * 8f;
                 }
                 if (level.OnRawInterval(0.2f))
-                {
-                    TrailManager.Add(heartGem.bird, Calc.HexToColor("639bff"), frozenUpdate: true, useRawDeltaTime: true);
-                }
-
-                yield return null;
+                    TrailManager.Add((Entity) heartGem.bird, Calc.HexToColor("639bff"), frozenUpdate: true, useRawDeltaTime: true);
+                yield return (object) null;
             }
             heartGem.bird.RemoveSelf();
-            heartGem.bird = null;
+            heartGem.bird = (BirdNPC) null;
             Engine.TimeRate = 0.0f;
             level.Frozen = false;
             player.Active = false;
             player.StateMachine.State = 11;
-            while (Engine.TimeRate != 1.0)
+            while ((double) Engine.TimeRate != 1.0)
             {
                 Engine.TimeRate = Calc.Approach(Engine.TimeRate, 1f, 0.5f * Engine.RawDeltaTime);
-                yield return null;
+                yield return (object) null;
             }
             Engine.TimeRate = 1f;
-            yield return Textbox.Say("CH9_FAKE_HEART");
-            _ = heartGem.sfx.Source.Param("end", 1f);
-            yield return 0.283f;
+            yield return (object) Textbox.Say("CH9_FAKE_HEART");
+            heartGem.sfx.Source.Param("end", 1f);
+            yield return (object) 0.283f;
             level.FormationBackdrop.Display = false;
-            for (p = 0.0f; (double)p < 1.0; p += Engine.RawDeltaTime / 0.2f)
+            for (p = 0.0f; (double) p < 1.0; p += Engine.RawDeltaTime / 0.2f)
             {
                 heartGem.poem.TextAlpha = Ease.CubeIn(1f - p);
                 heartGem.poem.ParticleSpeed = heartGem.poem.TextAlpha;
-                yield return null;
+                yield return (object) null;
             }
             heartGem.poem.Heart.Play("break");
             while (heartGem.poem.Heart.Animating)
             {
                 heartGem.poem.Shake += Engine.DeltaTime;
-                yield return null;
+                yield return (object) null;
             }
             heartGem.poem.RemoveSelf();
-            heartGem.poem = null;
+            heartGem.poem = (Poem) null;
             for (int index = 0; index < 10; ++index)
             {
-                Vector2 position = level.Camera.Position + (new Vector2(320f, 180f) * 0.5f);
+                Vector2 position = level.Camera.Position + new Vector2(320f, 180f) * 0.5f;
                 Vector2 vector2 = level.Camera.Position + new Vector2(160f, -64f);
-                heartGem.Scene.Add(new AbsorbOrb(position, absorbTarget: new Vector2?(vector2)));
+                heartGem.Scene.Add((Entity) new AbsorbOrb(position, absorbTarget: new Vector2?(vector2)));
             }
             level.Shake();
             Glitch.Value = 0.8f;
-            while (Glitch.Value > 0.0)
+            while ((double) Glitch.Value > 0.0)
             {
                 Glitch.Value -= Engine.DeltaTime * 4f;
-                yield return null;
+                yield return (object) null;
             }
-            yield return 0.25f;
+            yield return (object) 0.25f;
             level.Session.Audio.Music.Event = "event:/new_content/music/lvl10/intermission_heartgroove";
             level.Session.Audio.Apply();
             player.Active = true;
             player.Depth = 0;
             player.StateMachine.State = 11;
-            while (!player.OnGround() && (double)player.Bottom < level.Bounds.Bottom)
-            {
-                yield return null;
-            }
-
+            while (!player.OnGround() && (double) player.Bottom < (double) level.Bounds.Bottom)
+                yield return (object) null;
             player.Facing = Facings.Right;
-            yield return 0.5f;
-            yield return Textbox.Say("CH9_KEEP_GOING", new Func<IEnumerator>(heartGem.PlayerStepForward));
+            yield return (object) 0.5f;
+            yield return (object) Textbox.Say("CH9_KEEP_GOING", new Func<IEnumerator>(heartGem.PlayerStepForward));
             heartGem.SkipFakeHeartCutscene(level);
             level.EndCutscene();
         }
@@ -566,27 +485,25 @@ namespace Celeste
         private IEnumerator PlayerStepForward()
         {
             HeartGem heartGem = this;
-            yield return 0.1f;
+            yield return (object) 0.1f;
             Player entity = heartGem.Scene.Tracker.GetEntity<Player>();
             if (entity != null && entity.CollideCheck<Solid>(entity.Position + new Vector2(12f, 1f)))
-            {
-                yield return entity.DummyWalkToExact((int)entity.X + 10);
-            }
-
-            yield return 0.2f;
+                yield return (object) entity.DummyWalkToExact((int) entity.X + 10);
+            yield return (object) 0.2f;
         }
 
         private void SkipFakeHeartCutscene(Level level)
         {
             Engine.TimeRate = 1f;
             Glitch.Value = 0.0f;
-            _ = (sfx?.Source.Stop());
+            if (this.sfx != null)
+                this.sfx.Source.Stop();
             level.Session.SetFlag("fake_heart");
             level.Frozen = false;
             level.FormationBackdrop.Display = false;
             level.Session.Audio.Music.Event = "event:/new_content/music/lvl10/intermission_heartgroove";
             level.Session.Audio.Apply();
-            Player entity1 = Scene.Tracker.GetEntity<Player>();
+            Player entity1 = this.Scene.Tracker.GetEntity<Player>();
             if (entity1 != null)
             {
                 entity1.Sprite.Play("idle");
@@ -594,38 +511,30 @@ namespace Celeste
                 entity1.StateMachine.State = 0;
                 entity1.Dashes = 1;
                 entity1.Speed = Vector2.Zero;
-                _ = entity1.MoveV(200f);
+                entity1.MoveV(200f);
                 entity1.Depth = 0;
                 for (int index = 0; index < 10; ++index)
-                {
                     entity1.UpdateHair(true);
-                }
             }
-            foreach (Entity entity2 in Scene.Entities.FindAll<AbsorbOrb>())
-            {
+            foreach (Entity entity2 in this.Scene.Entities.FindAll<AbsorbOrb>())
                 entity2.RemoveSelf();
-            }
-
-            poem?.RemoveSelf();
-            bird?.RemoveSelf();
-            fakeRightWall?.RemoveSelf();
-            FakeRemoveCameraTrigger();
-            foreach (Entity wall in walls)
-            {
+            if (this.poem != null)
+                this.poem.RemoveSelf();
+            if (this.bird != null)
+                this.bird.RemoveSelf();
+            if (this.fakeRightWall != null)
+                this.fakeRightWall.RemoveSelf();
+            this.FakeRemoveCameraTrigger();
+            foreach (Entity wall in this.walls)
                 wall.RemoveSelf();
-            }
-
-            RemoveSelf();
+            this.RemoveSelf();
         }
 
         private void FakeRemoveCameraTrigger()
         {
-            CameraTargetTrigger cameraTargetTrigger = CollideFirst<CameraTargetTrigger>();
+            CameraTargetTrigger cameraTargetTrigger = this.CollideFirst<CameraTargetTrigger>();
             if (cameraTargetTrigger == null)
-            {
                 return;
-            }
-
             cameraTargetTrigger.LerpStrength = 0.0f;
         }
     }

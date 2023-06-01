@@ -21,10 +21,10 @@ namespace Celeste
         public float AnimationSpeed = 12f;
         private Component image;
         public bool IsCrack;
-        private readonly List<MTexture> textures;
+        private List<MTexture> textures;
         private Vector2 scale;
         private float frame;
-        private readonly bool animated = true;
+        private bool animated = true;
         private bool parallax;
         private float parallaxAmount;
         private bool scaredAnimal;
@@ -33,27 +33,27 @@ namespace Celeste
         public Decal(string texture, Vector2 position, Vector2 scale, int depth)
             : base(position)
         {
-            Depth = depth;
+            this.Depth = depth;
             this.scale = scale;
             string extension = Path.GetExtension(texture);
-            Name = Regex.Replace(Path.Combine("decals", texture.Replace(extension, "")).Replace('\\', '/'), "\\d+$", string.Empty);
-            textures = GFX.Game.GetAtlasSubtextures(Name);
+            this.Name = Regex.Replace(Path.Combine("decals", texture.Replace(extension, "")).Replace('\\', '/'), "\\d+$", string.Empty);
+            this.textures = GFX.Game.GetAtlasSubtextures(this.Name);
         }
 
         public override void Added(Scene scene)
         {
             base.Added(scene);
-            string path = Name.ToLower().Replace("decals/", "");
+            string path = this.Name.ToLower().Replace("decals/", "");
             switch (path)
             {
                 case "0-prologue/house":
-                    CreateSmoke(new Vector2(36f, -28f), true);
+                    this.CreateSmoke(new Vector2(36f, -28f), true);
                     break;
                 case "1-forsakencity/rags":
                 case "1-forsakencity/ragsb":
                 case "3-resort/curtain_side_a":
                 case "3-resort/curtain_side_d":
-                    MakeBanner(2f, 3.5f, 2, 0.05f, true);
+                    this.MakeBanner(2f, 3.5f, 2, 0.05f, true);
                     break;
                 case "10-farewell/bed":
                 case "10-farewell/car":
@@ -65,9 +65,9 @@ namespace Celeste
                 case "10-farewell/reflection":
                 case "10-farewell/temple":
                 case "10-farewell/tower":
-                    Depth = 10001;
-                    MakeParallax(-0.15f);
-                    MakeFloaty();
+                    this.Depth = 10001;
+                    this.MakeParallax(-0.15f);
+                    this.MakeFloaty();
                     break;
                 case "10-farewell/clouds/cloud_a":
                 case "10-farewell/clouds/cloud_b":
@@ -89,16 +89,16 @@ namespace Celeste
                 case "10-farewell/clouds/cloud_h":
                 case "10-farewell/clouds/cloud_i":
                 case "10-farewell/clouds/cloud_j":
-                    Depth = -13001;
-                    MakeParallax(0.1f);
-                    scale *= 1.15f;
+                    this.Depth = -13001;
+                    this.MakeParallax(0.1f);
+                    this.scale *= 1.15f;
                     break;
                 case "10-farewell/coral_":
                 case "10-farewell/coral_a":
                 case "10-farewell/coral_b":
                 case "10-farewell/coral_c":
                 case "10-farewell/coral_d":
-                    MakeScaredAnimation();
+                    this.MakeScaredAnimation();
                     break;
                 case "10-farewell/creature_a":
                 case "10-farewell/creature_b":
@@ -106,55 +106,55 @@ namespace Celeste
                 case "10-farewell/creature_d":
                 case "10-farewell/creature_e":
                 case "10-farewell/creature_f":
-                    Depth = 10001;
-                    MakeParallax(-0.1f);
-                    MakeFloaty();
+                    this.Depth = 10001;
+                    this.MakeParallax(-0.1f);
+                    this.MakeFloaty();
                     break;
                 case "10-farewell/finalflag":
-                    AnimationSpeed = 6f;
-                    Add(image = new Decal.FinalFlagDecalImage());
+                    this.AnimationSpeed = 6f;
+                    this.Add(this.image = (Component) new Decal.FinalFlagDecalImage());
                     break;
                 case "10-farewell/glitch_a_":
                 case "10-farewell/glitch_b_":
                 case "10-farewell/glitch_c":
-                    frame = Calc.Random.NextFloat(textures.Count);
+                    this.frame = Calc.Random.NextFloat((float) this.textures.Count);
                     break;
                 case "3-resort/bridgecolumn":
-                    MakeSolid(-5f, -8f, 10f, 16f, 8);
+                    this.MakeSolid(-5f, -8f, 10f, 16f, 8);
                     break;
                 case "3-resort/bridgecolumntop":
-                    MakeSolid(-8f, -8f, 16f, 8f, 8);
-                    MakeSolid(-5f, 0.0f, 10f, 8f, 8);
+                    this.MakeSolid(-8f, -8f, 16f, 8f, 8);
+                    this.MakeSolid(-5f, 0.0f, 10f, 8f, 8);
                     break;
                 case "3-resort/brokenelevator":
-                    MakeSolid(-16f, -20f, 32f, 48f, 22);
+                    this.MakeSolid(-16f, -20f, 32f, 48f, 22);
                     break;
                 case "3-resort/roofcenter":
                 case "3-resort/roofcenter_b":
                 case "3-resort/roofcenter_c":
                 case "3-resort/roofcenter_d":
-                    MakeSolid(-8f, -4f, 16f, 8f, 14);
+                    this.MakeSolid(-8f, -4f, 16f, 8f, 14);
                     break;
                 case "3-resort/roofedge":
                 case "3-resort/roofedge_b":
                 case "3-resort/roofedge_c":
                 case "3-resort/roofedge_d":
-                    MakeSolid(scale.X < 0.0 ? 0.0f : -8f, -4f, 8f, 8f, 14);
+                    this.MakeSolid((double) this.scale.X < 0.0 ? 0.0f : -8f, -4f, 8f, 8f, 14);
                     break;
                 case "3-resort/vent":
-                    CreateSmoke(Vector2.Zero, false);
+                    this.CreateSmoke(Vector2.Zero, false);
                     break;
                 case "4-cliffside/bridge_a":
-                    MakeSolid(-24f, 0.0f, 48f, 8f, 8, Depth != 9000);
+                    this.MakeSolid(-24f, 0.0f, 48f, 8f, 8, this.Depth != 9000);
                     break;
                 case "4-cliffside/flower_a":
                 case "4-cliffside/flower_b":
                 case "4-cliffside/flower_c":
                 case "4-cliffside/flower_d":
-                    MakeBanner(2f, 2f, 1, 0.05f, false, 2f, true);
+                    this.MakeBanner(2f, 2f, 1, 0.05f, false, 2f, true);
                     break;
                 case "5-temple-dark/mosaic_b":
-                    Add(new BloomPoint(new Vector2(0.0f, 5f), 0.75f, 16f));
+                    this.Add((Component) new BloomPoint(new Vector2(0.0f, 5f), 0.75f, 16f));
                     break;
                 case "5-temple/bg_mirror_a":
                 case "5-temple/bg_mirror_b":
@@ -176,15 +176,15 @@ namespace Celeste
                 case "5-temple/bg_mirror_shard_i":
                 case "5-temple/bg_mirror_shard_j":
                 case "5-temple/bg_mirror_shard_k":
-                    scale.Y = 1f;
-                    MakeMirror(path, false);
+                    this.scale.Y = 1f;
+                    this.MakeMirror(path, false);
                     break;
                 case "5-temple/bg_mirror_c":
                 case "5-temple/statue_d":
-                    MakeMirror(path, true);
+                    this.MakeMirror(path, true);
                     break;
                 case "6-reflection/crystal_reflection":
-                    MakeMirrorSpecialCase(path, new Vector2(-12f, 2f));
+                    this.MakeMirrorSpecialCase(path, new Vector2(-12f, 2f));
                     break;
                 case "7-summit/cloud_a":
                 case "7-summit/cloud_b":
@@ -206,50 +206,44 @@ namespace Celeste
                 case "7-summit/cloud_h":
                 case "7-summit/cloud_i":
                 case "7-summit/cloud_j":
-                    Depth = -13001;
-                    MakeParallax(0.1f);
-                    scale *= 1.15f;
+                    this.Depth = -13001;
+                    this.MakeParallax(0.1f);
+                    this.scale *= 1.15f;
                     break;
                 case "7-summit/summitflag":
-                    Add(new SoundSource("event:/env/local/07_summit/flag_flap"));
+                    this.Add((Component) new SoundSource("event:/env/local/07_summit/flag_flap"));
                     break;
                 case "9-core/ball_a":
-                    Add(image = new Decal.CoreSwapImage(textures[0], GFX.Game["decals/9-core/ball_a_ice"]));
+                    this.Add(this.image = (Component) new Decal.CoreSwapImage(this.textures[0], GFX.Game["decals/9-core/ball_a_ice"]));
                     break;
                 case "9-core/ball_a_ice":
-                    Add(image = new Decal.CoreSwapImage(GFX.Game["decals/9-core/ball_a"], textures[0]));
+                    this.Add(this.image = (Component) new Decal.CoreSwapImage(GFX.Game["decals/9-core/ball_a"], this.textures[0]));
                     break;
                 case "9-core/heart_bevel_a":
                 case "9-core/heart_bevel_b":
                 case "9-core/heart_bevel_c":
                 case "9-core/heart_bevel_d":
-                    scale.Y = 1f;
-                    scale.X = 1f;
+                    this.scale.Y = 1f;
+                    this.scale.X = 1f;
                     break;
                 case "9-core/rock_e":
-                    Add(image = new Decal.CoreSwapImage(textures[0], GFX.Game["decals/9-core/rock_e_ice"]));
+                    this.Add(this.image = (Component) new Decal.CoreSwapImage(this.textures[0], GFX.Game["decals/9-core/rock_e_ice"]));
                     break;
                 case "9-core/rock_e_ice":
-                    Add(image = new Decal.CoreSwapImage(GFX.Game["decals/9-core/rock_e"], textures[0]));
+                    this.Add(this.image = (Component) new Decal.CoreSwapImage(GFX.Game["decals/9-core/rock_e"], this.textures[0]));
                     break;
                 case "generic/grass_a":
                 case "generic/grass_b":
                 case "generic/grass_c":
                 case "generic/grass_d":
-                    MakeBanner(2f, 2f, 1, 0.05f, false, -2f);
+                    this.MakeBanner(2f, 2f, 1, 0.05f, false, -2f);
                     break;
             }
-            if (Name.Contains("crack"))
-            {
-                IsCrack = true;
-            }
-
-            if (image != null)
-            {
+            if (this.Name.Contains("crack"))
+                this.IsCrack = true;
+            if (this.image != null)
                 return;
-            }
-
-            Add(image = new Decal.DecalImage());
+            this.Add(this.image = (Component) new Decal.DecalImage());
         }
 
         private void MakeBanner(
@@ -261,7 +255,7 @@ namespace Celeste
             float offset = 0.0f,
             bool onlyIfWindy = false)
         {
-            Decal.Banner banner = new()
+            Decal.Banner banner = new Decal.Banner()
             {
                 WaveSpeed = speed,
                 WaveAmplitude = amplitude,
@@ -272,23 +266,17 @@ namespace Celeste
                 Offset = offset,
                 OnlyIfWindy = onlyIfWindy
             };
-            foreach (MTexture texture in textures)
+            foreach (MTexture texture in this.textures)
             {
-                List<MTexture> mtextureList = new();
+                List<MTexture> mtextureList = new List<MTexture>();
                 for (int y = 0; y < texture.Height; y += sliceSize)
-                {
                     mtextureList.Add(texture.GetSubtexture(0, y, texture.Width, sliceSize));
-                }
-
                 banner.Segments.Add(mtextureList);
             }
-            Add(image = banner);
+            this.Add(this.image = (Component) banner);
         }
 
-        private void MakeFloaty()
-        {
-            Add(wave = new SineWave(Calc.Random.Range(0.1f, 0.4f), Calc.Random.NextFloat() * 6.28318548f));
-        }
+        private void MakeFloaty() => this.Add((Component) (this.wave = new SineWave(Calc.Random.Range(0.1f, 0.4f), Calc.Random.NextFloat() * 6.28318548f)));
 
         private void MakeSolid(
             float x,
@@ -298,66 +286,64 @@ namespace Celeste
             int surfaceSoundIndex,
             bool blockWaterfalls = true)
         {
-            Solid solid = new(Position + new Vector2(x, y), w, h, true)
-            {
-                BlockWaterfalls = blockWaterfalls,
-                SurfaceSoundIndex = surfaceSoundIndex
-            };
-            Scene.Add(solid);
+            Solid solid = new Solid(this.Position + new Vector2(x, y), w, h, true);
+            solid.BlockWaterfalls = blockWaterfalls;
+            solid.SurfaceSoundIndex = surfaceSoundIndex;
+            this.Scene.Add((Entity) solid);
         }
 
         private void CreateSmoke(Vector2 offset, bool inbg)
         {
-            Level scene = Scene as Level;
-            ParticleEmitter particleEmitter = new(inbg ? scene.ParticlesBG : scene.ParticlesFG, ParticleTypes.Chimney, offset, new Vector2(4f, 1f), -1.57079637f, 1, 0.2f);
-            Add(particleEmitter);
+            Level scene = this.Scene as Level;
+            ParticleEmitter particleEmitter = new ParticleEmitter(inbg ? scene.ParticlesBG : scene.ParticlesFG, ParticleTypes.Chimney, offset, new Vector2(4f, 1f), -1.57079637f, 1, 0.2f);
+            this.Add((Component) particleEmitter);
             particleEmitter.SimulateCycle();
         }
 
         private void MakeMirror(string path, bool keepOffsetsClose)
         {
-            Depth = 9500;
+            this.Depth = 9500;
             if (keepOffsetsClose)
             {
-                MakeMirror(path, GetMirrorOffset());
+                this.MakeMirror(path, this.GetMirrorOffset());
             }
             else
             {
                 foreach (MTexture atlasSubtexture in GFX.Game.GetAtlasSubtextures("mirrormasks/" + path))
                 {
                     MTexture mask = atlasSubtexture;
-                    MirrorSurface surface = new()
+                    MirrorSurface surface = new MirrorSurface()
                     {
-                        ReflectionOffset = GetMirrorOffset()
+                        ReflectionOffset = this.GetMirrorOffset()
                     };
-                    surface.OnRender = () => mask.DrawCentered(Position, surface.ReflectionColor, scale);
-                    Add(surface);
+                    surface.OnRender = (Action) (() => mask.DrawCentered(this.Position, surface.ReflectionColor, this.scale));
+                    this.Add((Component) surface);
                 }
             }
         }
 
         private void MakeMirror(string path, Vector2 offset)
         {
-            Depth = 9500;
+            this.Depth = 9500;
             foreach (MTexture atlasSubtexture in GFX.Game.GetAtlasSubtextures("mirrormasks/" + path))
             {
                 MTexture mask = atlasSubtexture;
-                MirrorSurface surface = new()
+                MirrorSurface surface = new MirrorSurface()
                 {
                     ReflectionOffset = offset + new Vector2(Calc.Random.NextFloat(4f) - 2f, Calc.Random.NextFloat(4f) - 2f)
                 };
-                surface.OnRender = () => mask.DrawCentered(Position, surface.ReflectionColor, scale);
-                Add(surface);
+                surface.OnRender = (Action) (() => mask.DrawCentered(this.Position, surface.ReflectionColor, this.scale));
+                this.Add((Component) surface);
             }
         }
 
         private void MakeMirrorSpecialCase(string path, Vector2 offset)
         {
-            Depth = 9500;
+            this.Depth = 9500;
             List<MTexture> atlasSubtextures = GFX.Game.GetAtlasSubtextures("mirrormasks/" + path);
             for (int index = 0; index < atlasSubtextures.Count; ++index)
             {
-                Vector2 vector2 = new(Calc.Random.NextFloat(4f) - 2f, Calc.Random.NextFloat(4f) - 2f);
+                Vector2 vector2 = new Vector2(Calc.Random.NextFloat(4f) - 2f, Calc.Random.NextFloat(4f) - 2f);
                 switch (index)
                 {
                     case 2:
@@ -368,62 +354,55 @@ namespace Celeste
                         break;
                 }
                 MTexture mask = atlasSubtextures[index];
-                MirrorSurface surface = new()
+                MirrorSurface surface = new MirrorSurface()
                 {
                     ReflectionOffset = offset + vector2
                 };
-                surface.OnRender = () => mask.DrawCentered(Position, surface.ReflectionColor, scale);
-                Add(surface);
+                surface.OnRender = (Action) (() => mask.DrawCentered(this.Position, surface.ReflectionColor, this.scale));
+                this.Add((Component) surface);
             }
         }
 
-        private Vector2 GetMirrorOffset()
-        {
-            return new Vector2(Calc.Random.Range(5, 14) * Calc.Random.Choose<int>(1, -1), Calc.Random.Range(2, 6) * Calc.Random.Choose<int>(1, -1));
-        }
+        private Vector2 GetMirrorOffset() => new Vector2((float) (Calc.Random.Range(5, 14) * Calc.Random.Choose<int>(1, -1)), (float) (Calc.Random.Range(2, 6) * Calc.Random.Choose<int>(1, -1)));
 
         private void MakeParallax(float amount)
         {
-            parallax = true;
-            parallaxAmount = amount;
+            this.parallax = true;
+            this.parallaxAmount = amount;
         }
 
         private void MakeScaredAnimation()
         {
-            Sprite sprite = new(null, null);
-            image = sprite;
-            sprite.AddLoop("hidden", 0.1f, textures[0]);
-            sprite.Add("return", 0.1f, "idle", textures[1]);
-            sprite.AddLoop("idle", 0.1f, textures[2], textures[3], textures[4], textures[5], textures[6], textures[7]);
-            sprite.Add("hide", 0.1f, "hidden", textures[8], textures[9], textures[10], textures[11], textures[12]);
+            Sprite sprite = new Sprite((Atlas) null, (string) null);
+            this.image = (Component) sprite;
+            sprite.AddLoop("hidden", 0.1f, this.textures[0]);
+            sprite.Add("return", 0.1f, "idle", this.textures[1]);
+            sprite.AddLoop("idle", 0.1f, this.textures[2], this.textures[3], this.textures[4], this.textures[5], this.textures[6], this.textures[7]);
+            sprite.Add("hide", 0.1f, "hidden", this.textures[8], this.textures[9], this.textures[10], this.textures[11], this.textures[12]);
             sprite.Play("idle", true);
-            sprite.Scale = scale;
-            _ = sprite.CenterOrigin();
-            Add(sprite);
-            scaredAnimal = true;
+            sprite.Scale = this.scale;
+            sprite.CenterOrigin();
+            this.Add((Component) sprite);
+            this.scaredAnimal = true;
         }
 
         public override void Update()
         {
-            if (animated && textures.Count > 1)
+            if (this.animated && this.textures.Count > 1)
             {
-                frame += AnimationSpeed * Engine.DeltaTime;
-                frame %= textures.Count;
+                this.frame += this.AnimationSpeed * Engine.DeltaTime;
+                this.frame %= (float) this.textures.Count;
             }
-            if (scaredAnimal)
+            if (this.scaredAnimal)
             {
                 Sprite image = this.image as Sprite;
-                Player entity = Scene.Tracker.GetEntity<Player>();
+                Player entity = this.Scene.Tracker.GetEntity<Player>();
                 if (entity != null)
                 {
-                    if (image.CurrentAnimationID == "idle" && (double)(entity.Position - Position).Length() < 32.0)
-                    {
+                    if (image.CurrentAnimationID == "idle" && (double) (entity.Position - this.Position).Length() < 32.0)
                         image.Play("hide");
-                    }
-                    else if (image.CurrentAnimationID == "hidden" && (double)(entity.Position - Position).Length() > 48.0)
-                    {
+                    else if (image.CurrentAnimationID == "hidden" && (double) (entity.Position - this.Position).Length() > 48.0)
                         image.Play("return");
-                    }
                 }
             }
             base.Update();
@@ -431,29 +410,23 @@ namespace Celeste
 
         public override void Render()
         {
-            Vector2 position = Position;
-            if (parallax)
-            {
-                Position += (Position - ((Scene as Level).Camera.Position + new Vector2(160f, 90f))) * parallaxAmount;
-            }
-
-            if (wave != null)
-            {
-                Position.Y += wave.Value * 4f;
-            }
-
+            Vector2 position = this.Position;
+            if (this.parallax)
+                this.Position = this.Position + (this.Position - ((this.Scene as Level).Camera.Position + new Vector2(160f, 90f))) * this.parallaxAmount;
+            if (this.wave != null)
+                this.Position.Y += this.wave.Value * 4f;
             base.Render();
-            Position = position;
+            this.Position = position;
         }
 
         public void FinalFlagTrigger()
         {
-            Wiggler wiggler = Wiggler.Create(1f, 4f, v => (image as Decal.FinalFlagDecalImage).Rotation = 0.209439516f * v, true);
-            Vector2 position = Position;
+            Wiggler wiggler = Wiggler.Create(1f, 4f, (Action<float>) (v => (this.image as Decal.FinalFlagDecalImage).Rotation = 0.209439516f * v), true);
+            Vector2 position = this.Position;
             position.X = Calc.Snap(position.X, 8f) - 8f;
             position.Y += 6f;
-            Scene.Add(new SummitCheckpoint.ConfettiRenderer(position));
-            Add(wiggler);
+            this.Scene.Add((Entity) new SummitCheckpoint.ConfettiRenderer(position));
+            this.Add((Component) wiggler);
         }
 
         private class Banner : Component
@@ -469,7 +442,7 @@ namespace Celeste
             private float sineTimer = Calc.Random.NextFloat();
             public List<List<MTexture>> Segments;
 
-            public Decal Decal => (Decal)Entity;
+            public Decal Decal => (Decal) this.Entity;
 
             public Banner()
                 : base(true, true)
@@ -478,52 +451,47 @@ namespace Celeste
 
             public override void Update()
             {
-                if (OnlyIfWindy)
+                if (this.OnlyIfWindy)
                 {
-                    float x = (Scene as Level).Wind.X;
-                    WindMultiplier = Calc.Approach(WindMultiplier, Math.Min(3f, Math.Abs(x) * 0.004f), Engine.DeltaTime * 4f);
-                    if ((double)x != 0.0)
-                    {
-                        Offset = Math.Sign(x) * Math.Abs(Offset);
-                    }
+                    float x = (this.Scene as Level).Wind.X;
+                    this.WindMultiplier = Calc.Approach(this.WindMultiplier, Math.Min(3f, Math.Abs(x) * 0.004f), Engine.DeltaTime * 4f);
+                    if ((double) x != 0.0)
+                        this.Offset = (float) Math.Sign(x) * Math.Abs(this.Offset);
                 }
-                sineTimer += Engine.DeltaTime * WindMultiplier;
+                this.sineTimer += Engine.DeltaTime * this.WindMultiplier;
                 base.Update();
             }
 
             public override void Render()
             {
-                MTexture texture = Decal.textures[(int)Decal.frame];
-                List<MTexture> segment = Segments[(int)Decal.frame];
+                MTexture texture = this.Decal.textures[(int) this.Decal.frame];
+                List<MTexture> segment = this.Segments[(int) this.Decal.frame];
                 for (int index = 0; index < segment.Count; ++index)
                 {
-                    float num = (EaseDown ? index / (float)segment.Count : (float)(1.0 - (index / (double)segment.Count))) * WindMultiplier;
-                    float x = (float)((Math.Sin((sineTimer * (double)WaveSpeed) + (index * (double)SliceSinIncrement)) * (double)num * WaveAmplitude) + ((double)num * Offset));
-                    segment[index].Draw(Decal.Position + new Vector2(x, 0.0f), new Vector2(texture.Width / 2, (texture.Height / 2) - (index * SliceSize)), Color.White, Decal.scale);
+                    float num = (this.EaseDown ? (float) index / (float) segment.Count : (float) (1.0 - (double) index / (double) segment.Count)) * this.WindMultiplier;
+                    float x = (float) (Math.Sin((double) this.sineTimer * (double) this.WaveSpeed + (double) index * (double) this.SliceSinIncrement) * (double) num * (double) this.WaveAmplitude + (double) num * (double) this.Offset);
+                    segment[index].Draw(this.Decal.Position + new Vector2(x, 0.0f), new Vector2((float) (texture.Width / 2), (float) (texture.Height / 2 - index * this.SliceSize)), Color.White, this.Decal.scale);
                 }
             }
         }
 
         private class DecalImage : Component
         {
-            public Decal Decal => (Decal)Entity;
+            public Decal Decal => (Decal) this.Entity;
 
             public DecalImage()
                 : base(true, true)
             {
             }
 
-            public override void Render()
-            {
-                Decal.textures[(int)Decal.frame].DrawCentered(Decal.Position, Color.White, Decal.scale);
-            }
+            public override void Render() => this.Decal.textures[(int) this.Decal.frame].DrawCentered(this.Decal.Position, Color.White, this.Decal.scale);
         }
 
         private class FinalFlagDecalImage : Component
         {
             public float Rotation;
 
-            public Decal Decal => (Decal)Entity;
+            public Decal Decal => (Decal) this.Entity;
 
             public FinalFlagDecalImage()
                 : base(true, true)
@@ -532,17 +500,17 @@ namespace Celeste
 
             public override void Render()
             {
-                MTexture texture = Decal.textures[(int)Decal.frame];
-                texture.DrawJustified(Decal.Position + (Vector2.UnitY * (texture.Height / 2)), new Vector2(0.5f, 1f), Color.White, Decal.scale, Rotation);
+                MTexture texture = this.Decal.textures[(int) this.Decal.frame];
+                texture.DrawJustified(this.Decal.Position + Vector2.UnitY * (float) (texture.Height / 2), new Vector2(0.5f, 1f), Color.White, this.Decal.scale, this.Rotation);
             }
         }
 
         private class CoreSwapImage : Component
         {
-            private readonly MTexture hot;
-            private readonly MTexture cold;
+            private MTexture hot;
+            private MTexture cold;
 
-            public Decal Decal => (Decal)Entity;
+            public Decal Decal => (Decal) this.Entity;
 
             public CoreSwapImage(MTexture hot, MTexture cold)
                 : base(false, true)
@@ -551,10 +519,7 @@ namespace Celeste
                 this.cold = cold;
             }
 
-            public override void Render()
-            {
-                ((Scene as Level).CoreMode == Session.CoreModes.Cold ? cold : hot).DrawCentered(Decal.Position, Color.White, Decal.scale);
-            }
+            public override void Render() => ((this.Scene as Level).CoreMode == Session.CoreModes.Cold ? this.cold : this.hot).DrawCentered(this.Decal.Position, Color.White, this.Decal.scale);
         }
     }
 }

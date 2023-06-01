@@ -6,6 +6,7 @@
 
 using Microsoft.Xna.Framework;
 using Monocle;
+using System;
 using System.Collections;
 
 namespace Celeste
@@ -15,7 +16,7 @@ namespace Celeste
         private Vector2? node;
 
         public RidgeGate(EntityData data, Vector2 offset)
-            : this(data.Position + offset, data.Width, data.Height, data.FirstNodeNullable(new Vector2?(offset)), data.Bool("ridge", true))
+            : this(data.Position + offset, (float) data.Width, (float) data.Height, data.FirstNodeNullable(new Vector2?(offset)), data.Bool("ridge", true))
         {
         }
 
@@ -23,34 +24,31 @@ namespace Celeste
             : base(position, width, height, true)
         {
             this.node = node;
-            Add(new Monocle.Image(GFX.Game[ridgeImage ? "objects/ridgeGate" : "objects/farewellGate"]));
+            this.Add((Component) new Monocle.Image(GFX.Game[ridgeImage ? "objects/ridgeGate" : "objects/farewellGate"]));
         }
 
         public override void Awake(Scene scene)
         {
             base.Awake(scene);
-            if (!node.HasValue || !CollideCheck<Player>())
-            {
+            if (!this.node.HasValue || !this.CollideCheck<Player>())
                 return;
-            }
-
-            Visible = Collidable = false;
-            Vector2 position = Position;
-            Position = node.Value;
-            Add(new Coroutine(EnterSequence(position)));
+            this.Visible = this.Collidable = false;
+            Vector2 position = this.Position;
+            this.Position = this.node.Value;
+            this.Add((Component) new Coroutine(this.EnterSequence(position)));
         }
 
         private IEnumerator EnterSequence(Vector2 moveTo)
         {
             RidgeGate ridgeGate = this;
             ridgeGate.Visible = ridgeGate.Collidable = true;
-            yield return 0.25f;
-            _ = Audio.Play("event:/game/04_cliffside/stone_blockade", ridgeGate.Position);
-            yield return 0.25f;
+            yield return (object) 0.25f;
+            Audio.Play("event:/game/04_cliffside/stone_blockade", ridgeGate.Position);
+            yield return (object) 0.25f;
             Vector2 start = ridgeGate.Position;
             Tween tween = Tween.Create(Tween.TweenMode.Oneshot, Ease.CubeOut, start: true);
-            tween.OnUpdate = t => MoveTo(Vector2.Lerp(start, moveTo, t.Eased));
-            ridgeGate.Add(tween);
+            tween.OnUpdate = (Action<Tween>) (t => this.MoveTo(Vector2.Lerp(start, moveTo, t.Eased)));
+            ridgeGate.Add((Component) tween);
         }
     }
 }

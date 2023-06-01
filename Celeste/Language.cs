@@ -29,59 +29,59 @@ namespace Celeste
         public string PeriodCharacters = ".!?";
         public int Lines;
         public int Words;
-        public Dictionary<string, string> Dialog = new(StringComparer.OrdinalIgnoreCase);
-        public Dictionary<string, string> Cleaned = new(StringComparer.OrdinalIgnoreCase);
-        private static readonly Regex command = new("\\{(.*?)\\}", RegexOptions.RightToLeft);
-        private static readonly Regex insert = new("\\{\\+\\s*(.*?)\\}");
-        private static readonly Regex variable = new("^\\w+\\=.*");
-        private static readonly Regex portrait = new("\\[(?<content>[^\\[\\\\]*(?:\\\\.[^\\]\\\\]*)*)\\]", RegexOptions.IgnoreCase);
+        public Dictionary<string, string> Dialog = new Dictionary<string, string>((IEqualityComparer<string>) StringComparer.OrdinalIgnoreCase);
+        public Dictionary<string, string> Cleaned = new Dictionary<string, string>((IEqualityComparer<string>) StringComparer.OrdinalIgnoreCase);
+        private static readonly Regex command = new Regex("\\{(.*?)\\}", RegexOptions.RightToLeft);
+        private static readonly Regex insert = new Regex("\\{\\+\\s*(.*?)\\}");
+        private static readonly Regex variable = new Regex("^\\w+\\=.*");
+        private static readonly Regex portrait = new Regex("\\[(?<content>[^\\[\\\\]*(?:\\\\.[^\\]\\\\]*)*)\\]", RegexOptions.IgnoreCase);
 
-        public PixelFont Font => Fonts.Get(FontFace);
+        public PixelFont Font => Fonts.Get(this.FontFace);
 
-        public PixelFontSize FontSize => Font.Get(FontFaceSize);
+        public PixelFontSize FontSize => this.Font.Get(this.FontFaceSize);
 
-        public string this[string name] => Dialog[name];
+        public string this[string name] => this.Dialog[name];
 
         public bool CanDisplay(string text)
         {
-            PixelFontSize fontSize = FontSize;
+            PixelFontSize fontSize = this.FontSize;
             for (int index = 0; index < text.Length; ++index)
             {
-                if (text[index] != ' ' && fontSize.Get(text[index]) == null)
-                {
+                if (text[index] != ' ' && fontSize.Get((int) text[index]) == null)
                     return false;
-                }
             }
             return true;
         }
 
         public void Export(string path)
         {
-            using BinaryWriter binaryWriter = new(File.OpenWrite(path));
-            binaryWriter.Write(Id);
-            binaryWriter.Write(Label);
-            binaryWriter.Write(IconPath);
-            binaryWriter.Write(Order);
-            binaryWriter.Write(FontFace);
-            binaryWriter.Write(FontFaceSize);
-            binaryWriter.Write(SplitRegex);
-            binaryWriter.Write(CommaCharacters);
-            binaryWriter.Write(PeriodCharacters);
-            binaryWriter.Write(Lines);
-            binaryWriter.Write(Words);
-            binaryWriter.Write(Dialog.Count);
-            foreach (KeyValuePair<string, string> keyValuePair in Dialog)
+            using (BinaryWriter binaryWriter = new BinaryWriter((Stream) File.OpenWrite(path)))
             {
-                binaryWriter.Write(keyValuePair.Key);
-                binaryWriter.Write(keyValuePair.Value);
-                binaryWriter.Write(Cleaned[keyValuePair.Key]);
+                binaryWriter.Write(this.Id);
+                binaryWriter.Write(this.Label);
+                binaryWriter.Write(this.IconPath);
+                binaryWriter.Write(this.Order);
+                binaryWriter.Write(this.FontFace);
+                binaryWriter.Write(this.FontFaceSize);
+                binaryWriter.Write(this.SplitRegex);
+                binaryWriter.Write(this.CommaCharacters);
+                binaryWriter.Write(this.PeriodCharacters);
+                binaryWriter.Write(this.Lines);
+                binaryWriter.Write(this.Words);
+                binaryWriter.Write(this.Dialog.Count);
+                foreach (KeyValuePair<string, string> keyValuePair in this.Dialog)
+                {
+                    binaryWriter.Write(keyValuePair.Key);
+                    binaryWriter.Write(keyValuePair.Value);
+                    binaryWriter.Write(this.Cleaned[keyValuePair.Key]);
+                }
             }
         }
 
         public static Language FromExport(string path)
         {
-            Language language = new();
-            using (BinaryReader binaryReader = new(File.OpenRead(path)))
+            Language language = new Language();
+            using (BinaryReader binaryReader = new BinaryReader((Stream) File.OpenRead(path)))
             {
                 language.Id = binaryReader.ReadString();
                 language.Label = binaryReader.ReadString();
@@ -108,9 +108,9 @@ namespace Celeste
 
         public static Language FromTxt(string path)
         {
-            Language language = null;
+            Language language = (Language) null;
             string key1 = "";
-            StringBuilder stringBuilder = new();
+            StringBuilder stringBuilder = new StringBuilder();
             string input1 = "";
             foreach (string readLine in File.ReadLines(path, Encoding.UTF8))
             {
@@ -118,36 +118,26 @@ namespace Celeste
                 if (input2.Length > 0 && input2[0] != '#')
                 {
                     if (input2.IndexOf('[') >= 0)
-                    {
                         input2 = Language.portrait.Replace(input2, "{portrait ${content}}");
-                    }
-
                     string input3 = input2.Replace("\\#", "#");
                     if (input3.Length > 0)
                     {
                         if (Language.variable.IsMatch(input3))
                         {
                             if (!string.IsNullOrEmpty(key1))
-                            {
                                 language.Dialog[key1] = stringBuilder.ToString();
-                            }
-
                             string[] strArray1 = input3.Split('=');
                             string str1 = strArray1[0].Trim();
                             string str2 = strArray1.Length > 1 ? strArray1[1].Trim() : "";
                             if (str1.Equals("language", StringComparison.OrdinalIgnoreCase))
                             {
                                 string[] strArray2 = str2.Split(',');
-                                language = new Language
-                                {
-                                    FontFace = null,
-                                    Id = strArray2[0],
-                                    FilePath = Path.GetFileName(path)
-                                };
+                                language = new Language();
+                                language.FontFace = (string) null;
+                                language.Id = strArray2[0];
+                                language.FilePath = Path.GetFileName(path);
                                 if (strArray2.Length > 1)
-                                {
                                     language.Label = strArray2[1];
-                                }
                             }
                             else if (str1.Equals("icon", StringComparison.OrdinalIgnoreCase))
                             {
@@ -156,23 +146,17 @@ namespace Celeste
                                 language.Icon = new MTexture(texture);
                             }
                             else if (str1.Equals("order", StringComparison.OrdinalIgnoreCase))
-                            {
                                 language.Order = int.Parse(str2);
-                            }
                             else if (str1.Equals("font", StringComparison.OrdinalIgnoreCase))
                             {
                                 string[] strArray3 = str2.Split(',');
                                 language.FontFace = strArray3[0];
-                                language.FontFaceSize = float.Parse(strArray3[1], CultureInfo.InvariantCulture);
+                                language.FontFaceSize = float.Parse(strArray3[1], (IFormatProvider) CultureInfo.InvariantCulture);
                             }
                             else if (str1.Equals("SPLIT_REGEX", StringComparison.OrdinalIgnoreCase))
-                            {
                                 language.SplitRegex = str2;
-                            }
                             else if (str1.Equals("commas", StringComparison.OrdinalIgnoreCase))
-                            {
                                 language.CommaCharacters = str2;
-                            }
                             else if (str1.Equals("periods", StringComparison.OrdinalIgnoreCase))
                             {
                                 language.PeriodCharacters = str2;
@@ -180,8 +164,8 @@ namespace Celeste
                             else
                             {
                                 key1 = str1;
-                                _ = stringBuilder.Clear();
-                                _ = stringBuilder.Append(str2);
+                                stringBuilder.Clear();
+                                stringBuilder.Append(str2);
                             }
                         }
                         else
@@ -190,31 +174,23 @@ namespace Celeste
                             {
                                 string str = stringBuilder.ToString();
                                 if (!str.EndsWith("{break}") && !str.EndsWith("{n}") && Language.command.Replace(input1, "").Length > 0)
-                                {
-                                    _ = stringBuilder.Append("{break}");
-                                }
+                                    stringBuilder.Append("{break}");
                             }
-                            _ = stringBuilder.Append(input3);
+                            stringBuilder.Append(input3);
                         }
                         input1 = input3;
                     }
                 }
             }
             if (!string.IsNullOrEmpty(key1))
-            {
                 language.Dialog[key1] = stringBuilder.ToString();
-            }
-
-            List<string> stringList = new();
+            List<string> stringList = new List<string>();
             foreach (KeyValuePair<string, string> keyValuePair in language.Dialog)
-            {
                 stringList.Add(keyValuePair.Key);
-            }
-
             foreach (string key2 in stringList)
             {
                 string input4 = language.Dialog[key2];
-                MatchCollection matchCollection = null;
+                MatchCollection matchCollection = (MatchCollection) null;
                 while (matchCollection == null || matchCollection.Count > 0)
                 {
                     matchCollection = Language.insert.Matches(input4);
@@ -222,7 +198,8 @@ namespace Celeste
                     {
                         Match match = matchCollection[i];
                         string key3 = match.Groups[1].Value;
-                        input4 = !language.Dialog.TryGetValue(key3, out string newValue) ? input4.Replace(match.Value, "[XXX]") : input4.Replace(match.Value, newValue);
+                        string newValue;
+                        input4 = !language.Dialog.TryGetValue(key3, out newValue) ? input4.Replace(match.Value, "[XXX]") : input4.Replace(match.Value, newValue);
                     }
                 }
                 language.Dialog[key2] = input4;
@@ -244,12 +221,9 @@ namespace Celeste
 
         public void Dispose()
         {
-            if (Icon.Texture == null || Icon.Texture.IsDisposed)
-            {
+            if (this.Icon.Texture == null || this.Icon.Texture.IsDisposed)
                 return;
-            }
-
-            Icon.Texture.Dispose();
+            this.Icon.Texture.Dispose();
         }
     }
 }

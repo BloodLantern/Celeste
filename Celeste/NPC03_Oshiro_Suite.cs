@@ -19,66 +19,60 @@ namespace Celeste
         public NPC03_Oshiro_Suite(Vector2 position)
             : base(position)
         {
-            Add(Sprite = new OshiroSprite(1));
-            Add(Light = new VertexLight(-Vector2.UnitY * 16f, Color.White, 1f, 32, 64));
-            Add(Talker = new TalkComponent(new Rectangle(-16, -8, 32, 8), new Vector2(0.0f, -24f), new Action<Player>(OnTalk)));
-            Talker.Enabled = false;
-            MoveAnim = "move";
-            IdleAnim = "idle";
+            this.Add((Component) (this.Sprite = (Sprite) new OshiroSprite(1)));
+            this.Add((Component) (this.Light = new VertexLight(-Vector2.UnitY * 16f, Color.White, 1f, 32, 64)));
+            this.Add((Component) (this.Talker = new TalkComponent(new Rectangle(-16, -8, 32, 8), new Vector2(0.0f, -24f), new Action<Player>(this.OnTalk))));
+            this.Talker.Enabled = false;
+            this.MoveAnim = "move";
+            this.IdleAnim = "idle";
         }
 
         public override void Added(Scene scene)
         {
             base.Added(scene);
-            if (!Session.GetFlag("oshiro_resort_suite"))
+            if (!this.Session.GetFlag("oshiro_resort_suite"))
             {
-                Scene.Add(new CS03_OshiroMasterSuite(this));
+                this.Scene.Add((Entity) new CS03_OshiroMasterSuite((NPC) this));
             }
             else
             {
-                Sprite.Play("idle_ground");
-                Talker.Enabled = true;
+                this.Sprite.Play("idle_ground");
+                this.Talker.Enabled = true;
             }
         }
 
         private void OnTalk(Player player)
         {
-            finishedTalking = false;
-            Level.StartCutscene(new Action<Level>(EndTalking));
-            Add(new Coroutine(Talk(player)));
+            this.finishedTalking = false;
+            this.Level.StartCutscene(new Action<Level>(this.EndTalking));
+            this.Add((Component) new Coroutine(this.Talk(player)));
         }
 
         private IEnumerator Talk(Player player)
         {
             NPC03_Oshiro_Suite npC03OshiroSuite = this;
             int conversation = npC03OshiroSuite.Session.GetCounter("oshiroSuiteSadConversation");
-            yield return npC03OshiroSuite.PlayerApproach(player, false, new float?(12f));
-            yield return Textbox.Say("CH3_OSHIRO_SUITE_SAD" + conversation);
-            yield return npC03OshiroSuite.PlayerLeave(player);
+            yield return (object) npC03OshiroSuite.PlayerApproach(player, false, new float?(12f));
+            yield return (object) Textbox.Say("CH3_OSHIRO_SUITE_SAD" + (object) conversation);
+            yield return (object) npC03OshiroSuite.PlayerLeave(player);
             npC03OshiroSuite.EndTalking(npC03OshiroSuite.SceneAs<Level>());
         }
 
         private void EndTalking(Level level)
         {
-            Player first = Scene.Entities.FindFirst<Player>();
+            Player first = this.Scene.Entities.FindFirst<Player>();
             if (first != null)
             {
                 first.StateMachine.Locked = false;
                 first.StateMachine.State = 0;
             }
-            if (finishedTalking)
-            {
+            if (this.finishedTalking)
                 return;
-            }
-
-            int num = (Session.GetCounter("oshiroSuiteSadConversation") + 1) % 7;
+            int num = (this.Session.GetCounter("oshiroSuiteSadConversation") + 1) % 7;
             if (num == 0)
-            {
                 ++num;
-            }
-
-            Session.SetCounter("oshiroSuiteSadConversation", num);
-            finishedTalking = true;
+            this.Session.SetCounter("oshiroSuiteSadConversation", num);
+            this.finishedTalking = true;
         }
     }
 }

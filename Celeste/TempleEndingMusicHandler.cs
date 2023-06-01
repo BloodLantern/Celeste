@@ -15,50 +15,37 @@ namespace Celeste
         public const string StartLevel = "e-01";
         public const string EndLevel = "e-09";
         public const string ApplyIn = "e-*";
-        private readonly HashSet<string> levels = new();
+        private HashSet<string> levels = new HashSet<string>();
         private float startX;
         private float endX;
 
-        public TempleEndingMusicHandler()
-        {
-            Tag = (int)Tags.TransitionUpdate | (int)Tags.Global;
-        }
+        public TempleEndingMusicHandler() => this.Tag = (int) Tags.TransitionUpdate | (int) Tags.Global;
 
         public override void Awake(Scene scene)
         {
             base.Awake(scene);
-            Regex regex = new(Regex.Escape("e-*").Replace("\\*", ".*") + "$");
+            Regex regex = new Regex(Regex.Escape("e-*").Replace("\\*", ".*") + "$");
             foreach (LevelData level in (scene as Level).Session.MapData.Levels)
             {
                 if (level.Name.Equals("e-01"))
-                {
-                    startX = level.Bounds.Left;
-                }
+                    this.startX = (float) level.Bounds.Left;
                 else if (level.Name.Equals("e-09"))
-                {
-                    endX = level.Bounds.Right;
-                }
-
+                    this.endX = (float) level.Bounds.Right;
                 if (regex.IsMatch(level.Name))
-                {
-                    _ = levels.Add(level.Name);
-                }
+                    this.levels.Add(level.Name);
             }
         }
 
         public override void Update()
         {
             base.Update();
-            Level scene = Scene as Level;
-            Player entity = Scene.Tracker.GetEntity<Player>();
-            if (entity == null || !levels.Contains(scene.Session.Level) || !(Audio.CurrentMusic == "event:/music/lvl5/mirror"))
-            {
+            Level scene = this.Scene as Level;
+            Player entity = this.Scene.Tracker.GetEntity<Player>();
+            if (entity == null || !this.levels.Contains(scene.Session.Level) || !(Audio.CurrentMusic == "event:/music/lvl5/mirror"))
                 return;
-            }
-
-            float num = Calc.Clamp((float)(((double)entity.X - startX) / (endX - (double)startX)), 0.0f, 1f);
-            _ = scene.Session.Audio.Music.Layer(1, 1f - num);
-            _ = scene.Session.Audio.Music.Layer(5, num);
+            float num = Calc.Clamp((float) (((double) entity.X - (double) this.startX) / ((double) this.endX - (double) this.startX)), 0.0f, 1f);
+            scene.Session.Audio.Music.Layer(1, 1f - num);
+            scene.Session.Audio.Music.Layer(5, num);
             scene.Session.Audio.Apply();
         }
     }

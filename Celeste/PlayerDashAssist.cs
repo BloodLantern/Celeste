@@ -18,7 +18,7 @@ namespace Celeste
         public float Direction;
         public float Scale;
         public Vector2 Offset;
-        private readonly List<MTexture> images;
+        private List<MTexture> images;
         private EventInstance snapshot;
         private float timer;
         private bool paused;
@@ -26,98 +26,71 @@ namespace Celeste
 
         public PlayerDashAssist()
         {
-            Tag = (int)Tags.Global;
-            Depth = -1000000;
-            Visible = false;
-            images = GFX.Game.GetAtlasSubtextures("util/dasharrow/dasharrow");
+            this.Tag = (int) Tags.Global;
+            this.Depth = -1000000;
+            this.Visible = false;
+            this.images = GFX.Game.GetAtlasSubtextures("util/dasharrow/dasharrow");
         }
 
         public override void Update()
         {
             if (!Engine.DashAssistFreeze)
             {
-                if (!paused)
-                {
+                if (!this.paused)
                     return;
-                }
-
-                if (!Scene.Paused)
-                {
+                if (!this.Scene.Paused)
                     Audio.PauseGameplaySfx = false;
-                }
-
-                DisableSnapshot();
-                timer = 0.0f;
-                paused = false;
+                this.DisableSnapshot();
+                this.timer = 0.0f;
+                this.paused = false;
             }
             else
             {
-                paused = true;
+                this.paused = true;
                 Audio.PauseGameplaySfx = true;
-                timer += Engine.RawDeltaTime;
-                if (timer > 0.20000000298023224 && snapshot == null)
-                {
-                    EnableSnapshot();
-                }
-
-                Player entity = Scene.Tracker.GetEntity<Player>();
+                this.timer += Engine.RawDeltaTime;
+                if ((double) this.timer > 0.20000000298023224 && (HandleBase) this.snapshot == (HandleBase) null)
+                    this.EnableSnapshot();
+                Player entity = this.Scene.Tracker.GetEntity<Player>();
                 if (entity == null)
-                {
                     return;
-                }
-
                 float num1 = Input.GetAimVector(entity.Facing).Angle();
-                if ((double)Calc.AbsAngleDiff(num1, Direction) >= 1.5807963609695435)
+                if ((double) Calc.AbsAngleDiff(num1, this.Direction) >= 1.5807963609695435)
                 {
-                    Direction = num1;
-                    Scale = 0.0f;
+                    this.Direction = num1;
+                    this.Scale = 0.0f;
                 }
                 else
-                {
-                    Direction = Calc.AngleApproach(Direction, num1, 18.849556f * Engine.RawDeltaTime);
-                }
-
-                Scale = Calc.Approach(Scale, 1f, Engine.DeltaTime * 4f);
-                int num2 = 1 + ((8 + (int)Math.Round((double)num1 / 0.78539818525314331)) % 8);
-                if (lastIndex != 0 && lastIndex != num2)
-                {
-                    _ = Audio.Play("event:/game/general/assist_dash_aim", entity.Center, "dash_direction", num2);
-                }
-
-                lastIndex = num2;
+                    this.Direction = Calc.AngleApproach(this.Direction, num1, 18.849556f * Engine.RawDeltaTime);
+                this.Scale = Calc.Approach(this.Scale, 1f, Engine.DeltaTime * 4f);
+                int num2 = 1 + (8 + (int) Math.Round((double) num1 / 0.78539818525314331)) % 8;
+                if (this.lastIndex != 0 && this.lastIndex != num2)
+                    Audio.Play("event:/game/general/assist_dash_aim", entity.Center, "dash_direction", (float) num2);
+                this.lastIndex = num2;
             }
         }
 
         public override void Render()
         {
-            Player entity = Scene.Tracker.GetEntity<Player>();
+            Player entity = this.Scene.Tracker.GetEntity<Player>();
             if (entity == null || !Engine.DashAssistFreeze)
-            {
                 return;
-            }
-
-            MTexture mtexture = null;
+            MTexture mtexture = (MTexture) null;
             float rotation = float.MaxValue;
             for (int index = 0; index < 8; ++index)
             {
-                float num = Calc.AngleDiff((float)(6.2831854820251465 * (index / 8.0)), Direction);
-                if ((double)Math.Abs(num) < (double)Math.Abs(rotation))
+                float num = Calc.AngleDiff((float) (6.2831854820251465 * ((double) index / 8.0)), this.Direction);
+                if ((double) Math.Abs(num) < (double) Math.Abs(rotation))
                 {
                     rotation = num;
-                    mtexture = images[index];
+                    mtexture = this.images[index];
                 }
             }
             if (mtexture == null)
-            {
                 return;
-            }
-
-            if ((double)Math.Abs(rotation) < 0.05000000074505806)
-            {
+            if ((double) Math.Abs(rotation) < 0.05000000074505806)
                 rotation = 0.0f;
-            }
-
-            mtexture.DrawOutlineCentered((entity.Center + Offset + Calc.AngleToVector(Direction, 20f)).Round(), Color.White, Ease.BounceOut(Scale), rotation);
+            mtexture.DrawOutlineCentered((entity.Center + this.Offset + Calc.AngleToVector(this.Direction, 20f)).Round(), Color.White, Ease.BounceOut(this.Scale), rotation);
         }
 
         private void EnableSnapshot()
@@ -126,24 +99,21 @@ namespace Celeste
 
         private void DisableSnapshot()
         {
-            if (!(snapshot != null))
-            {
+            if (!((HandleBase) this.snapshot != (HandleBase) null))
                 return;
-            }
-
-            Audio.ReleaseSnapshot(snapshot);
-            snapshot = null;
+            Audio.ReleaseSnapshot(this.snapshot);
+            this.snapshot = (EventInstance) null;
         }
 
         public override void Removed(Scene scene)
         {
-            DisableSnapshot();
+            this.DisableSnapshot();
             base.Removed(scene);
         }
 
         public override void SceneEnd(Scene scene)
         {
-            DisableSnapshot();
+            this.DisableSnapshot();
             base.SceneEnd(scene);
         }
     }

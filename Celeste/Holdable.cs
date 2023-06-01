@@ -25,7 +25,7 @@ namespace Celeste
         public Func<Vector2> SpeedGetter;
         public bool SlowRun = true;
         public bool SlowFall;
-        private readonly float cannotHoldDelay;
+        private float cannotHoldDelay;
         private Vector2 startPos;
         private float gravityTimer;
         private float cannotHoldTimer;
@@ -41,187 +41,137 @@ namespace Celeste
 
         public bool Check(Player player)
         {
-            Collider collider = Entity.Collider;
-            if (PickupCollider != null)
-            {
-                Entity.Collider = PickupCollider;
-            }
-
-            int num = player.CollideCheck(Entity) ? 1 : 0;
-            Entity.Collider = collider;
+            Collider collider = this.Entity.Collider;
+            if (this.PickupCollider != null)
+                this.Entity.Collider = this.PickupCollider;
+            int num = player.CollideCheck(this.Entity) ? 1 : 0;
+            this.Entity.Collider = collider;
             return num != 0;
         }
 
         public override void Added(Entity entity)
         {
             base.Added(entity);
-            startPos = Entity.Position;
+            this.startPos = this.Entity.Position;
         }
 
         public override void EntityRemoved(Scene scene)
         {
             base.EntityRemoved(scene);
-            if (Holder is null or null)
-            {
+            if (this.Holder == null || this.Holder == null)
                 return;
-            }
-
-            Holder.Holding = null;
+            this.Holder.Holding = (Holdable) null;
         }
 
         public bool Pickup(Player player)
         {
-            if (cannotHoldTimer > 0.0 || Scene == null || Entity.Scene == null)
-            {
+            if ((double) this.cannotHoldTimer > 0.0 || this.Scene == null || this.Entity.Scene == null)
                 return false;
-            }
-
-            idleDepth = Entity.Depth;
-            Entity.Depth = player.Depth - 1;
-            Entity.Visible = true;
-            Holder = player;
-            OnPickup?.Invoke();
+            this.idleDepth = this.Entity.Depth;
+            this.Entity.Depth = player.Depth - 1;
+            this.Entity.Visible = true;
+            this.Holder = player;
+            if (this.OnPickup != null)
+                this.OnPickup();
             return true;
         }
 
         public void Carry(Vector2 position)
         {
-            if (OnCarry != null)
-            {
-                OnCarry(position);
-            }
+            if (this.OnCarry != null)
+                this.OnCarry(position);
             else
-            {
-                Entity.Position = position;
-            }
+                this.Entity.Position = position;
         }
 
         public void Release(Vector2 force)
         {
-            if (Entity.CollideCheck<Solid>())
+            if (this.Entity.CollideCheck<Solid>())
             {
-                if (force.X != 0.0)
+                if ((double) force.X != 0.0)
                 {
                     bool flag = false;
                     int num1 = Math.Sign(force.X);
                     int num2 = 0;
                     while (!flag && num2++ < 10)
                     {
-                        if (!Entity.CollideCheck<Solid>(Entity.Position + (num1 * num2 * Vector2.UnitX)))
-                        {
+                        if (!this.Entity.CollideCheck<Solid>(this.Entity.Position + (float) (num1 * num2) * Vector2.UnitX))
                             flag = true;
-                        }
                     }
                     if (flag)
-                    {
-                        Entity.X += num1 * num2;
-                    }
+                        this.Entity.X += (float) (num1 * num2);
                 }
-                while (Entity.CollideCheck<Solid>())
-                {
-                    Entity.Position += Vector2.UnitY;
-                }
+                while (this.Entity.CollideCheck<Solid>())
+                    this.Entity.Position += Vector2.UnitY;
             }
-            Entity.Depth = idleDepth;
-            Holder = null;
-            gravityTimer = 0.1f;
-            cannotHoldTimer = cannotHoldDelay;
-            if (OnRelease == null)
-            {
+            this.Entity.Depth = this.idleDepth;
+            this.Holder = (Player) null;
+            this.gravityTimer = 0.1f;
+            this.cannotHoldTimer = this.cannotHoldDelay;
+            if (this.OnRelease == null)
                 return;
-            }
-
-            OnRelease(force);
+            this.OnRelease(force);
         }
 
-        public bool IsHeld => Holder != null;
+        public bool IsHeld => this.Holder != null;
 
-        public bool ShouldHaveGravity => gravityTimer <= 0.0;
+        public bool ShouldHaveGravity => (double) this.gravityTimer <= 0.0;
 
         public override void Update()
         {
             base.Update();
-            if (cannotHoldTimer > 0.0)
-            {
-                cannotHoldTimer -= Engine.DeltaTime;
-            }
-
-            if (gravityTimer <= 0.0)
-            {
+            if ((double) this.cannotHoldTimer > 0.0)
+                this.cannotHoldTimer -= Engine.DeltaTime;
+            if ((double) this.gravityTimer <= 0.0)
                 return;
-            }
-
-            gravityTimer -= Engine.DeltaTime;
+            this.gravityTimer -= Engine.DeltaTime;
         }
 
         public void CheckAgainstColliders()
         {
-            foreach (HoldableCollider component in Scene.Tracker.GetComponents<HoldableCollider>())
+            foreach (HoldableCollider component in this.Scene.Tracker.GetComponents<HoldableCollider>())
             {
                 if (component.Check(this))
-                {
                     component.OnCollide(this);
-                }
             }
         }
 
         public override void DebugRender(Camera camera)
         {
             base.DebugRender(camera);
-            if (PickupCollider == null)
-            {
+            if (this.PickupCollider == null)
                 return;
-            }
-
-            Collider collider = Entity.Collider;
-            Entity.Collider = PickupCollider;
-            Entity.Collider.Render(camera, Color.Pink);
-            Entity.Collider = collider;
+            Collider collider = this.Entity.Collider;
+            this.Entity.Collider = this.PickupCollider;
+            this.Entity.Collider.Render(camera, Color.Pink);
+            this.Entity.Collider = collider;
         }
 
-        public bool Dangerous(HoldableCollider hc)
-        {
-            return DangerousCheck != null && DangerousCheck(hc);
-        }
+        public bool Dangerous(HoldableCollider hc) => this.DangerousCheck != null && this.DangerousCheck(hc);
 
         public void HitSeeker(Seeker seeker)
         {
-            if (OnHitSeeker == null)
-            {
+            if (this.OnHitSeeker == null)
                 return;
-            }
-
-            OnHitSeeker(seeker);
+            this.OnHitSeeker(seeker);
         }
 
         public void Swat(HoldableCollider hc, int dir)
         {
-            if (OnSwat == null)
-            {
+            if (this.OnSwat == null)
                 return;
-            }
-
-            OnSwat(hc, dir);
+            this.OnSwat(hc, dir);
         }
 
-        public bool HitSpring(Spring spring)
-        {
-            return OnHitSpring != null && OnHitSpring(spring);
-        }
+        public bool HitSpring(Spring spring) => this.OnHitSpring != null && this.OnHitSpring(spring);
 
         public void HitSpinner(Entity spinner)
         {
-            if (OnHitSpinner == null)
-            {
+            if (this.OnHitSpinner == null)
                 return;
-            }
-
-            OnHitSpinner(spinner);
+            this.OnHitSpinner(spinner);
         }
 
-        public Vector2 GetSpeed()
-        {
-            return SpeedGetter != null ? SpeedGetter() : Vector2.Zero;
-        }
+        public Vector2 GetSpeed() => this.SpeedGetter != null ? this.SpeedGetter() : Vector2.Zero;
     }
 }

@@ -16,87 +16,69 @@ namespace Celeste
         public bool Moving = true;
         private Vector2 center;
         private float rotationPercent;
-        private readonly float length;
+        private float length;
         private bool fallOutOfScreen;
 
-        public float Angle => MathHelper.Lerp(4.712389f, -1.57079637f, Easer(rotationPercent));
+        public float Angle => MathHelper.Lerp(4.712389f, -1.57079637f, this.Easer(this.rotationPercent));
 
         public bool Clockwise { get; private set; }
 
         public RotateSpinner(EntityData data, Vector2 offset)
             : base(data.Position + offset)
         {
-            Depth = -50;
-            center = data.Nodes[0] + offset;
-            Clockwise = data.Bool("clockwise");
-            Collider = new Monocle.Circle(6f);
-            Add(new PlayerCollider(new Action<Player>(OnPlayer)));
-            Add(new StaticMover()
+            this.Depth = -50;
+            this.center = data.Nodes[0] + offset;
+            this.Clockwise = data.Bool("clockwise");
+            this.Collider = (Collider) new Monocle.Circle(6f);
+            this.Add((Component) new PlayerCollider(new Action<Player>(this.OnPlayer)));
+            this.Add((Component) new StaticMover()
             {
-                SolidChecker = s => s.CollidePoint(center),
-                JumpThruChecker = jt => jt.CollidePoint(center),
-                OnMove = v =>
+                SolidChecker = (Func<Solid, bool>) (s => s.CollidePoint(this.center)),
+                JumpThruChecker = (Func<JumpThru, bool>) (jt => jt.CollidePoint(this.center)),
+                OnMove = (Action<Vector2>) (v =>
                 {
-                    center += v;
-                    Position += v;
-                },
-                OnDestroy = () => fallOutOfScreen = true
+                    this.center += v;
+                    this.Position = this.Position + v;
+                }),
+                OnDestroy = (Action) (() => this.fallOutOfScreen = true)
             });
-            rotationPercent = EaserInverse(Calc.Percent(Calc.WrapAngle(Calc.Angle(center, Position)), -1.57079637f, 4.712389f));
-            length = (Position - center).Length();
-            Position = center + Calc.AngleToVector(Angle, length);
+            this.rotationPercent = this.EaserInverse(Calc.Percent(Calc.WrapAngle(Calc.Angle(this.center, this.Position)), -1.57079637f, 4.712389f));
+            this.length = (this.Position - this.center).Length();
+            this.Position = this.center + Calc.AngleToVector(this.Angle, this.length);
         }
 
-        private float Easer(float v)
-        {
-            return v;
-        }
+        private float Easer(float v) => v;
 
-        private float EaserInverse(float v)
-        {
-            return v;
-        }
+        private float EaserInverse(float v) => v;
 
         public override void Update()
         {
             base.Update();
-            if (Moving)
+            if (this.Moving)
             {
-                if (Clockwise)
+                if (this.Clockwise)
                 {
-                    rotationPercent -= Engine.DeltaTime / 1.8f;
-                    ++rotationPercent;
+                    this.rotationPercent -= Engine.DeltaTime / 1.8f;
+                    ++this.rotationPercent;
                 }
                 else
-                {
-                    rotationPercent += Engine.DeltaTime / 1.8f;
-                }
-
-                rotationPercent %= 1f;
-                Position = center + Calc.AngleToVector(Angle, length);
+                    this.rotationPercent += Engine.DeltaTime / 1.8f;
+                this.rotationPercent %= 1f;
+                this.Position = this.center + Calc.AngleToVector(this.Angle, this.length);
             }
-            if (!fallOutOfScreen)
-            {
+            if (!this.fallOutOfScreen)
                 return;
-            }
-
-            center.Y += 160f * Engine.DeltaTime;
-            if ((double)Y <= (Scene as Level).Bounds.Bottom + 32)
-            {
+            this.center.Y += 160f * Engine.DeltaTime;
+            if ((double) this.Y <= (double) ((this.Scene as Level).Bounds.Bottom + 32))
                 return;
-            }
-
-            RemoveSelf();
+            this.RemoveSelf();
         }
 
         public virtual void OnPlayer(Player player)
         {
-            if (player.Die((player.Position - Position).SafeNormalize()) == null)
-            {
+            if (player.Die((player.Position - this.Position).SafeNormalize()) == null)
                 return;
-            }
-
-            Moving = false;
+            this.Moving = false;
         }
     }
 }

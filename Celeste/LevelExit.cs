@@ -15,8 +15,8 @@ namespace Celeste
 {
     public class LevelExit : Scene
     {
-        private readonly LevelExit.Mode mode;
-        private readonly Session session;
+        private LevelExit.Mode mode;
+        private Session session;
         private float timer;
         private XmlElement completeXml;
         private Atlas completeAtlas;
@@ -28,7 +28,7 @@ namespace Celeste
 
         public LevelExit(LevelExit.Mode mode, Session session, HiresSnow snow = null)
         {
-            Add(new HudRenderer());
+            this.Add((Monocle.Renderer) new HudRenderer());
             this.session = session;
             this.mode = mode;
             this.snow = snow;
@@ -37,137 +37,99 @@ namespace Celeste
         public override void Begin()
         {
             base.Begin();
-            if (mode != LevelExit.Mode.GoldenBerryRestart)
-            {
-                SaveLoadIcon.Show(this);
-            }
-
-            bool flag = snow == null;
+            if (this.mode != LevelExit.Mode.GoldenBerryRestart)
+                SaveLoadIcon.Show((Scene) this);
+            bool flag = this.snow == null;
             if (flag)
+                this.snow = new HiresSnow();
+            if (this.mode == LevelExit.Mode.Completed)
             {
-                snow = new HiresSnow();
-            }
-
-            if (mode == LevelExit.Mode.Completed)
-            {
-                snow.Direction = new Vector2(0.0f, 16f);
+                this.snow.Direction = new Vector2(0.0f, 16f);
                 if (flag)
-                {
-                    snow.Reset();
-                }
-
-                RunThread.Start(new Action(LoadCompleteThread), "COMPLETE_LEVEL");
-                _ = session.Area.Mode != AreaMode.Normal
-                    ? Audio.SetMusic("event:/music/menu/complete_bside")
-                    : session.Area.ID == 7 ? Audio.SetMusic("event:/music/menu/complete_summit") : Audio.SetMusic("event:/music/menu/complete_area");
-
-                _ = Audio.SetAmbience(null);
+                    this.snow.Reset();
+                RunThread.Start(new Action(this.LoadCompleteThread), "COMPLETE_LEVEL");
+                if (this.session.Area.Mode != AreaMode.Normal)
+                    Audio.SetMusic("event:/music/menu/complete_bside");
+                else if (this.session.Area.ID == 7)
+                    Audio.SetMusic("event:/music/menu/complete_summit");
+                else
+                    Audio.SetMusic("event:/music/menu/complete_area");
+                Audio.SetAmbience((string) null);
             }
-            if (mode == LevelExit.Mode.GiveUp)
-            {
-                overworldLoader = new OverworldLoader(Overworld.StartMode.AreaQuit, snow);
-            }
-            else if (mode == LevelExit.Mode.SaveAndQuit)
-            {
-                overworldLoader = new OverworldLoader(Overworld.StartMode.MainMenu, snow);
-            }
-            else if (mode == LevelExit.Mode.CompletedInterlude)
-            {
-                overworldLoader = new OverworldLoader(Overworld.StartMode.AreaComplete, snow);
-            }
-
+            if (this.mode == LevelExit.Mode.GiveUp)
+                this.overworldLoader = new OverworldLoader(Overworld.StartMode.AreaQuit, this.snow);
+            else if (this.mode == LevelExit.Mode.SaveAndQuit)
+                this.overworldLoader = new OverworldLoader(Overworld.StartMode.MainMenu, this.snow);
+            else if (this.mode == LevelExit.Mode.CompletedInterlude)
+                this.overworldLoader = new OverworldLoader(Overworld.StartMode.AreaComplete, this.snow);
             Entity entity;
-            Add(entity = new Entity());
-            entity.Add(new Coroutine(Routine()));
-            if (mode is not LevelExit.Mode.Restart and not LevelExit.Mode.GoldenBerryRestart)
+            this.Add(entity = new Entity());
+            entity.Add((Component) new Coroutine(this.Routine()));
+            if (this.mode != LevelExit.Mode.Restart && this.mode != LevelExit.Mode.GoldenBerryRestart)
             {
-                Add(snow);
+                this.Add((Monocle.Renderer) this.snow);
                 if (flag)
                 {
-                    FadeWipe fadeWipe = new(this, true);
+                    FadeWipe fadeWipe = new FadeWipe((Scene) this, true);
                 }
             }
             //Stats.Store();
-            RendererList.UpdateLists();
+            this.RendererList.UpdateLists();
         }
 
         private void LoadCompleteThread()
         {
-            completeXml = AreaData.Get(session).CompleteScreenXml;
-            if (completeXml != null && completeXml.HasAttr("atlas"))
-            {
-                completeAtlas = Atlas.FromAtlas(Path.Combine("Graphics", "Atlases", completeXml.Attr("atlas")), Atlas.AtlasDataFormat.PackerNoAtlas);
-            }
-
-            completeLoaded = true;
+            this.completeXml = AreaData.Get(this.session).CompleteScreenXml;
+            if (this.completeXml != null && this.completeXml.HasAttr("atlas"))
+                this.completeAtlas = Atlas.FromAtlas(Path.Combine("Graphics", "Atlases", this.completeXml.Attr("atlas")), Atlas.AtlasDataFormat.PackerNoAtlas);
+            this.completeLoaded = true;
         }
 
         private IEnumerator Routine()
         {
-            if (mode != LevelExit.Mode.GoldenBerryRestart)
+            if (this.mode != LevelExit.Mode.GoldenBerryRestart)
             {
                 UserIO.SaveHandler(true, true);
                 while (UserIO.Saving)
+                    yield return (object) null;
+                if (this.mode == LevelExit.Mode.Completed)
                 {
-                    yield return null;
-                }
-
-                if (mode == LevelExit.Mode.Completed)
-                {
-                    while (!completeLoaded)
-                    {
-                        yield return null;
-                    }
+                    while (!this.completeLoaded)
+                        yield return (object) null;
                 }
                 while (SaveLoadIcon.OnScreen)
-                {
-                    yield return null;
-                }
+                    yield return (object) null;
             }
-            if (mode == LevelExit.Mode.Completed)
+            if (this.mode == LevelExit.Mode.Completed)
             {
-                while (timer < 3.2999999523162842)
-                {
-                    yield return null;
-                }
-
+                while ((double) this.timer < 3.2999999523162842)
+                    yield return (object) null;
                 Audio.SetMusicParam("end", 1f);
-                Engine.Scene = new AreaComplete(session, completeXml, completeAtlas, snow);
+                Engine.Scene = (Scene) new AreaComplete(this.session, this.completeXml, this.completeAtlas, this.snow);
             }
-            else if (mode is LevelExit.Mode.GiveUp or LevelExit.Mode.SaveAndQuit or LevelExit.Mode.CompletedInterlude)
-            {
-                Engine.Scene = overworldLoader;
-            }
-            else if (mode is LevelExit.Mode.Restart or LevelExit.Mode.GoldenBerryRestart)
+            else if (this.mode == LevelExit.Mode.GiveUp || this.mode == LevelExit.Mode.SaveAndQuit || this.mode == LevelExit.Mode.CompletedInterlude)
+                Engine.Scene = (Scene) this.overworldLoader;
+            else if (this.mode == LevelExit.Mode.Restart || this.mode == LevelExit.Mode.GoldenBerryRestart)
             {
                 Session session;
-                if (mode == LevelExit.Mode.GoldenBerryRestart)
+                if (this.mode == LevelExit.Mode.GoldenBerryRestart)
                 {
                     if ((this.session.Audio.Music.Event == "event:/music/lvl7/main" || this.session.Audio.Music.Event == "event:/music/lvl7/final_ascent") && this.session.Audio.Music.Progress > 0)
-                    {
-                        _ = Audio.SetMusic(null);
-                    }
-
-                    session = this.session.Restart(GoldenStrawberryEntryLevel);
+                        Audio.SetMusic((string) null);
+                    session = this.session.Restart(this.GoldenStrawberryEntryLevel);
                 }
                 else
-                {
                     session = this.session.Restart();
-                }
-
-                LevelLoader levelLoader = new(session);
-                if (mode == LevelExit.Mode.GoldenBerryRestart)
-                {
+                LevelLoader levelLoader = new LevelLoader(session);
+                if (this.mode == LevelExit.Mode.GoldenBerryRestart)
                     levelLoader.PlayerIntroTypeOverride = new Player.IntroTypes?(Player.IntroTypes.Respawn);
-                }
-
-                Engine.Scene = levelLoader;
+                Engine.Scene = (Scene) levelLoader;
             }
         }
 
         public override void Update()
         {
-            timer += Engine.DeltaTime;
+            this.timer += Engine.DeltaTime;
             base.Update();
         }
 

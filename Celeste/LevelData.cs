@@ -72,10 +72,10 @@ namespace Celeste
                         EditorColorIndex = (int)attribute.Value;
                         continue;
                     case "cameraOffsetX":
-                        CameraOffset.X = Convert.ToSingle(attribute.Value, CultureInfo.InvariantCulture);
+                        CameraOffset.X = Convert.ToSingle(attribute.Value, (IFormatProvider)CultureInfo.InvariantCulture);
                         continue;
                     case "cameraOffsetY":
-                        CameraOffset.Y = Convert.ToSingle(attribute.Value, CultureInfo.InvariantCulture);
+                        CameraOffset.Y = Convert.ToSingle(attribute.Value, (IFormatProvider)CultureInfo.InvariantCulture);
                         continue;
                     case "dark":
                         Dark = (bool)attribute.Value;
@@ -162,30 +162,17 @@ namespace Celeste
                         foreach (BinaryPacker.Element child2 in child1.Children)
                         {
                             if (child2.Name == "player")
-                            {
-                                Spawns.Add(new Vector2(Bounds.X + Convert.ToSingle(child2.Attributes["x"], CultureInfo.InvariantCulture), Bounds.Y + Convert.ToSingle(child2.Attributes["y"], CultureInfo.InvariantCulture)));
-                            }
-                            else if (child2.Name is "strawberry" or "snowberry")
-                            {
+                                Spawns.Add(new Vector2((float)Bounds.X + Convert.ToSingle(child2.Attributes["x"], (IFormatProvider)CultureInfo.InvariantCulture), (float)Bounds.Y + Convert.ToSingle(child2.Attributes["y"], (IFormatProvider)CultureInfo.InvariantCulture)));
+                            else if (child2.Name == "strawberry" || child2.Name == "snowberry")
                                 ++Strawberries;
-                            }
                             else if (child2.Name == "shard")
-                            {
                                 HasGem = true;
-                            }
                             else if (child2.Name == "blackGem")
-                            {
                                 HasHeartGem = true;
-                            }
                             else if (child2.Name == "checkpoint")
-                            {
                                 HasCheckpoint = true;
-                            }
-
                             if (!child2.Name.Equals("player"))
-                            {
                                 Entities.Add(CreateEntityData(child2));
-                            }
                         }
                     }
                 }
@@ -194,9 +181,7 @@ namespace Celeste
                     if (child1.Children != null)
                     {
                         foreach (BinaryPacker.Element child3 in child1.Children)
-                        {
                             Triggers.Add(CreateEntityData(child3));
-                        }
                     }
                 }
                 else if (child1.Name == "bgdecals")
@@ -204,14 +189,12 @@ namespace Celeste
                     if (child1.Children != null)
                     {
                         foreach (BinaryPacker.Element child4 in child1.Children)
-                        {
                             BgDecals.Add(new DecalData()
                             {
-                                Position = new Vector2(Convert.ToSingle(child4.Attributes["x"], CultureInfo.InvariantCulture), Convert.ToSingle(child4.Attributes["y"], CultureInfo.InvariantCulture)),
-                                Scale = new Vector2(Convert.ToSingle(child4.Attributes["scaleX"], CultureInfo.InvariantCulture), Convert.ToSingle(child4.Attributes["scaleY"], CultureInfo.InvariantCulture)),
+                                Position = new Vector2(Convert.ToSingle(child4.Attributes["x"], (IFormatProvider)CultureInfo.InvariantCulture), Convert.ToSingle(child4.Attributes["y"], (IFormatProvider)CultureInfo.InvariantCulture)),
+                                Scale = new Vector2(Convert.ToSingle(child4.Attributes["scaleX"], (IFormatProvider)CultureInfo.InvariantCulture), Convert.ToSingle(child4.Attributes["scaleY"], (IFormatProvider)CultureInfo.InvariantCulture)),
                                 Texture = (string)child4.Attributes["texture"]
                             });
-                        }
                     }
                 }
                 else if (child1.Name == "fgdecals")
@@ -219,82 +202,57 @@ namespace Celeste
                     if (child1.Children != null)
                     {
                         foreach (BinaryPacker.Element child5 in child1.Children)
-                        {
                             FgDecals.Add(new DecalData()
                             {
-                                Position = new Vector2(Convert.ToSingle(child5.Attributes["x"], CultureInfo.InvariantCulture), Convert.ToSingle(child5.Attributes["y"], CultureInfo.InvariantCulture)),
-                                Scale = new Vector2(Convert.ToSingle(child5.Attributes["scaleX"], CultureInfo.InvariantCulture), Convert.ToSingle(child5.Attributes["scaleY"], CultureInfo.InvariantCulture)),
+                                Position = new Vector2(Convert.ToSingle(child5.Attributes["x"], (IFormatProvider)CultureInfo.InvariantCulture), Convert.ToSingle(child5.Attributes["y"], (IFormatProvider)CultureInfo.InvariantCulture)),
+                                Scale = new Vector2(Convert.ToSingle(child5.Attributes["scaleX"], (IFormatProvider)CultureInfo.InvariantCulture), Convert.ToSingle(child5.Attributes["scaleY"], (IFormatProvider)CultureInfo.InvariantCulture)),
                                 Texture = (string)child5.Attributes["texture"]
                             });
-                        }
                     }
                 }
                 else if (child1.Name == "solids")
-                {
                     Solids = child1.Attr("innerText");
-                }
                 else if (child1.Name == "bg")
-                {
                     Bg = child1.Attr("innerText");
-                }
                 else if (child1.Name == "fgtiles")
-                {
                     FgTiles = child1.Attr("innerText");
-                }
                 else if (child1.Name == "bgtiles")
-                {
                     BgTiles = child1.Attr("innerText");
-                }
                 else if (child1.Name == "objtiles")
-                {
                     ObjTiles = child1.Attr("innerText");
-                }
             }
             Dummy = Spawns.Count <= 0;
         }
 
         private EntityData CreateEntityData(BinaryPacker.Element entity)
         {
-            EntityData entityData = new()
-            {
-                Name = entity.Name,
-                Level = this
-            };
+            EntityData entityData = new EntityData();
+            entityData.Name = entity.Name;
+            entityData.Level = this;
             if (entity.Attributes != null)
             {
                 foreach (KeyValuePair<string, object> attribute in entity.Attributes)
                 {
                     if (attribute.Key == "id")
-                    {
                         entityData.ID = (int)attribute.Value;
-                    }
                     else if (attribute.Key == "x")
-                    {
-                        entityData.Position.X = Convert.ToSingle(attribute.Value, CultureInfo.InvariantCulture);
-                    }
+                        entityData.Position.X = Convert.ToSingle(attribute.Value, (IFormatProvider)CultureInfo.InvariantCulture);
                     else if (attribute.Key == "y")
-                    {
-                        entityData.Position.Y = Convert.ToSingle(attribute.Value, CultureInfo.InvariantCulture);
-                    }
+                        entityData.Position.Y = Convert.ToSingle(attribute.Value, (IFormatProvider)CultureInfo.InvariantCulture);
                     else if (attribute.Key == "width")
-                    {
                         entityData.Width = (int)attribute.Value;
-                    }
                     else if (attribute.Key == "height")
-                    {
                         entityData.Height = (int)attribute.Value;
-                    }
                     else if (attribute.Key == "originX")
-                    {
-                        entityData.Origin.X = Convert.ToSingle(attribute.Value, CultureInfo.InvariantCulture);
-                    }
+                        entityData.Origin.X = Convert.ToSingle(attribute.Value, (IFormatProvider)CultureInfo.InvariantCulture);
                     else if (attribute.Key == "originY")
                     {
-                        entityData.Origin.Y = Convert.ToSingle(attribute.Value, CultureInfo.InvariantCulture);
+                        entityData.Origin.Y = Convert.ToSingle(attribute.Value, (IFormatProvider)CultureInfo.InvariantCulture);
                     }
                     else
                     {
-                        entityData.Values ??= new Dictionary<string, object>();
+                        if (entityData.Values == null)
+                            entityData.Values = new Dictionary<string, object>();
                         entityData.Values.Add(attribute.Key, attribute.Value);
                     }
                 }
@@ -305,41 +263,29 @@ namespace Celeste
                 foreach (KeyValuePair<string, object> attribute in entity.Children[index].Attributes)
                 {
                     if (attribute.Key == "x")
-                    {
-                        entityData.Nodes[index].X = Convert.ToSingle(attribute.Value, CultureInfo.InvariantCulture);
-                    }
+                        entityData.Nodes[index].X = Convert.ToSingle(attribute.Value, (IFormatProvider)CultureInfo.InvariantCulture);
                     else if (attribute.Key == "y")
-                    {
-                        entityData.Nodes[index].Y = Convert.ToSingle(attribute.Value, CultureInfo.InvariantCulture);
-                    }
+                        entityData.Nodes[index].Y = Convert.ToSingle(attribute.Value, (IFormatProvider)CultureInfo.InvariantCulture);
                 }
             }
             return entityData;
         }
 
-        public bool Check(Vector2 at)
-        {
-            return at.X >= (double)Bounds.Left && at.Y >= (double)Bounds.Top && at.X < (double)Bounds.Right && at.Y < (double)Bounds.Bottom;
-        }
+        public bool Check(Vector2 at) => (double)at.X >= (double)this.Bounds.Left && (double)at.Y >= (double)this.Bounds.Top && (double)at.X < (double)this.Bounds.Right && (double)at.Y < (double)this.Bounds.Bottom;
 
-        public Rectangle TileBounds => new(Bounds.X / 8, Bounds.Y / 8, (int)Math.Ceiling(Bounds.Width / 8.0), (int)Math.Ceiling(Bounds.Height / 8.0));
+        public Rectangle TileBounds => new Rectangle(this.Bounds.X / 8, this.Bounds.Y / 8, (int)Math.Ceiling((double)this.Bounds.Width / 8.0), (int)Math.Ceiling((double)this.Bounds.Height / 8.0));
 
         public Vector2 Position
         {
-            get => new(Bounds.X, Bounds.Y);
+            get => new Vector2((float)this.Bounds.X, (float)this.Bounds.Y);
             set
             {
-                for (int index = 0; index < Spawns.Count; ++index)
-                {
-                    Spawns[index] -= Position;
-                }
-
-                Bounds.X = (int)value.X;
-                Bounds.Y = (int)value.Y;
-                for (int index = 0; index < Spawns.Count; ++index)
-                {
-                    Spawns[index] += Position;
-                }
+                for (int index = 0; index < this.Spawns.Count; ++index)
+                    this.Spawns[index] -= this.Position;
+                this.Bounds.X = (int)value.X;
+                this.Bounds.Y = (int)value.Y;
+                for (int index = 0; index < this.Spawns.Count; ++index)
+                    this.Spawns[index] += this.Position;
             }
         }
 
@@ -348,11 +294,8 @@ namespace Celeste
             get
             {
                 int loadSeed = 0;
-                foreach (char ch in Name)
-                {
-                    loadSeed += ch;
-                }
-
+                foreach (char ch in this.Name)
+                    loadSeed += (int)ch;
                 return loadSeed;
             }
         }

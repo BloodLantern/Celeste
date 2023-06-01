@@ -12,7 +12,7 @@ namespace Celeste
     [Serializable]
     public struct EntityID
     {
-        public static readonly EntityID None = new("null", -1);
+        public static readonly EntityID None = new EntityID("null", -1);
         [XmlIgnore]
         public string Level;
         [XmlIgnore]
@@ -21,29 +21,23 @@ namespace Celeste
         [XmlAttribute]
         public string Key
         {
-            get => Level + ":" + ID;
+            get => this.Level + ":" + (object) this.ID;
             set
             {
                 string[] strArray = value.Split(':');
-                Level = strArray[0];
-                ID = int.Parse(strArray[1]);
+                this.Level = strArray[0];
+                this.ID = int.Parse(strArray[1]);
             }
         }
 
         public EntityID(string level, int entityID)
         {
-            Level = level;
-            ID = entityID;
+            this.Level = level;
+            this.ID = entityID;
         }
 
-        public override string ToString()
-        {
-            return Key;
-        }
+        public override string ToString() => this.Key;
 
-        public override int GetHashCode()
-        {
-            return Level.GetHashCode() ^ ID;
-        }
+        public override int GetHashCode() => this.Level.GetHashCode() ^ this.ID;
     }
 }

@@ -19,46 +19,46 @@ namespace Celeste
         public int BossNodeIndex;
         private float startDelay;
         private int nodeIndex;
-        private readonly Vector2[] nodes;
-        private readonly TileGrid sprite;
-        private readonly TileGrid highlight;
+        private Vector2[] nodes;
+        private TileGrid sprite;
+        private TileGrid highlight;
         private Coroutine moveCoroutine;
         private bool isHighlighted;
 
         public FinalBossMovingBlock(Vector2[] nodes, float width, float height, int bossNodeIndex)
             : base(nodes[0], width, height, false)
         {
-            BossNodeIndex = bossNodeIndex;
+            this.BossNodeIndex = bossNodeIndex;
             this.nodes = nodes;
             int newSeed = Calc.Random.Next();
             Calc.PushRandom(newSeed);
-            sprite = GFX.FGAutotiler.GenerateBox('g', (int)Width / 8, (int)Height / 8).TileGrid;
-            Add(sprite);
+            this.sprite = GFX.FGAutotiler.GenerateBox('g', (int) this.Width / 8, (int) this.Height / 8).TileGrid;
+            this.Add((Component) this.sprite);
             Calc.PopRandom();
             Calc.PushRandom(newSeed);
-            highlight = GFX.FGAutotiler.GenerateBox('G', (int)((double)Width / 8.0), (int)Height / 8).TileGrid;
-            highlight.Alpha = 0.0f;
-            Add(highlight);
+            this.highlight = GFX.FGAutotiler.GenerateBox('G', (int) ((double) this.Width / 8.0), (int) this.Height / 8).TileGrid;
+            this.highlight.Alpha = 0.0f;
+            this.Add((Component) this.highlight);
             Calc.PopRandom();
-            Add(new TileInterceptor(sprite, false));
-            Add(new LightOcclude());
+            this.Add((Component) new TileInterceptor(this.sprite, false));
+            this.Add((Component) new LightOcclude());
         }
 
         public FinalBossMovingBlock(EntityData data, Vector2 offset)
-            : this(data.NodesWithPosition(offset), data.Width, data.Height, data.Int(nameof(nodeIndex)))
+            : this(data.NodesWithPosition(offset), (float) data.Width, (float) data.Height, data.Int(nameof (nodeIndex)))
         {
         }
 
         public override void OnShake(Vector2 amount)
         {
             base.OnShake(amount);
-            sprite.Position = amount;
+            this.sprite.Position = amount;
         }
 
         public void StartMoving(float delay)
         {
-            startDelay = delay;
-            Add(moveCoroutine = new Coroutine(MoveSequence()));
+            this.startDelay = delay;
+            this.Add((Component) (this.moveCoroutine = new Coroutine(this.MoveSequence())));
         }
 
         private IEnumerator MoveSequence()
@@ -70,157 +70,138 @@ namespace Celeste
                 finalBossMovingBlock1.StartShaking(0.2f + finalBossMovingBlock1.startDelay);
                 if (!finalBossMovingBlock1.isHighlighted)
                 {
-                    for (float p = 0.0f; (double)p < 1.0; p += Engine.DeltaTime / (float)(0.20000000298023224 + finalBossMovingBlock1.startDelay + 0.20000000298023224))
+                    for (float p = 0.0f; (double) p < 1.0; p += Engine.DeltaTime / (float) (0.20000000298023224 + (double) finalBossMovingBlock1.startDelay + 0.20000000298023224))
                     {
                         finalBossMovingBlock1.highlight.Alpha = Ease.CubeIn(p);
                         finalBossMovingBlock1.sprite.Alpha = 1f - finalBossMovingBlock1.highlight.Alpha;
-                        yield return null;
+                        yield return (object) null;
                     }
                     finalBossMovingBlock1.highlight.Alpha = 1f;
                     finalBossMovingBlock1.sprite.Alpha = 0.0f;
                     finalBossMovingBlock1.isHighlighted = true;
                 }
                 else
-                {
-                    yield return (float)(0.20000000298023224 + finalBossMovingBlock1.startDelay + 0.20000000298023224);
-                }
-
+                    yield return (object) (float) (0.20000000298023224 + (double) finalBossMovingBlock1.startDelay + 0.20000000298023224);
                 finalBossMovingBlock1.startDelay = 0.0f;
                 ++finalBossMovingBlock1.nodeIndex;
                 finalBossMovingBlock1.nodeIndex %= finalBossMovingBlock1.nodes.Length;
                 Vector2 from = finalBossMovingBlock1.Position;
                 Vector2 to = finalBossMovingBlock1.nodes[finalBossMovingBlock1.nodeIndex];
                 Tween tween = Tween.Create(Tween.TweenMode.Oneshot, Ease.CubeIn, 0.8f, true);
-                tween.OnUpdate = t => finalBossMovingBlock.MoveTo(Vector2.Lerp(from, to, t.Eased));
-                tween.OnComplete = t =>
+                tween.OnUpdate = (Action<Tween>) (t => finalBossMovingBlock.MoveTo(Vector2.Lerp(from, to, t.Eased)));
+                tween.OnComplete = (Action<Tween>) (t =>
                 {
-                    if (finalBossMovingBlock.CollideCheck<SolidTiles>(finalBossMovingBlock.Position + ((to - from).SafeNormalize() * 2f)))
+                    if (finalBossMovingBlock.CollideCheck<SolidTiles>(finalBossMovingBlock.Position + (to - from).SafeNormalize() * 2f))
                     {
-                        _ = Audio.Play("event:/game/06_reflection/fallblock_boss_impact", finalBossMovingBlock.Center);
+                        Audio.Play("event:/game/06_reflection/fallblock_boss_impact", finalBossMovingBlock.Center);
                         finalBossMovingBlock.ImpactParticles(to - from);
                     }
                     else
-                    {
                         finalBossMovingBlock.StopParticles(to - from);
-                    }
-                };
-                finalBossMovingBlock1.Add(tween);
-                yield return 0.8f;
+                });
+                finalBossMovingBlock1.Add((Component) tween);
+                yield return (object) 0.8f;
             }
         }
 
         private void StopParticles(Vector2 moved)
         {
-            Level level = SceneAs<Level>();
+            Level level = this.SceneAs<Level>();
             float direction = moved.Angle();
-            if (moved.X > 0.0)
+            if ((double) moved.X > 0.0)
             {
-                Vector2 vector2 = new(Right - 1f, Top);
-                for (int index = 0; index < (double)Height; index += 4)
-                {
-                    level.Particles.Emit(FinalBossMovingBlock.P_Stop, vector2 + (Vector2.UnitY * (2 + index + Calc.Random.Range(-1, 1))), direction);
-                }
+                Vector2 vector2 = new Vector2(this.Right - 1f, this.Top);
+                for (int index = 0; (double) index < (double) this.Height; index += 4)
+                    level.Particles.Emit(FinalBossMovingBlock.P_Stop, vector2 + Vector2.UnitY * (float) (2 + index + Calc.Random.Range(-1, 1)), direction);
             }
-            else if (moved.X < 0.0)
+            else if ((double) moved.X < 0.0)
             {
-                Vector2 vector2 = new(Left, Top);
-                for (int index = 0; index < (double)Height; index += 4)
-                {
-                    level.Particles.Emit(FinalBossMovingBlock.P_Stop, vector2 + (Vector2.UnitY * (2 + index + Calc.Random.Range(-1, 1))), direction);
-                }
+                Vector2 vector2 = new Vector2(this.Left, this.Top);
+                for (int index = 0; (double) index < (double) this.Height; index += 4)
+                    level.Particles.Emit(FinalBossMovingBlock.P_Stop, vector2 + Vector2.UnitY * (float) (2 + index + Calc.Random.Range(-1, 1)), direction);
             }
-            if (moved.Y > 0.0)
+            if ((double) moved.Y > 0.0)
             {
-                Vector2 vector2 = new(Left, Bottom - 1f);
-                for (int index = 0; index < (double)Width; index += 4)
-                {
-                    level.Particles.Emit(FinalBossMovingBlock.P_Stop, vector2 + (Vector2.UnitX * (2 + index + Calc.Random.Range(-1, 1))), direction);
-                }
+                Vector2 vector2 = new Vector2(this.Left, this.Bottom - 1f);
+                for (int index = 0; (double) index < (double) this.Width; index += 4)
+                    level.Particles.Emit(FinalBossMovingBlock.P_Stop, vector2 + Vector2.UnitX * (float) (2 + index + Calc.Random.Range(-1, 1)), direction);
             }
             else
             {
-                if (moved.Y >= 0.0)
-                {
+                if ((double) moved.Y >= 0.0)
                     return;
-                }
-
-                Vector2 vector2 = new(Left, Top);
-                for (int index = 0; index < (double)Width; index += 4)
-                {
-                    level.Particles.Emit(FinalBossMovingBlock.P_Stop, vector2 + (Vector2.UnitX * (2 + index + Calc.Random.Range(-1, 1))), direction);
-                }
+                Vector2 vector2 = new Vector2(this.Left, this.Top);
+                for (int index = 0; (double) index < (double) this.Width; index += 4)
+                    level.Particles.Emit(FinalBossMovingBlock.P_Stop, vector2 + Vector2.UnitX * (float) (2 + index + Calc.Random.Range(-1, 1)), direction);
             }
         }
 
         private void BreakParticles()
         {
-            Vector2 center = Center;
-            for (int index1 = 0; index1 < (double)Width; index1 += 4)
+            Vector2 center = this.Center;
+            for (int index1 = 0; (double) index1 < (double) this.Width; index1 += 4)
             {
-                for (int index2 = 0; index2 < (double)Height; index2 += 4)
+                for (int index2 = 0; (double) index2 < (double) this.Height; index2 += 4)
                 {
-                    Vector2 position = Position + new Vector2(2 + index1, 2 + index2);
-                    SceneAs<Level>().Particles.Emit(FinalBossMovingBlock.P_Break, 1, position, Vector2.One * 2f, (position - center).Angle());
+                    Vector2 position = this.Position + new Vector2((float) (2 + index1), (float) (2 + index2));
+                    this.SceneAs<Level>().Particles.Emit(FinalBossMovingBlock.P_Break, 1, position, Vector2.One * 2f, (position - center).Angle());
                 }
             }
         }
 
         private void ImpactParticles(Vector2 moved)
         {
-            if (moved.X < 0.0)
+            if ((double) moved.X < 0.0)
             {
-                Vector2 vector2 = new(0.0f, 2f);
-                for (int index = 0; index < (double)Height / 8.0; ++index)
+                Vector2 vector2 = new Vector2(0.0f, 2f);
+                for (int index = 0; (double) index < (double) this.Height / 8.0; ++index)
                 {
-                    Vector2 point = new(Left - 1f, Top + 4f + (index * 8));
-                    if (!Scene.CollideCheck<Water>(point) && Scene.CollideCheck<Solid>(point))
+                    Vector2 point = new Vector2(this.Left - 1f, this.Top + 4f + (float) (index * 8));
+                    if (!this.Scene.CollideCheck<Water>(point) && this.Scene.CollideCheck<Solid>(point))
                     {
-                        SceneAs<Level>().ParticlesFG.Emit(CrushBlock.P_Impact, point + vector2, 0.0f);
-                        SceneAs<Level>().ParticlesFG.Emit(CrushBlock.P_Impact, point - vector2, 0.0f);
+                        this.SceneAs<Level>().ParticlesFG.Emit(CrushBlock.P_Impact, point + vector2, 0.0f);
+                        this.SceneAs<Level>().ParticlesFG.Emit(CrushBlock.P_Impact, point - vector2, 0.0f);
                     }
                 }
             }
-            else if (moved.X > 0.0)
+            else if ((double) moved.X > 0.0)
             {
-                Vector2 vector2 = new(0.0f, 2f);
-                for (int index = 0; index < (double)Height / 8.0; ++index)
+                Vector2 vector2 = new Vector2(0.0f, 2f);
+                for (int index = 0; (double) index < (double) this.Height / 8.0; ++index)
                 {
-                    Vector2 point = new(Right + 1f, Top + 4f + (index * 8));
-                    if (!Scene.CollideCheck<Water>(point) && Scene.CollideCheck<Solid>(point))
+                    Vector2 point = new Vector2(this.Right + 1f, this.Top + 4f + (float) (index * 8));
+                    if (!this.Scene.CollideCheck<Water>(point) && this.Scene.CollideCheck<Solid>(point))
                     {
-                        SceneAs<Level>().ParticlesFG.Emit(CrushBlock.P_Impact, point + vector2, 3.14159274f);
-                        SceneAs<Level>().ParticlesFG.Emit(CrushBlock.P_Impact, point - vector2, 3.14159274f);
+                        this.SceneAs<Level>().ParticlesFG.Emit(CrushBlock.P_Impact, point + vector2, 3.14159274f);
+                        this.SceneAs<Level>().ParticlesFG.Emit(CrushBlock.P_Impact, point - vector2, 3.14159274f);
                     }
                 }
             }
-            if (moved.Y < 0.0)
+            if ((double) moved.Y < 0.0)
             {
-                Vector2 vector2 = new(2f, 0.0f);
-                for (int index = 0; index < (double)Width / 8.0; ++index)
+                Vector2 vector2 = new Vector2(2f, 0.0f);
+                for (int index = 0; (double) index < (double) this.Width / 8.0; ++index)
                 {
-                    Vector2 point = new(Left + 4f + (index * 8), Top - 1f);
-                    if (!Scene.CollideCheck<Water>(point) && Scene.CollideCheck<Solid>(point))
+                    Vector2 point = new Vector2(this.Left + 4f + (float) (index * 8), this.Top - 1f);
+                    if (!this.Scene.CollideCheck<Water>(point) && this.Scene.CollideCheck<Solid>(point))
                     {
-                        SceneAs<Level>().ParticlesFG.Emit(CrushBlock.P_Impact, point + vector2, 1.57079637f);
-                        SceneAs<Level>().ParticlesFG.Emit(CrushBlock.P_Impact, point - vector2, 1.57079637f);
+                        this.SceneAs<Level>().ParticlesFG.Emit(CrushBlock.P_Impact, point + vector2, 1.57079637f);
+                        this.SceneAs<Level>().ParticlesFG.Emit(CrushBlock.P_Impact, point - vector2, 1.57079637f);
                     }
                 }
             }
             else
             {
-                if (moved.Y <= 0.0)
-                {
+                if ((double) moved.Y <= 0.0)
                     return;
-                }
-
-                Vector2 vector2 = new(2f, 0.0f);
-                for (int index = 0; index < (double)Width / 8.0; ++index)
+                Vector2 vector2 = new Vector2(2f, 0.0f);
+                for (int index = 0; (double) index < (double) this.Width / 8.0; ++index)
                 {
-                    Vector2 point = new(Left + 4f + (index * 8), Bottom + 1f);
-                    if (!Scene.CollideCheck<Water>(point) && Scene.CollideCheck<Solid>(point))
+                    Vector2 point = new Vector2(this.Left + 4f + (float) (index * 8), this.Bottom + 1f);
+                    if (!this.Scene.CollideCheck<Water>(point) && this.Scene.CollideCheck<Solid>(point))
                     {
-                        SceneAs<Level>().ParticlesFG.Emit(CrushBlock.P_Impact, point + vector2, -1.57079637f);
-                        SceneAs<Level>().ParticlesFG.Emit(CrushBlock.P_Impact, point - vector2, -1.57079637f);
+                        this.SceneAs<Level>().ParticlesFG.Emit(CrushBlock.P_Impact, point + vector2, -1.57079637f);
+                        this.SceneAs<Level>().ParticlesFG.Emit(CrushBlock.P_Impact, point - vector2, -1.57079637f);
                     }
                 }
             }
@@ -228,54 +209,46 @@ namespace Celeste
 
         public override void Render()
         {
-            Vector2 position = Position;
-            Position += Shake;
+            Vector2 position = this.Position;
+            this.Position = this.Position + this.Shake;
             base.Render();
-            if ((double)highlight.Alpha is > 0.0 and < 1.0)
+            if ((double) this.highlight.Alpha > 0.0 && (double) this.highlight.Alpha < 1.0)
             {
-                int num = (int)((1.0 - highlight.Alpha) * 16.0);
-                Rectangle rect = new((int)X, (int)Y, (int)Width, (int)Height);
+                int num = (int) ((1.0 - (double) this.highlight.Alpha) * 16.0);
+                Rectangle rect = new Rectangle((int) this.X, (int) this.Y, (int) this.Width, (int) this.Height);
                 rect.Inflate(num, num);
                 Draw.HollowRect(rect, Color.Lerp(Color.Purple, Color.Pink, 0.7f));
             }
-            Position = position;
+            this.Position = position;
         }
 
         private void Finish()
         {
-            Vector2 from = CenterRight + (Vector2.UnitX * 10f);
-            for (int index1 = 0; index1 < (double)Width / 8.0; ++index1)
+            Vector2 from = this.CenterRight + Vector2.UnitX * 10f;
+            for (int index1 = 0; (double) index1 < (double) this.Width / 8.0; ++index1)
             {
-                for (int index2 = 0; index2 < (double)Height / 8.0; ++index2)
-                {
-                    Scene.Add(Engine.Pooler.Create<Debris>().Init(Position + new Vector2(4 + (index1 * 8), 4 + (index2 * 8)), 'f').BlastFrom(from));
-                }
+                for (int index2 = 0; (double) index2 < (double) this.Height / 8.0; ++index2)
+                    this.Scene.Add((Entity) Engine.Pooler.Create<Debris>().Init(this.Position + new Vector2((float) (4 + index1 * 8), (float) (4 + index2 * 8)), 'f').BlastFrom(from));
             }
-            BreakParticles();
-            DestroyStaticMovers();
-            RemoveSelf();
+            this.BreakParticles();
+            this.DestroyStaticMovers();
+            this.RemoveSelf();
         }
 
         public void Destroy(float delay)
         {
-            if (Scene == null)
-            {
+            if (this.Scene == null)
                 return;
-            }
-
-            if (moveCoroutine != null)
+            if (this.moveCoroutine != null)
+                this.Remove((Component) this.moveCoroutine);
+            if ((double) delay <= 0.0)
             {
-                Remove(moveCoroutine);
-            }
-
-            if ((double)delay <= 0.0)
-            {
-                Finish();
+                this.Finish();
             }
             else
             {
-                StartShaking(delay);
-                _ = Alarm.Set(this, delay, new Action(Finish));
+                this.StartShaking(delay);
+                Alarm.Set((Entity) this, delay, new Action(this.Finish));
             }
         }
     }

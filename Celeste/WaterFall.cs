@@ -22,8 +22,8 @@ namespace Celeste
         public WaterFall(Vector2 position)
             : base(position)
         {
-            Depth = -9999;
-            Tag = (int)Tags.TransitionUpdate;
+            this.Depth = -9999;
+            this.Tag = (int) Tags.TransitionUpdate;
         }
 
         public WaterFall(EntityData data, Vector2 offset)
@@ -34,66 +34,51 @@ namespace Celeste
         public override void Awake(Scene scene)
         {
             base.Awake(scene);
-            Level scene1 = Scene as Level;
+            Level scene1 = this.Scene as Level;
             bool flag = false;
-            for (height = 8f; (double)Y + height < scene1.Bounds.Bottom && (water = Scene.CollideFirst<Water>(new Rectangle((int)X, (int)((double)Y + height), 8, 8))) == null && ((solid = Scene.CollideFirst<Solid>(new Rectangle((int)X, (int)((double)Y + height), 8, 8))) == null || !solid.BlockWaterfalls); solid = null)
-            {
-                height += 8f;
-            }
-
-            if (water != null && !Scene.CollideCheck<Solid>(new Rectangle((int)X, (int)((double)Y + height), 8, 16)))
-            {
+            for (this.height = 8f; (double) this.Y + (double) this.height < (double) scene1.Bounds.Bottom && (this.water = this.Scene.CollideFirst<Water>(new Rectangle((int) this.X, (int) ((double) this.Y + (double) this.height), 8, 8))) == null && ((this.solid = this.Scene.CollideFirst<Solid>(new Rectangle((int) this.X, (int) ((double) this.Y + (double) this.height), 8, 8))) == null || !this.solid.BlockWaterfalls); this.solid = (Solid) null)
+                this.height += 8f;
+            if (this.water != null && !this.Scene.CollideCheck<Solid>(new Rectangle((int) this.X, (int) ((double) this.Y + (double) this.height), 8, 16)))
                 flag = true;
-            }
-
-            Add(loopingSfx = new SoundSource());
-            _ = loopingSfx.Play("event:/env/local/waterfall_small_main");
-            Add(enteringSfx = new SoundSource());
-            _ = enteringSfx.Play(flag ? "event:/env/local/waterfall_small_in_deep" : "event:/env/local/waterfall_small_in_shallow");
-            enteringSfx.Position.Y = height;
-            Add(new DisplacementRenderHook(new Action(RenderDisplacement)));
+            this.Add((Component) (this.loopingSfx = new SoundSource()));
+            this.loopingSfx.Play("event:/env/local/waterfall_small_main");
+            this.Add((Component) (this.enteringSfx = new SoundSource()));
+            this.enteringSfx.Play(flag ? "event:/env/local/waterfall_small_in_deep" : "event:/env/local/waterfall_small_in_shallow");
+            this.enteringSfx.Position.Y = this.height;
+            this.Add((Component) new DisplacementRenderHook(new Action(this.RenderDisplacement)));
         }
 
         public override void Update()
         {
-            loopingSfx.Position.Y = Calc.Clamp((Scene as Level).Camera.Position.Y + 90f, Y, height);
-            if (water != null && Scene.OnInterval(0.3f))
+            this.loopingSfx.Position.Y = Calc.Clamp((this.Scene as Level).Camera.Position.Y + 90f, this.Y, this.height);
+            if (this.water != null && this.Scene.OnInterval(0.3f))
+                this.water.TopSurface.DoRipple(new Vector2(this.X + 4f, this.water.Y), 0.75f);
+            if (this.water != null || this.solid != null)
             {
-                water.TopSurface.DoRipple(new Vector2(X + 4f, water.Y), 0.75f);
-            }
-
-            if (water != null || solid != null)
-            {
-                Vector2 position = new(X + 4f, (float)((double)Y + height + 2.0));
-                (Scene as Level).ParticlesFG.Emit(Water.P_Splash, 1, position, new Vector2(8f, 2f), new Vector2(0.0f, -1f).Angle());
+                Vector2 position = new Vector2(this.X + 4f, (float) ((double) this.Y + (double) this.height + 2.0));
+                (this.Scene as Level).ParticlesFG.Emit(Water.P_Splash, 1, position, new Vector2(8f, 2f), new Vector2(0.0f, -1f).Angle());
             }
             base.Update();
         }
 
-        public void RenderDisplacement()
-        {
-            Draw.Rect(X, Y, 8f, height, new Color(0.5f, 0.5f, 0.8f, 1f));
-        }
+        public void RenderDisplacement() => Draw.Rect(this.X, this.Y, 8f, this.height, new Color(0.5f, 0.5f, 0.8f, 1f));
 
         public override void Render()
         {
-            if (water == null || water.TopSurface == null)
+            if (this.water == null || this.water.TopSurface == null)
             {
-                Draw.Rect(X + 1f, Y, 6f, height, Water.FillColor);
-                Draw.Rect(X - 1f, Y, 2f, height, Water.SurfaceColor);
-                Draw.Rect(X + 7f, Y, 2f, height, Water.SurfaceColor);
+                Draw.Rect(this.X + 1f, this.Y, 6f, this.height, Water.FillColor);
+                Draw.Rect(this.X - 1f, this.Y, 2f, this.height, Water.SurfaceColor);
+                Draw.Rect(this.X + 7f, this.Y, 2f, this.height, Water.SurfaceColor);
             }
             else
             {
-                Water.Surface topSurface = water.TopSurface;
-                float num = height + water.TopSurface.Position.Y - water.Y;
+                Water.Surface topSurface = this.water.TopSurface;
+                float num = this.height + this.water.TopSurface.Position.Y - this.water.Y;
                 for (int index = 0; index < 6; ++index)
-                {
-                    Draw.Rect((float)((double)X + index + 1.0), Y, 1f, num - topSurface.GetSurfaceHeight(new Vector2(X + 1f + index, water.Y)), Water.FillColor);
-                }
-
-                Draw.Rect(X - 1f, Y, 2f, num - topSurface.GetSurfaceHeight(new Vector2(X, water.Y)), Water.SurfaceColor);
-                Draw.Rect(X + 7f, Y, 2f, num - topSurface.GetSurfaceHeight(new Vector2(X + 8f, water.Y)), Water.SurfaceColor);
+                    Draw.Rect((float) ((double) this.X + (double) index + 1.0), this.Y, 1f, num - topSurface.GetSurfaceHeight(new Vector2(this.X + 1f + (float) index, this.water.Y)), Water.FillColor);
+                Draw.Rect(this.X - 1f, this.Y, 2f, num - topSurface.GetSurfaceHeight(new Vector2(this.X, this.water.Y)), Water.SurfaceColor);
+                Draw.Rect(this.X + 7f, this.Y, 2f, num - topSurface.GetSurfaceHeight(new Vector2(this.X + 8f, this.water.Y)), Water.SurfaceColor);
             }
         }
     }

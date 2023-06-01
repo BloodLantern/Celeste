@@ -13,39 +13,36 @@ namespace Celeste
     [Tracked(false)]
     public class Door : Actor
     {
-        private readonly Sprite sprite;
-        private readonly string openSfx;
-        private readonly string closeSfx;
-        private readonly LightOcclude occlude;
+        private Sprite sprite;
+        private string openSfx;
+        private string closeSfx;
+        private LightOcclude occlude;
         private bool disabled;
 
         public Door(EntityData data, Vector2 offset)
             : base(data.Position + offset)
         {
-            Depth = 8998;
+            this.Depth = 8998;
             string str = data.Attr("type", "wood");
             if (str == "wood")
             {
-                Add(sprite = GFX.SpriteBank.Create("door"));
-                openSfx = "event:/game/03_resort/door_wood_open";
-                closeSfx = "event:/game/03_resort/door_wood_close";
+                this.Add((Component) (this.sprite = GFX.SpriteBank.Create("door")));
+                this.openSfx = "event:/game/03_resort/door_wood_open";
+                this.closeSfx = "event:/game/03_resort/door_wood_close";
             }
             else
             {
-                Add(sprite = GFX.SpriteBank.Create(str + "door"));
-                openSfx = "event:/game/03_resort/door_metal_open";
-                closeSfx = "event:/game/03_resort/door_metal_close";
+                this.Add((Component) (this.sprite = GFX.SpriteBank.Create(str + "door")));
+                this.openSfx = "event:/game/03_resort/door_metal_open";
+                this.closeSfx = "event:/game/03_resort/door_metal_close";
             }
-            sprite.Play("idle");
-            Collider = new Hitbox(12f, 22f, -6f, -23f);
-            Add(occlude = new LightOcclude(new Rectangle(-1, -24, 2, 24)));
-            Add(new PlayerCollider(new Action<Player>(HitPlayer)));
+            this.sprite.Play("idle");
+            this.Collider = (Collider) new Hitbox(12f, 22f, -6f, -23f);
+            this.Add((Component) (this.occlude = new LightOcclude(new Rectangle(-1, -24, 2, 24))));
+            this.Add((Component) new PlayerCollider(new Action<Player>(this.HitPlayer)));
         }
 
-        public override bool IsRiding(Solid solid)
-        {
-            return Scene.CollideCheck(new Rectangle((int)X - 2, (int)Y - 2, 4, 4), solid);
-        }
+        public override bool IsRiding(Solid solid) => this.Scene.CollideCheck(new Rectangle((int) this.X - 2, (int) this.Y - 2, 4, 4), (Entity) solid);
 
         protected override void OnSquish(CollisionData data)
         {
@@ -53,54 +50,39 @@ namespace Celeste
 
         private void HitPlayer(Player player)
         {
-            if (disabled)
-            {
+            if (this.disabled)
                 return;
-            }
-
-            Open(player.X);
+            this.Open(player.X);
         }
 
         public void Open(float x)
         {
-            if (sprite.CurrentAnimationID == "idle")
+            if (this.sprite.CurrentAnimationID == "idle")
             {
-                _ = Audio.Play(openSfx, Position);
-                sprite.Play("open");
-                if ((double)X == (double)x)
-                {
+                Audio.Play(this.openSfx, this.Position);
+                this.sprite.Play("open");
+                if ((double) this.X == (double) x)
                     return;
-                }
-
-                sprite.Scale.X = Math.Sign(x - X);
+                this.sprite.Scale.X = (float) Math.Sign(x - this.X);
             }
             else
             {
-                if (!(sprite.CurrentAnimationID == "close"))
-                {
+                if (!(this.sprite.CurrentAnimationID == "close"))
                     return;
-                }
-
-                sprite.Play("close", true);
+                this.sprite.Play("close", true);
             }
         }
 
         public override void Update()
         {
-            string currentAnimationId = sprite.CurrentAnimationID;
+            string currentAnimationId = this.sprite.CurrentAnimationID;
             base.Update();
-            occlude.Visible = sprite.CurrentAnimationID == "idle";
-            if (!disabled && CollideCheck<Solid>())
-            {
-                disabled = true;
-            }
-
-            if (!(currentAnimationId == "close") || !(sprite.CurrentAnimationID == "idle"))
-            {
+            this.occlude.Visible = this.sprite.CurrentAnimationID == "idle";
+            if (!this.disabled && this.CollideCheck<Solid>())
+                this.disabled = true;
+            if (!(currentAnimationId == "close") || !(this.sprite.CurrentAnimationID == "idle"))
                 return;
-            }
-
-            _ = Audio.Play(closeSfx, Position);
+            Audio.Play(this.closeSfx, this.Position);
         }
     }
 }

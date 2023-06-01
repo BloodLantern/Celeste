@@ -25,83 +25,61 @@ namespace Celeste
         public override void Added(Entity entity)
         {
             base.Added(entity);
-            entity.Add(pop = Wiggler.Create(0.5f, 4f, f =>
+            entity.Add((Component) (this.pop = Wiggler.Create(0.5f, 4f, (Action<float>) (f =>
             {
-                Sprite sprite = Entity.Get<Sprite>();
+                Sprite sprite = this.Entity.Get<Sprite>();
                 if (sprite == null)
-                {
                     return;
-                }
-
-                sprite.Scale = new Vector2(Math.Sign(sprite.Scale.X), 1f) * (1 + (0.25f * f));
-            }));
+                sprite.Scale = new Vector2((float) Math.Sign(sprite.Scale.X), 1f) * (float) (1.0 + 0.25 * (double) f);
+            }))));
         }
 
         public override void Removed(Entity entity)
         {
-            entity.Remove(pop);
+            entity.Remove((Component) this.pop);
             base.Removed(entity);
         }
 
-        public void SetReturnToAnimation(string anim)
-        {
-            lastAnimation = anim;
-        }
+        public void SetReturnToAnimation(string anim) => this.lastAnimation = anim;
 
         public override void Update()
         {
-            Sprite sprite = Entity.Get<Sprite>();
-            if (Scene == null || sprite == null)
-            {
+            Sprite sprite = this.Entity.Get<Sprite>();
+            if (this.Scene == null || sprite == null)
                 return;
-            }
-
             bool flag = false;
-            Textbox entity = Scene.Tracker.GetEntity<Textbox>();
-            if (Enabled && entity != null)
+            Textbox entity = this.Scene.Tracker.GetEntity<Textbox>();
+            if (this.Enabled && entity != null)
             {
                 if (entity.PortraitName.IsIgnoreCase("badeline"))
                 {
                     if (entity.PortraitAnimation.IsIgnoreCase("scoff"))
                     {
-                        if (!wasSyncingSprite)
-                        {
-                            lastAnimation = sprite.CurrentAnimationID;
-                        }
-
+                        if (!this.wasSyncingSprite)
+                            this.lastAnimation = sprite.CurrentAnimationID;
                         sprite.Play("laugh");
-                        wasSyncingSprite = flag = true;
+                        this.wasSyncingSprite = flag = true;
                     }
                     else if (entity.PortraitAnimation.IsIgnoreCase("yell", "freakA", "freakB", "freakC"))
                     {
-                        if (!wasSyncingSprite)
+                        if (!this.wasSyncingSprite)
                         {
-                            pop.Start();
-                            lastAnimation = sprite.CurrentAnimationID;
+                            this.pop.Start();
+                            this.lastAnimation = sprite.CurrentAnimationID;
                         }
                         sprite.Play("angry");
-                        wasSyncingSprite = flag = true;
+                        this.wasSyncingSprite = flag = true;
                     }
                 }
             }
-
-            if (!wasSyncingSprite || flag)
-            {
+            if (!this.wasSyncingSprite || flag)
                 return;
-            }
-
-            wasSyncingSprite = false;
-            if (string.IsNullOrEmpty(lastAnimation) || lastAnimation == "spin")
-            {
-                lastAnimation = "fallSlow";
-            }
-
+            this.wasSyncingSprite = false;
+            if (string.IsNullOrEmpty(this.lastAnimation) || this.lastAnimation == "spin")
+                this.lastAnimation = "fallSlow";
             if (sprite.CurrentAnimationID == "angry")
-            {
-                pop.Start();
-            }
-
-            sprite.Play(lastAnimation);
+                this.pop.Start();
+            sprite.Play(this.lastAnimation);
         }
     }
 }

@@ -20,10 +20,7 @@ namespace Celeste
         private bool loadedSuccess;
         public bool HasSlots;
 
-        public OuiFileSelect()
-        {
-            OuiFileSelect.Loaded = false;
-        }
+        public OuiFileSelect() => OuiFileSelect.Loaded = false;
 
         public override IEnumerator Enter(Oui from)
         {
@@ -34,63 +31,47 @@ namespace Celeste
                 for (int index = 0; index < ouiFileSelect.Slots.Length; ++index)
                 {
                     if (ouiFileSelect.Slots[index] != null)
-                    {
-                        ouiFileSelect.Scene.Remove(ouiFileSelect.Slots[index]);
-                    }
+                        ouiFileSelect.Scene.Remove((Entity) ouiFileSelect.Slots[index]);
                 }
                 RunThread.Start(new Action(ouiFileSelect.LoadThread), "FILE_LOADING");
                 float elapsed = 0.0f;
-                while (!OuiFileSelect.Loaded || (double)elapsed < 0.5)
+                while (!OuiFileSelect.Loaded || (double) elapsed < 0.5)
                 {
                     elapsed += Engine.DeltaTime;
-                    yield return null;
+                    yield return (object) null;
                 }
                 for (int index = 0; index < ouiFileSelect.Slots.Length; ++index)
                 {
                     if (ouiFileSelect.Slots[index] != null)
-                    {
-                        ouiFileSelect.Scene.Add(ouiFileSelect.Slots[index]);
-                    }
+                        ouiFileSelect.Scene.Add((Entity) ouiFileSelect.Slots[index]);
                 }
                 if (!ouiFileSelect.loadedSuccess)
                 {
-                    FileErrorOverlay error = new(FileErrorOverlay.Error.Load);
+                    FileErrorOverlay error = new FileErrorOverlay(FileErrorOverlay.Error.Load);
                     while (error.Open)
-                    {
-                        yield return null;
-                    }
-
+                        yield return (object) null;
                     if (!error.Ignore)
                     {
-                        _ = ouiFileSelect.Overworld.Goto<OuiMainMenu>();
+                        ouiFileSelect.Overworld.Goto<OuiMainMenu>();
                         yield break;
                     }
                     else
-                    {
-                        error = null;
-                    }
+                        error = (FileErrorOverlay) null;
                 }
             }
-            else if (from is not OuiFileNaming and not OuiAssistMode)
-            {
-                yield return 0.2f;
-            }
-
+            else if (!(from is OuiFileNaming) && !(from is OuiAssistMode))
+                yield return (object) 0.2f;
             ouiFileSelect.HasSlots = false;
             for (int index = 0; index < ouiFileSelect.Slots.Length; ++index)
             {
                 if (ouiFileSelect.Slots[index].Exists)
-                {
                     ouiFileSelect.HasSlots = true;
-                }
             }
-            _ = Audio.Play("event:/ui/main/whoosh_savefile_in");
-            if (from is OuiFileNaming or OuiAssistMode)
+            Audio.Play("event:/ui/main/whoosh_savefile_in");
+            if (from is OuiFileNaming || from is OuiAssistMode)
             {
                 if (!ouiFileSelect.SlotSelected)
-                {
                     ouiFileSelect.SelectSlot(false);
-                }
             }
             else if (!ouiFileSelect.HasSlots)
             {
@@ -100,12 +81,12 @@ namespace Celeste
             }
             else if (!ouiFileSelect.SlotSelected)
             {
-                _ = Alarm.Set(ouiFileSelect, 0.4f, () => Audio.Play("event:/ui/main/savefile_rollover_first"));
+                Alarm.Set((Entity) ouiFileSelect, 0.4f, (Action) (() => Audio.Play("event:/ui/main/savefile_rollover_first")));
                 for (int i = 0; i < ouiFileSelect.Slots.Length; ++i)
                 {
                     ouiFileSelect.Slots[i].Position = new Vector2(ouiFileSelect.Slots[i].HiddenPosition(1, 0).X, ouiFileSelect.Slots[i].IdlePosition.Y);
                     ouiFileSelect.Slots[i].Show();
-                    yield return 0.02f;
+                    yield return (object) 0.02f;
                 }
             }
         }
@@ -114,7 +95,7 @@ namespace Celeste
         {
             if (UserIO.Open(UserIO.Mode.Read))
             {
-                for (int index = 0; index < Slots.Length; ++index)
+                for (int index = 0; index < this.Slots.Length; ++index)
                 {
                     OuiFileSelectSlot ouiFileSelectSlot;
                     if (!UserIO.Exists(SaveData.GetFilename(index)))
@@ -130,123 +111,105 @@ namespace Celeste
                             ouiFileSelectSlot = new OuiFileSelectSlot(index, this, data);
                         }
                         else
-                        {
                             ouiFileSelectSlot = new OuiFileSelectSlot(index, this, true);
-                        }
                     }
-                    Slots[index] = ouiFileSelectSlot;
+                    this.Slots[index] = ouiFileSelectSlot;
                 }
                 UserIO.Close();
-                loadedSuccess = true;
+                this.loadedSuccess = true;
             }
             OuiFileSelect.Loaded = true;
         }
 
         public override IEnumerator Leave(Oui next)
         {
-            _ = Audio.Play("event:/ui/main/whoosh_savefile_out");
+            Audio.Play("event:/ui/main/whoosh_savefile_out");
             int slideTo = 1;
-            if (next is null or OuiChapterSelect or OuiFileNaming or OuiAssistMode)
-            {
+            if (next == null || next is OuiChapterSelect || next is OuiFileNaming || next is OuiAssistMode)
                 slideTo = -1;
-            }
-
-            for (int i = 0; i < Slots.Length; ++i)
+            for (int i = 0; i < this.Slots.Length; ++i)
             {
                 switch (next)
                 {
-                    case OuiFileNaming _ when SlotIndex == i:
-                        Slots[i].MoveTo(Slots[i].IdlePosition.X, Slots[0].IdlePosition.Y);
+                    case OuiFileNaming _ when this.SlotIndex == i:
+                        this.Slots[i].MoveTo(this.Slots[i].IdlePosition.X, this.Slots[0].IdlePosition.Y);
                         break;
-                    case OuiAssistMode _ when SlotIndex == i:
-                        Slots[i].MoveTo(Slots[i].IdlePosition.X, -400f);
+                    case OuiAssistMode _ when this.SlotIndex == i:
+                        this.Slots[i].MoveTo(this.Slots[i].IdlePosition.X, -400f);
                         break;
                     default:
-                        Slots[i].Hide(slideTo, 0);
+                        this.Slots[i].Hide(slideTo, 0);
                         break;
                 }
-                yield return 0.02f;
+                yield return (object) 0.02f;
             }
         }
 
         public void UnselectHighlighted()
         {
-            SlotSelected = false;
-            Slots[SlotIndex].Unselect();
-            for (int index = 0; index < Slots.Length; ++index)
+            this.SlotSelected = false;
+            this.Slots[this.SlotIndex].Unselect();
+            for (int index = 0; index < this.Slots.Length; ++index)
             {
-                if (SlotIndex != index)
-                {
-                    Slots[index].Show();
-                }
+                if (this.SlotIndex != index)
+                    this.Slots[index].Show();
             }
         }
 
         public void SelectSlot(bool reset)
         {
-            if (!Slots[SlotIndex].Exists & reset)
+            if (!this.Slots[this.SlotIndex].Exists & reset)
             {
-                Slots[SlotIndex].Name = Settings.Instance == null || string.IsNullOrWhiteSpace(Settings.Instance.DefaultFileName) ? Dialog.Clean("FILE_DEFAULT") : Settings.Instance.DefaultFileName;
-                Slots[SlotIndex].AssistModeEnabled = false;
-                Slots[SlotIndex].VariantModeEnabled = false;
+                this.Slots[this.SlotIndex].Name = Settings.Instance == null || string.IsNullOrWhiteSpace(Settings.Instance.DefaultFileName) ? Dialog.Clean("FILE_DEFAULT") : Settings.Instance.DefaultFileName;
+                this.Slots[this.SlotIndex].AssistModeEnabled = false;
+                this.Slots[this.SlotIndex].VariantModeEnabled = false;
             }
-            SlotSelected = true;
-            Slots[SlotIndex].Select(reset);
-            for (int index = 0; index < Slots.Length; ++index)
+            this.SlotSelected = true;
+            this.Slots[this.SlotIndex].Select(reset);
+            for (int index = 0; index < this.Slots.Length; ++index)
             {
-                if (SlotIndex != index)
-                {
-                    Slots[index].Hide(0, index < SlotIndex ? -1 : 1);
-                }
+                if (this.SlotIndex != index)
+                    this.Slots[index].Hide(0, index < this.SlotIndex ? -1 : 1);
             }
         }
 
         public override void Update()
         {
             base.Update();
-            if (!Focused)
-            {
+            if (!this.Focused)
                 return;
-            }
-
-            if (!SlotSelected)
+            if (!this.SlotSelected)
             {
-                if (Input.MenuUp.Pressed && SlotIndex > 0)
+                if (Input.MenuUp.Pressed && this.SlotIndex > 0)
                 {
-                    _ = Audio.Play("event:/ui/main/savefile_rollover_up");
-                    --SlotIndex;
+                    Audio.Play("event:/ui/main/savefile_rollover_up");
+                    --this.SlotIndex;
                 }
-                else if (Input.MenuDown.Pressed && SlotIndex < Slots.Length - 1)
+                else if (Input.MenuDown.Pressed && this.SlotIndex < this.Slots.Length - 1)
                 {
-                    _ = Audio.Play("event:/ui/main/savefile_rollover_down");
-                    ++SlotIndex;
+                    Audio.Play("event:/ui/main/savefile_rollover_down");
+                    ++this.SlotIndex;
                 }
                 else if (Input.MenuConfirm.Pressed)
                 {
-                    _ = Audio.Play("event:/ui/main/button_select");
-                    _ = Audio.Play("event:/ui/main/whoosh_savefile_out");
-                    SelectSlot(true);
+                    Audio.Play("event:/ui/main/button_select");
+                    Audio.Play("event:/ui/main/whoosh_savefile_out");
+                    this.SelectSlot(true);
                 }
                 else
                 {
                     if (!Input.MenuCancel.Pressed)
-                    {
                         return;
-                    }
-
-                    _ = Audio.Play("event:/ui/main/button_back");
-                    _ = Overworld.Goto<OuiMainMenu>();
+                    Audio.Play("event:/ui/main/button_back");
+                    this.Overworld.Goto<OuiMainMenu>();
                 }
             }
             else
             {
-                if (!Input.MenuCancel.Pressed || HasSlots || Slots[SlotIndex].StartingGame)
-                {
+                if (!Input.MenuCancel.Pressed || this.HasSlots || this.Slots[this.SlotIndex].StartingGame)
                     return;
-                }
-
-                _ = Audio.Play("event:/ui/main/button_back");
-                _ = Overworld.Goto<OuiMainMenu>();
+                Audio.Play("event:/ui/main/button_back");
+                this.Overworld.Goto<OuiMainMenu>();
             }
         }
     }

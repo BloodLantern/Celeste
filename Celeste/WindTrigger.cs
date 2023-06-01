@@ -17,21 +17,17 @@ namespace Celeste
         public WindTrigger(EntityData data, Vector2 offset)
             : base(data, offset)
         {
-            Pattern = data.Enum<WindController.Patterns>("pattern");
+            this.Pattern = data.Enum<WindController.Patterns>("pattern");
         }
 
         public override void OnEnter(Player player)
         {
             base.OnEnter(player);
-            WindController first = Scene.Entities.FindFirst<WindController>();
+            WindController first = this.Scene.Entities.FindFirst<WindController>();
             if (first == null)
-            {
-                Scene.Add(new WindController(Pattern));
-            }
+                this.Scene.Add((Entity) new WindController(this.Pattern));
             else
-            {
-                first.SetPattern(Pattern);
-            }
+                first.SetPattern(this.Pattern);
         }
     }
 }

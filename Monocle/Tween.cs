@@ -20,7 +20,7 @@ namespace Monocle
         public bool UseRawDeltaTime;
         private bool startedReversed;
         private ulong cachedFrame;
-        private static readonly List<Tween> cached = new();
+        private static List<Tween> cached = new List<Tween>();
 
         public Tween.TweenMode Mode { get; private set; }
 
@@ -40,18 +40,19 @@ namespace Monocle
             float duration = 1f,
             bool start = false)
         {
-            Tween tween1 = null;
+            Tween tween1 = (Tween) null;
             foreach (Tween tween2 in Tween.cached)
             {
                 if (Engine.FrameCounter > tween2.cachedFrame + 3UL)
                 {
                     tween1 = tween2;
-                    _ = Tween.cached.Remove(tween2);
+                    Tween.cached.Remove(tween2);
                     break;
                 }
             }
-            tween1 ??= new Tween();
-            tween1.OnUpdate = tween1.OnComplete = tween1.OnStart = null;
+            if (tween1 == null)
+                tween1 = new Tween();
+            tween1.OnUpdate = tween1.OnComplete = tween1.OnStart = (Action<Tween>) null;
             tween1.Init(mode, easer, duration, start);
             return tween1;
         }
@@ -67,7 +68,7 @@ namespace Monocle
             Tween tween = Tween.Create(tweenMode, easer, duration, true);
             tween.OnUpdate += onUpdate;
             tween.OnComplete += onComplete;
-            entity.Add(tween);
+            entity.Add((Component) tween);
             return tween;
         }
 
@@ -80,8 +81,8 @@ namespace Monocle
         {
             Vector2 startPosition = entity.Position;
             Tween tween = Tween.Create(tweenMode, easer, duration, true);
-            tween.OnUpdate = t => entity.Position = Vector2.Lerp(startPosition, targetPosition, t.Eased);
-            entity.Add(tween);
+            tween.OnUpdate = (Action<Tween>) (t => entity.Position = Vector2.Lerp(startPosition, targetPosition, t.Eased));
+            entity.Add((Component) tween);
             return tween;
         }
 
@@ -92,125 +93,104 @@ namespace Monocle
 
         private void Init(Tween.TweenMode mode, Ease.Easer easer, float duration, bool start)
         {
-            if ((double)duration <= 0.0)
-            {
+            if ((double) duration <= 0.0)
                 duration = 1E-06f;
-            }
-
-            UseRawDeltaTime = false;
-            Mode = mode;
-            Easer = easer;
-            Duration = duration;
-            TimeLeft = 0.0f;
-            Percent = 0.0f;
-            Active = false;
+            this.UseRawDeltaTime = false;
+            this.Mode = mode;
+            this.Easer = easer;
+            this.Duration = duration;
+            this.TimeLeft = 0.0f;
+            this.Percent = 0.0f;
+            this.Active = false;
             if (!start)
-            {
                 return;
-            }
-
-            Start();
+            this.Start();
         }
 
         public override void Removed(Entity entity)
         {
             base.Removed(entity);
             Tween.cached.Add(this);
-            cachedFrame = Engine.FrameCounter;
+            this.cachedFrame = Engine.FrameCounter;
         }
 
         public override void Update()
         {
-            TimeLeft -= UseRawDeltaTime ? Engine.RawDeltaTime : Engine.DeltaTime;
-            Percent = Math.Max(0.0f, TimeLeft) / Duration;
-            if (!Reverse)
-            {
-                Percent = 1f - Percent;
-            }
-
-            Eased = Easer == null ? Percent : Easer(Percent);
-            OnUpdate?.Invoke(this);
-            if ((double)TimeLeft > 0.0)
-            {
+            this.TimeLeft -= this.UseRawDeltaTime ? Engine.RawDeltaTime : Engine.DeltaTime;
+            this.Percent = Math.Max(0.0f, this.TimeLeft) / this.Duration;
+            if (!this.Reverse)
+                this.Percent = 1f - this.Percent;
+            this.Eased = this.Easer == null ? this.Percent : this.Easer(this.Percent);
+            if (this.OnUpdate != null)
+                this.OnUpdate(this);
+            if ((double) this.TimeLeft > 0.0)
                 return;
-            }
-
-            TimeLeft = 0.0f;
-            OnComplete?.Invoke(this);
-            switch (Mode)
+            this.TimeLeft = 0.0f;
+            if (this.OnComplete != null)
+                this.OnComplete(this);
+            switch (this.Mode)
             {
                 case Tween.TweenMode.Persist:
-                    Active = false;
+                    this.Active = false;
                     break;
                 case Tween.TweenMode.Oneshot:
-                    Active = false;
-                    RemoveSelf();
+                    this.Active = false;
+                    this.RemoveSelf();
                     break;
                 case Tween.TweenMode.Looping:
-                    Start(Reverse);
+                    this.Start(this.Reverse);
                     break;
                 case Tween.TweenMode.YoyoOneshot:
-                    if (Reverse == startedReversed)
+                    if (this.Reverse == this.startedReversed)
                     {
-                        Start(!Reverse);
-                        startedReversed = !Reverse;
+                        this.Start(!this.Reverse);
+                        this.startedReversed = !this.Reverse;
                         break;
                     }
-                    Active = false;
-                    RemoveSelf();
+                    this.Active = false;
+                    this.RemoveSelf();
                     break;
                 case Tween.TweenMode.YoyoLooping:
-                    Start(!Reverse);
+                    this.Start(!this.Reverse);
                     break;
             }
         }
 
-        public void Start()
-        {
-            Start(false);
-        }
+        public void Start() => this.Start(false);
 
         public void Start(bool reverse)
         {
-            startedReversed = Reverse = reverse;
-            TimeLeft = Duration;
-            Eased = Percent = Reverse ? 1f : 0.0f;
-            Active = true;
-            if (OnStart == null)
-            {
+            this.startedReversed = this.Reverse = reverse;
+            this.TimeLeft = this.Duration;
+            this.Eased = this.Percent = this.Reverse ? 1f : 0.0f;
+            this.Active = true;
+            if (this.OnStart == null)
                 return;
-            }
-
-            OnStart(this);
+            this.OnStart(this);
         }
 
         public void Start(float duration, bool reverse = false)
         {
-            Duration = duration;
-            Start(reverse);
+            this.Duration = duration;
+            this.Start(reverse);
         }
 
-        public void Stop()
-        {
-            Active = false;
-        }
+        public void Stop() => this.Active = false;
 
         public void Reset()
         {
-            TimeLeft = Duration;
-            Eased = Percent = Reverse ? 1f : 0.0f;
+            this.TimeLeft = this.Duration;
+            this.Eased = this.Percent = this.Reverse ? 1f : 0.0f;
         }
 
         public IEnumerator Wait()
         {
             Tween tween = this;
             while (tween.Active)
-            {
-                yield return null;
-            }
+                yield return (object) null;
         }
 
-        public float Inverted => 1f - Eased;
+        public float Inverted => 1f - this.Eased;
 
         public enum TweenMode
         {

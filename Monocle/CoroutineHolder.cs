@@ -11,66 +11,56 @@ namespace Monocle
 {
     public class CoroutineHolder : Component
     {
-        private readonly List<CoroutineHolder.CoroutineData> coroutineList;
-        private readonly HashSet<CoroutineHolder.CoroutineData> toRemove;
+        private List<CoroutineHolder.CoroutineData> coroutineList;
+        private HashSet<CoroutineHolder.CoroutineData> toRemove;
         private int nextID;
         private bool isRunning;
 
         public CoroutineHolder()
             : base(true, false)
         {
-            coroutineList = new List<CoroutineHolder.CoroutineData>();
-            toRemove = new HashSet<CoroutineHolder.CoroutineData>();
+            this.coroutineList = new List<CoroutineHolder.CoroutineData>();
+            this.toRemove = new HashSet<CoroutineHolder.CoroutineData>();
         }
 
         public override void Update()
         {
-            isRunning = true;
-            for (int index = 0; index < coroutineList.Count; ++index)
+            this.isRunning = true;
+            for (int index = 0; index < this.coroutineList.Count; ++index)
             {
-                IEnumerator enumerator = coroutineList[index].Data.Peek();
+                IEnumerator enumerator = this.coroutineList[index].Data.Peek();
                 if (enumerator.MoveNext())
                 {
                     if (enumerator.Current is IEnumerator)
-                    {
-                        coroutineList[index].Data.Push(enumerator.Current as IEnumerator);
-                    }
+                        this.coroutineList[index].Data.Push(enumerator.Current as IEnumerator);
                 }
                 else
                 {
-                    _ = coroutineList[index].Data.Pop();
-                    if (coroutineList[index].Data.Count == 0)
-                    {
-                        _ = toRemove.Add(coroutineList[index]);
-                    }
+                    this.coroutineList[index].Data.Pop();
+                    if (this.coroutineList[index].Data.Count == 0)
+                        this.toRemove.Add(this.coroutineList[index]);
                 }
             }
-            isRunning = false;
-            if (toRemove.Count <= 0)
-            {
+            this.isRunning = false;
+            if (this.toRemove.Count <= 0)
                 return;
-            }
-
-            foreach (CoroutineHolder.CoroutineData coroutineData in toRemove)
-            {
-                _ = coroutineList.Remove(coroutineData);
-            }
-
-            toRemove.Clear();
+            foreach (CoroutineHolder.CoroutineData coroutineData in this.toRemove)
+                this.coroutineList.Remove(coroutineData);
+            this.toRemove.Clear();
         }
 
         public void EndCoroutine(int id)
         {
-            foreach (CoroutineHolder.CoroutineData coroutine in coroutineList)
+            foreach (CoroutineHolder.CoroutineData coroutine in this.coroutineList)
             {
                 if (coroutine.ID == id)
                 {
-                    if (isRunning)
+                    if (this.isRunning)
                     {
-                        _ = toRemove.Add(coroutine);
+                        this.toRemove.Add(coroutine);
                         break;
                     }
-                    _ = coroutineList.Remove(coroutine);
+                    this.coroutineList.Remove(coroutine);
                     break;
                 }
             }
@@ -78,17 +68,15 @@ namespace Monocle
 
         public int StartCoroutine(IEnumerator functionCall)
         {
-            CoroutineHolder.CoroutineData coroutineData = new(nextID++, functionCall);
-            coroutineList.Add(coroutineData);
+            CoroutineHolder.CoroutineData coroutineData = new CoroutineHolder.CoroutineData(this.nextID++, functionCall);
+            this.coroutineList.Add(coroutineData);
             return coroutineData.ID;
         }
 
         public static IEnumerator WaitForFrames(int frames)
         {
             for (int i = 0; i < frames; ++i)
-            {
-                yield return 0;
-            }
+                yield return (object) 0;
         }
 
         private class CoroutineData
@@ -98,9 +86,9 @@ namespace Monocle
 
             public CoroutineData(int id, IEnumerator functionCall)
             {
-                ID = id;
-                Data = new Stack<IEnumerator>();
-                Data.Push(functionCall);
+                this.ID = id;
+                this.Data = new Stack<IEnumerator>();
+                this.Data.Push(functionCall);
             }
         }
     }

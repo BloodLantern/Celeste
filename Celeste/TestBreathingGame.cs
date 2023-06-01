@@ -11,24 +11,24 @@ namespace Celeste
 {
     public class TestBreathingGame : Scene
     {
-        private readonly BreathingMinigame game;
+        private BreathingMinigame game;
 
         public TestBreathingGame()
         {
-            game = new BreathingMinigame();
-            Add(game);
+            this.game = new BreathingMinigame();
+            this.Add((Entity) this.game);
         }
 
         public override void BeforeRender()
         {
-            game.BeforeRender();
+            this.game.BeforeRender();
             base.BeforeRender();
         }
 
         public override void Render()
         {
-            Draw.SpriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, SamplerState.LinearClamp, null, null, null, Engine.ScreenMatrix);
-            game.Render();
+            Draw.SpriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, SamplerState.LinearClamp, (DepthStencilState) null, (RasterizerState) null, (Effect) null, Engine.ScreenMatrix);
+            this.game.Render();
             Draw.SpriteBatch.End();
         }
     }

@@ -14,20 +14,20 @@ namespace Celeste
     public class BirdPath : Entity
     {
         private Vector2 start;
-        private readonly Sprite sprite;
-        private readonly Vector2[] nodes;
+        private Sprite sprite;
+        private Vector2[] nodes;
         private Color trailColor = Calc.HexToColor("639bff");
         private Vector2 target;
         private Vector2 speed;
-        private readonly float maxspeed;
+        private float maxspeed;
         private Vector2 lastTrail;
-        private readonly float speedMult;
+        private float speedMult;
         private EntityID ID;
-        private readonly bool onlyOnce;
-        private readonly bool onlyIfLeft;
+        private bool onlyOnce;
+        private bool onlyIfLeft;
 
         public BirdPath(EntityID id, EntityData data, Vector2 offset)
-            : this(id, data.Position + offset, data.NodesOffset(offset), data.Bool("only_once"), data.Bool(nameof(onlyIfLeft)), data.Float(nameof(speedMult), 1f))
+            : this(id, data.Position + offset, data.NodesOffset(offset), data.Bool("only_once"), data.Bool(nameof (onlyIfLeft)), data.Float(nameof (speedMult), 1f))
         {
         }
 
@@ -39,61 +39,46 @@ namespace Celeste
             bool onlyIfLeft,
             float speedMult)
         {
-            Tag = (int)Tags.TransitionUpdate;
-            ID = id;
-            Position = position;
-            start = position;
+            this.Tag = (int) Tags.TransitionUpdate;
+            this.ID = id;
+            this.Position = position;
+            this.start = position;
             this.nodes = nodes;
             this.onlyOnce = onlyOnce;
             this.onlyIfLeft = onlyIfLeft;
             this.speedMult = speedMult;
-            maxspeed = 150f * speedMult;
-            Add(sprite = GFX.SpriteBank.Create("bird"));
-            sprite.Play("flyupRoll");
-            _ = sprite.JustifyOrigin(0.5f, 0.75f);
-            Add(new SoundSource("event:/new_content/game/10_farewell/bird_flyuproll")
+            this.maxspeed = 150f * speedMult;
+            this.Add((Component) (this.sprite = GFX.SpriteBank.Create("bird")));
+            this.sprite.Play("flyupRoll");
+            this.sprite.JustifyOrigin(0.5f, 0.75f);
+            this.Add((Component) new SoundSource("event:/new_content/game/10_farewell/bird_flyuproll")
             {
                 RemoveOnOneshotEnd = true
             });
-            Add(new Coroutine(Routine()));
+            this.Add((Component) new Coroutine(this.Routine()));
         }
 
-        public void WaitForTrigger()
-        {
-            Visible = Active = false;
-        }
+        public void WaitForTrigger() => this.Visible = this.Active = false;
 
-        public void Trigger()
-        {
-            Visible = Active = true;
-        }
+        public void Trigger() => this.Visible = this.Active = true;
 
         public override void Added(Scene scene)
         {
             base.Added(scene);
-            if (!onlyOnce)
-            {
+            if (!this.onlyOnce)
                 return;
-            }
-
-            _ = (Scene as Level).Session.DoNotLoad.Add(ID);
+            (this.Scene as Level).Session.DoNotLoad.Add(this.ID);
         }
 
         public override void Awake(Scene scene)
         {
             base.Awake(scene);
-            if (!onlyIfLeft)
-            {
+            if (!this.onlyIfLeft)
                 return;
-            }
-
-            Player entity = Scene.Tracker.GetEntity<Player>();
-            if (entity == null || entity.X <= X)
-            {
+            Player entity = this.Scene.Tracker.GetEntity<Player>();
+            if (entity == null || (double) entity.X <= (double) this.X)
                 return;
-            }
-
-            RemoveSelf();
+            this.RemoveSelf();
         }
 
         private IEnumerator Routine()
@@ -104,18 +89,18 @@ namespace Celeste
             {
                 Vector2 node = birdPath.nodes[i];
                 Vector2 next = birdPath.nodes[i + 1];
-                SimpleCurve curve = new(begin, next, node);
+                SimpleCurve curve = new SimpleCurve(begin, next, node);
                 float duration = curve.GetLengthParametric(32) / birdPath.maxspeed;
                 bool playedSfx = false;
-                _ = birdPath.Position;
-                for (float p = 0.0f; (double)p < 1.0; p += Engine.DeltaTime * birdPath.speedMult / duration)
+                Vector2 position = birdPath.Position;
+                for (float p = 0.0f; (double) p < 1.0; p += Engine.DeltaTime * birdPath.speedMult / duration)
                 {
                     birdPath.target = curve.GetPoint(p);
-                    if ((double)p > 0.89999997615814209)
+                    if ((double) p > 0.89999997615814209)
                     {
                         if (!playedSfx && birdPath.sprite.CurrentAnimationID != "flyupRoll")
                         {
-                            birdPath.Add(new SoundSource("event:/new_content/game/10_farewell/bird_flyuproll")
+                            birdPath.Add((Component) new SoundSource("event:/new_content/game/10_farewell/bird_flyuproll")
                             {
                                 RemoveOnOneshotEnd = true
                             });
@@ -123,71 +108,57 @@ namespace Celeste
                         }
                         birdPath.sprite.Play("flyupRoll");
                     }
-                    yield return null;
+                    yield return (object) null;
                 }
                 begin = next;
-                _ = new Vector2();
-                _ = new SimpleCurve();
+                next = new Vector2();
+                curve = new SimpleCurve();
             }
             birdPath.RemoveSelf();
         }
 
         public override void Update()
         {
-            if ((Scene as Level).Transitioning)
+            if ((this.Scene as Level).Transitioning)
             {
-                foreach (Component component in (Entity)this)
+                foreach (Component component in (Entity) this)
                 {
                     if (component is SoundSource soundSource)
-                    {
                         soundSource.UpdateSfxPosition();
-                    }
                 }
             }
             else
             {
                 base.Update();
-                int num1 = Math.Sign(X - target.X);
-                speed += (target - Position).SafeNormalize() * 800f * Engine.DeltaTime;
-                if (speed.Length() > maxspeed)
-                {
-                    speed = speed.SafeNormalize(maxspeed);
-                }
-
-                Position += speed * Engine.DeltaTime;
-                int num2 = Math.Sign(X - target.X);
+                int num1 = Math.Sign(this.X - this.target.X);
+                this.speed += (this.target - this.Position).SafeNormalize() * 800f * Engine.DeltaTime;
+                if ((double) this.speed.Length() > (double) this.maxspeed)
+                    this.speed = this.speed.SafeNormalize(this.maxspeed);
+                this.Position = this.Position + this.speed * Engine.DeltaTime;
+                int num2 = Math.Sign(this.X - this.target.X);
                 if (num1 != num2)
-                {
-                    speed.X *= 0.75f;
-                }
-
-                sprite.Rotation = 1.57079637f + Calc.AngleLerp(speed.Angle(), Calc.Angle(Position, target), 0.5f);
-                if ((lastTrail - Position).Length() <= 32)
-                {
+                    this.speed.X *= 0.75f;
+                this.sprite.Rotation = 1.57079637f + Calc.AngleLerp(this.speed.Angle(), Calc.Angle(this.Position, this.target), 0.5f);
+                if ((double) (this.lastTrail - this.Position).Length() <= 32.0)
                     return;
-                }
-
-                TrailManager.Add(this, trailColor);
-                lastTrail = Position;
+                TrailManager.Add((Entity) this, this.trailColor);
+                this.lastTrail = this.Position;
             }
         }
 
-        public override void Render()
-        {
-            base.Render();
-        }
+        public override void Render() => base.Render();
 
         public override void DebugRender(Camera camera)
         {
-            Vector2 begin = start;
-            for (int i = 0; i < nodes.Length - 1; i += 2)
+            Vector2 begin = this.start;
+            for (int index = 0; index < this.nodes.Length - 1; index += 2)
             {
-                Vector2 node = nodes[i + 1];
-                new SimpleCurve(begin, node, nodes[i]).Render(Color.Red * 0.25f, 32);
+                Vector2 node = this.nodes[index + 1];
+                new SimpleCurve(begin, node, this.nodes[index]).Render(Color.Red * 0.25f, 32);
                 begin = node;
             }
-            Draw.Line(Position, Position + ((target - Position).SafeNormalize() * ((target - Position).Length() - 3f)), Color.Yellow);
-            Draw.Circle(target, 3f, Color.Yellow, 16);
+            Draw.Line(this.Position, this.Position + (this.target - this.Position).SafeNormalize() * ((this.target - this.Position).Length() - 3f), Color.Yellow);
+            Draw.Circle(this.target, 3f, Color.Yellow, 16);
         }
     }
 }

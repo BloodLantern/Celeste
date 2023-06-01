@@ -12,7 +12,7 @@ namespace Monocle
     public class Alarm : Component
     {
         public Action OnComplete;
-        private static readonly Stack<Alarm> cached = new();
+        private static Stack<Alarm> cached = new Stack<Alarm>();
 
         public Alarm.AlarmMode Mode { get; private set; }
 
@@ -38,7 +38,7 @@ namespace Monocle
             Alarm.AlarmMode alarmMode = Alarm.AlarmMode.Oneshot)
         {
             Alarm alarm = Alarm.Create(alarmMode, onComplete, duration, true);
-            entity.Add(alarm);
+            entity.Add((Component) alarm);
             return alarm;
         }
 
@@ -49,45 +49,35 @@ namespace Monocle
 
         private void Init(Alarm.AlarmMode mode, Action onComplete, float duration = 1f, bool start = false)
         {
-            Mode = mode;
-            Duration = duration;
-            OnComplete = onComplete;
-            Active = false;
-            TimeLeft = 0.0f;
+            this.Mode = mode;
+            this.Duration = duration;
+            this.OnComplete = onComplete;
+            this.Active = false;
+            this.TimeLeft = 0.0f;
             if (!start)
-            {
                 return;
-            }
-
-            Start();
+            this.Start();
         }
 
         public override void Update()
         {
-            TimeLeft -= Engine.DeltaTime;
-            if ((double)TimeLeft > 0.0)
-            {
+            this.TimeLeft -= Engine.DeltaTime;
+            if ((double) this.TimeLeft > 0.0)
                 return;
-            }
-
-            TimeLeft = 0.0f;
-            OnComplete?.Invoke();
-            if (Mode == Alarm.AlarmMode.Looping)
+            this.TimeLeft = 0.0f;
+            if (this.OnComplete != null)
+                this.OnComplete();
+            if (this.Mode == Alarm.AlarmMode.Looping)
+                this.Start();
+            else if (this.Mode == Alarm.AlarmMode.Oneshot)
             {
-                Start();
-            }
-            else if (Mode == Alarm.AlarmMode.Oneshot)
-            {
-                RemoveSelf();
+                this.RemoveSelf();
             }
             else
             {
-                if ((double)TimeLeft > 0.0)
-                {
+                if ((double) this.TimeLeft > 0.0)
                     return;
-                }
-
-                Active = false;
+                this.Active = false;
             }
         }
 
@@ -99,20 +89,17 @@ namespace Monocle
 
         public void Start()
         {
-            Active = true;
-            TimeLeft = Duration;
+            this.Active = true;
+            this.TimeLeft = this.Duration;
         }
 
         public void Start(float duration)
         {
-            Duration = duration;
-            Start();
+            this.Duration = duration;
+            this.Start();
         }
 
-        public void Stop()
-        {
-            Active = false;
-        }
+        public void Stop() => this.Active = false;
 
         public enum AlarmMode
         {

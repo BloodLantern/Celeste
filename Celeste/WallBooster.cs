@@ -15,60 +15,57 @@ namespace Celeste
     public class WallBooster : Entity
     {
         public Facings Facing;
-        private readonly StaticMover staticMover;
-        private readonly ClimbBlocker climbBlocker;
-        private readonly SoundSource idleSfx;
+        private StaticMover staticMover;
+        private ClimbBlocker climbBlocker;
+        private SoundSource idleSfx;
         public bool IceMode;
-        private readonly bool notCoreMode;
-        private readonly List<Sprite> tiles;
+        private bool notCoreMode;
+        private List<Sprite> tiles;
 
         public WallBooster(Vector2 position, float height, bool left, bool notCoreMode)
             : base(position)
         {
-            Tag = (int)Tags.TransitionUpdate;
-            Depth = 1999;
+            this.Tag = (int) Tags.TransitionUpdate;
+            this.Depth = 1999;
             this.notCoreMode = notCoreMode;
             if (left)
             {
-                Facing = Facings.Left;
-                Collider = new Hitbox(2f, height);
+                this.Facing = Facings.Left;
+                this.Collider = (Collider) new Hitbox(2f, height);
             }
             else
             {
-                Facing = Facings.Right;
-                Collider = new Hitbox(2f, height, 6f);
+                this.Facing = Facings.Right;
+                this.Collider = (Collider) new Hitbox(2f, height, 6f);
             }
-            Add(new CoreModeListener(new Action<Session.CoreModes>(OnChangeMode)));
-            Add(staticMover = new StaticMover());
-            Add(climbBlocker = new ClimbBlocker(false));
-            Add(idleSfx = new SoundSource());
-            tiles = BuildSprite(left);
+            this.Add((Component) new CoreModeListener(new Action<Session.CoreModes>(this.OnChangeMode)));
+            this.Add((Component) (this.staticMover = new StaticMover()));
+            this.Add((Component) (this.climbBlocker = new ClimbBlocker(false)));
+            this.Add((Component) (this.idleSfx = new SoundSource()));
+            this.tiles = this.BuildSprite(left);
         }
 
         public WallBooster(EntityData data, Vector2 offset)
-            : this(data.Position + offset, data.Height, data.Bool("left"), data.Bool(nameof(notCoreMode)))
+            : this(data.Position + offset, (float) data.Height, data.Bool("left"), data.Bool(nameof (notCoreMode)))
         {
         }
 
         private List<Sprite> BuildSprite(bool left)
         {
-            List<Sprite> spriteList = new();
-            for (int y = 0; y < (double)Height; y += 8)
+            List<Sprite> spriteList = new List<Sprite>();
+            for (int y = 0; (double) y < (double) this.Height; y += 8)
             {
-                string id = y != 0 ? (y + 16 <= (double)Height ? "WallBoosterMid" : "WallBoosterBottom") : "WallBoosterTop";
+                string id = y != 0 ? ((double) (y + 16) <= (double) this.Height ? "WallBoosterMid" : "WallBoosterBottom") : "WallBoosterTop";
                 Sprite sprite = GFX.SpriteBank.Create(id);
                 if (!left)
                 {
                     sprite.FlipX = true;
-                    sprite.Position = new Vector2(4f, y);
+                    sprite.Position = new Vector2(4f, (float) y);
                 }
                 else
-                {
-                    sprite.Position = new Vector2(0.0f, y);
-                }
-
+                    sprite.Position = new Vector2(0.0f, (float) y);
                 spriteList.Add(sprite);
-                Add(sprite);
+                this.Add((Component) sprite);
             }
             return spriteList;
         }
@@ -77,55 +74,43 @@ namespace Celeste
         {
             base.Added(scene);
             Session.CoreModes mode = Session.CoreModes.None;
-            if (SceneAs<Level>().CoreMode == Session.CoreModes.Cold || notCoreMode)
-            {
+            if (this.SceneAs<Level>().CoreMode == Session.CoreModes.Cold || this.notCoreMode)
                 mode = Session.CoreModes.Cold;
-            }
-
-            OnChangeMode(mode);
+            this.OnChangeMode(mode);
         }
 
         private void OnChangeMode(Session.CoreModes mode)
         {
-            IceMode = mode == Session.CoreModes.Cold;
-            climbBlocker.Blocking = IceMode;
-            tiles.ForEach(t => t.Play(IceMode ? "ice" : "hot"));
-            if (IceMode)
+            this.IceMode = mode == Session.CoreModes.Cold;
+            this.climbBlocker.Blocking = this.IceMode;
+            this.tiles.ForEach((Action<Sprite>) (t => t.Play(this.IceMode ? "ice" : "hot")));
+            if (this.IceMode)
             {
-                _ = idleSfx.Stop();
+                this.idleSfx.Stop();
             }
             else
             {
-                if (idleSfx.Playing)
-                {
+                if (this.idleSfx.Playing)
                     return;
-                }
-
-                _ = idleSfx.Play("event:/env/local/09_core/conveyor_idle");
+                this.idleSfx.Play("event:/env/local/09_core/conveyor_idle");
             }
         }
 
         public override void Update()
         {
-            PositionIdleSfx();
-            if ((Scene as Level).Transitioning)
-            {
+            this.PositionIdleSfx();
+            if ((this.Scene as Level).Transitioning)
                 return;
-            }
-
             base.Update();
         }
 
         private void PositionIdleSfx()
         {
-            Player entity = Scene.Tracker.GetEntity<Player>();
+            Player entity = this.Scene.Tracker.GetEntity<Player>();
             if (entity == null)
-            {
                 return;
-            }
-
-            idleSfx.Position = Calc.ClosestPointOnLine(Position, Position + new Vector2(0.0f, Height), entity.Center) - Position;
-            idleSfx.UpdateSfxPosition();
+            this.idleSfx.Position = Calc.ClosestPointOnLine(this.Position, this.Position + new Vector2(0.0f, this.Height), entity.Center) - this.Position;
+            this.idleSfx.UpdateSfxPosition();
         }
     }
 }

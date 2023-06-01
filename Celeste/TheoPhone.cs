@@ -11,22 +11,19 @@ namespace Celeste
 {
     public class TheoPhone : Entity
     {
-        private readonly VertexLight light;
+        private VertexLight light;
 
         public TheoPhone(Vector2 position)
             : base(position)
         {
-            Add(light = new VertexLight(Color.LawnGreen, 1f, 8, 16));
-            Add(new Monocle.Image(GFX.Game["characters/theo/phone"]).JustifyOrigin(0.5f, 1f));
+            this.Add((Component) (this.light = new VertexLight(Color.LawnGreen, 1f, 8, 16)));
+            this.Add((Component) new Monocle.Image(GFX.Game["characters/theo/phone"]).JustifyOrigin(0.5f, 1f));
         }
 
         public override void Update()
         {
-            if (Scene.OnInterval(0.5f))
-            {
-                light.Visible = !light.Visible;
-            }
-
+            if (this.Scene.OnInterval(0.5f))
+                this.light.Visible = !this.light.Visible;
             base.Update();
         }
     }

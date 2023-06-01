@@ -14,11 +14,11 @@ namespace FMOD
         public RESULT result;
         public ERRORCALLBACK_INSTANCETYPE instancetype;
         public IntPtr instance;
-        private readonly IntPtr functionname_internal;
-        private readonly IntPtr functionparams_internal;
+        private IntPtr functionname_internal;
+        private IntPtr functionparams_internal;
 
-        public string functionname => Marshal.PtrToStringAnsi(functionname_internal);
+        public string functionname => Marshal.PtrToStringAnsi(this.functionname_internal);
 
-        public string functionparams => Marshal.PtrToStringAnsi(functionparams_internal);
+        public string functionparams => Marshal.PtrToStringAnsi(this.functionparams_internal);
     }
 }

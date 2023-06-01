@@ -28,23 +28,23 @@ namespace Celeste
         public bool Sitting;
         private int facing;
         private Level level;
-        private readonly Monocle.Circle circle;
-        private readonly Vector2[] nodes;
+        private Monocle.Circle circle;
+        private Vector2[] nodes;
         private int nodeIndex;
-        private readonly int patternIndex;
-        private readonly Coroutine attackCoroutine;
-        private readonly Coroutine triggerBlocksCoroutine;
+        private int patternIndex;
+        private Coroutine attackCoroutine;
+        private Coroutine triggerBlocksCoroutine;
         private List<Entity> fallingBlocks;
         private List<Entity> movingBlocks;
         private bool playerHasMoved;
-        private readonly SineWave floatSine;
-        private readonly bool dialog;
-        private readonly bool startHit;
-        private readonly VertexLight light;
-        private readonly Wiggler scaleWiggler;
+        private SineWave floatSine;
+        private bool dialog;
+        private bool startHit;
+        private VertexLight light;
+        private Wiggler scaleWiggler;
         private FinalBossStarfield bossBg;
-        private readonly SoundSource chargeSfx;
-        private readonly SoundSource laserSfx;
+        private SoundSource chargeSfx;
+        private SoundSource laserSfx;
 
         public FinalBoss(
             Vector2 position,
@@ -57,280 +57,231 @@ namespace Celeste
             : base(position)
         {
             this.patternIndex = patternIndex;
-            CameraYPastMax = cameraYPastMax;
+            this.CameraYPastMax = cameraYPastMax;
             this.dialog = dialog;
             this.startHit = startHit;
-            Add(light = new VertexLight(Color.White, 1f, 32, 64));
-            Collider = circle = new Monocle.Circle(14f, y: -6f);
-            Add(new PlayerCollider(new Action<Player>(OnPlayer)));
+            this.Add((Component) (this.light = new VertexLight(Color.White, 1f, 32, 64)));
+            this.Collider = (Collider) (this.circle = new Monocle.Circle(14f, y: -6f));
+            this.Add((Component) new PlayerCollider(new Action<Player>(this.OnPlayer)));
             this.nodes = new Vector2[nodes.Length + 1];
-            this.nodes[0] = Position;
+            this.nodes[0] = this.Position;
             for (int index = 0; index < nodes.Length; ++index)
-            {
                 this.nodes[index + 1] = nodes[index];
-            }
-
-            attackCoroutine = new Coroutine(false);
-            Add(attackCoroutine);
-            triggerBlocksCoroutine = new Coroutine(false);
-            Add(triggerBlocksCoroutine);
-            Add(new CameraLocker(cameraLockY ? Level.CameraLockModes.FinalBoss : Level.CameraLockModes.FinalBossNoY, 140f, cameraYPastMax));
-            Add(floatSine = new SineWave(0.6f));
-            Add(scaleWiggler = Wiggler.Create(0.6f, 3f));
-            Add(chargeSfx = new SoundSource());
-            Add(laserSfx = new SoundSource());
+            this.attackCoroutine = new Coroutine(false);
+            this.Add((Component) this.attackCoroutine);
+            this.triggerBlocksCoroutine = new Coroutine(false);
+            this.Add((Component) this.triggerBlocksCoroutine);
+            this.Add((Component) new CameraLocker(cameraLockY ? Level.CameraLockModes.FinalBoss : Level.CameraLockModes.FinalBossNoY, 140f, cameraYPastMax));
+            this.Add((Component) (this.floatSine = new SineWave(0.6f)));
+            this.Add((Component) (this.scaleWiggler = Wiggler.Create(0.6f, 3f)));
+            this.Add((Component) (this.chargeSfx = new SoundSource()));
+            this.Add((Component) (this.laserSfx = new SoundSource()));
         }
 
         public FinalBoss(EntityData e, Vector2 offset)
-            : this(e.Position + offset, e.NodesOffset(offset), e.Int(nameof(patternIndex)), e.Float("cameraPastY", 120f), e.Bool(nameof(dialog)), e.Bool(nameof(startHit)), e.Bool("cameraLockY", true))
+            : this(e.Position + offset, e.NodesOffset(offset), e.Int(nameof (patternIndex)), e.Float("cameraPastY", 120f), e.Bool(nameof (dialog)), e.Bool(nameof (startHit)), e.Bool("cameraLockY", true))
         {
         }
 
         public override void Added(Scene scene)
         {
             base.Added(scene);
-            level = SceneAs<Level>();
-            if (patternIndex == 0)
+            this.level = this.SceneAs<Level>();
+            if (this.patternIndex == 0)
             {
-                NormalSprite = new PlayerSprite(PlayerSpriteMode.Badeline);
-                NormalSprite.Scale.X = -1f;
-                NormalSprite.Play("laugh");
-                normalHair = new PlayerHair(NormalSprite)
-                {
-                    Color = BadelineOldsite.HairColor,
-                    Border = Color.Black,
-                    Facing = Facings.Left
-                };
-                Add(normalHair);
-                Add(NormalSprite);
+                this.NormalSprite = new PlayerSprite(PlayerSpriteMode.Badeline);
+                this.NormalSprite.Scale.X = -1f;
+                this.NormalSprite.Play("laugh");
+                this.normalHair = new PlayerHair(this.NormalSprite);
+                this.normalHair.Color = BadelineOldsite.HairColor;
+                this.normalHair.Border = Color.Black;
+                this.normalHair.Facing = Facings.Left;
+                this.Add((Component) this.normalHair);
+                this.Add((Component) this.NormalSprite);
             }
             else
+                this.CreateBossSprite();
+            this.bossBg = this.level.Background.Get<FinalBossStarfield>();
+            if (this.patternIndex == 0 && !this.level.Session.GetFlag("boss_intro") && this.level.Session.Level.Equals("boss-00"))
             {
-                CreateBossSprite();
+                this.level.Session.Audio.Music.Event = "event:/music/lvl2/phone_loop";
+                this.level.Session.Audio.Apply();
+                if (this.bossBg != null)
+                    this.bossBg.Alpha = 0.0f;
+                this.Sitting = true;
+                this.Position.Y += 16f;
+                this.NormalSprite.Play("pretendDead");
+                this.NormalSprite.Scale.X = 1f;
             }
-
-            bossBg = level.Background.Get<FinalBossStarfield>();
-            if (patternIndex == 0 && !level.Session.GetFlag("boss_intro") && level.Session.Level.Equals("boss-00"))
-            {
-                level.Session.Audio.Music.Event = "event:/music/lvl2/phone_loop";
-                level.Session.Audio.Apply();
-                if (bossBg != null)
-                {
-                    bossBg.Alpha = 0.0f;
-                }
-
-                Sitting = true;
-                Position.Y += 16f;
-                NormalSprite.Play("pretendDead");
-                NormalSprite.Scale.X = 1f;
-            }
-            else if (patternIndex == 0 && !level.Session.GetFlag("boss_mid") && level.Session.Level.Equals("boss-14"))
-            {
-                level.Add(new CS06_BossMid());
-            }
-            else if (startHit)
-            {
-                _ = Alarm.Set(this, 0.5f, () => OnPlayer(null));
-            }
-
-            light.Position = (Sprite ?? (GraphicsComponent)NormalSprite).Position + new Vector2(0.0f, -10f);
+            else if (this.patternIndex == 0 && !this.level.Session.GetFlag("boss_mid") && this.level.Session.Level.Equals("boss-14"))
+                this.level.Add((Entity) new CS06_BossMid());
+            else if (this.startHit)
+                Alarm.Set((Entity) this, 0.5f, (Action) (() => this.OnPlayer((Player) null)));
+            this.light.Position = (this.Sprite != null ? (GraphicsComponent) this.Sprite : (GraphicsComponent) this.NormalSprite).Position + new Vector2(0.0f, -10f);
         }
 
         public override void Awake(Scene scene)
         {
             base.Awake(scene);
-            fallingBlocks = Scene.Tracker.GetEntitiesCopy<FallingBlock>();
-            fallingBlocks.Sort((a, b) => (int)((double)a.X - (double)b.X));
-            movingBlocks = Scene.Tracker.GetEntitiesCopy<FinalBossMovingBlock>();
-            movingBlocks.Sort((a, b) => (int)((double)a.X - (double)b.X));
+            this.fallingBlocks = this.Scene.Tracker.GetEntitiesCopy<FallingBlock>();
+            this.fallingBlocks.Sort((Comparison<Entity>) ((a, b) => (int) ((double) a.X - (double) b.X)));
+            this.movingBlocks = this.Scene.Tracker.GetEntitiesCopy<FinalBossMovingBlock>();
+            this.movingBlocks.Sort((Comparison<Entity>) ((a, b) => (int) ((double) a.X - (double) b.X)));
         }
 
         private void CreateBossSprite()
         {
-            Add(Sprite = GFX.SpriteBank.Create("badeline_boss"));
-            Sprite.OnFrameChange = anim =>
+            this.Add((Component) (this.Sprite = GFX.SpriteBank.Create("badeline_boss")));
+            this.Sprite.OnFrameChange = (Action<string>) (anim =>
             {
-                if (!(anim == "idle") || Sprite.CurrentAnimationFrame != 18)
-                {
+                if (!(anim == "idle") || this.Sprite.CurrentAnimationFrame != 18)
                     return;
-                }
-
-                _ = Audio.Play("event:/char/badeline/boss_idle_air", Position);
-            };
-            facing = -1;
-            if (NormalSprite != null)
+                Audio.Play("event:/char/badeline/boss_idle_air", this.Position);
+            });
+            this.facing = -1;
+            if (this.NormalSprite != null)
             {
-                Sprite.Position = NormalSprite.Position;
-                Remove(NormalSprite);
+                this.Sprite.Position = this.NormalSprite.Position;
+                this.Remove((Component) this.NormalSprite);
             }
-            if (normalHair != null)
-            {
-                Remove(normalHair);
-            }
-
-            NormalSprite = null;
-            normalHair = null;
+            if (this.normalHair != null)
+                this.Remove((Component) this.normalHair);
+            this.NormalSprite = (PlayerSprite) null;
+            this.normalHair = (PlayerHair) null;
         }
 
-        public Vector2 BeamOrigin => Center + Sprite.Position + new Vector2(0.0f, -14f);
+        public Vector2 BeamOrigin => this.Center + this.Sprite.Position + new Vector2(0.0f, -14f);
 
-        public Vector2 ShotOrigin => Center + Sprite.Position + new Vector2(6f * Sprite.Scale.X, 2f);
+        public Vector2 ShotOrigin => this.Center + this.Sprite.Position + new Vector2(6f * this.Sprite.Scale.X, 2f);
 
         public override void Update()
         {
             base.Update();
-            Sprite sprite = Sprite ?? NormalSprite;
-            if (!Sitting)
+            Sprite sprite = this.Sprite != null ? this.Sprite : (Sprite) this.NormalSprite;
+            if (!this.Sitting)
             {
-                Player entity = Scene.Tracker.GetEntity<Player>();
-                if (!Moving && entity != null)
+                Player entity = this.Scene.Tracker.GetEntity<Player>();
+                if (!this.Moving && entity != null)
                 {
-                    if (facing == -1 && (double)entity.X > (double)X + 20.0)
+                    if (this.facing == -1 && (double) entity.X > (double) this.X + 20.0)
                     {
-                        facing = 1;
-                        scaleWiggler.Start();
+                        this.facing = 1;
+                        this.scaleWiggler.Start();
                     }
-                    else if (facing == 1 && (double)entity.X < (double)X - 20.0)
+                    else if (this.facing == 1 && (double) entity.X < (double) this.X - 20.0)
                     {
-                        facing = -1;
-                        scaleWiggler.Start();
+                        this.facing = -1;
+                        this.scaleWiggler.Start();
                     }
                 }
-                if (!playerHasMoved && entity != null && entity.Speed != Vector2.Zero)
+                if (!this.playerHasMoved && entity != null && entity.Speed != Vector2.Zero)
                 {
-                    playerHasMoved = true;
-                    if (patternIndex != 0)
-                    {
-                        StartAttacking();
-                    }
-
-                    TriggerMovingBlocks(0);
+                    this.playerHasMoved = true;
+                    if (this.patternIndex != 0)
+                        this.StartAttacking();
+                    this.TriggerMovingBlocks(0);
                 }
-                sprite.Position = !Moving
-                    ? avoidPos + new Vector2(floatSine.Value * 3f, floatSine.ValueOverTwo * 4f)
-                    : Calc.Approach(sprite.Position, Vector2.Zero, 12f * Engine.DeltaTime);
-                float radius = circle.Radius;
-                circle.Radius = 6f;
-                CollideFirst<DashBlock>()?.Break(Center, -Vector2.UnitY);
-                circle.Radius = radius;
-                if (!level.IsInBounds(Position, 24f))
+                if (!this.Moving)
+                    sprite.Position = this.avoidPos + new Vector2(this.floatSine.Value * 3f, this.floatSine.ValueOverTwo * 4f);
+                else
+                    sprite.Position = Calc.Approach(sprite.Position, Vector2.Zero, 12f * Engine.DeltaTime);
+                float radius = this.circle.Radius;
+                this.circle.Radius = 6f;
+                this.CollideFirst<DashBlock>()?.Break(this.Center, -Vector2.UnitY);
+                this.circle.Radius = radius;
+                if (!this.level.IsInBounds(this.Position, 24f))
                 {
-                    Active = Visible = Collidable = false;
+                    this.Active = this.Visible = this.Collidable = false;
                     return;
                 }
                 Vector2 target;
-                if (!Moving && entity != null)
+                if (!this.Moving && entity != null)
                 {
-                    float length = Calc.ClampedMap((Center - entity.Center).Length(), 32f, 88f, 12f, 0.0f);
-                    target = (double)length > 0.0 ? (Center - entity.Center).SafeNormalize(length) : Vector2.Zero;
+                    float length = Calc.ClampedMap((this.Center - entity.Center).Length(), 32f, 88f, 12f, 0.0f);
+                    target = (double) length > 0.0 ? (this.Center - entity.Center).SafeNormalize(length) : Vector2.Zero;
                 }
                 else
-                {
                     target = Vector2.Zero;
-                }
-
-                avoidPos = Calc.Approach(avoidPos, target, 40f * Engine.DeltaTime);
+                this.avoidPos = Calc.Approach(this.avoidPos, target, 40f * Engine.DeltaTime);
             }
-            light.Position = sprite.Position + new Vector2(0.0f, -10f);
+            this.light.Position = sprite.Position + new Vector2(0.0f, -10f);
         }
 
         public override void Render()
         {
-            if (Sprite != null)
+            if (this.Sprite != null)
             {
-                Sprite.Scale.X = facing;
-                Sprite.Scale.Y = 1f;
-                Sprite sprite = Sprite;
-                sprite.Scale *= (float)(1.0 + ((double)scaleWiggler.Value * 0.20000000298023224));
+                this.Sprite.Scale.X = (float) this.facing;
+                this.Sprite.Scale.Y = 1f;
+                Sprite sprite = this.Sprite;
+                sprite.Scale = sprite.Scale * (float) (1.0 + (double) this.scaleWiggler.Value * 0.20000000298023224);
             }
-            if (NormalSprite != null)
+            if (this.NormalSprite != null)
             {
-                Vector2 position = NormalSprite.Position;
-                NormalSprite.Position = NormalSprite.Position.Floor();
+                Vector2 position = this.NormalSprite.Position;
+                this.NormalSprite.Position = this.NormalSprite.Position.Floor();
                 base.Render();
-                NormalSprite.Position = position;
+                this.NormalSprite.Position = position;
             }
             else
-            {
                 base.Render();
-            }
         }
 
         public void OnPlayer(Player player)
         {
-            if (Sprite == null)
+            if (this.Sprite == null)
+                this.CreateBossSprite();
+            this.Sprite.Play("getHit");
+            Audio.Play("event:/char/badeline/boss_hug", this.Position);
+            this.chargeSfx.Stop();
+            if (this.laserSfx.EventName == "event:/char/badeline/boss_laser_charge" && this.laserSfx.Playing)
+                this.laserSfx.Stop();
+            this.Collidable = false;
+            this.avoidPos = Vector2.Zero;
+            ++this.nodeIndex;
+            if (this.dialog)
             {
-                CreateBossSprite();
+                if (this.nodeIndex == 1)
+                    this.Scene.Add((Entity) new MiniTextbox("ch6_boss_tired_a"));
+                else if (this.nodeIndex == 2)
+                    this.Scene.Add((Entity) new MiniTextbox("ch6_boss_tired_b"));
+                else if (this.nodeIndex == 3)
+                    this.Scene.Add((Entity) new MiniTextbox("ch6_boss_tired_c"));
             }
-
-            Sprite.Play("getHit");
-            _ = Audio.Play("event:/char/badeline/boss_hug", Position);
-            _ = chargeSfx.Stop();
-            if (laserSfx.EventName == "event:/char/badeline/boss_laser_charge" && laserSfx.Playing)
-            {
-                _ = laserSfx.Stop();
-            }
-
-            Collidable = false;
-            avoidPos = Vector2.Zero;
-            ++nodeIndex;
-            if (dialog)
-            {
-                if (nodeIndex == 1)
-                {
-                    Scene.Add(new MiniTextbox("ch6_boss_tired_a"));
-                }
-                else if (nodeIndex == 2)
-                {
-                    Scene.Add(new MiniTextbox("ch6_boss_tired_b"));
-                }
-                else if (nodeIndex == 3)
-                {
-                    Scene.Add(new MiniTextbox("ch6_boss_tired_c"));
-                }
-            }
-            foreach (FinalBossShot entity in level.Tracker.GetEntities<FinalBossShot>())
-            {
+            foreach (FinalBossShot entity in this.level.Tracker.GetEntities<FinalBossShot>())
                 entity.Destroy();
-            }
-
-            foreach (FinalBossBeam entity in level.Tracker.GetEntities<FinalBossBeam>())
-            {
+            foreach (FinalBossBeam entity in this.level.Tracker.GetEntities<FinalBossBeam>())
                 entity.Destroy();
-            }
-
-            TriggerFallingBlocks(X);
-            TriggerMovingBlocks(nodeIndex);
-            attackCoroutine.Active = false;
-            Moving = true;
-            bool lastHit = nodeIndex == nodes.Length - 1;
-            if (level.Session.Area.Mode == AreaMode.Normal)
+            this.TriggerFallingBlocks(this.X);
+            this.TriggerMovingBlocks(this.nodeIndex);
+            this.attackCoroutine.Active = false;
+            this.Moving = true;
+            bool lastHit = this.nodeIndex == this.nodes.Length - 1;
+            if (this.level.Session.Area.Mode == AreaMode.Normal)
             {
-                if (lastHit && level.Session.Level.Equals("boss-19"))
+                if (lastHit && this.level.Session.Level.Equals("boss-19"))
                 {
-                    _ = Alarm.Set(this, 0.25f, () =>
+                    Alarm.Set((Entity) this, 0.25f, (Action) (() =>
                     {
-                        _ = Audio.Play("event:/game/06_reflection/boss_spikes_burst");
-                        foreach (CrystalStaticSpinner entity in Scene.Tracker.GetEntities<CrystalStaticSpinner>())
-                        {
+                        Audio.Play("event:/game/06_reflection/boss_spikes_burst");
+                        foreach (CrystalStaticSpinner entity in this.Scene.Tracker.GetEntities<CrystalStaticSpinner>())
                             entity.Destroy(true);
-                        }
-                    });
+                    }));
                     Audio.SetParameter(Audio.CurrentAmbienceEventInstance, "postboss", 1f);
-                    _ = Audio.SetMusic(null);
+                    Audio.SetMusic((string) null);
                 }
-                else if (startHit && level.Session.Audio.Music.Event != "event:/music/lvl6/badeline_glitch")
+                else if (this.startHit && this.level.Session.Audio.Music.Event != "event:/music/lvl6/badeline_glitch")
                 {
-                    level.Session.Audio.Music.Event = "event:/music/lvl6/badeline_glitch";
-                    level.Session.Audio.Apply();
+                    this.level.Session.Audio.Music.Event = "event:/music/lvl6/badeline_glitch";
+                    this.level.Session.Audio.Apply();
                 }
-                else if (level.Session.Audio.Music.Event is not "event:/music/lvl6/badeline_fight" and not "event:/music/lvl6/badeline_glitch")
+                else if (this.level.Session.Audio.Music.Event != "event:/music/lvl6/badeline_fight" && this.level.Session.Audio.Music.Event != "event:/music/lvl6/badeline_glitch")
                 {
-                    level.Session.Audio.Music.Event = "event:/music/lvl6/badeline_fight";
-                    level.Session.Audio.Apply();
+                    this.level.Session.Audio.Music.Event = "event:/music/lvl6/badeline_fight";
+                    this.level.Session.Audio.Apply();
                 }
             }
-            Add(new Coroutine(MoveSequence(player, lastHit)));
+            this.Add((Component) new Coroutine(this.MoveSequence(player, lastHit)));
         }
 
         private IEnumerator MoveSequence(Player player, bool lastHit)
@@ -340,36 +291,27 @@ namespace Celeste
             {
                 Audio.SetMusicParam("boss_pitch", 1f);
                 Tween tween = Tween.Create(Tween.TweenMode.Oneshot, duration: 0.3f, start: true);
-                tween.OnUpdate = t => Glitch.Value = 0.6f * t.Eased;
-                finalBoss.Add(tween);
+                tween.OnUpdate = (Action<Tween>) (t => Glitch.Value = 0.6f * t.Eased);
+                finalBoss.Add((Component) tween);
             }
             else
             {
                 Tween tween = Tween.Create(Tween.TweenMode.Oneshot, duration: 0.3f, start: true);
-                tween.OnUpdate = t => Glitch.Value = (float)(0.5 * (1.0 - (double)t.Eased));
-                finalBoss.Add(tween);
+                tween.OnUpdate = (Action<Tween>) (t => Glitch.Value = (float) (0.5 * (1.0 - (double) t.Eased)));
+                finalBoss.Add((Component) tween);
             }
             if (player != null && !player.Dead)
-            {
-                player.StartAttract(finalBoss.Center + (Vector2.UnitY * 4f));
-            }
-
+                player.StartAttract(finalBoss.Center + Vector2.UnitY * 4f);
             float timer = 0.15f;
             while (player != null && !player.Dead && !player.AtAttractTarget)
             {
-                yield return null;
+                yield return (object) null;
                 timer -= Engine.DeltaTime;
             }
-            if ((double)timer > 0.0)
-            {
-                yield return timer;
-            }
-
+            if ((double) timer > 0.0)
+                yield return (object) timer;
             foreach (ReflectionTentacles entity in finalBoss.Scene.Tracker.GetEntities<ReflectionTentacles>())
-            {
                 entity.Retreat();
-            }
-
             if (player != null)
             {
                 Celeste.Freeze(0.1f);
@@ -378,115 +320,95 @@ namespace Celeste
             }
             finalBoss.PushPlayer(player);
             finalBoss.level.Shake();
-            yield return 0.05f;
-            for (float direction = 0.0f; (double)direction < 6.2831854820251465; direction += 0.17453292f)
+            yield return (object) 0.05f;
+            for (float direction = 0.0f; (double) direction < 6.2831854820251465; direction += 0.17453292f)
             {
-                Vector2 position = finalBoss.Center + finalBoss.Sprite.Position + Calc.AngleToVector(direction + Calc.Random.Range(-1f * (float)Math.PI / 90f, (float)Math.PI / 90f), Calc.Random.Range(16, 20));
+                Vector2 position = finalBoss.Center + finalBoss.Sprite.Position + Calc.AngleToVector(direction + Calc.Random.Range(-1f * (float) Math.PI / 90f, (float) Math.PI / 90f), (float) Calc.Random.Range(16, 20));
                 finalBoss.level.Particles.Emit(FinalBoss.P_Burst, position, direction);
             }
-            yield return 0.05f;
+            yield return (object) 0.05f;
             Audio.SetMusicParam("boss_pitch", 0.0f);
             float from1 = Engine.TimeRate;
-            Tween tween1 = Tween.Create(Tween.TweenMode.Oneshot, duration: 0.35f / Engine.TimeRateB, start: true);
+            Tween tween1 = Tween.Create(Tween.TweenMode.Oneshot, duration: (0.35f / Engine.TimeRateB), start: true);
             tween1.UseRawDeltaTime = true;
-            tween1.OnUpdate = t =>
+            tween1.OnUpdate = (Action<Tween>) (t =>
             {
-                if (bossBg != null && bossBg.Alpha < (double)t.Eased)
-                {
-                    bossBg.Alpha = t.Eased;
-                }
-
+                if (this.bossBg != null && (double) this.bossBg.Alpha < (double) t.Eased)
+                    this.bossBg.Alpha = t.Eased;
                 Engine.TimeRate = MathHelper.Lerp(from1, 1f, t.Eased);
                 if (!lastHit)
-                {
                     return;
-                }
-
-                Glitch.Value = (float)(0.60000002384185791 * (1.0 - (double)t.Eased));
-            };
-            finalBoss.Add(tween1);
-            yield return 0.2f;
+                Glitch.Value = (float) (0.60000002384185791 * (1.0 - (double) t.Eased));
+            });
+            finalBoss.Add((Component) tween1);
+            yield return (object) 0.2f;
             Vector2 from2 = finalBoss.Position;
             Vector2 to = finalBoss.nodes[finalBoss.nodeIndex];
             float duration = Vector2.Distance(from2, to) / 600f;
             float dir = (to - from2).Angle();
             Tween tween2 = Tween.Create(Tween.TweenMode.Oneshot, Ease.SineInOut, duration, true);
-            tween2.OnUpdate = t =>
+            tween2.OnUpdate = (Action<Tween>) (t =>
             {
-                Position = Vector2.Lerp(from2, to, t.Eased);
-                if ((double)t.Eased < 0.10000000149011612 || (double)t.Eased > 0.89999997615814209 || !Scene.OnInterval(0.02f))
-                {
+                this.Position = Vector2.Lerp(from2, to, t.Eased);
+                if ((double) t.Eased < 0.10000000149011612 || (double) t.Eased > 0.89999997615814209 || !this.Scene.OnInterval(0.02f))
                     return;
-                }
-
-                TrailManager.Add(this, Player.NormalHairColor, 0.5f);
-                level.Particles.Emit(Player.P_DashB, 2, Center, Vector2.One * 3f, dir);
-            };
-            tween2.OnComplete = t =>
+                TrailManager.Add((Entity) this, Player.NormalHairColor, 0.5f);
+                this.level.Particles.Emit(Player.P_DashB, 2, this.Center, Vector2.One * 3f, dir);
+            });
+            tween2.OnComplete = (Action<Tween>) (t =>
             {
-                Sprite.Play("recoverHit");
-                Moving = false;
-                Collidable = true;
-                Player entity = Scene.Tracker.GetEntity<Player>();
+                this.Sprite.Play("recoverHit");
+                this.Moving = false;
+                this.Collidable = true;
+                Player entity = this.Scene.Tracker.GetEntity<Player>();
                 if (entity != null)
                 {
-                    facing = Math.Sign(entity.X - X);
-                    if (facing == 0)
-                    {
-                        facing = -1;
-                    }
+                    this.facing = Math.Sign(entity.X - this.X);
+                    if (this.facing == 0)
+                        this.facing = -1;
                 }
-                StartAttacking();
-                floatSine.Reset();
-            };
-            finalBoss.Add(tween2);
+                this.StartAttacking();
+                this.floatSine.Reset();
+            });
+            finalBoss.Add((Component) tween2);
         }
 
         private void PushPlayer(Player player)
         {
             if (player != null && !player.Dead)
             {
-                int dir = Math.Sign(X - nodes[nodeIndex].X);
+                int dir = Math.Sign(this.X - this.nodes[this.nodeIndex].X);
                 if (dir == 0)
-                {
                     dir = -1;
-                }
-
                 player.FinalBossPushLaunch(dir);
             }
-            _ = SceneAs<Level>().Displacement.AddBurst(Position, 0.4f, 12f, 36f, 0.5f);
-            _ = SceneAs<Level>().Displacement.AddBurst(Position, 0.4f, 24f, 48f, 0.5f);
-            _ = SceneAs<Level>().Displacement.AddBurst(Position, 0.4f, 36f, 60f, 0.5f);
+            this.SceneAs<Level>().Displacement.AddBurst(this.Position, 0.4f, 12f, 36f, 0.5f);
+            this.SceneAs<Level>().Displacement.AddBurst(this.Position, 0.4f, 24f, 48f, 0.5f);
+            this.SceneAs<Level>().Displacement.AddBurst(this.Position, 0.4f, 36f, 60f, 0.5f);
         }
 
         private void TriggerFallingBlocks(float leftOfX)
         {
-            while (fallingBlocks.Count > 0 && fallingBlocks[0].Scene == null)
-            {
-                fallingBlocks.RemoveAt(0);
-            }
-
+            while (this.fallingBlocks.Count > 0 && this.fallingBlocks[0].Scene == null)
+                this.fallingBlocks.RemoveAt(0);
             int num = 0;
-            while (fallingBlocks.Count > 0 && (double)fallingBlocks[0].X < (double)leftOfX)
+            while (this.fallingBlocks.Count > 0 && (double) this.fallingBlocks[0].X < (double) leftOfX)
             {
-                FallingBlock fallingBlock = fallingBlocks[0] as FallingBlock;
+                FallingBlock fallingBlock = this.fallingBlocks[0] as FallingBlock;
                 fallingBlock.StartShaking();
                 fallingBlock.Triggered = true;
-                fallingBlock.FallDelay = 0.4f * num;
+                fallingBlock.FallDelay = 0.4f * (float) num;
                 ++num;
-                fallingBlocks.RemoveAt(0);
+                this.fallingBlocks.RemoveAt(0);
             }
         }
 
         private void TriggerMovingBlocks(int nodeIndex)
         {
             if (nodeIndex > 0)
-            {
-                DestroyMovingBlocks(nodeIndex - 1);
-            }
-
+                this.DestroyMovingBlocks(nodeIndex - 1);
             float delay = 0.0f;
-            foreach (FinalBossMovingBlock movingBlock in movingBlocks)
+            foreach (FinalBossMovingBlock movingBlock in this.movingBlocks)
             {
                 if (movingBlock.BossNodeIndex == nodeIndex)
                 {
@@ -499,7 +421,7 @@ namespace Celeste
         private void DestroyMovingBlocks(int nodeIndex)
         {
             float delay = 0.0f;
-            foreach (FinalBossMovingBlock movingBlock in movingBlocks)
+            foreach (FinalBossMovingBlock movingBlock in this.movingBlocks)
             {
                 if (movingBlock.BossNodeIndex == nodeIndex)
                 {
@@ -511,71 +433,71 @@ namespace Celeste
 
         private void StartAttacking()
         {
-            switch (patternIndex)
+            switch (this.patternIndex)
             {
                 case 0:
                 case 1:
-                    attackCoroutine.Replace(Attack01Sequence());
+                    this.attackCoroutine.Replace(this.Attack01Sequence());
                     break;
                 case 2:
-                    attackCoroutine.Replace(Attack02Sequence());
+                    this.attackCoroutine.Replace(this.Attack02Sequence());
                     break;
                 case 3:
-                    attackCoroutine.Replace(Attack03Sequence());
+                    this.attackCoroutine.Replace(this.Attack03Sequence());
                     break;
                 case 4:
-                    attackCoroutine.Replace(Attack04Sequence());
+                    this.attackCoroutine.Replace(this.Attack04Sequence());
                     break;
                 case 5:
-                    attackCoroutine.Replace(Attack05Sequence());
+                    this.attackCoroutine.Replace(this.Attack05Sequence());
                     break;
                 case 6:
-                    attackCoroutine.Replace(Attack06Sequence());
+                    this.attackCoroutine.Replace(this.Attack06Sequence());
                     break;
                 case 7:
-                    attackCoroutine.Replace(Attack07Sequence());
+                    this.attackCoroutine.Replace(this.Attack07Sequence());
                     break;
                 case 8:
-                    attackCoroutine.Replace(Attack08Sequence());
+                    this.attackCoroutine.Replace(this.Attack08Sequence());
                     break;
                 case 9:
-                    attackCoroutine.Replace(Attack09Sequence());
+                    this.attackCoroutine.Replace(this.Attack09Sequence());
                     break;
                 case 10:
-                    attackCoroutine.Replace(Attack10Sequence());
+                    this.attackCoroutine.Replace(this.Attack10Sequence());
                     break;
                 case 11:
-                    attackCoroutine.Replace(Attack11Sequence());
+                    this.attackCoroutine.Replace(this.Attack11Sequence());
                     break;
                 case 13:
-                    attackCoroutine.Replace(Attack13Sequence());
+                    this.attackCoroutine.Replace(this.Attack13Sequence());
                     break;
                 case 14:
-                    attackCoroutine.Replace(Attack14Sequence());
+                    this.attackCoroutine.Replace(this.Attack14Sequence());
                     break;
                 case 15:
-                    attackCoroutine.Replace(Attack15Sequence());
+                    this.attackCoroutine.Replace(this.Attack15Sequence());
                     break;
             }
         }
 
         private void StartShootCharge()
         {
-            Sprite.Play("attack1Begin");
-            _ = chargeSfx.Play("event:/char/badeline/boss_bullet");
+            this.Sprite.Play("attack1Begin");
+            this.chargeSfx.Play("event:/char/badeline/boss_bullet");
         }
 
         private IEnumerator Attack01Sequence()
         {
-            StartShootCharge();
+            this.StartShootCharge();
             while (true)
             {
-                yield return 0.5f;
-                Shoot();
-                yield return 1f;
-                StartShootCharge();
-                yield return 0.15f;
-                yield return 0.3f;
+                yield return (object) 0.5f;
+                this.Shoot();
+                yield return (object) 1f;
+                this.StartShootCharge();
+                yield return (object) 0.15f;
+                yield return (object) 0.3f;
             }
         }
 
@@ -583,109 +505,109 @@ namespace Celeste
         {
             while (true)
             {
-                yield return 0.5f;
-                yield return Beam();
-                yield return 0.4f;
-                StartShootCharge();
-                yield return 0.3f;
-                Shoot();
-                yield return 0.5f;
-                yield return 0.3f;
+                yield return (object) 0.5f;
+                yield return (object) this.Beam();
+                yield return (object) 0.4f;
+                this.StartShootCharge();
+                yield return (object) 0.3f;
+                this.Shoot();
+                yield return (object) 0.5f;
+                yield return (object) 0.3f;
             }
         }
 
         private IEnumerator Attack03Sequence()
         {
-            StartShootCharge();
-            yield return 0.1f;
+            this.StartShootCharge();
+            yield return (object) 0.1f;
             while (true)
             {
                 for (int i = 0; i < 5; ++i)
                 {
-                    Player entity = level.Tracker.GetEntity<Player>();
+                    Player entity = this.level.Tracker.GetEntity<Player>();
                     if (entity != null)
                     {
                         Vector2 at = entity.Center;
                         for (int j = 0; j < 2; ++j)
                         {
-                            ShootAt(at);
-                            yield return 0.15f;
+                            this.ShootAt(at);
+                            yield return (object) 0.15f;
                         }
-                        _ = new Vector2();
+                        at = new Vector2();
                     }
                     if (i < 4)
                     {
-                        StartShootCharge();
-                        yield return 0.5f;
+                        this.StartShootCharge();
+                        yield return (object) 0.5f;
                     }
                 }
-                yield return 2f;
-                StartShootCharge();
-                yield return 0.7f;
+                yield return (object) 2f;
+                this.StartShootCharge();
+                yield return (object) 0.7f;
             }
         }
 
         private IEnumerator Attack04Sequence()
         {
-            StartShootCharge();
-            yield return 0.1f;
+            this.StartShootCharge();
+            yield return (object) 0.1f;
             while (true)
             {
                 for (int i = 0; i < 5; ++i)
                 {
-                    Player entity = level.Tracker.GetEntity<Player>();
+                    Player entity = this.level.Tracker.GetEntity<Player>();
                     if (entity != null)
                     {
                         Vector2 at = entity.Center;
                         for (int j = 0; j < 2; ++j)
                         {
-                            ShootAt(at);
-                            yield return 0.15f;
+                            this.ShootAt(at);
+                            yield return (object) 0.15f;
                         }
-                        _ = new Vector2();
+                        at = new Vector2();
                     }
                     if (i < 4)
                     {
-                        StartShootCharge();
-                        yield return 0.5f;
+                        this.StartShootCharge();
+                        yield return (object) 0.5f;
                     }
                 }
-                yield return 1.5f;
-                yield return Beam();
-                yield return 1.5f;
-                StartShootCharge();
+                yield return (object) 1.5f;
+                yield return (object) this.Beam();
+                yield return (object) 1.5f;
+                this.StartShootCharge();
             }
         }
 
         private IEnumerator Attack05Sequence()
         {
-            yield return 0.2f;
+            yield return (object) 0.2f;
             while (true)
             {
-                yield return Beam();
-                yield return 0.6f;
-                StartShootCharge();
-                yield return 0.3f;
+                yield return (object) this.Beam();
+                yield return (object) 0.6f;
+                this.StartShootCharge();
+                yield return (object) 0.3f;
                 for (int i = 0; i < 3; ++i)
                 {
-                    Player entity = level.Tracker.GetEntity<Player>();
+                    Player entity = this.level.Tracker.GetEntity<Player>();
                     if (entity != null)
                     {
                         Vector2 at = entity.Center;
                         for (int j = 0; j < 2; ++j)
                         {
-                            ShootAt(at);
-                            yield return 0.15f;
+                            this.ShootAt(at);
+                            yield return (object) 0.15f;
                         }
-                        _ = new Vector2();
+                        at = new Vector2();
                     }
                     if (i < 2)
                     {
-                        StartShootCharge();
-                        yield return 0.5f;
+                        this.StartShootCharge();
+                        yield return (object) 0.5f;
                     }
                 }
-                yield return 0.8f;
+                yield return (object) 0.8f;
             }
         }
 
@@ -693,8 +615,8 @@ namespace Celeste
         {
             while (true)
             {
-                yield return Beam();
-                yield return 0.7f;
+                yield return (object) this.Beam();
+                yield return (object) 0.7f;
             }
         }
 
@@ -702,10 +624,10 @@ namespace Celeste
         {
             while (true)
             {
-                Shoot();
-                yield return 0.8f;
-                StartShootCharge();
-                yield return 0.8f;
+                this.Shoot();
+                yield return (object) 0.8f;
+                this.StartShootCharge();
+                yield return (object) 0.8f;
             }
         }
 
@@ -713,25 +635,25 @@ namespace Celeste
         {
             while (true)
             {
-                yield return 0.1f;
-                yield return Beam();
-                yield return 0.8f;
+                yield return (object) 0.1f;
+                yield return (object) this.Beam();
+                yield return (object) 0.8f;
             }
         }
 
         private IEnumerator Attack09Sequence()
         {
-            StartShootCharge();
+            this.StartShootCharge();
             while (true)
             {
-                yield return 0.5f;
-                Shoot();
-                yield return 0.15f;
-                StartShootCharge();
-                Shoot();
-                yield return 0.4f;
-                StartShootCharge();
-                yield return 0.1f;
+                yield return (object) 0.5f;
+                this.Shoot();
+                yield return (object) 0.15f;
+                this.StartShootCharge();
+                this.Shoot();
+                yield return (object) 0.4f;
+                this.StartShootCharge();
+                yield return (object) 0.1f;
             }
         }
 
@@ -742,35 +664,33 @@ namespace Celeste
 
         private IEnumerator Attack11Sequence()
         {
-            if (nodeIndex == 0)
+            if (this.nodeIndex == 0)
             {
-                StartShootCharge();
-                yield return 0.6f;
+                this.StartShootCharge();
+                yield return (object) 0.6f;
             }
             while (true)
             {
-                Shoot();
-                yield return 1.9f;
-                StartShootCharge();
-                yield return 0.6f;
+                this.Shoot();
+                yield return (object) 1.9f;
+                this.StartShootCharge();
+                yield return (object) 0.6f;
             }
         }
 
         private IEnumerator Attack13Sequence()
         {
-            if (nodeIndex != 0)
-            {
-                yield return Attack01Sequence();
-            }
+            if (this.nodeIndex != 0)
+                yield return (object) this.Attack01Sequence();
         }
 
         private IEnumerator Attack14Sequence()
         {
             while (true)
             {
-                yield return 0.2f;
-                yield return Beam();
-                yield return 0.3f;
+                yield return (object) 0.2f;
+                yield return (object) this.Beam();
+                yield return (object) 0.3f;
             }
         }
 
@@ -778,61 +698,56 @@ namespace Celeste
         {
             while (true)
             {
-                yield return 0.2f;
-                yield return Beam();
-                yield return 1.2f;
+                yield return (object) 0.2f;
+                yield return (object) this.Beam();
+                yield return (object) 1.2f;
             }
         }
 
         private void Shoot(float angleOffset = 0.0f)
         {
-            _ = !chargeSfx.Playing ? chargeSfx.Play("event:/char/badeline/boss_bullet", "end", 1f) : chargeSfx.Param("end", 1f);
-
-            Sprite.Play("attack1Recoil", true);
-            Player entity = level.Tracker.GetEntity<Player>();
+            if (!this.chargeSfx.Playing)
+                this.chargeSfx.Play("event:/char/badeline/boss_bullet", "end", 1f);
+            else
+                this.chargeSfx.Param("end", 1f);
+            this.Sprite.Play("attack1Recoil", true);
+            Player entity = this.level.Tracker.GetEntity<Player>();
             if (entity == null)
-            {
                 return;
-            }
-
-            level.Add(Engine.Pooler.Create<FinalBossShot>().Init(this, entity, angleOffset));
+            this.level.Add((Entity) Engine.Pooler.Create<FinalBossShot>().Init(this, entity, angleOffset));
         }
 
         private void ShootAt(Vector2 at)
         {
-            _ = !chargeSfx.Playing ? chargeSfx.Play("event:/char/badeline/boss_bullet", "end", 1f) : chargeSfx.Param("end", 1f);
-
-            Sprite.Play("attack1Recoil", true);
-            level.Add(Engine.Pooler.Create<FinalBossShot>().Init(this, at));
+            if (!this.chargeSfx.Playing)
+                this.chargeSfx.Play("event:/char/badeline/boss_bullet", "end", 1f);
+            else
+                this.chargeSfx.Param("end", 1f);
+            this.Sprite.Play("attack1Recoil", true);
+            this.level.Add((Entity) Engine.Pooler.Create<FinalBossShot>().Init(this, at));
         }
 
         private IEnumerator Beam()
         {
             FinalBoss boss = this;
-            _ = boss.laserSfx.Play("event:/char/badeline/boss_laser_charge");
+            boss.laserSfx.Play("event:/char/badeline/boss_laser_charge");
             boss.Sprite.Play("attack2Begin", true);
-            yield return 0.1f;
+            yield return (object) 0.1f;
             Player entity = boss.level.Tracker.GetEntity<Player>();
             if (entity != null)
-            {
-                boss.level.Add(Engine.Pooler.Create<FinalBossBeam>().Init(boss, entity));
-            }
-
-            yield return 0.9f;
+                boss.level.Add((Entity) Engine.Pooler.Create<FinalBossBeam>().Init(boss, entity));
+            yield return (object) 0.9f;
             boss.Sprite.Play("attack2Lock", true);
-            yield return 0.5f;
-            _ = boss.laserSfx.Stop();
-            _ = Audio.Play("event:/char/badeline/boss_laser_fire", boss.Position);
+            yield return (object) 0.5f;
+            boss.laserSfx.Stop();
+            Audio.Play("event:/char/badeline/boss_laser_fire", boss.Position);
             boss.Sprite.Play("attack2Recoil");
         }
 
         public override void Removed(Scene scene)
         {
-            if (bossBg != null && patternIndex == 0)
-            {
-                bossBg.Alpha = 1f;
-            }
-
+            if (this.bossBg != null && this.patternIndex == 0)
+                this.bossBg.Alpha = 1f;
             base.Removed(scene);
         }
     }

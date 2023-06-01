@@ -7,6 +7,7 @@
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Monocle;
+using System;
 
 namespace Celeste
 {
@@ -21,59 +22,53 @@ namespace Celeste
         public bool ForceClose;
         private float ease;
         private float timer;
-        private readonly Sprite icon = GFX.GuiSpriteBank.Create("save");
+        private Sprite icon = GFX.GuiSpriteBank.Create("save");
         private float startTimer = 0.5f;
-        private readonly Wiggler wiggler;
+        private Wiggler wiggler;
 
         public AutoSavingNotice()
         {
-            icon.Visible = false;
-            wiggler = Wiggler.Create(0.4f, 4f, f => icon.Rotation = f * 0.1f);
+            this.icon.Visible = false;
+            this.wiggler = Wiggler.Create(0.4f, 4f, (Action<float>) (f => this.icon.Rotation = f * 0.1f));
         }
 
         public override void Update(Scene scene)
         {
             base.Update(scene);
-            if (startTimer > 0.0)
+            if ((double) this.startTimer > 0.0)
             {
-                startTimer -= Engine.DeltaTime;
-                if (startTimer <= 0.0)
+                this.startTimer -= Engine.DeltaTime;
+                if ((double) this.startTimer <= 0.0)
                 {
-                    icon.Play("start");
-                    icon.Visible = true;
+                    this.icon.Play("start");
+                    this.icon.Visible = true;
                 }
             }
             if (scene.OnInterval(1f))
-            {
-                wiggler.Start();
-            }
-
-            bool flag = ForceClose || (!Display && timer >= 1.0);
-            ease = Calc.Approach(ease, !flag ? 1f : 0.0f, Engine.DeltaTime);
-            timer += Engine.DeltaTime / duration;
-            StillVisible = Display || ease > 0.0;
-            wiggler.Update();
-            icon.Update();
-            if (!flag || string.IsNullOrEmpty(icon.CurrentAnimationID) || !icon.CurrentAnimationID.Equals("idle"))
-            {
+                this.wiggler.Start();
+            bool flag = this.ForceClose || !this.Display && (double) this.timer >= 1.0;
+            this.ease = Calc.Approach(this.ease, !flag ? 1f : 0.0f, Engine.DeltaTime);
+            this.timer += Engine.DeltaTime / 3f;
+            this.StillVisible = this.Display || (double) this.ease > 0.0;
+            this.wiggler.Update();
+            this.icon.Update();
+            if (!flag || string.IsNullOrEmpty(this.icon.CurrentAnimationID) || !this.icon.CurrentAnimationID.Equals("idle"))
                 return;
-            }
-
-            icon.Play("end");
+            this.icon.Play("end");
         }
 
         public override void Render(Scene scene)
         {
-            float num = Ease.CubeInOut(ease);
-            Color color = TextColor * num;
-            Draw.SpriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, SamplerState.LinearClamp, null, null, null, Engine.ScreenMatrix);
-            ActiveFont.Draw(Dialog.Clean(title), new Vector2(960f, (float)(480.0 - (30.0 * (double)num))), new Vector2(0.5f, 1f), Vector2.One, color);
-            if (icon.Visible)
+            float num = Ease.CubeInOut(this.ease);
+            Color color = AutoSavingNotice.TextColor * num;
+            Draw.SpriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, SamplerState.LinearClamp, (DepthStencilState) null, (RasterizerState) null, (Effect) null, Engine.ScreenMatrix);
+            ActiveFont.Draw(Dialog.Clean("autosaving_title_PC"), new Vector2(960f, (float) (480.0 - 30.0 * (double) num)), new Vector2(0.5f, 1f), Vector2.One, color);
+            if (this.icon.Visible)
             {
-                icon.RenderPosition = new Vector2(1920f, 1080f) / 2f;
-                icon.Render();
+                this.icon.RenderPosition = new Vector2(1920f, 1080f) / 2f;
+                this.icon.Render();
             }
-            ActiveFont.Draw(Dialog.Clean(desc), new Vector2(960f, (float)(600.0 + (30.0 * (double)num))), new Vector2(0.5f, 0.0f), Vector2.One, color);
+            ActiveFont.Draw(Dialog.Clean("autosaving_desc_PC"), new Vector2(960f, (float) (600.0 + 30.0 * (double) num)), new Vector2(0.5f, 0.0f), Vector2.One, color);
             Draw.SpriteBatch.End();
         }
     }

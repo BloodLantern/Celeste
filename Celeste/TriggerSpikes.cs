@@ -15,16 +15,16 @@ namespace Celeste
     {
         private const float RetractTime = 6f;
         private const float DelayTime = 0.4f;
-        private readonly TriggerSpikes.Directions direction;
+        private TriggerSpikes.Directions direction;
         private Vector2 outwards;
         private Vector2 offset;
-        private readonly PlayerCollider pc;
+        private PlayerCollider pc;
         private Vector2 shakeOffset;
         private TriggerSpikes.SpikeInfo[] spikes;
         private List<MTexture> dustTextures;
-        private readonly List<MTexture> tentacleTextures;
+        private List<MTexture> tentacleTextures;
         private Color[] tentacleColors;
-        private readonly int size;
+        private int size;
 
         public TriggerSpikes(Vector2 position, int size, TriggerSpikes.Directions direction)
             : base(position)
@@ -34,43 +34,43 @@ namespace Celeste
             switch (direction)
             {
                 case TriggerSpikes.Directions.Up:
-                    tentacleTextures = GFX.Game.GetAtlasSubtextures("danger/triggertentacle/wiggle_v");
-                    outwards = new Vector2(0.0f, -1f);
-                    offset = new Vector2(0.0f, -1f);
-                    Collider = new Hitbox(size, 4f, y: -4f);
-                    Add(new SafeGroundBlocker());
-                    Add(new LedgeBlocker(new Func<Player, bool>(UpSafeBlockCheck)));
+                    this.tentacleTextures = GFX.Game.GetAtlasSubtextures("danger/triggertentacle/wiggle_v");
+                    this.outwards = new Vector2(0.0f, -1f);
+                    this.offset = new Vector2(0.0f, -1f);
+                    this.Collider = (Collider) new Hitbox((float) size, 4f, y: -4f);
+                    this.Add((Component) new SafeGroundBlocker());
+                    this.Add((Component) new LedgeBlocker(new Func<Player, bool>(this.UpSafeBlockCheck)));
                     break;
                 case TriggerSpikes.Directions.Down:
-                    tentacleTextures = GFX.Game.GetAtlasSubtextures("danger/triggertentacle/wiggle_v");
-                    outwards = new Vector2(0.0f, 1f);
-                    Collider = new Hitbox(size, 4f);
+                    this.tentacleTextures = GFX.Game.GetAtlasSubtextures("danger/triggertentacle/wiggle_v");
+                    this.outwards = new Vector2(0.0f, 1f);
+                    this.Collider = (Collider) new Hitbox((float) size, 4f);
                     break;
                 case TriggerSpikes.Directions.Left:
-                    tentacleTextures = GFX.Game.GetAtlasSubtextures("danger/triggertentacle/wiggle_h");
-                    outwards = new Vector2(-1f, 0.0f);
-                    Collider = new Hitbox(4f, size, -4f);
-                    Add(new SafeGroundBlocker());
-                    Add(new LedgeBlocker(new Func<Player, bool>(SideSafeBlockCheck)));
+                    this.tentacleTextures = GFX.Game.GetAtlasSubtextures("danger/triggertentacle/wiggle_h");
+                    this.outwards = new Vector2(-1f, 0.0f);
+                    this.Collider = (Collider) new Hitbox(4f, (float) size, -4f);
+                    this.Add((Component) new SafeGroundBlocker());
+                    this.Add((Component) new LedgeBlocker(new Func<Player, bool>(this.SideSafeBlockCheck)));
                     break;
                 case TriggerSpikes.Directions.Right:
-                    tentacleTextures = GFX.Game.GetAtlasSubtextures("danger/triggertentacle/wiggle_h");
-                    outwards = new Vector2(1f, 0.0f);
-                    offset = new Vector2(1f, 0.0f);
-                    Collider = new Hitbox(4f, size);
-                    Add(new SafeGroundBlocker());
-                    Add(new LedgeBlocker(new Func<Player, bool>(SideSafeBlockCheck)));
+                    this.tentacleTextures = GFX.Game.GetAtlasSubtextures("danger/triggertentacle/wiggle_h");
+                    this.outwards = new Vector2(1f, 0.0f);
+                    this.offset = new Vector2(1f, 0.0f);
+                    this.Collider = (Collider) new Hitbox(4f, (float) size);
+                    this.Add((Component) new SafeGroundBlocker());
+                    this.Add((Component) new LedgeBlocker(new Func<Player, bool>(this.SideSafeBlockCheck)));
                     break;
             }
-            Add(pc = new PlayerCollider(new Action<Player>(OnCollide)));
-            Add(new StaticMover()
+            this.Add((Component) (this.pc = new PlayerCollider(new Action<Player>(this.OnCollide))));
+            this.Add((Component) new StaticMover()
             {
-                OnShake = new Action<Vector2>(OnShake),
-                SolidChecker = new Func<Solid, bool>(IsRiding),
-                JumpThruChecker = new Func<JumpThru, bool>(IsRiding)
+                OnShake = new Action<Vector2>(this.OnShake),
+                SolidChecker = new Func<Solid, bool>(this.IsRiding),
+                JumpThruChecker = new Func<JumpThru, bool>(this.IsRiding)
             });
-            Add(new DustEdge(new Action(RenderSpikes)));
-            Depth = -50;
+            this.Add((Component) new DustEdge(new Action(this.RenderSpikes)));
+            this.Depth = -50;
         }
 
         public TriggerSpikes(EntityData data, Vector2 offset, TriggerSpikes.Directions dir)
@@ -82,146 +82,114 @@ namespace Celeste
         {
             base.Added(scene);
             Vector3[] edgeColors = DustStyles.Get(scene).EdgeColors;
-            dustTextures = GFX.Game.GetAtlasSubtextures("danger/dustcreature/base");
-            tentacleColors = new Color[edgeColors.Length];
-            for (int index = 0; index < tentacleColors.Length; ++index)
+            this.dustTextures = GFX.Game.GetAtlasSubtextures("danger/dustcreature/base");
+            this.tentacleColors = new Color[edgeColors.Length];
+            for (int index = 0; index < this.tentacleColors.Length; ++index)
+                this.tentacleColors[index] = Color.Lerp(new Color(edgeColors[index]), Color.DarkSlateBlue, 0.4f);
+            Vector2 vector2 = new Vector2(Math.Abs(this.outwards.Y), Math.Abs(this.outwards.X));
+            this.spikes = new TriggerSpikes.SpikeInfo[this.size / 4];
+            for (int index = 0; index < this.spikes.Length; ++index)
             {
-                tentacleColors[index] = Color.Lerp(new Color(edgeColors[index]), Color.DarkSlateBlue, 0.4f);
-            }
-
-            Vector2 vector2 = new(Math.Abs(outwards.Y), Math.Abs(outwards.X));
-            spikes = new TriggerSpikes.SpikeInfo[size / 4];
-            for (int index = 0; index < spikes.Length; ++index)
-            {
-                spikes[index].Parent = this;
-                spikes[index].Index = index;
-                spikes[index].WorldPosition = Position + (vector2 * (2 + (index * 4)));
-                spikes[index].ParticleTimerOffset = Calc.Random.NextFloat(0.25f);
-                spikes[index].TextureIndex = Calc.Random.Next(dustTextures.Count);
-                spikes[index].DustOutDistance = Calc.Random.Choose<int>(3, 4, 6);
-                spikes[index].TentacleColor = Calc.Random.Next(tentacleColors.Length);
-                spikes[index].TentacleFrame = Calc.Random.NextFloat(tentacleTextures.Count);
+                this.spikes[index].Parent = this;
+                this.spikes[index].Index = index;
+                this.spikes[index].WorldPosition = this.Position + vector2 * (float) (2 + index * 4);
+                this.spikes[index].ParticleTimerOffset = Calc.Random.NextFloat(0.25f);
+                this.spikes[index].TextureIndex = Calc.Random.Next(this.dustTextures.Count);
+                this.spikes[index].DustOutDistance = Calc.Random.Choose<int>(3, 4, 6);
+                this.spikes[index].TentacleColor = Calc.Random.Next(this.tentacleColors.Length);
+                this.spikes[index].TentacleFrame = Calc.Random.NextFloat((float) this.tentacleTextures.Count);
             }
         }
 
-        private void OnShake(Vector2 amount)
-        {
-            shakeOffset += amount;
-        }
+        private void OnShake(Vector2 amount) => this.shakeOffset += amount;
 
         private bool UpSafeBlockCheck(Player player)
         {
-            int num1 = 8 * (int)player.Facing;
-            int val1_1 = (int)(((double)player.Left + num1 - (double)Left) / 4.0);
-            int val1_2 = (int)(((double)player.Right + num1 - (double)Left) / 4.0);
-            if (val1_2 < 0 || val1_1 >= spikes.Length)
-            {
+            int num1 = 8 * (int) player.Facing;
+            int val1_1 = (int) (((double) player.Left + (double) num1 - (double) this.Left) / 4.0);
+            int val1_2 = (int) (((double) player.Right + (double) num1 - (double) this.Left) / 4.0);
+            if (val1_2 < 0 || val1_1 >= this.spikes.Length)
                 return false;
-            }
-
             int num2 = Math.Max(val1_1, 0);
-            int num3 = Math.Min(val1_2, spikes.Length - 1);
+            int num3 = Math.Min(val1_2, this.spikes.Length - 1);
             for (int index = num2; index <= num3; ++index)
             {
-                if (spikes[index].Lerp >= 1.0)
-                {
+                if ((double) this.spikes[index].Lerp >= 1.0)
                     return true;
-                }
             }
             return false;
         }
 
         private bool SideSafeBlockCheck(Player player)
         {
-            int val1_1 = (int)(((double)player.Top - (double)Top) / 4.0);
-            int val1_2 = (int)(((double)player.Bottom - (double)Top) / 4.0);
-            if (val1_2 < 0 || val1_1 >= spikes.Length)
-            {
+            int val1_1 = (int) (((double) player.Top - (double) this.Top) / 4.0);
+            int val1_2 = (int) (((double) player.Bottom - (double) this.Top) / 4.0);
+            if (val1_2 < 0 || val1_1 >= this.spikes.Length)
                 return false;
-            }
-
             int num1 = Math.Max(val1_1, 0);
-            int num2 = Math.Min(val1_2, spikes.Length - 1);
+            int num2 = Math.Min(val1_2, this.spikes.Length - 1);
             for (int index = num1; index <= num2; ++index)
             {
-                if (spikes[index].Lerp >= 1.0)
-                {
+                if ((double) this.spikes[index].Lerp >= 1.0)
                     return true;
-                }
             }
             return false;
         }
 
         private void OnCollide(Player player)
         {
-            GetPlayerCollideIndex(player, out int minIndex, out int maxIndex);
-            if (maxIndex < 0 || minIndex >= spikes.Length)
-            {
+            int minIndex;
+            int maxIndex;
+            this.GetPlayerCollideIndex(player, out minIndex, out maxIndex);
+            if (maxIndex < 0 || minIndex >= this.spikes.Length)
                 return;
-            }
-
             int num1 = Math.Max(minIndex, 0);
-            int num2 = Math.Min(maxIndex, spikes.Length - 1);
+            int num2 = Math.Min(maxIndex, this.spikes.Length - 1);
             int index = num1;
-            while (index <= num2 && !spikes[index].OnPlayer(player, outwards))
-            {
+            while (index <= num2 && !this.spikes[index].OnPlayer(player, this.outwards))
                 ++index;
-            }
         }
 
         private void GetPlayerCollideIndex(Player player, out int minIndex, out int maxIndex)
         {
             minIndex = maxIndex = -1;
-            switch (direction)
+            switch (this.direction)
             {
                 case TriggerSpikes.Directions.Up:
-                    if (player.Speed.Y < 0.0)
-                    {
+                    if ((double) player.Speed.Y < 0.0)
                         break;
-                    }
-
-                    minIndex = (int)(((double)player.Left - (double)Left) / 4.0);
-                    maxIndex = (int)(((double)player.Right - (double)Left) / 4.0);
+                    minIndex = (int) (((double) player.Left - (double) this.Left) / 4.0);
+                    maxIndex = (int) (((double) player.Right - (double) this.Left) / 4.0);
                     break;
                 case TriggerSpikes.Directions.Down:
-                    if (player.Speed.Y > 0.0)
-                    {
+                    if ((double) player.Speed.Y > 0.0)
                         break;
-                    }
-
-                    minIndex = (int)(((double)player.Left - (double)Left) / 4.0);
-                    maxIndex = (int)(((double)player.Right - (double)Left) / 4.0);
+                    minIndex = (int) (((double) player.Left - (double) this.Left) / 4.0);
+                    maxIndex = (int) (((double) player.Right - (double) this.Left) / 4.0);
                     break;
                 case TriggerSpikes.Directions.Left:
-                    if (player.Speed.X < 0.0)
-                    {
+                    if ((double) player.Speed.X < 0.0)
                         break;
-                    }
-
-                    minIndex = (int)(((double)player.Top - (double)Top) / 4.0);
-                    maxIndex = (int)(((double)player.Bottom - (double)Top) / 4.0);
+                    minIndex = (int) (((double) player.Top - (double) this.Top) / 4.0);
+                    maxIndex = (int) (((double) player.Bottom - (double) this.Top) / 4.0);
                     break;
                 case TriggerSpikes.Directions.Right:
-                    if (player.Speed.X > 0.0)
-                    {
+                    if ((double) player.Speed.X > 0.0)
                         break;
-                    }
-
-                    minIndex = (int)(((double)player.Top - (double)Top) / 4.0);
-                    maxIndex = (int)(((double)player.Bottom - (double)Top) / 4.0);
+                    minIndex = (int) (((double) player.Top - (double) this.Top) / 4.0);
+                    maxIndex = (int) (((double) player.Bottom - (double) this.Top) / 4.0);
                     break;
             }
         }
 
         private bool PlayerCheck(int spikeIndex)
         {
-            Player player = CollideFirst<Player>();
+            Player player = this.CollideFirst<Player>();
             if (player == null)
-            {
                 return false;
-            }
-
-            GetPlayerCollideIndex(player, out int minIndex, out int maxIndex);
+            int minIndex;
+            int maxIndex;
+            this.GetPlayerCollideIndex(player, out minIndex, out maxIndex);
             return minIndex <= spikeIndex + 1 && maxIndex >= spikeIndex - 1;
         }
 
@@ -233,7 +201,7 @@ namespace Celeste
                 case TriggerSpikes.Directions.Down:
                     return data.Width;
                 default:
-                    _ = (int)(dir - 2);
+                    int num = (int) (dir - 2);
                     return data.Height;
             }
         }
@@ -241,74 +209,64 @@ namespace Celeste
         public override void Update()
         {
             base.Update();
-            for (int index = 0; index < spikes.Length; ++index)
-            {
-                spikes[index].Update();
-            }
+            for (int index = 0; index < this.spikes.Length; ++index)
+                this.spikes[index].Update();
         }
 
         public override void Render()
         {
             base.Render();
-            Vector2 vector2 = new(Math.Abs(outwards.Y), Math.Abs(outwards.X));
-            int count = tentacleTextures.Count;
+            Vector2 vector2 = new Vector2(Math.Abs(this.outwards.Y), Math.Abs(this.outwards.X));
+            int count = this.tentacleTextures.Count;
             Vector2 one = Vector2.One;
-            Vector2 justify = new(0.0f, 0.5f);
-            if (direction == TriggerSpikes.Directions.Left)
-            {
+            Vector2 justify = new Vector2(0.0f, 0.5f);
+            if (this.direction == TriggerSpikes.Directions.Left)
                 one.X = -1f;
-            }
-            else if (direction == TriggerSpikes.Directions.Up)
-            {
+            else if (this.direction == TriggerSpikes.Directions.Up)
                 one.Y = -1f;
-            }
-
-            if (direction is TriggerSpikes.Directions.Up or TriggerSpikes.Directions.Down)
-            {
+            if (this.direction == TriggerSpikes.Directions.Up || this.direction == TriggerSpikes.Directions.Down)
                 justify = new Vector2(0.5f, 0.0f);
-            }
-
-            for (int index = 0; index < spikes.Length; ++index)
+            for (int index = 0; index < this.spikes.Length; ++index)
             {
-                if (!spikes[index].Triggered)
+                if (!this.spikes[index].Triggered)
                 {
-                    MTexture tentacleTexture = tentacleTextures[(int)(spikes[index].TentacleFrame % (double)count)];
-                    Vector2 position = Position + (vector2 * (2 + (index * 4)));
+                    MTexture tentacleTexture = this.tentacleTextures[(int) ((double) this.spikes[index].TentacleFrame % (double) count)];
+                    Vector2 position = this.Position + vector2 * (float) (2 + index * 4);
                     tentacleTexture.DrawJustified(position + vector2, justify, Color.Black, one, 0.0f);
-                    tentacleTexture.DrawJustified(position, justify, tentacleColors[spikes[index].TentacleColor], one, 0.0f);
+                    tentacleTexture.DrawJustified(position, justify, this.tentacleColors[this.spikes[index].TentacleColor], one, 0.0f);
                 }
             }
-            RenderSpikes();
+            this.RenderSpikes();
         }
 
         private void RenderSpikes()
         {
-            Vector2 vector2 = new(Math.Abs(outwards.Y), Math.Abs(outwards.X));
-            for (int index = 0; index < spikes.Length; ++index)
+            Vector2 vector2 = new Vector2(Math.Abs(this.outwards.Y), Math.Abs(this.outwards.X));
+            for (int index = 0; index < this.spikes.Length; ++index)
             {
-                if (spikes[index].Triggered)
-                {
-                    dustTextures[spikes[index].TextureIndex].DrawCentered(Position + (outwards * (float)((spikes[index].Lerp * (double)spikes[index].DustOutDistance) - 4.0)) + (vector2 * (2 + (index * 4))), Color.White, 0.5f * spikes[index].Lerp, spikes[index].TextureRotation);
-                }
+                if (this.spikes[index].Triggered)
+                    this.dustTextures[this.spikes[index].TextureIndex].DrawCentered(this.Position + this.outwards * (float) ((double) this.spikes[index].Lerp * (double) this.spikes[index].DustOutDistance - 4.0) + vector2 * (float) (2 + index * 4), Color.White, 0.5f * this.spikes[index].Lerp, this.spikes[index].TextureRotation);
             }
         }
 
         private bool IsRiding(Solid solid)
         {
-            return direction switch
+            switch (this.direction)
             {
-                TriggerSpikes.Directions.Up => CollideCheckOutside(solid, Position + Vector2.UnitY),
-                TriggerSpikes.Directions.Down => CollideCheckOutside(solid, Position - Vector2.UnitY),
-                TriggerSpikes.Directions.Left => CollideCheckOutside(solid, Position + Vector2.UnitX),
-                TriggerSpikes.Directions.Right => CollideCheckOutside(solid, Position - Vector2.UnitX),
-                _ => false,
-            };
+                case TriggerSpikes.Directions.Up:
+                    return this.CollideCheckOutside((Entity) solid, this.Position + Vector2.UnitY);
+                case TriggerSpikes.Directions.Down:
+                    return this.CollideCheckOutside((Entity) solid, this.Position - Vector2.UnitY);
+                case TriggerSpikes.Directions.Left:
+                    return this.CollideCheckOutside((Entity) solid, this.Position + Vector2.UnitX);
+                case TriggerSpikes.Directions.Right:
+                    return this.CollideCheckOutside((Entity) solid, this.Position - Vector2.UnitX);
+                default:
+                    return false;
+            }
         }
 
-        private bool IsRiding(JumpThru jumpThru)
-        {
-            return direction == TriggerSpikes.Directions.Up && CollideCheck(jumpThru, Position + Vector2.UnitY);
-        }
+        private bool IsRiding(JumpThru jumpThru) => this.direction == TriggerSpikes.Directions.Up && this.CollideCheck((Entity) jumpThru, this.Position + Vector2.UnitY);
 
         public enum Directions
         {
@@ -336,60 +294,47 @@ namespace Celeste
 
             public void Update()
             {
-                if (Triggered)
+                if (this.Triggered)
                 {
-                    if (DelayTimer > 0.0)
+                    if ((double) this.DelayTimer > 0.0)
                     {
-                        DelayTimer -= Engine.DeltaTime;
-                        if (DelayTimer <= 0.0)
+                        this.DelayTimer -= Engine.DeltaTime;
+                        if ((double) this.DelayTimer <= 0.0)
                         {
-                            if (PlayerCheck())
-                            {
-                                DelayTimer = 0.05f;
-                            }
+                            if (this.PlayerCheck())
+                                this.DelayTimer = 0.05f;
                             else
-                            {
-                                _ = Audio.Play("event:/game/03_resort/fluff_tendril_emerge", WorldPosition);
-                            }
+                                Audio.Play("event:/game/03_resort/fluff_tendril_emerge", this.WorldPosition);
                         }
                     }
                     else
-                    {
-                        Lerp = Calc.Approach(Lerp, 1f, 8f * Engine.DeltaTime);
-                    }
-
-                    TextureRotation += Engine.DeltaTime * 1.2f;
+                        this.Lerp = Calc.Approach(this.Lerp, 1f, 8f * Engine.DeltaTime);
+                    this.TextureRotation += Engine.DeltaTime * 1.2f;
                 }
                 else
                 {
-                    Lerp = Calc.Approach(Lerp, 0.0f, 4f * Engine.DeltaTime);
-                    TentacleFrame += Engine.DeltaTime * 12f;
-                    if (Lerp > 0.0)
-                    {
+                    this.Lerp = Calc.Approach(this.Lerp, 0.0f, 4f * Engine.DeltaTime);
+                    this.TentacleFrame += Engine.DeltaTime * 12f;
+                    if ((double) this.Lerp > 0.0)
                         return;
-                    }
-
-                    Triggered = false;
+                    this.Triggered = false;
                 }
             }
 
-            public bool PlayerCheck()
-            {
-                return Parent.PlayerCheck(Index);
-            }
+            public bool PlayerCheck() => this.Parent.PlayerCheck(this.Index);
 
             public bool OnPlayer(Player player, Vector2 outwards)
             {
-                if (!Triggered)
+                if (!this.Triggered)
                 {
-                    _ = Audio.Play("event:/game/03_resort/fluff_tendril_touch", WorldPosition);
-                    Triggered = true;
-                    DelayTimer = 0.4f;
-                    RetractTimer = 6f;
+                    Audio.Play("event:/game/03_resort/fluff_tendril_touch", this.WorldPosition);
+                    this.Triggered = true;
+                    this.DelayTimer = 0.4f;
+                    this.RetractTimer = 6f;
                 }
-                else if (Lerp >= 1.0)
+                else if ((double) this.Lerp >= 1.0)
                 {
-                    _ = player.Die(outwards);
+                    player.Die(outwards);
                     return true;
                 }
                 return false;

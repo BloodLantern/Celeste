@@ -20,24 +20,24 @@ namespace Celeste
         private float consumeDelay;
         private float burstSpeed;
         private Vector2 burstDirection;
-        //private Vector2 burstScale;
+        private Vector2 burstScale;
         private float alpha = 1f;
-        private readonly Image sprite;
-        //private readonly BloomPoint bloom;
+        private Monocle.Image sprite;
+        private BloomPoint bloom;
 
         public AbsorbOrb(Vector2 position, Entity into = null, Vector2? absorbTarget = null)
         {
-            AbsorbInto = into;
-            AbsorbTarget = absorbTarget;
-            Position = position;
-            Tag = (int)Tags.FrozenUpdate;
-            Depth = -2000000;
-            consumeDelay = 0.6f + (Calc.Random.NextFloat() * 0.3f);
-            burstSpeed = 80f + (Calc.Random.NextFloat() * 40f);
-            burstDirection = Calc.AngleToVector(Calc.Random.NextFloat() * 2f * (float)Math.PI, 1f);
-            Add(sprite = new Image(GFX.Game["collectables/heartGem/orb"]));
-            _ = sprite.CenterOrigin();
-            Add(/*bloom = */new BloomPoint(1f, 16f));
+            this.AbsorbInto = into;
+            this.AbsorbTarget = absorbTarget;
+            this.Position = position;
+            this.Tag = (int) Tags.FrozenUpdate;
+            this.Depth = -2000000;
+            this.consumeDelay = (float) (0.699999988079071 + (double) Calc.Random.NextFloat() * 0.30000001192092896);
+            this.burstSpeed = (float) (80.0 + (double) Calc.Random.NextFloat() * 40.0);
+            this.burstDirection = Calc.AngleToVector(Calc.Random.NextFloat() * 6.28318548f, 1f);
+            this.Add((Component) (this.sprite = new Monocle.Image(GFX.Game["collectables/heartGem/orb"])));
+            this.sprite.CenterOrigin();
+            this.Add((Component) (this.bloom = new BloomPoint(1f, 16f)));
         }
 
         public override void Update()
@@ -45,75 +45,63 @@ namespace Celeste
             base.Update();
             Vector2 vector2_1 = Vector2.Zero;
             bool flag = false;
-            if (AbsorbInto != null)
+            if (this.AbsorbInto != null)
             {
-                vector2_1 = AbsorbInto.Center;
-                flag = AbsorbInto.Scene == null || (AbsorbInto is Player && (AbsorbInto as Player).Dead);
+                vector2_1 = this.AbsorbInto.Center;
+                flag = this.AbsorbInto.Scene == null || this.AbsorbInto is Player && (this.AbsorbInto as Player).Dead;
             }
-            else if (AbsorbTarget.HasValue)
+            else if (this.AbsorbTarget.HasValue)
             {
-                vector2_1 = AbsorbTarget.Value;
+                vector2_1 = this.AbsorbTarget.Value;
             }
             else
             {
-                Player entity = Scene.Tracker.GetEntity<Player>();
+                Player entity = this.Scene.Tracker.GetEntity<Player>();
                 if (entity != null)
-                {
                     vector2_1 = entity.Center;
-                }
-
                 flag = entity == null || entity.Scene == null || entity.Dead;
             }
             if (flag)
             {
-                Position += burstDirection * burstSpeed * Engine.RawDeltaTime;
-                burstSpeed = Calc.Approach(burstSpeed, 800f, Engine.RawDeltaTime * 200f);
-                sprite.Rotation = burstDirection.Angle();
-                sprite.Scale = new Vector2(Math.Min(2f, (float)(0.5 + (burstSpeed * 0.02f))), Math.Max(0.05f, (float)(0.5 - (burstSpeed * 0.004f))));
-                sprite.Color = Color.White * (alpha = Calc.Approach(alpha, 0.0f, Engine.DeltaTime));
+                this.Position = this.Position + this.burstDirection * this.burstSpeed * Engine.RawDeltaTime;
+                this.burstSpeed = Calc.Approach(this.burstSpeed, 800f, Engine.RawDeltaTime * 200f);
+                this.sprite.Rotation = this.burstDirection.Angle();
+                this.sprite.Scale = new Vector2(Math.Min(2f, (float) (0.5 + (double) this.burstSpeed * 0.019999999552965164)), Math.Max(0.05f, (float) (0.5 - (double) this.burstSpeed * 0.0040000001899898052)));
+                this.sprite.Color = Color.White * (this.alpha = Calc.Approach(this.alpha, 0.0f, Engine.DeltaTime));
             }
-            else if (consumeDelay > 0.0)
+            else if ((double) this.consumeDelay > 0.0)
             {
-                Position += burstDirection * burstSpeed * Engine.RawDeltaTime;
-                burstSpeed = Calc.Approach(burstSpeed, 0.0f, Engine.RawDeltaTime * 120f);
-                sprite.Rotation = burstDirection.Angle();
-                sprite.Scale = new Vector2(Math.Min(2f, (float)(0.5 + (burstSpeed * 0.02f))), Math.Max(0.05f, (float)(0.5 - (burstSpeed * 0.004f))));
-                consumeDelay -= Engine.RawDeltaTime;
-                if (consumeDelay > 0.0)
-                {
+                this.Position = this.Position + this.burstDirection * this.burstSpeed * Engine.RawDeltaTime;
+                this.burstSpeed = Calc.Approach(this.burstSpeed, 0.0f, Engine.RawDeltaTime * 120f);
+                this.sprite.Rotation = this.burstDirection.Angle();
+                this.sprite.Scale = new Vector2(Math.Min(2f, (float) (0.5 + (double) this.burstSpeed * 0.019999999552965164)), Math.Max(0.05f, (float) (0.5 - (double) this.burstSpeed * 0.0040000001899898052)));
+                this.consumeDelay -= Engine.RawDeltaTime;
+                if ((double) this.consumeDelay > 0.0)
                     return;
-                }
-
-                Vector2 position = Position;
+                Vector2 position = this.Position;
                 Vector2 end = vector2_1;
                 Vector2 vector2_2 = (position + end) / 2f;
-                Vector2 vector2_3 = (end - position).SafeNormalize().Perpendicular() * (position - end).Length() * (float)(0.5f + (Calc.Random.NextFloat() * 0.5f));
+                Vector2 vector2_3 = (end - position).SafeNormalize().Perpendicular() * (position - end).Length() * (float) (0.05000000074505806 + (double) Calc.Random.NextFloat() * 0.44999998807907104);
                 float num1 = end.X - position.X;
                 float num2 = end.Y - position.Y;
-                if ((Math.Abs(num1) > Math.Abs(num2) && Math.Sign(vector2_3.X) != Math.Sign(num1)) || (Math.Abs(num2) > Math.Abs(num2) && Math.Sign(vector2_3.Y) != Math.Sign(num2)))
-                {
+                if ((double) Math.Abs(num1) > (double) Math.Abs(num2) && Math.Sign(vector2_3.X) != Math.Sign(num1) || (double) Math.Abs(num2) > (double) Math.Abs(num2) && Math.Sign(vector2_3.Y) != Math.Sign(num2))
                     vector2_3 *= -1f;
-                }
-
-                curve = new SimpleCurve(position, end, vector2_2 + vector2_3);
-                duration = 0.3f + Calc.Random.NextFloat(0.25f);
-                //burstScale = sprite.Scale;
+                this.curve = new SimpleCurve(position, end, vector2_2 + vector2_3);
+                this.duration = 0.3f + Calc.Random.NextFloat(0.25f);
+                this.burstScale = this.sprite.Scale;
             }
             else
             {
-                curve.End = vector2_1;
-                if (this.percent >= 1.0)
-                {
-                    RemoveSelf();
-                }
-
-                this.percent = Calc.Approach(this.percent, 1f, Engine.RawDeltaTime / duration);
+                this.curve.End = vector2_1;
+                if ((double) this.percent >= 1.0)
+                    this.RemoveSelf();
+                this.percent = Calc.Approach(this.percent, 1f, Engine.RawDeltaTime / this.duration);
                 float percent = Ease.CubeIn(this.percent);
-                Position = curve.GetPoint(this.percent);
-                float num = Calc.YoYo(this.percent) * curve.GetLengthParametric(10);
-                sprite.Scale = new Vector2(Math.Min(2f, 0.5f + (num * 0.02f)), Math.Max(0.05f, 0.5f - (num * 0.004f)));
-                sprite.Color = Color.White * (1f - percent);
-                sprite.Rotation = Calc.Angle(Position, curve.GetPoint(Ease.CubeIn(percent + 0.01f)));
+                this.Position = this.curve.GetPoint(percent);
+                float num = Calc.YoYo(percent) * this.curve.GetLengthParametric(10);
+                this.sprite.Scale = new Vector2(Math.Min(2f, (float) (0.5 + (double) num * 0.019999999552965164)), Math.Max(0.05f, (float) (0.5 - (double) num * 0.0040000001899898052)));
+                this.sprite.Color = Color.White * (1f - percent);
+                this.sprite.Rotation = Calc.Angle(this.Position, this.curve.GetPoint(Ease.CubeIn(this.percent + 0.01f)));
             }
         }
     }

@@ -14,90 +14,63 @@ namespace Monocle
 
         public Circle(float radius, float x = 0.0f, float y = 0.0f)
         {
-            Radius = radius;
-            Position.X = x;
-            Position.Y = y;
+            this.Radius = radius;
+            this.Position.X = x;
+            this.Position.Y = y;
         }
 
         public override float Width
         {
-            get => Radius * 2f;
-            set => Radius = value / 2f;
+            get => this.Radius * 2f;
+            set => this.Radius = value / 2f;
         }
 
         public override float Height
         {
-            get => Radius * 2f;
-            set => Radius = value / 2f;
+            get => this.Radius * 2f;
+            set => this.Radius = value / 2f;
         }
 
         public override float Left
         {
-            get => Position.X - Radius;
-            set => Position.X = value + Radius;
+            get => this.Position.X - this.Radius;
+            set => this.Position.X = value + this.Radius;
         }
 
         public override float Top
         {
-            get => Position.Y - Radius;
-            set => Position.Y = value + Radius;
+            get => this.Position.Y - this.Radius;
+            set => this.Position.Y = value + this.Radius;
         }
 
         public override float Right
         {
-            get => Position.X + Radius;
-            set => Position.X = value - Radius;
+            get => this.Position.X + this.Radius;
+            set => this.Position.X = value - this.Radius;
         }
 
         public override float Bottom
         {
-            get => Position.Y + Radius;
-            set => Position.Y = value - Radius;
+            get => this.Position.Y + this.Radius;
+            set => this.Position.Y = value - this.Radius;
         }
 
-        public override Collider Clone()
-        {
-            return new Circle(Radius, Position.X, Position.Y);
-        }
+        public override Collider Clone() => (Collider) new Circle(this.Radius, this.Position.X, this.Position.Y);
 
-        public override void Render(Camera camera, Color color)
-        {
-            Draw.Circle(AbsolutePosition, Radius, color, 4);
-        }
+        public override void Render(Camera camera, Color color) => Draw.Circle(this.AbsolutePosition, this.Radius, color, 4);
 
-        public override bool Collide(Vector2 point)
-        {
-            return Monocle.Collide.CircleToPoint(AbsolutePosition, Radius, point);
-        }
+        public override bool Collide(Vector2 point) => Monocle.Collide.CircleToPoint(this.AbsolutePosition, this.Radius, point);
 
-        public override bool Collide(Rectangle rect)
-        {
-            return Monocle.Collide.RectToCircle(rect, AbsolutePosition, Radius);
-        }
+        public override bool Collide(Rectangle rect) => Monocle.Collide.RectToCircle(rect, this.AbsolutePosition, this.Radius);
 
-        public override bool Collide(Vector2 from, Vector2 to)
-        {
-            return Monocle.Collide.CircleToLine(AbsolutePosition, Radius, from, to);
-        }
+        public override bool Collide(Vector2 from, Vector2 to) => Monocle.Collide.CircleToLine(this.AbsolutePosition, this.Radius, from, to);
 
-        public override bool Collide(Circle circle)
-        {
-            return (double)Vector2.DistanceSquared(AbsolutePosition, circle.AbsolutePosition) < (Radius + (double)circle.Radius) * (Radius + (double)circle.Radius);
-        }
+        public override bool Collide(Circle circle) => (double) Vector2.DistanceSquared(this.AbsolutePosition, circle.AbsolutePosition) < ((double) this.Radius + (double) circle.Radius) * ((double) this.Radius + (double) circle.Radius);
 
-        public override bool Collide(Hitbox hitbox)
-        {
-            return hitbox.Collide(this);
-        }
+        public override bool Collide(Hitbox hitbox) => hitbox.Collide(this);
 
-        public override bool Collide(Grid grid)
-        {
-            return grid.Collide(this);
-        }
+        public override bool Collide(Grid grid) => grid.Collide(this);
 
-        public override bool Collide(ColliderList list)
-        {
-            return list.Collide(this);
-        }
+        public override bool Collide(ColliderList list) => list.Collide(this);
     }
 }

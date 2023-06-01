@@ -21,14 +21,14 @@ namespace Celeste
 
         public static void Load()
         {
-            Chooser<MTexture> chooser1 = new(new MTexture[4]
+            Chooser<MTexture> chooser1 = new Chooser<MTexture>(new MTexture[4]
             {
                 GFX.Game["particles/smoke0"],
                 GFX.Game["particles/smoke1"],
                 GFX.Game["particles/smoke2"],
                 GFX.Game["particles/smoke3"]
             });
-            Chooser<MTexture> chooser2 = new(new MTexture[4]
+            Chooser<MTexture> chooser2 = new Chooser<MTexture>(new MTexture[4]
             {
                 GFX.Game["particles/zappysmoke00"],
                 GFX.Game["particles/zappysmoke01"],
@@ -231,10 +231,8 @@ namespace Celeste
                 SpeedMultiplier = 0.01f,
                 Acceleration = new Vector2(0.0f, 90f)
             };
-            Cloud.P_FragileCloud = new ParticleType(Cloud.P_Cloud)
-            {
-                Color = Calc.HexToColor("5e22ae")
-            };
+            Cloud.P_FragileCloud = new ParticleType(Cloud.P_Cloud);
+            Cloud.P_FragileCloud.Color = Calc.HexToColor("5e22ae");
             Booster.P_Burst = new ParticleType()
             {
                 Source = GFX.Game["particles/blob"],
@@ -252,15 +250,13 @@ namespace Celeste
                 SpeedMultiplier = 0.01f,
                 Acceleration = new Vector2(0.0f, 90f)
             };
-            Booster.P_BurstRed = new ParticleType(Booster.P_Burst)
-            {
-                Color = Calc.HexToColor("942c3e")
-            };
+            Booster.P_BurstRed = new ParticleType(Booster.P_Burst);
+            Booster.P_BurstRed.Color = Calc.HexToColor("942c3e");
             Booster.P_Appear = new ParticleType()
             {
                 Size = 1f,
                 Color = Calc.HexToColor("4ACFC6"),
-                DirectionRange = (float)Math.PI / 30f,
+                DirectionRange = (float) Math.PI / 30f,
                 LifeMin = 0.6f,
                 LifeMax = 1f,
                 SpeedMin = 40f,
@@ -512,7 +508,7 @@ namespace Celeste
                 Size = 1f,
                 SizeRange = 0.0f,
                 SpeedMultiplier = 0.6f,
-                DirectionRange = 5f * (float)Math.PI / 36f
+                DirectionRange = 5f * (float) Math.PI / 36f
             };
             SwitchGate.P_Behind = new ParticleType()
             {
@@ -674,7 +670,7 @@ namespace Celeste
                 SpeedMax = 10f,
                 DirectionRange = 6.28318548f
             };
-            ParticleType copyFrom = new()
+            ParticleType copyFrom = new ParticleType()
             {
                 Source = GFX.Game["particles/rect"],
                 Color = Calc.HexToColor("EA64B7"),
@@ -1266,14 +1262,11 @@ namespace Celeste
             };
             ForsakenCitySatellite.Particles.Clear();
             foreach (KeyValuePair<string, Color> color in ForsakenCitySatellite.Colors)
-            {
                 ForsakenCitySatellite.Particles.Add(color.Key, new ParticleType(Player.P_DashA)
                 {
                     Color = color.Value,
                     Color2 = Color.Lerp(color.Value, Color.White, 0.5f)
                 });
-            }
-
             HeartGemDoor.P_Shimmer = new ParticleType()
             {
                 Size = 1f,

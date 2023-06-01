@@ -38,77 +38,59 @@ namespace Celeste
 
         public TrackSpinner(EntityData data, Vector2 offset)
         {
-            Collider = new ColliderList(new Collider[2]
+            this.Collider = (Collider) new ColliderList(new Collider[2]
             {
-                 new Monocle.Circle(6f),
-                 new Hitbox(16f, 4f, -8f, -3f)
+                (Collider) new Monocle.Circle(6f),
+                (Collider) new Hitbox(16f, 4f, -8f, -3f)
             });
-            Add(new PlayerCollider(new Action<Player>(OnPlayer)));
-            Start = data.Position + offset;
-            End = data.Nodes[0] + offset;
-            Speed = data.Enum<TrackSpinner.Speeds>("speed", TrackSpinner.Speeds.Normal);
-            Angle = (Start - End).Angle();
-            Percent = data.Bool("startCenter") ? 0.5f : 0.0f;
-            if ((double)Percent == 1.0)
-            {
-                Up = false;
-            }
-
-            UpdatePosition();
+            this.Add((Component) new PlayerCollider(new Action<Player>(this.OnPlayer)));
+            this.Start = data.Position + offset;
+            this.End = data.Nodes[0] + offset;
+            this.Speed = data.Enum<TrackSpinner.Speeds>("speed", TrackSpinner.Speeds.Normal);
+            this.Angle = (this.Start - this.End).Angle();
+            this.Percent = data.Bool("startCenter") ? 0.5f : 0.0f;
+            if ((double) this.Percent == 1.0)
+                this.Up = false;
+            this.UpdatePosition();
         }
 
-        public void UpdatePosition()
-        {
-            Position = Vector2.Lerp(Start, End, Ease.SineInOut(Percent));
-        }
+        public void UpdatePosition() => this.Position = Vector2.Lerp(this.Start, this.End, Ease.SineInOut(this.Percent));
 
         public override void Awake(Scene scene)
         {
             base.Awake(scene);
-            OnTrackStart();
+            this.OnTrackStart();
         }
 
         public override void Update()
         {
             base.Update();
-            if (!Moving)
-            {
+            if (!this.Moving)
                 return;
-            }
-
-            if (PauseTimer > 0.0)
+            if ((double) this.PauseTimer > 0.0)
             {
-                PauseTimer -= Engine.DeltaTime;
-                if (PauseTimer > 0.0)
-                {
+                this.PauseTimer -= Engine.DeltaTime;
+                if ((double) this.PauseTimer > 0.0)
                     return;
-                }
-
-                OnTrackStart();
+                this.OnTrackStart();
             }
             else
             {
-                Percent = Calc.Approach(Percent, Up ? 1f : 0.0f, Engine.DeltaTime / TrackSpinner.MoveTimes[(int)Speed]);
-                UpdatePosition();
-                if ((!Up || (double)Percent != 1.0) && (Up || (double)Percent != 0.0))
-                {
+                this.Percent = Calc.Approach(this.Percent, this.Up ? 1f : 0.0f, Engine.DeltaTime / TrackSpinner.MoveTimes[(int) this.Speed]);
+                this.UpdatePosition();
+                if ((!this.Up || (double) this.Percent != 1.0) && (this.Up || (double) this.Percent != 0.0))
                     return;
-                }
-
-                Up = !Up;
-                PauseTimer = TrackSpinner.PauseTimes[(int)Speed];
-                OnTrackEnd();
+                this.Up = !this.Up;
+                this.PauseTimer = TrackSpinner.PauseTimes[(int) this.Speed];
+                this.OnTrackEnd();
             }
         }
 
         public virtual void OnPlayer(Player player)
         {
-            if (player.Die((player.Position - Position).SafeNormalize()) == null)
-            {
+            if (player.Die((player.Position - this.Position).SafeNormalize()) == null)
                 return;
-            }
-
-            Moving = false;
+            this.Moving = false;
         }
 
         public virtual void OnTrackStart()

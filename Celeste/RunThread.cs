@@ -13,23 +13,17 @@ namespace Celeste
 {
     public static class RunThread
     {
-        private static readonly List<Thread> threads = new();
+        private static List<Thread> threads = new List<Thread>();
 
         public static void Start(Action method, string name, bool highPriority = false)
         {
-            Thread thread = new(() => RunThread.RunThreadWithLogging(method));
+            Thread thread = new Thread((ThreadStart) (() => RunThread.RunThreadWithLogging(method)));
             lock (RunThread.threads)
-            {
                 RunThread.threads.Add(thread);
-            }
-
             thread.Name = name;
             thread.IsBackground = true;
             if (highPriority)
-            {
                 thread.Priority = ThreadPriority.Highest;
-            }
-
             thread.Start();
         }
 
@@ -49,9 +43,7 @@ namespace Celeste
             finally
             {
                 lock (RunThread.threads)
-                {
-                    _ = RunThread.threads.Remove(Thread.CurrentThread);
-                }
+                    RunThread.threads.Remove(Thread.CurrentThread);
             }
         }
 
@@ -63,10 +55,7 @@ namespace Celeste
                 lock (RunThread.threads)
                 {
                     if (RunThread.threads.Count == 0)
-                    {
                         break;
-                    }
-
                     thread = RunThread.threads[0];
                 }
                 thread.Join();

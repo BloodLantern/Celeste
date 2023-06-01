@@ -15,31 +15,27 @@ namespace Monocle
 
         public Entity Entity { get; private set; }
 
-        internal virtual void Added(Entity entity)
-        {
-            Entity = entity;
-        }
+        internal virtual void Added(Entity entity) => this.Entity = entity;
 
-        internal virtual void Removed()
-        {
-            Entity = null;
-        }
+        internal virtual void Removed() => this.Entity = (Entity) null;
 
-        public bool Collide(Entity entity)
-        {
-            return Collide(entity.Collider);
-        }
+        public bool Collide(Entity entity) => this.Collide(entity.Collider);
 
         public bool Collide(Collider collider)
         {
-            return collider switch
+            switch (collider)
             {
-                Hitbox _ => Collide(collider as Hitbox),
-                Grid _ => Collide(collider as Grid),
-                ColliderList _ => Collide(collider as ColliderList),
-                Circle _ => Collide(collider as Circle),
-                _ => throw new Exception("Collisions against the collider type are not implemented!"),
-            };
+                case Hitbox _:
+                    return this.Collide(collider as Hitbox);
+                case Grid _:
+                    return this.Collide(collider as Grid);
+                case ColliderList _:
+                    return this.Collide(collider as ColliderList);
+                case Circle _:
+                    return this.Collide(collider as Circle);
+                default:
+                    throw new Exception("Collisions against the collider type are not implemented!");
+            }
         }
 
         public abstract bool Collide(Vector2 point);
@@ -74,135 +70,132 @@ namespace Monocle
 
         public void CenterOrigin()
         {
-            Position.X = (float)(-(double)Width / 2.0);
-            Position.Y = (float)(-(double)Height / 2.0);
+            this.Position.X = (float) (-(double) this.Width / 2.0);
+            this.Position.Y = (float) (-(double) this.Height / 2.0);
         }
 
         public float CenterX
         {
-            get => Left + (Width / 2f);
-            set => Left = value - (Width / 2f);
+            get => this.Left + this.Width / 2f;
+            set => this.Left = value - this.Width / 2f;
         }
 
         public float CenterY
         {
-            get => Top + (Height / 2f);
-            set => Top = value - (Height / 2f);
+            get => this.Top + this.Height / 2f;
+            set => this.Top = value - this.Height / 2f;
         }
 
         public Vector2 TopLeft
         {
-            get => new(Left, Top);
+            get => new Vector2(this.Left, this.Top);
             set
             {
-                Left = value.X;
-                Top = value.Y;
+                this.Left = value.X;
+                this.Top = value.Y;
             }
         }
 
         public Vector2 TopCenter
         {
-            get => new(CenterX, Top);
+            get => new Vector2(this.CenterX, this.Top);
             set
             {
-                CenterX = value.X;
-                Top = value.Y;
+                this.CenterX = value.X;
+                this.Top = value.Y;
             }
         }
 
         public Vector2 TopRight
         {
-            get => new(Right, Top);
+            get => new Vector2(this.Right, this.Top);
             set
             {
-                Right = value.X;
-                Top = value.Y;
+                this.Right = value.X;
+                this.Top = value.Y;
             }
         }
 
         public Vector2 CenterLeft
         {
-            get => new(Left, CenterY);
+            get => new Vector2(this.Left, this.CenterY);
             set
             {
-                Left = value.X;
-                CenterY = value.Y;
+                this.Left = value.X;
+                this.CenterY = value.Y;
             }
         }
 
         public Vector2 Center
         {
-            get => new(CenterX, CenterY);
+            get => new Vector2(this.CenterX, this.CenterY);
             set
             {
-                CenterX = value.X;
-                CenterY = value.Y;
+                this.CenterX = value.X;
+                this.CenterY = value.Y;
             }
         }
 
-        public Vector2 Size => new(Width, Height);
+        public Vector2 Size => new Vector2(this.Width, this.Height);
 
-        public Vector2 HalfSize => Size * 0.5f;
+        public Vector2 HalfSize => this.Size * 0.5f;
 
         public Vector2 CenterRight
         {
-            get => new(Right, CenterY);
+            get => new Vector2(this.Right, this.CenterY);
             set
             {
-                Right = value.X;
-                CenterY = value.Y;
+                this.Right = value.X;
+                this.CenterY = value.Y;
             }
         }
 
         public Vector2 BottomLeft
         {
-            get => new(Left, Bottom);
+            get => new Vector2(this.Left, this.Bottom);
             set
             {
-                Left = value.X;
-                Bottom = value.Y;
+                this.Left = value.X;
+                this.Bottom = value.Y;
             }
         }
 
         public Vector2 BottomCenter
         {
-            get => new(CenterX, Bottom);
+            get => new Vector2(this.CenterX, this.Bottom);
             set
             {
-                CenterX = value.X;
-                Bottom = value.Y;
+                this.CenterX = value.X;
+                this.Bottom = value.Y;
             }
         }
 
         public Vector2 BottomRight
         {
-            get => new(Right, Bottom);
+            get => new Vector2(this.Right, this.Bottom);
             set
             {
-                Right = value.X;
-                Bottom = value.Y;
+                this.Right = value.X;
+                this.Bottom = value.Y;
             }
         }
 
-        public void Render(Camera camera)
-        {
-            Render(camera, Color.Red);
-        }
+        public void Render(Camera camera) => this.Render(camera, Color.Red);
 
-        public Vector2 AbsolutePosition => Entity != null ? Entity.Position + Position : Position;
+        public Vector2 AbsolutePosition => this.Entity != null ? this.Entity.Position + this.Position : this.Position;
 
-        public float AbsoluteX => Entity != null ? Entity.Position.X + Position.X : Position.X;
+        public float AbsoluteX => this.Entity != null ? this.Entity.Position.X + this.Position.X : this.Position.X;
 
-        public float AbsoluteY => Entity != null ? Entity.Position.Y + Position.Y : Position.Y;
+        public float AbsoluteY => this.Entity != null ? this.Entity.Position.Y + this.Position.Y : this.Position.Y;
 
-        public float AbsoluteTop => Entity != null ? Top + Entity.Position.Y : Top;
+        public float AbsoluteTop => this.Entity != null ? this.Top + this.Entity.Position.Y : this.Top;
 
-        public float AbsoluteBottom => Entity != null ? Bottom + Entity.Position.Y : Bottom;
+        public float AbsoluteBottom => this.Entity != null ? this.Bottom + this.Entity.Position.Y : this.Bottom;
 
-        public float AbsoluteLeft => Entity != null ? Left + Entity.Position.X : Left;
+        public float AbsoluteLeft => this.Entity != null ? this.Left + this.Entity.Position.X : this.Left;
 
-        public float AbsoluteRight => Entity != null ? Right + Entity.Position.X : Right;
+        public float AbsoluteRight => this.Entity != null ? this.Right + this.Entity.Position.X : this.Right;
 
-        public Rectangle Bounds => new((int)AbsoluteLeft, (int)AbsoluteTop, (int)Width, (int)Height);
+        public Rectangle Bounds => new Rectangle((int) this.AbsoluteLeft, (int) this.AbsoluteTop, (int) this.Width, (int) this.Height);
     }
 }

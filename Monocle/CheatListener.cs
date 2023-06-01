@@ -13,57 +13,46 @@ namespace Monocle
     {
         public string CurrentInput;
         public bool Logging;
-        private readonly List<Tuple<char, Func<bool>>> inputs;
-        private readonly List<Tuple<string, Action>> cheats;
+        private List<Tuple<char, Func<bool>>> inputs;
+        private List<Tuple<string, Action>> cheats;
         private int maxInput;
 
         public CheatListener()
         {
-            Visible = false;
-            CurrentInput = "";
-            inputs = new List<Tuple<char, Func<bool>>>();
-            cheats = new List<Tuple<string, Action>>();
+            this.Visible = false;
+            this.CurrentInput = "";
+            this.inputs = new List<Tuple<char, Func<bool>>>();
+            this.cheats = new List<Tuple<string, Action>>();
         }
 
         public override void Update()
         {
             bool flag = false;
-            foreach (Tuple<char, Func<bool>> input in inputs)
+            foreach (Tuple<char, Func<bool>> input in this.inputs)
             {
                 if (input.Item2())
                 {
-                    CurrentInput += input.Item1.ToString();
+                    this.CurrentInput += input.Item1.ToString();
                     flag = true;
                 }
             }
             if (!flag)
-            {
                 return;
-            }
-
-            if (CurrentInput.Length > maxInput)
+            if (this.CurrentInput.Length > this.maxInput)
+                this.CurrentInput = this.CurrentInput.Substring(this.CurrentInput.Length - this.maxInput);
+            if (this.Logging)
+                Calc.Log((object) this.CurrentInput);
+            foreach (Tuple<string, Action> cheat in this.cheats)
             {
-                CurrentInput = CurrentInput.Substring(CurrentInput.Length - maxInput);
-            }
-
-            if (Logging)
-            {
-                Calc.Log(CurrentInput);
-            }
-
-            foreach (Tuple<string, Action> cheat in cheats)
-            {
-                if (CurrentInput.Contains(cheat.Item1))
+                if (this.CurrentInput.Contains(cheat.Item1))
                 {
-                    CurrentInput = "";
-                    cheat.Item2?.Invoke();
-                    _ = cheats.Remove(cheat);
-                    if (!Logging)
-                    {
+                    this.CurrentInput = "";
+                    if (cheat.Item2 != null)
+                        cheat.Item2();
+                    this.cheats.Remove(cheat);
+                    if (!this.Logging)
                         break;
-                    }
-
-                    Calc.Log("Cheat Activated: " + cheat.Item1);
+                    Calc.Log((object) ("Cheat Activated: " + cheat.Item1));
                     break;
                 }
             }
@@ -71,13 +60,10 @@ namespace Monocle
 
         public void AddCheat(string code, Action onEntered = null)
         {
-            cheats.Add(new Tuple<string, Action>(code, onEntered));
-            maxInput = Math.Max(code.Length, maxInput);
+            this.cheats.Add(new Tuple<string, Action>(code, onEntered));
+            this.maxInput = Math.Max(code.Length, this.maxInput);
         }
 
-        public void AddInput(char id, Func<bool> checker)
-        {
-            inputs.Add(new Tuple<char, Func<bool>>(id, checker));
-        }
+        public void AddInput(char id, Func<bool> checker) => this.inputs.Add(new Tuple<char, Func<bool>>(id, checker));
     }
 }

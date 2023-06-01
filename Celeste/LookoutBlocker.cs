@@ -15,7 +15,7 @@ namespace Celeste
         public LookoutBlocker(EntityData data, Vector2 offset)
             : base(data.Position + offset)
         {
-            Collider = new Hitbox(data.Width, data.Height);
+            this.Collider = (Collider) new Hitbox((float) data.Width, (float) data.Height);
         }
     }
 }

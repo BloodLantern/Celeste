@@ -14,12 +14,12 @@ namespace Celeste
         public NPC08_Theo(EntityData data, Vector2 position)
             : base(data.Position + position)
         {
-            Add(Sprite = GFX.SpriteBank.Create("theo"));
-            Sprite.Scale.X = -1f;
-            Sprite.Play("idle");
-            IdleAnim = "idle";
-            MoveAnim = "walk";
-            Maxspeed = 30f;
+            this.Add((Component) (this.Sprite = GFX.SpriteBank.Create("theo")));
+            this.Sprite.Scale.X = -1f;
+            this.Sprite.Play("idle");
+            this.IdleAnim = "idle";
+            this.MoveAnim = "walk";
+            this.Maxspeed = 30f;
         }
     }
 }

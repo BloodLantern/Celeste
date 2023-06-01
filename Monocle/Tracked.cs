@@ -12,9 +12,6 @@ namespace Monocle
     {
         public bool Inherited;
 
-        public Tracked(bool inherited = false)
-        {
-            Inherited = inherited;
-        }
+        public Tracked(bool inherited = false) => this.Inherited = inherited;
     }
 }

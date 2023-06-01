@@ -14,19 +14,18 @@ namespace Monocle
     {
         public static void SerializeToFile<T>(T obj, string filepath, SaveLoad.SerializeModes mode)
         {
-            using FileStream serializationStream = new(filepath, FileMode.Create);
-            if (mode == SaveLoad.SerializeModes.Binary)
+            using (FileStream serializationStream = new FileStream(filepath, FileMode.Create))
             {
-                new BinaryFormatter().Serialize(serializationStream, obj);
-            }
-            else
-            {
-                if (mode != SaveLoad.SerializeModes.XML)
+                if (mode == SaveLoad.SerializeModes.Binary)
                 {
-                    return;
+                    new BinaryFormatter().Serialize((Stream) serializationStream, (object) obj);
                 }
-
-                new XmlSerializer(typeof(T)).Serialize(serializationStream, obj);
+                else
+                {
+                    if (mode != SaveLoad.SerializeModes.XML)
+                        return;
+                    new XmlSerializer(typeof (T)).Serialize((Stream) serializationStream, (object) obj);
+                }
             }
         }
 
@@ -45,8 +44,8 @@ namespace Monocle
 
         public static T DeserializeFromFile<T>(string filepath, SaveLoad.SerializeModes mode)
         {
-            using FileStream serializationStream = File.OpenRead(filepath);
-            return mode == SaveLoad.SerializeModes.Binary ? (T)new BinaryFormatter().Deserialize(serializationStream) : (T)new XmlSerializer(typeof(T)).Deserialize(serializationStream);
+            using (FileStream serializationStream = File.OpenRead(filepath))
+                return mode == SaveLoad.SerializeModes.Binary ? (T) new BinaryFormatter().Deserialize((Stream) serializationStream) : (T) new XmlSerializer(typeof (T)).Deserialize((Stream) serializationStream);
         }
 
         public static T SafeDeserializeFromFile<T>(
@@ -55,22 +54,16 @@ namespace Monocle
             bool debugUnsafe = false)
         {
             if (!File.Exists(filepath))
-            {
-                return default;
-            }
-
+                return default (T);
             if (debugUnsafe)
-            {
                 return SaveLoad.DeserializeFromFile<T>(filepath, mode);
-            }
-
             try
             {
                 return SaveLoad.DeserializeFromFile<T>(filepath, mode);
             }
             catch
             {
-                return default;
+                return default (T);
             }
         }
 
@@ -95,13 +88,13 @@ namespace Monocle
                 catch
                 {
                     loadError = true;
-                    return default;
+                    return default (T);
                 }
             }
             else
             {
                 loadError = false;
-                return default;
+                return default (T);
             }
         }
 

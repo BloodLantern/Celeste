@@ -14,7 +14,7 @@ namespace Celeste
     public class CS05_Entrance : CutsceneEntity
     {
         public const string Flag = "entrance";
-        private readonly NPC theo;
+        private NPC theo;
         private Player player;
         private Vector2 playerMoveTo;
 
@@ -24,10 +24,7 @@ namespace Celeste
             this.theo = theo;
         }
 
-        public override void OnBegin(Level level)
-        {
-            Add(new Coroutine(Cutscene(level)));
-        }
+        public override void OnBegin(Level level) => this.Add((Component) new Coroutine(this.Cutscene(level)));
 
         private IEnumerator Cutscene(Level level)
         {
@@ -38,45 +35,45 @@ namespace Celeste
             cs05Entrance.player.X = cs05Entrance.theo.X - 32f;
             cs05Entrance.playerMoveTo = new Vector2(cs05Entrance.theo.X - 32f, cs05Entrance.player.Y);
             cs05Entrance.player.Facing = Facings.Left;
-            SpotlightWipe.FocusPoint = cs05Entrance.theo.TopCenter - (Vector2.UnitX * 16f) - level.Camera.Position;
-            yield return 2f;
+            SpotlightWipe.FocusPoint = cs05Entrance.theo.TopCenter - Vector2.UnitX * 16f - level.Camera.Position;
+            yield return (object) 2f;
             cs05Entrance.player.Facing = Facings.Right;
-            yield return 0.3f;
-            yield return cs05Entrance.theo.MoveTo(new Vector2(cs05Entrance.theo.X + 48f, cs05Entrance.theo.Y));
-            yield return Textbox.Say("ch5_entrance", new Func<IEnumerator>(cs05Entrance.MaddyTurnsRight), new Func<IEnumerator>(cs05Entrance.TheoTurns), new Func<IEnumerator>(cs05Entrance.TheoLeaves));
+            yield return (object) 0.3f;
+            yield return (object) cs05Entrance.theo.MoveTo(new Vector2(cs05Entrance.theo.X + 48f, cs05Entrance.theo.Y));
+            yield return (object) Textbox.Say("ch5_entrance", new Func<IEnumerator>(cs05Entrance.MaddyTurnsRight), new Func<IEnumerator>(cs05Entrance.TheoTurns), new Func<IEnumerator>(cs05Entrance.TheoLeaves));
             cs05Entrance.EndCutscene(level);
         }
 
         private IEnumerator MaddyTurnsRight()
         {
-            player.Facing = Facings.Right;
+            this.player.Facing = Facings.Right;
             yield break;
         }
 
         private IEnumerator TheoTurns()
         {
-            theo.Sprite.Scale.X *= -1f;
+            this.theo.Sprite.Scale.X *= -1f;
             yield break;
         }
 
         // ISSUE: reference to a compiler-generated field
         private IEnumerator TheoLeaves()
         {
-            yield return theo.MoveTo(new Vector2(Level.Bounds.Right + 32, theo.Y), false, null, false);
-            yield break;
+                yield return this.theo.MoveTo(new Vector2((float)(this.Level.Bounds.Right + 32), this.theo.Y), false, null, false);
+                yield break;
         }
 
-        public override void OnEnd(Level level)
+                public override void OnEnd(Level level)
         {
-            if (player != null)
+            if (this.player != null)
             {
-                player.StateMachine.Locked = false;
-                player.StateMachine.State = 0;
-                player.ForceCameraUpdate = false;
-                player.Position = playerMoveTo;
-                player.Facing = Facings.Right;
+                this.player.StateMachine.Locked = false;
+                this.player.StateMachine.State = 0;
+                this.player.ForceCameraUpdate = false;
+                this.player.Position = this.playerMoveTo;
+                this.player.Facing = Facings.Right;
             }
-            Scene.Remove(theo);
+            this.Scene.Remove((Entity) this.theo);
             level.Session.SetFlag("entrance");
         }
     }

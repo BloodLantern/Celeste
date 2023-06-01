@@ -17,18 +17,18 @@ namespace Celeste
         public static ParticleType P_PressB;
         public static ParticleType P_PressAMirror;
         public static ParticleType P_PressBMirror;
-        private readonly DashSwitch.Sides side;
+        private DashSwitch.Sides side;
         private Vector2 pressedTarget;
         private bool pressed;
         private Vector2 pressDirection;
         private float speedY;
-        private readonly float startY;
-        private readonly bool persistent;
+        private float startY;
+        private bool persistent;
         private EntityID id;
-        private readonly bool mirrorMode;
+        private bool mirrorMode;
         private bool playerWasOn;
-        private readonly bool allGates;
-        private readonly Sprite sprite;
+        private bool allGates;
+        private Sprite sprite;
 
         public DashSwitch(
             Vector2 position,
@@ -43,48 +43,48 @@ namespace Celeste
             this.persistent = persistent;
             this.allGates = allGates;
             this.id = id;
-            mirrorMode = spriteName != "default";
-            Add(sprite = GFX.SpriteBank.Create("dashSwitch_" + spriteName));
-            sprite.Play("idle");
-            if (side is DashSwitch.Sides.Up or DashSwitch.Sides.Down)
+            this.mirrorMode = spriteName != "default";
+            this.Add((Component) (this.sprite = GFX.SpriteBank.Create("dashSwitch_" + spriteName)));
+            this.sprite.Play("idle");
+            if (side == DashSwitch.Sides.Up || side == DashSwitch.Sides.Down)
             {
-                Collider.Width = 16f;
-                Collider.Height = 8f;
+                this.Collider.Width = 16f;
+                this.Collider.Height = 8f;
             }
             else
             {
-                Collider.Width = 8f;
-                Collider.Height = 16f;
+                this.Collider.Width = 8f;
+                this.Collider.Height = 16f;
             }
             switch (side)
             {
                 case DashSwitch.Sides.Up:
-                    sprite.Position = new Vector2(8f, 0.0f);
-                    sprite.Rotation = -1.57079637f;
-                    pressedTarget = Position + (Vector2.UnitY * -8f);
-                    pressDirection = -Vector2.UnitY;
+                    this.sprite.Position = new Vector2(8f, 0.0f);
+                    this.sprite.Rotation = -1.57079637f;
+                    this.pressedTarget = this.Position + Vector2.UnitY * -8f;
+                    this.pressDirection = -Vector2.UnitY;
                     break;
                 case DashSwitch.Sides.Down:
-                    sprite.Position = new Vector2(8f, 8f);
-                    sprite.Rotation = 1.57079637f;
-                    pressedTarget = Position + (Vector2.UnitY * 8f);
-                    pressDirection = Vector2.UnitY;
-                    startY = Y;
+                    this.sprite.Position = new Vector2(8f, 8f);
+                    this.sprite.Rotation = 1.57079637f;
+                    this.pressedTarget = this.Position + Vector2.UnitY * 8f;
+                    this.pressDirection = Vector2.UnitY;
+                    this.startY = this.Y;
                     break;
                 case DashSwitch.Sides.Left:
-                    sprite.Position = new Vector2(0.0f, 8f);
-                    sprite.Rotation = 3.14159274f;
-                    pressedTarget = Position + (Vector2.UnitX * -8f);
-                    pressDirection = -Vector2.UnitX;
+                    this.sprite.Position = new Vector2(0.0f, 8f);
+                    this.sprite.Rotation = 3.14159274f;
+                    this.pressedTarget = this.Position + Vector2.UnitX * -8f;
+                    this.pressDirection = -Vector2.UnitX;
                     break;
                 case DashSwitch.Sides.Right:
-                    sprite.Position = new Vector2(8f, 8f);
-                    sprite.Rotation = 0.0f;
-                    pressedTarget = Position + (Vector2.UnitX * 8f);
-                    pressDirection = Vector2.UnitX;
+                    this.sprite.Position = new Vector2(8f, 8f);
+                    this.sprite.Rotation = 0.0f;
+                    this.pressedTarget = this.Position + Vector2.UnitX * 8f;
+                    this.pressDirection = Vector2.UnitX;
                     break;
             }
-            OnDashCollide = new DashCollision(OnDashed);
+            this.OnDashCollide = new DashCollision(this.OnDashed);
         }
 
         public static DashSwitch Create(EntityData data, Vector2 offset, EntityID id)
@@ -99,126 +99,99 @@ namespace Celeste
         public override void Awake(Scene scene)
         {
             base.Awake(scene);
-            if (!persistent || !SceneAs<Level>().Session.GetFlag(FlagName))
-            {
+            if (!this.persistent || !this.SceneAs<Level>().Session.GetFlag(this.FlagName))
                 return;
-            }
-
-            sprite.Play("pushed");
-            Position = pressedTarget - (pressDirection * 2f);
-            pressed = true;
-            Collidable = false;
-            if (allGates)
+            this.sprite.Play("pushed");
+            this.Position = this.pressedTarget - this.pressDirection * 2f;
+            this.pressed = true;
+            this.Collidable = false;
+            if (this.allGates)
             {
-                foreach (TempleGate entity in Scene.Tracker.GetEntities<TempleGate>())
+                foreach (TempleGate entity in this.Scene.Tracker.GetEntities<TempleGate>())
                 {
-                    if (entity.Type == TempleGate.Types.NearestSwitch && entity.LevelID == id.Level)
-                    {
+                    if (entity.Type == TempleGate.Types.NearestSwitch && entity.LevelID == this.id.Level)
                         entity.StartOpen();
-                    }
                 }
             }
             else
-            {
-                GetGate()?.StartOpen();
-            }
+                this.GetGate()?.StartOpen();
         }
 
         public override void Update()
         {
             base.Update();
-            if (pressed || side != DashSwitch.Sides.Down)
-            {
+            if (this.pressed || this.side != DashSwitch.Sides.Down)
                 return;
-            }
-
-            Player playerOnTop = GetPlayerOnTop();
+            Player playerOnTop = this.GetPlayerOnTop();
             if (playerOnTop != null)
             {
                 if (playerOnTop.Holding != null)
                 {
-                    _ = (int)OnDashed(playerOnTop, Vector2.UnitY);
+                    int num = (int) this.OnDashed(playerOnTop, Vector2.UnitY);
                 }
                 else
                 {
-                    if (speedY < 0.0)
-                    {
-                        speedY = 0.0f;
-                    }
-
-                    speedY = Calc.Approach(speedY, 70f, 200f * Engine.DeltaTime);
-                    MoveTowardsY(startY + 2f, speedY * Engine.DeltaTime);
-                    if (!playerWasOn)
-                    {
-                        _ = Audio.Play("event:/game/05_mirror_temple/button_depress", Position);
-                    }
+                    if ((double) this.speedY < 0.0)
+                        this.speedY = 0.0f;
+                    this.speedY = Calc.Approach(this.speedY, 70f, 200f * Engine.DeltaTime);
+                    this.MoveTowardsY(this.startY + 2f, this.speedY * Engine.DeltaTime);
+                    if (!this.playerWasOn)
+                        Audio.Play("event:/game/05_mirror_temple/button_depress", this.Position);
                 }
             }
             else
             {
-                if (speedY > 0.0)
-                {
-                    speedY = 0.0f;
-                }
-
-                speedY = Calc.Approach(speedY, -150f, 200f * Engine.DeltaTime);
-                MoveTowardsY(startY, -speedY * Engine.DeltaTime);
-                if (playerWasOn)
-                {
-                    _ = Audio.Play("event:/game/05_mirror_temple/button_return", Position);
-                }
+                if ((double) this.speedY > 0.0)
+                    this.speedY = 0.0f;
+                this.speedY = Calc.Approach(this.speedY, -150f, 200f * Engine.DeltaTime);
+                this.MoveTowardsY(this.startY, -this.speedY * Engine.DeltaTime);
+                if (this.playerWasOn)
+                    Audio.Play("event:/game/05_mirror_temple/button_return", this.Position);
             }
-            playerWasOn = playerOnTop != null;
+            this.playerWasOn = playerOnTop != null;
         }
 
         public DashCollisionResults OnDashed(Player player, Vector2 direction)
         {
-            if (!pressed && direction == pressDirection)
+            if (!this.pressed && direction == this.pressDirection)
             {
                 Input.Rumble(RumbleStrength.Medium, RumbleLength.Medium);
-                _ = Audio.Play("event:/game/05_mirror_temple/button_activate", Position);
-                sprite.Play("push");
-                pressed = true;
-                MoveTo(pressedTarget);
-                Collidable = false;
-                Position -= pressDirection * 2f;
-                SceneAs<Level>().ParticlesFG.Emit(mirrorMode ? DashSwitch.P_PressAMirror : DashSwitch.P_PressA, 10, Position + sprite.Position, direction.Perpendicular() * 6f, sprite.Rotation - 3.14159274f);
-                SceneAs<Level>().ParticlesFG.Emit(mirrorMode ? DashSwitch.P_PressBMirror : DashSwitch.P_PressB, 4, Position + sprite.Position, direction.Perpendicular() * 6f, sprite.Rotation - 3.14159274f);
-                if (allGates)
+                Audio.Play("event:/game/05_mirror_temple/button_activate", this.Position);
+                this.sprite.Play("push");
+                this.pressed = true;
+                this.MoveTo(this.pressedTarget);
+                this.Collidable = false;
+                this.Position = this.Position - this.pressDirection * 2f;
+                this.SceneAs<Level>().ParticlesFG.Emit(this.mirrorMode ? DashSwitch.P_PressAMirror : DashSwitch.P_PressA, 10, this.Position + this.sprite.Position, direction.Perpendicular() * 6f, this.sprite.Rotation - 3.14159274f);
+                this.SceneAs<Level>().ParticlesFG.Emit(this.mirrorMode ? DashSwitch.P_PressBMirror : DashSwitch.P_PressB, 4, this.Position + this.sprite.Position, direction.Perpendicular() * 6f, this.sprite.Rotation - 3.14159274f);
+                if (this.allGates)
                 {
-                    foreach (TempleGate entity in Scene.Tracker.GetEntities<TempleGate>())
+                    foreach (TempleGate entity in this.Scene.Tracker.GetEntities<TempleGate>())
                     {
-                        if (entity.Type == TempleGate.Types.NearestSwitch && entity.LevelID == id.Level)
-                        {
+                        if (entity.Type == TempleGate.Types.NearestSwitch && entity.LevelID == this.id.Level)
                             entity.SwitchOpen();
-                        }
                     }
                 }
                 else
-                {
-                    GetGate()?.SwitchOpen();
-                }
-
-                Scene.Entities.FindFirst<TempleMirrorPortal>()?.OnSwitchHit(Math.Sign(X - (Scene as Level).Bounds.Center.X));
-                if (persistent)
-                {
-                    SceneAs<Level>().Session.SetFlag(FlagName);
-                }
+                    this.GetGate()?.SwitchOpen();
+                this.Scene.Entities.FindFirst<TempleMirrorPortal>()?.OnSwitchHit(Math.Sign(this.X - (float) (this.Scene as Level).Bounds.Center.X));
+                if (this.persistent)
+                    this.SceneAs<Level>().Session.SetFlag(this.FlagName);
             }
             return DashCollisionResults.NormalCollision;
         }
 
         private TempleGate GetGate()
         {
-            List<Entity> entities = Scene.Tracker.GetEntities<TempleGate>();
-            TempleGate gate = null;
+            List<Entity> entities = this.Scene.Tracker.GetEntities<TempleGate>();
+            TempleGate gate = (TempleGate) null;
             float num1 = 0.0f;
             foreach (TempleGate templeGate in entities)
             {
-                if (templeGate.Type == TempleGate.Types.NearestSwitch && !templeGate.ClaimedByASwitch && templeGate.LevelID == id.Level)
+                if (templeGate.Type == TempleGate.Types.NearestSwitch && !templeGate.ClaimedByASwitch && templeGate.LevelID == this.id.Level)
                 {
-                    float num2 = Vector2.DistanceSquared(Position, templeGate.Position);
-                    if (gate == null || (double)num2 < (double)num1)
+                    float num2 = Vector2.DistanceSquared(this.Position, templeGate.Position);
+                    if (gate == null || (double) num2 < (double) num1)
                     {
                         gate = templeGate;
                         num1 = num2;
@@ -226,19 +199,13 @@ namespace Celeste
                 }
             }
             if (gate != null)
-            {
                 gate.ClaimedByASwitch = true;
-            }
-
             return gate;
         }
 
-        private string FlagName => DashSwitch.GetFlagName(id);
+        private string FlagName => DashSwitch.GetFlagName(this.id);
 
-        public static string GetFlagName(EntityID id)
-        {
-            return "dashSwitch_" + id.Key;
-        }
+        public static string GetFlagName(EntityID id) => "dashSwitch_" + id.Key;
 
         public enum Sides
         {
