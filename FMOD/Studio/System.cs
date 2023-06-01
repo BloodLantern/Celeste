@@ -15,11 +15,9 @@ namespace FMOD.Studio
         public static RESULT create(out FMOD.Studio.System studiosystem)
         {
             studiosystem = null;
-            RESULT result = FMOD.Studio.System.FMOD_Studio_System_Create(out IntPtr studiosystem1, 69652U);
+            RESULT result = FMOD_Studio_System_Create(out IntPtr studiosystem1, 69652U);
             if (result != RESULT.OK)
-            {
                 return result;
-            }
 
             studiosystem = new FMOD.Studio.System(studiosystem1);
             return result;
@@ -28,13 +26,13 @@ namespace FMOD.Studio
         public RESULT setAdvancedSettings(ADVANCEDSETTINGS settings)
         {
             settings.cbsize = Marshal.SizeOf(typeof(ADVANCEDSETTINGS));
-            return FMOD.Studio.System.FMOD_Studio_System_SetAdvancedSettings(rawPtr, ref settings);
+            return FMOD_Studio_System_SetAdvancedSettings(rawPtr, ref settings);
         }
 
         public RESULT getAdvancedSettings(out ADVANCEDSETTINGS settings)
         {
             settings.cbsize = Marshal.SizeOf(typeof(ADVANCEDSETTINGS));
-            return FMOD.Studio.System.FMOD_Studio_System_GetAdvancedSettings(rawPtr, out settings);
+            return FMOD_Studio_System_GetAdvancedSettings(rawPtr, out settings);
         }
 
         public RESULT initialize(
@@ -43,24 +41,24 @@ namespace FMOD.Studio
             FMOD.INITFLAGS flags,
             IntPtr extradriverdata)
         {
-            return FMOD.Studio.System.FMOD_Studio_System_Initialize(rawPtr, maxchannels, studioFlags, flags, extradriverdata);
+            return FMOD_Studio_System_Initialize(rawPtr, maxchannels, studioFlags, flags, extradriverdata);
         }
 
         public RESULT release()
         {
-            return FMOD.Studio.System.FMOD_Studio_System_Release(rawPtr);
+            return FMOD_Studio_System_Release(rawPtr);
         }
 
         public RESULT update()
         {
-            return FMOD.Studio.System.FMOD_Studio_System_Update(rawPtr);
+            return FMOD_Studio_System_Update(rawPtr);
         }
 
         public RESULT getLowLevelSystem(out FMOD.System system)
         {
             system = null;
             _ = new IntPtr();
-            RESULT lowLevelSystem = FMOD.Studio.System.FMOD_Studio_System_GetLowLevelSystem(rawPtr, out IntPtr system1);
+            RESULT lowLevelSystem = FMOD_Studio_System_GetLowLevelSystem(rawPtr, out IntPtr system1);
             if (lowLevelSystem != RESULT.OK)
             {
                 return lowLevelSystem;
@@ -74,7 +72,7 @@ namespace FMOD.Studio
         {
             _event = null;
             _ = new IntPtr();
-            RESULT result = FMOD.Studio.System.FMOD_Studio_System_GetEvent(rawPtr, Encoding.UTF8.GetBytes(path + "\0"), out IntPtr description);
+            RESULT result = FMOD_Studio_System_GetEvent(rawPtr, Encoding.UTF8.GetBytes(path + "\0"), out IntPtr description);
             if (result != RESULT.OK)
             {
                 return result;
@@ -88,7 +86,7 @@ namespace FMOD.Studio
         {
             bus = null;
             _ = new IntPtr();
-            RESULT bus2 = FMOD.Studio.System.FMOD_Studio_System_GetBus(rawPtr, Encoding.UTF8.GetBytes(path + "\0"), out IntPtr bus1);
+            RESULT bus2 = FMOD_Studio_System_GetBus(rawPtr, Encoding.UTF8.GetBytes(path + "\0"), out IntPtr bus1);
             if (bus2 != RESULT.OK)
             {
                 return bus2;
@@ -102,7 +100,7 @@ namespace FMOD.Studio
         {
             vca = null;
             _ = new IntPtr();
-            RESULT vca2 = FMOD.Studio.System.FMOD_Studio_System_GetVCA(rawPtr, Encoding.UTF8.GetBytes(path + "\0"), out IntPtr vca1);
+            RESULT vca2 = FMOD_Studio_System_GetVCA(rawPtr, Encoding.UTF8.GetBytes(path + "\0"), out IntPtr vca1);
             if (vca2 != RESULT.OK)
             {
                 return vca2;
@@ -116,7 +114,7 @@ namespace FMOD.Studio
         {
             bank = null;
             _ = new IntPtr();
-            RESULT bank2 = FMOD.Studio.System.FMOD_Studio_System_GetBank(rawPtr, Encoding.UTF8.GetBytes(path + "\0"), out IntPtr bank1);
+            RESULT bank2 = FMOD_Studio_System_GetBank(rawPtr, Encoding.UTF8.GetBytes(path + "\0"), out IntPtr bank1);
             if (bank2 != RESULT.OK)
             {
                 return bank2;
@@ -130,7 +128,7 @@ namespace FMOD.Studio
         {
             _event = null;
             _ = new IntPtr();
-            RESULT eventById = FMOD.Studio.System.FMOD_Studio_System_GetEventByID(rawPtr, ref guid, out IntPtr description);
+            RESULT eventById = FMOD_Studio_System_GetEventByID(rawPtr, ref guid, out IntPtr description);
             if (eventById != RESULT.OK)
             {
                 return eventById;
@@ -144,7 +142,7 @@ namespace FMOD.Studio
         {
             bus = null;
             _ = new IntPtr();
-            RESULT busById = FMOD.Studio.System.FMOD_Studio_System_GetBusByID(rawPtr, ref guid, out IntPtr bus1);
+            RESULT busById = FMOD_Studio_System_GetBusByID(rawPtr, ref guid, out IntPtr bus1);
             if (busById != RESULT.OK)
             {
                 return busById;
@@ -158,7 +156,7 @@ namespace FMOD.Studio
         {
             vca = null;
             _ = new IntPtr();
-            RESULT vcaById = FMOD.Studio.System.FMOD_Studio_System_GetVCAByID(rawPtr, ref guid, out IntPtr vca1);
+            RESULT vcaById = FMOD_Studio_System_GetVCAByID(rawPtr, ref guid, out IntPtr vca1);
             if (vcaById != RESULT.OK)
             {
                 return vcaById;
@@ -172,7 +170,7 @@ namespace FMOD.Studio
         {
             bank = null;
             _ = new IntPtr();
-            RESULT bankById = FMOD.Studio.System.FMOD_Studio_System_GetBankByID(rawPtr, ref guid, out IntPtr bank1);
+            RESULT bankById = FMOD_Studio_System_GetBankByID(rawPtr, ref guid, out IntPtr bank1);
             if (bankById != RESULT.OK)
             {
                 return bankById;
@@ -184,7 +182,7 @@ namespace FMOD.Studio
 
         public RESULT getSoundInfo(string key, out SOUND_INFO info)
         {
-            RESULT soundInfo = FMOD.Studio.System.FMOD_Studio_System_GetSoundInfo(rawPtr, Encoding.UTF8.GetBytes(key + "\0"), out SOUND_INFO_INTERNAL info1);
+            RESULT soundInfo = FMOD_Studio_System_GetSoundInfo(rawPtr, Encoding.UTF8.GetBytes(key + "\0"), out SOUND_INFO_INTERNAL info1);
             if (soundInfo != RESULT.OK)
             {
                 info = new SOUND_INFO();
@@ -196,18 +194,18 @@ namespace FMOD.Studio
 
         public RESULT lookupID(string path, out Guid guid)
         {
-            return FMOD.Studio.System.FMOD_Studio_System_LookupID(rawPtr, Encoding.UTF8.GetBytes(path + "\0"), out guid);
+            return FMOD_Studio_System_LookupID(rawPtr, Encoding.UTF8.GetBytes(path + "\0"), out guid);
         }
 
         public RESULT lookupPath(Guid guid, out string path)
         {
             path = null;
             byte[] numArray = new byte[256];
-            RESULT result = FMOD.Studio.System.FMOD_Studio_System_LookupPath(rawPtr, ref guid, numArray, numArray.Length, out int retrieved);
+            RESULT result = FMOD_Studio_System_LookupPath(rawPtr, ref guid, numArray, numArray.Length, out int retrieved);
             if (result == RESULT.ERR_TRUNCATED)
             {
                 numArray = new byte[retrieved];
-                result = FMOD.Studio.System.FMOD_Studio_System_LookupPath(rawPtr, ref guid, numArray, numArray.Length, out retrieved);
+                result = FMOD_Studio_System_LookupPath(rawPtr, ref guid, numArray, numArray.Length, out retrieved);
             }
             if (result == RESULT.OK)
             {
@@ -219,39 +217,39 @@ namespace FMOD.Studio
 
         public RESULT getNumListeners(out int numlisteners)
         {
-            return FMOD.Studio.System.FMOD_Studio_System_GetNumListeners(rawPtr, out numlisteners);
+            return FMOD_Studio_System_GetNumListeners(rawPtr, out numlisteners);
         }
 
         public RESULT setNumListeners(int numlisteners)
         {
-            return FMOD.Studio.System.FMOD_Studio_System_SetNumListeners(rawPtr, numlisteners);
+            return FMOD_Studio_System_SetNumListeners(rawPtr, numlisteners);
         }
 
         public RESULT getListenerAttributes(int listener, out _3D_ATTRIBUTES attributes)
         {
-            return FMOD.Studio.System.FMOD_Studio_System_GetListenerAttributes(rawPtr, listener, out attributes);
+            return FMOD_Studio_System_GetListenerAttributes(rawPtr, listener, out attributes);
         }
 
         public RESULT setListenerAttributes(int listener, _3D_ATTRIBUTES attributes)
         {
-            return FMOD.Studio.System.FMOD_Studio_System_SetListenerAttributes(rawPtr, listener, ref attributes);
+            return FMOD_Studio_System_SetListenerAttributes(rawPtr, listener, ref attributes);
         }
 
         public RESULT getListenerWeight(int listener, out float weight)
         {
-            return FMOD.Studio.System.FMOD_Studio_System_GetListenerWeight(rawPtr, listener, out weight);
+            return FMOD_Studio_System_GetListenerWeight(rawPtr, listener, out weight);
         }
 
         public RESULT setListenerWeight(int listener, float weight)
         {
-            return FMOD.Studio.System.FMOD_Studio_System_SetListenerWeight(rawPtr, listener, weight);
+            return FMOD_Studio_System_SetListenerWeight(rawPtr, listener, weight);
         }
 
         public RESULT loadBankFile(string name, LOAD_BANK_FLAGS flags, out Bank bank)
         {
             bank = null;
             _ = new IntPtr();
-            RESULT result = FMOD.Studio.System.FMOD_Studio_System_LoadBankFile(rawPtr, Encoding.UTF8.GetBytes(name + "\0"), flags, out IntPtr bank1);
+            RESULT result = FMOD_Studio_System_LoadBankFile(rawPtr, Encoding.UTF8.GetBytes(name + "\0"), flags, out IntPtr bank1);
             if (result != RESULT.OK)
             {
                 return result;
@@ -265,7 +263,7 @@ namespace FMOD.Studio
         {
             bank = null;
             _ = new IntPtr();
-            RESULT result = FMOD.Studio.System.FMOD_Studio_System_LoadBankMemory(rawPtr, buffer, buffer.Length, LOAD_MEMORY_MODE.LOAD_MEMORY, flags, out IntPtr bank1);
+            RESULT result = FMOD_Studio_System_LoadBankMemory(rawPtr, buffer, buffer.Length, LOAD_MEMORY_MODE.LOAD_MEMORY, flags, out IntPtr bank1);
             if (result != RESULT.OK)
             {
                 return result;
@@ -280,7 +278,7 @@ namespace FMOD.Studio
             bank = null;
             info.size = Marshal.SizeOf((object)info);
             _ = new IntPtr();
-            RESULT result = FMOD.Studio.System.FMOD_Studio_System_LoadBankCustom(rawPtr, ref info, flags, out IntPtr bank1);
+            RESULT result = FMOD_Studio_System_LoadBankCustom(rawPtr, ref info, flags, out IntPtr bank1);
             if (result != RESULT.OK)
             {
                 return result;
@@ -292,27 +290,27 @@ namespace FMOD.Studio
 
         public RESULT unloadAll()
         {
-            return FMOD.Studio.System.FMOD_Studio_System_UnloadAll(rawPtr);
+            return FMOD_Studio_System_UnloadAll(rawPtr);
         }
 
         public RESULT flushCommands()
         {
-            return FMOD.Studio.System.FMOD_Studio_System_FlushCommands(rawPtr);
+            return FMOD_Studio_System_FlushCommands(rawPtr);
         }
 
         public RESULT flushSampleLoading()
         {
-            return FMOD.Studio.System.FMOD_Studio_System_FlushSampleLoading(rawPtr);
+            return FMOD_Studio_System_FlushSampleLoading(rawPtr);
         }
 
         public RESULT startCommandCapture(string path, COMMANDCAPTURE_FLAGS flags)
         {
-            return FMOD.Studio.System.FMOD_Studio_System_StartCommandCapture(rawPtr, Encoding.UTF8.GetBytes(path + "\0"), flags);
+            return FMOD_Studio_System_StartCommandCapture(rawPtr, Encoding.UTF8.GetBytes(path + "\0"), flags);
         }
 
         public RESULT stopCommandCapture()
         {
-            return FMOD.Studio.System.FMOD_Studio_System_StopCommandCapture(rawPtr);
+            return FMOD_Studio_System_StopCommandCapture(rawPtr);
         }
 
         public RESULT loadCommandReplay(
@@ -322,7 +320,7 @@ namespace FMOD.Studio
         {
             replay = null;
             _ = new IntPtr();
-            int num = (int)FMOD.Studio.System.FMOD_Studio_System_LoadCommandReplay(rawPtr, Encoding.UTF8.GetBytes(path + "\0"), flags, out IntPtr commandReplay);
+            int num = (int)FMOD_Studio_System_LoadCommandReplay(rawPtr, Encoding.UTF8.GetBytes(path + "\0"), flags, out IntPtr commandReplay);
             if (num != 0)
             {
                 return (RESULT)num;
@@ -334,13 +332,13 @@ namespace FMOD.Studio
 
         public RESULT getBankCount(out int count)
         {
-            return FMOD.Studio.System.FMOD_Studio_System_GetBankCount(rawPtr, out count);
+            return FMOD_Studio_System_GetBankCount(rawPtr, out count);
         }
 
         public RESULT getBankList(out Bank[] array)
         {
             array = null;
-            RESULT bankCount = FMOD.Studio.System.FMOD_Studio_System_GetBankCount(rawPtr, out int count1);
+            RESULT bankCount = FMOD_Studio_System_GetBankCount(rawPtr, out int count1);
             if (bankCount != RESULT.OK)
             {
                 return bankCount;
@@ -352,7 +350,7 @@ namespace FMOD.Studio
                 return bankCount;
             }
             IntPtr[] array1 = new IntPtr[count1];
-            RESULT bankList = FMOD.Studio.System.FMOD_Studio_System_GetBankList(rawPtr, array1, count1, out int count2);
+            RESULT bankList = FMOD_Studio_System_GetBankList(rawPtr, array1, count1, out int count2);
             if (bankList != RESULT.OK)
             {
                 return bankList;
@@ -374,32 +372,32 @@ namespace FMOD.Studio
 
         public RESULT getCPUUsage(out CPU_USAGE usage)
         {
-            return FMOD.Studio.System.FMOD_Studio_System_GetCPUUsage(rawPtr, out usage);
+            return FMOD_Studio_System_GetCPUUsage(rawPtr, out usage);
         }
 
         public RESULT getBufferUsage(out BUFFER_USAGE usage)
         {
-            return FMOD.Studio.System.FMOD_Studio_System_GetBufferUsage(rawPtr, out usage);
+            return FMOD_Studio_System_GetBufferUsage(rawPtr, out usage);
         }
 
         public RESULT resetBufferUsage()
         {
-            return FMOD.Studio.System.FMOD_Studio_System_ResetBufferUsage(rawPtr);
+            return FMOD_Studio_System_ResetBufferUsage(rawPtr);
         }
 
         public RESULT setCallback(SYSTEM_CALLBACK callback, SYSTEM_CALLBACK_TYPE callbackmask = SYSTEM_CALLBACK_TYPE.ALL)
         {
-            return FMOD.Studio.System.FMOD_Studio_System_SetCallback(rawPtr, callback, callbackmask);
+            return FMOD_Studio_System_SetCallback(rawPtr, callback, callbackmask);
         }
 
         public RESULT getUserData(out IntPtr userdata)
         {
-            return FMOD.Studio.System.FMOD_Studio_System_GetUserData(rawPtr, out userdata);
+            return FMOD_Studio_System_GetUserData(rawPtr, out userdata);
         }
 
         public RESULT setUserData(IntPtr userdata)
         {
-            return FMOD.Studio.System.FMOD_Studio_System_SetUserData(rawPtr, userdata);
+            return FMOD_Studio_System_SetUserData(rawPtr, userdata);
         }
 
         [DllImport("fmodstudio")]
@@ -637,7 +635,7 @@ namespace FMOD.Studio
 
         protected override bool isValidInternal()
         {
-            return FMOD.Studio.System.FMOD_Studio_System_IsValid(rawPtr);
+            return FMOD_Studio_System_IsValid(rawPtr);
         }
     }
 }

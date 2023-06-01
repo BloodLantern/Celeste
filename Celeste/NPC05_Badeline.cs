@@ -193,9 +193,10 @@ namespace Celeste
 
         public void MoveToNode(int index, bool chatMove = true)
         {
-            _ = chatMove
-                ? moveSfx.Play("event:/char/badeline/temple_move_chats")
-                : SoundEmitter.Play("event:/char/badeline/temple_move_first", this);
+            if (chatMove)
+                moveSfx.Play("event:/char/badeline/temple_move_chats");
+            else
+                SoundEmitter.Play("event:/char/badeline/temple_move_first", this);
 
             Vector2 start = shadow.Position;
             Vector2 end = nodes[index];

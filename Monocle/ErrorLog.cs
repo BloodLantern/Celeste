@@ -18,62 +18,56 @@ namespace Monocle
 
         public static void Write(Exception e)
         {
-            ErrorLog.Write(e.ToString());
+            Write(e.ToString());
         }
 
         public static void Write(string str)
         {
             StringBuilder stringBuilder = new();
             string str1 = "";
-            if (Path.IsPathRooted("error_log.txt"))
+            if (Path.IsPathRooted(Filename))
             {
-                string directoryName = Path.GetDirectoryName("error_log.txt");
+                string directoryName = Path.GetDirectoryName(Filename);
                 if (!Directory.Exists(directoryName))
-                {
-                    _ = Directory.CreateDirectory(directoryName);
-                }
+                    Directory.CreateDirectory(directoryName);
             }
-            if (File.Exists("error_log.txt"))
+            if (File.Exists(Filename))
             {
-                StreamReader streamReader = new("error_log.txt");
+                StreamReader streamReader = new(Filename);
                 str1 = streamReader.ReadToEnd();
                 streamReader.Close();
-                if (!str1.Contains("=========================================="))
-                {
+                if (!str1.Contains(Marker))
                     str1 = "";
-                }
             }
             _ = Engine.Instance != null ? stringBuilder.Append(Engine.Instance.Title) : stringBuilder.Append("Monocle Engine");
 
-            _ = stringBuilder.AppendLine(" Error Log");
-            _ = stringBuilder.AppendLine("==========================================");
-            _ = stringBuilder.AppendLine();
+            stringBuilder.AppendLine(" Error Log");
+            stringBuilder.AppendLine(Marker);
+            stringBuilder.AppendLine();
             if (Engine.Instance != null && Engine.Instance.Version != null)
             {
-                _ = stringBuilder.Append("Ver ");
-                _ = stringBuilder.AppendLine(Engine.Instance.Version.ToString());
+                stringBuilder.Append("Ver ");
+                stringBuilder.AppendLine(Engine.Instance.Version.ToString());
             }
-            _ = stringBuilder.AppendLine(DateTime.Now.ToString());
-            _ = stringBuilder.AppendLine(str);
+            stringBuilder.AppendLine(DateTime.Now.ToString());
+            stringBuilder.AppendLine(str);
             if (str1 != "")
             {
-                int startIndex = str1.IndexOf("==========================================") + "==========================================".Length;
+                int startIndex = str1.IndexOf(Marker) + Marker.Length;
                 string str2 = str1.Substring(startIndex);
-                _ = stringBuilder.AppendLine(str2);
+                stringBuilder.AppendLine(str2);
             }
-            StreamWriter streamWriter = new("error_log.txt", false);
+            StreamWriter streamWriter = new(Filename, false);
             streamWriter.Write(stringBuilder.ToString());
             streamWriter.Close();
         }
 
         public static void Open()
         {
-            if (!File.Exists("error_log.txt"))
-            {
+            if (!File.Exists(Filename))
                 return;
-            }
 
-            _ = Process.Start("error_log.txt");
+            Process.Start(Filename);
         }
     }
 }

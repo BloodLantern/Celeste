@@ -211,7 +211,10 @@ namespace Celeste
 
         private void Close()
         {
-            _ = fromAreaInspect ? Overworld.Goto<OuiChapterPanel>() : Overworld.Goto<OuiChapterSelect>();
+            if (fromAreaInspect)
+                Overworld.Goto<OuiChapterPanel>();
+            else
+                Overworld.Goto<OuiChapterSelect>();
         }
 
         public override void Render()
