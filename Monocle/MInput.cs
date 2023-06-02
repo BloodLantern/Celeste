@@ -13,84 +13,84 @@ namespace Monocle
         public static bool ControllerHasFocus = false;
         public static bool IsControllerFocused = false;
 
-        public static MInput.KeyboardData Keyboard { get; private set; }
+        public static KeyboardData Keyboard { get; private set; }
 
-        public static MInput.MouseData Mouse { get; private set; }
+        public static MouseData Mouse { get; private set; }
 
-        public static MInput.GamePadData[] GamePads { get; private set; }
+        public static GamePadData[] GamePads { get; private set; }
 
         internal static void Initialize()
         {
-            MInput.Keyboard = new MInput.KeyboardData();
-            MInput.Mouse = new MInput.MouseData();
-            MInput.GamePads = new MInput.GamePadData[4];
+            Keyboard = new KeyboardData();
+            Mouse = new MouseData();
+            GamePads = new GamePadData[4];
             for (int playerIndex = 0; playerIndex < 4; ++playerIndex)
-                MInput.GamePads[playerIndex] = new MInput.GamePadData(playerIndex);
-            MInput.VirtualInputs = new List<VirtualInput>();
+                GamePads[playerIndex] = new GamePadData(playerIndex);
+            VirtualInputs = new List<VirtualInput>();
         }
 
         internal static void Shutdown()
         {
-            foreach (MInput.GamePadData gamePad in MInput.GamePads)
+            foreach (GamePadData gamePad in GamePads)
                 gamePad.StopRumble();
         }
 
         internal static void Update()
         {
-            if (Engine.Instance.IsActive && MInput.Active)
+            if (Engine.Instance.IsActive && Active)
             {
                 if (Engine.Commands.Open)
                 {
-                    MInput.Keyboard.UpdateNull();
-                    MInput.Mouse.UpdateNull();
+                    Keyboard.UpdateNull();
+                    Mouse.UpdateNull();
                 }
                 else
                 {
-                    MInput.Keyboard.Update();
-                    MInput.Mouse.Update();
+                    Keyboard.Update();
+                    Mouse.Update();
                 }
                 bool flag1 = false;
                 bool flag2 = false;
                 for (int index = 0; index < 4; ++index)
                 {
-                    MInput.GamePads[index].Update();
-                    if (MInput.GamePads[index].HasAnyInput())
+                    GamePads[index].Update();
+                    if (GamePads[index].HasAnyInput())
                     {
-                        MInput.ControllerHasFocus = true;
+                        ControllerHasFocus = true;
                         flag1 = true;
                     }
-                    if (MInput.GamePads[index].Attached)
+                    if (GamePads[index].Attached)
                         flag2 = true;
                 }
-                if (!flag2 || !flag1 && MInput.Keyboard.HasAnyInput())
-                    MInput.ControllerHasFocus = false;
+                if (!flag2 || !flag1 && Keyboard.HasAnyInput())
+                    ControllerHasFocus = false;
             }
             else
             {
-                MInput.Keyboard.UpdateNull();
-                MInput.Mouse.UpdateNull();
+                Keyboard.UpdateNull();
+                Mouse.UpdateNull();
                 for (int index = 0; index < 4; ++index)
-                    MInput.GamePads[index].UpdateNull();
+                    GamePads[index].UpdateNull();
             }
-            MInput.UpdateVirtualInputs();
+            UpdateVirtualInputs();
         }
 
         public static void UpdateNull()
         {
-            MInput.Keyboard.UpdateNull();
-            MInput.Mouse.UpdateNull();
+            Keyboard.UpdateNull();
+            Mouse.UpdateNull();
             for (int index = 0; index < 4; ++index)
-                MInput.GamePads[index].UpdateNull();
-            MInput.UpdateVirtualInputs();
+                GamePads[index].UpdateNull();
+            UpdateVirtualInputs();
         }
 
         private static void UpdateVirtualInputs()
         {
-            foreach (VirtualInput virtualInput in MInput.VirtualInputs)
+            foreach (VirtualInput virtualInput in VirtualInputs)
                 virtualInput.Update();
         }
 
-        public static void RumbleFirst(float strength, float time) => MInput.GamePads[0].Rumble(strength, time);
+        public static void RumbleFirst(float strength, float time) => GamePads[0].Rumble(strength, time);
 
         public static int Axis(bool negative, bool positive, int bothValue) => negative ? (positive ? bothValue : -1) : (positive ? 1 : 0);
 
@@ -103,9 +103,9 @@ namespace Monocle
             float axisValue,
             float deadzone)
         {
-            int num = MInput.Axis(axisValue, deadzone);
+            int num = Axis(axisValue, deadzone);
             if (num == 0)
-                num = MInput.Axis(negative, positive, bothValue);
+                num = Axis(negative, positive, bothValue);
             return num;
         }
 
@@ -133,11 +133,11 @@ namespace Monocle
 
             public bool HasAnyInput() => this.CurrentState.GetPressedKeys().Length != 0;
 
-            public bool Check(Keys key) => !MInput.Disabled && key != Keys.None && this.CurrentState.IsKeyDown(key);
+            public bool Check(Keys key) => !Disabled && key != Keys.None && this.CurrentState.IsKeyDown(key);
 
-            public bool Pressed(Keys key) => !MInput.Disabled && key != Keys.None && this.CurrentState.IsKeyDown(key) && !this.PreviousState.IsKeyDown(key);
+            public bool Pressed(Keys key) => !Disabled && key != Keys.None && this.CurrentState.IsKeyDown(key) && !this.PreviousState.IsKeyDown(key);
 
-            public bool Released(Keys key) => !MInput.Disabled && key != Keys.None && !this.CurrentState.IsKeyDown(key) && this.PreviousState.IsKeyDown(key);
+            public bool Released(Keys key) => !Disabled && key != Keys.None && !this.CurrentState.IsKeyDown(key) && this.PreviousState.IsKeyDown(key);
 
             public bool Check(Keys keyA, Keys keyB) => this.Check(keyA) || this.Check(keyB);
 
@@ -257,7 +257,7 @@ namespace Monocle
                 this.PreviousState = this.CurrentState;
                 this.CurrentState = GamePad.GetState(this.PlayerIndex);
                 if (!this.Attached && this.CurrentState.IsConnected)
-                    MInput.IsControllerFocused = true;
+                    IsControllerFocused = true;
                 this.Attached = this.CurrentState.IsConnected;
                 if ((double) this.rumbleTime <= 0.0)
                     return;
@@ -292,11 +292,11 @@ namespace Monocle
                 this.rumbleTime = 0.0f;
             }
 
-            public bool Check(Buttons button) => !MInput.Disabled && this.CurrentState.IsButtonDown(button);
+            public bool Check(Buttons button) => !Disabled && this.CurrentState.IsButtonDown(button);
 
-            public bool Pressed(Buttons button) => !MInput.Disabled && this.CurrentState.IsButtonDown(button) && this.PreviousState.IsButtonUp(button);
+            public bool Pressed(Buttons button) => !Disabled && this.CurrentState.IsButtonDown(button) && this.PreviousState.IsButtonUp(button);
 
-            public bool Released(Buttons button) => !MInput.Disabled && this.CurrentState.IsButtonUp(button) && this.PreviousState.IsButtonDown(button);
+            public bool Released(Buttons button) => !Disabled && this.CurrentState.IsButtonUp(button) && this.PreviousState.IsButtonDown(button);
 
             public bool Check(Buttons buttonA, Buttons buttonB) => this.Check(buttonA) || this.Check(buttonB);
 
@@ -462,21 +462,21 @@ namespace Monocle
 
             public bool DPadDownReleased => this.CurrentState.DPad.Down == ButtonState.Released && this.PreviousState.DPad.Down == ButtonState.Pressed;
 
-            public bool LeftTriggerCheck(float threshold) => !MInput.Disabled && (double) this.CurrentState.Triggers.Left >= (double) threshold;
+            public bool LeftTriggerCheck(float threshold) => !Disabled && (double) this.CurrentState.Triggers.Left >= (double) threshold;
 
-            public bool LeftTriggerPressed(float threshold) => !MInput.Disabled && (double) this.CurrentState.Triggers.Left >= (double) threshold && (double) this.PreviousState.Triggers.Left < (double) threshold;
+            public bool LeftTriggerPressed(float threshold) => !Disabled && (double) this.CurrentState.Triggers.Left >= (double) threshold && (double) this.PreviousState.Triggers.Left < (double) threshold;
 
-            public bool LeftTriggerReleased(float threshold) => !MInput.Disabled && (double) this.CurrentState.Triggers.Left < (double) threshold && (double) this.PreviousState.Triggers.Left >= (double) threshold;
+            public bool LeftTriggerReleased(float threshold) => !Disabled && (double) this.CurrentState.Triggers.Left < (double) threshold && (double) this.PreviousState.Triggers.Left >= (double) threshold;
 
-            public bool RightTriggerCheck(float threshold) => !MInput.Disabled && (double) this.CurrentState.Triggers.Right >= (double) threshold;
+            public bool RightTriggerCheck(float threshold) => !Disabled && (double) this.CurrentState.Triggers.Right >= (double) threshold;
 
-            public bool RightTriggerPressed(float threshold) => !MInput.Disabled && (double) this.CurrentState.Triggers.Right >= (double) threshold && (double) this.PreviousState.Triggers.Right < (double) threshold;
+            public bool RightTriggerPressed(float threshold) => !Disabled && (double) this.CurrentState.Triggers.Right >= (double) threshold && (double) this.PreviousState.Triggers.Right < (double) threshold;
 
-            public bool RightTriggerReleased(float threshold) => !MInput.Disabled && (double) this.CurrentState.Triggers.Right < (double) threshold && (double) this.PreviousState.Triggers.Right >= (double) threshold;
+            public bool RightTriggerReleased(float threshold) => !Disabled && (double) this.CurrentState.Triggers.Right < (double) threshold && (double) this.PreviousState.Triggers.Right >= (double) threshold;
 
             public float Axis(Buttons button, float threshold)
             {
-                if (MInput.Disabled)
+                if (Disabled)
                     return 0.0f;
                 switch (button)
                 {
@@ -543,7 +543,7 @@ namespace Monocle
 
             public bool Check(Buttons button, float threshold)
             {
-                if (MInput.Disabled)
+                if (Disabled)
                     return false;
                 switch (button)
                 {
@@ -610,7 +610,7 @@ namespace Monocle
 
             public bool Pressed(Buttons button, float threshold)
             {
-                if (MInput.Disabled)
+                if (Disabled)
                     return false;
                 switch (button)
                 {
@@ -677,7 +677,7 @@ namespace Monocle
 
             public bool Released(Buttons button, float threshold)
             {
-                if (MInput.Disabled)
+                if (Disabled)
                     return false;
                 switch (button)
                 {

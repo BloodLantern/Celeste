@@ -17,7 +17,7 @@ namespace Celeste
         private static void CmdGlobalStats()
         {
             foreach (Stat stat in Enum.GetValues(typeof (Stat)))
-                Engine.Commands.Log((object) (stat.ToString() + ": " + (object) Stats.Global(stat)));
+                Engine.Commands.Log((stat.ToString() + ": " + Stats.Global(stat)));
         }
 
         [Command("export_dialog", "export dialog files to binary format")]
@@ -80,21 +80,21 @@ namespace Celeste
                 {
                     string path1;
                     int path2 = (int) eventDescription.Value.getPath(out path1);
-                    Engine.Commands.Log((object) (path1 + ": " + (object) count));
-                    Console.WriteLine(path1 + ": " + (object) count);
+                    Engine.Commands.Log((path1 + ": " + count));
+                    Console.WriteLine(path1 + ": " + count);
                 }
                 num += count;
             }
-            Engine.Commands.Log((object) ("total: " + (object) num));
-            Console.WriteLine("total: " + (object) num);
+            Engine.Commands.Log(("total: " + num));
+            Console.WriteLine("total: " + num);
         }
 
         [Command("lighting", "checks lightiing values")]
         private static void CmdLighting()
         {
-            if (!(Engine.Scene is Level scene))
+            if (Engine.Scene is not Level scene)
                 return;
-            Engine.Commands.Log((object) ("base(" + (object) scene.BaseLightingAlpha + "), session add(" + (object) scene.Session.LightingAlphaAdd + "), current (" + (object) scene.Lighting.Alpha + ")"));
+            Engine.Commands.Log(("base(" + scene.BaseLightingAlpha + "), session add(" + scene.Session.LightingAlphaAdd + "), current (" + scene.Lighting.Alpha + ")"));
         }
 
         [Command("detailed_levels", "counts detailed levels")]
@@ -123,13 +123,13 @@ namespace Celeste
                         }
                     }
                 }
-                Engine.Commands.Log((object) (num2.ToString() + " / " + (object) num1));
+                Engine.Commands.Log((num2.ToString() + " / " + num1));
             }
             else
             {
                 int num3 = 0;
                 int num4 = 0;
-                List<string> values = new List<string>();
+                List<string> values = new();
                 foreach (LevelData level in AreaData.GetMode(area, (AreaMode) mode).MapData.Levels)
                 {
                     if (!level.Dummy)
@@ -141,8 +141,8 @@ namespace Celeste
                             values.Add(level.Name);
                     }
                 }
-                Engine.Commands.Log((object) string.Join(", ", (IEnumerable<string>) values), Color.Red);
-                Engine.Commands.Log((object) (num4.ToString() + " / " + (object) num3));
+                Engine.Commands.Log(string.Join(", ", values), Color.Red);
+                Engine.Commands.Log((num4.ToString() + " / " + num3));
             }
         }
 
@@ -167,7 +167,7 @@ namespace Celeste
                     }
                 }
             }
-            Calc.Log((object) SaveData.Instance.TotalHeartGems);
+            Calc.Log(SaveData.Instance.TotalHeartGems);
         }
 
         [Command("logsession", "log session to output")]
@@ -178,7 +178,7 @@ namespace Celeste
             StringWriter stringWriter1 = new StringWriter();
             StringWriter stringWriter2 = stringWriter1;
             Session o = session;
-            xmlSerializer.Serialize((TextWriter) stringWriter2, (object) o);
+            xmlSerializer.Serialize((TextWriter) stringWriter2, o);
             Console.WriteLine(stringWriter1.ToString());
         }
 
@@ -194,12 +194,12 @@ namespace Celeste
         [Command("check_all_languages", "compares all langauges to english")]
         private static void CmdCheckLangauges(bool compareContent = false)
         {
-            Engine.Commands.Log((object) "---------------------");
+            Engine.Commands.Log("---------------------");
             bool flag = true;
             foreach (KeyValuePair<string, Language> language in Dialog.Languages)
-                flag &= Commands.CmdCheckLangauge(language.Key, compareContent);
-            Engine.Commands.Log((object) "---------------------");
-            Engine.Commands.Log((object) ("REUSLT: " + flag.ToString()), flag ? Color.LawnGreen : Color.Red);
+                flag &= CmdCheckLangauge(language.Key, compareContent);
+            Engine.Commands.Log("---------------------");
+            Engine.Commands.Log(("RESULT: " + flag.ToString()), flag ? Color.LawnGreen : Color.Red);
         }
 
         [Command("check_language", "compares all langauges to english")]
@@ -215,7 +215,7 @@ namespace Celeste
             bool flag3 = Dialog.CompareLanguages("english", id, compareContent);
             if (num != 0)
                 Fonts.Unload(language1.FontFace);
-            Engine.Commands.Log((object) (id + " [FONT: " + flag2.ToString() + ", MATCH: " + flag3.ToString() + "]"), flag2 & flag3 ? Color.White : Color.Red);
+            Engine.Commands.Log((id + " [FONT: " + flag2.ToString() + ", MATCH: " + flag3.ToString() + "]"), flag2 & flag3 ? Color.White : Color.Red);
             return flag1 & flag2 & flag3;
         }
 
@@ -237,9 +237,9 @@ namespace Celeste
                         {
                             int index2 = strawberry.Int("checkpointID");
                             int index3 = strawberry.Int("order");
-                            string str = index2.ToString() + ":" + (object) index3;
+                            string str = index2.ToString() + ":" + index3;
                             if (stringSet.Contains(str))
-                                Engine.Commands.Log((object) ("Conflicting Berry: Area[" + (object) area.ID + "] Mode[" + (object) index1 + "] Checkpoint[" + (object) index2 + "] Order[" + (object) index3 + "]"), Color.Red);
+                                Engine.Commands.Log(("Conflicting Berry: Area[" + area.ID + "] Mode[" + index1 + "] Checkpoint[" + index2 + "] Order[" + index3 + "]"), Color.Red);
                             else
                                 stringSet.Add(str);
                             entityDataArray[index2, index3] = strawberry;
@@ -249,7 +249,7 @@ namespace Celeste
                             for (int index5 = 1; index5 < entityDataArray.GetLength(1); ++index5)
                             {
                                 if (entityDataArray[index4, index5] != null && entityDataArray[index4, index5 - 1] == null)
-                                    Engine.Commands.Log((object) ("Missing Berry Order #" + (object) (index5 - 1) + ": Area[" + (object) area.ID + "] Mode[" + (object) index1 + "] Checkpoint[" + (object) index4 + "]"), Color.Red);
+                                    Engine.Commands.Log(("Missing Berry Order #" + (index5 - 1) + ": Area[" + area.ID + "] Mode[" + index1 + "] Checkpoint[" + index4 + "]"), Color.Red);
                             }
                         }
                     }
@@ -272,15 +272,15 @@ namespace Celeste
         [Command("audio", "checks audio state of session")]
         private static void CmdAudio()
         {
-            if (!(Engine.Scene is Level))
+            if (Engine.Scene is not Level)
                 return;
             AudioState audio = (Engine.Scene as Level).Session.Audio;
-            Engine.Commands.Log((object) ("MUSIC: " + audio.Music.Event), Color.Green);
+            Engine.Commands.Log(("MUSIC: " + audio.Music.Event), Color.Green);
             foreach (MEP parameter in audio.Music.Parameters)
-                Engine.Commands.Log((object) ("    " + parameter.Key + " = " + (object) parameter.Value));
-            Engine.Commands.Log((object) ("AMBIENCE: " + audio.Ambience.Event), Color.Green);
+                Engine.Commands.Log(("    " + parameter.Key + " = " + parameter.Value));
+            Engine.Commands.Log(("AMBIENCE: " + audio.Ambience.Event), Color.Green);
             foreach (MEP parameter in audio.Ambience.Parameters)
-                Engine.Commands.Log((object) ("    " + parameter.Key + " = " + (object) parameter.Value));
+                Engine.Commands.Log(("    " + parameter.Key + " = " + parameter.Value));
         }
 
         [Command("heartgem", "give heart gem")]
@@ -309,7 +309,7 @@ namespace Celeste
         [Command("textures", "counts textures in memory")]
         private static void CmdTextures()
         {
-            Engine.Commands.Log((object) VirtualContent.Count);
+            Engine.Commands.Log(VirtualContent.Count);
             VirtualContent.BySize();
         }
 
@@ -343,9 +343,9 @@ namespace Celeste
             if (string.IsNullOrEmpty(language))
                 language = Dialog.Language.Id;
             if (Dialog.Languages.ContainsKey(language))
-                Engine.Commands.Log((object) (language + ": " + (object) Dialog.Languages[language].Lines + " lines, " + (object) Dialog.Languages[language].Words + " words"));
+                Engine.Commands.Log((language + ": " + Dialog.Languages[language].Lines + " lines, " + Dialog.Languages[language].Words + " words"));
             else
-                Engine.Commands.Log((object) ("language '" + language + "' doesn't exist"));
+                Engine.Commands.Log(("language '" + language + "' doesn't exist"));
         }
 
         [Command("leaf", "play the leaf minigame")]
@@ -601,11 +601,11 @@ namespace Celeste
                     new MapData(new AreaKey(id)).GetStrawberries(out numArray[id]);
                     num += numArray[id];
                 }
-                Engine.Commands.Log((object) ("Grand Total Strawberries: " + (object) num), yellow);
+                Engine.Commands.Log(("Grand Total Strawberries: " + num), yellow);
                 for (int index = 0; index < numArray.Length; ++index)
                 {
                     Color color = numArray[index] == AreaData.Areas[index].Mode[0].TotalStrawberries ? (numArray[index] != 0 ? lime : gray) : red;
-                    Engine.Commands.Log((object) ("Chapter " + (object) index + ": " + (object) numArray[index]), color);
+                    Engine.Commands.Log(("Chapter " + index + ": " + numArray[index]), color);
                 }
             }
             else
@@ -618,12 +618,12 @@ namespace Celeste
                     numArray[index] = area.Mode[0].Checkpoints[index - 1].Strawberries;
                 int total;
                 int[] strawberries = new MapData(new AreaKey(chapterID)).GetStrawberries(out total);
-                Engine.Commands.Log((object) ("Chapter " + (object) chapterID + " Strawberries"));
-                Engine.Commands.Log((object) ("Total: " + (object) total), totalStrawberries == total ? lime : red);
+                Engine.Commands.Log(("Chapter " + chapterID + " Strawberries"));
+                Engine.Commands.Log(("Total: " + total), totalStrawberries == total ? lime : red);
                 for (int index = 0; index < numArray.Length; ++index)
                 {
                     Color color = strawberries[index] == numArray[index] ? (strawberries[index] != 0 ? lime : gray) : red;
-                    Engine.Commands.Log((object) ("CP" + (object) index + ": " + (object) strawberries[index]), color);
+                    Engine.Commands.Log(("CP" + index + ": " + strawberries[index]), color);
                 }
             }
         }
@@ -636,7 +636,7 @@ namespace Celeste
         {
             if (areaID >= 0)
             {
-                Engine.Commands.Log((object) Commands.GetLevelsInArea(new AreaKey(areaID, (AreaMode) mode)));
+                Engine.Commands.Log(Commands.GetLevelsInArea(new AreaKey(areaID, (AreaMode) mode)));
             }
             else
             {
@@ -646,7 +646,7 @@ namespace Celeste
                     for (int mode1 = 0; mode1 < area.Mode.Length; ++mode1)
                         num += Commands.GetLevelsInArea(new AreaKey(area.ID, (AreaMode) mode1));
                 }
-                Engine.Commands.Log((object) num);
+                Engine.Commands.Log(num);
             }
         }
 
@@ -692,7 +692,7 @@ namespace Celeste
             if (File.Exists(filename))
                 Engine.Scene = (Scene) new PreviewRecording(filename);
             else
-                Engine.Commands.Log((object) "FILE NOT FOUND");
+                Engine.Commands.Log("FILE NOT FOUND");
         }
 
         [Command("fonts", "check loaded fonts")]
@@ -702,7 +702,7 @@ namespace Celeste
         private static void CmdRename(string current, string newName)
         {
             if (!(Engine.Scene is MapEditor scene))
-                Engine.Commands.Log((object) "Must be in the Map Editor");
+                Engine.Commands.Log("Must be in the Map Editor");
             else
                 scene.Rename(current, newName);
         }

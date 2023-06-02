@@ -74,12 +74,18 @@
     <Prefer32Bit>true</Prefer32Bit>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="Microsoft.Xna.Framework" />
-    <Reference Include="Microsoft.Xna.Framework.Game" />
-    <Reference Include="Microsoft.Xna.Framework.Graphics" />
+    <Reference Include="Microsoft.Xna.Framework">
+      <HintPath>Reference\Microsoft.Xna.Framework.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.Xna.Framework.Game">
+      <HintPath>Reference\Microsoft.Xna.Framework.Game.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.Xna.Framework.Graphics">
+      <HintPath>Reference\Microsoft.Xna.Framework.Graphics.dll</HintPath>
+    </Reference>
     <Reference Include="Steamworks.NET, Version=20.1.0.0, Culture=neutral, processorArchitecture=x86">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>Steamworks\Steamworks.NET.dll</HintPath>
+      <HintPath>References\Steamworks.NET.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
@@ -687,6 +693,10 @@
     <Compile Include="Celeste\Pico8\Classic.cs" />
     <Compile Include="Celeste\Pico8\Emulator.cs" />
     <Compile Include="Monocle\Binding.cs" />
+    <Compile Include="Monocle\ChoiceSet.cs" />
+    <Compile Include="Monocle\Chooser.cs" />
+    <Compile Include="Monocle\CounterSet.cs" />
+    <Compile Include="Monocle\MethodHandle.cs" />
     <Compile Include="Monocle\ParticleEmitter.cs" />
     <Compile Include="Monocle\Circle.cs" />
     <Compile Include="Monocle\PointSectors.cs" />
@@ -699,22 +709,23 @@
     <Compile Include="Monocle\GraphicsComponent.cs" />
     <Compile Include="Monocle\Image.cs" />
     <Compile Include="Monocle\PixelText.cs" />
+    <Compile Include="Monocle\SpecEntity.cs" />
     <Compile Include="Monocle\Sprite.cs" />
-    <Compile Include="Monocle\Spritesheet`1.cs" />
     <Compile Include="Monocle\NumberText.cs" />
     <Compile Include="Monocle\OutlineText.cs" />
+    <Compile Include="Monocle\Spritesheet.cs" />
     <Compile Include="Monocle\Text.cs" />
     <Compile Include="Monocle\TimerText.cs" />
     <Compile Include="Monocle\TileGrid.cs" />
     <Compile Include="Monocle\Alarm.cs" />
     <Compile Include="Monocle\Coroutine.cs" />
     <Compile Include="Monocle\CoroutineHolder.cs" />
-    <Compile Include="Monocle\CounterSet`1.cs" />
     <Compile Include="Monocle\Shaker.cs" />
     <Compile Include="Monocle\ShakerList.cs" />
     <Compile Include="Monocle\SineWave.cs" />
     <Compile Include="Monocle\StateMachine.cs" />
     <Compile Include="Monocle\Tween.cs" />
+    <Compile Include="Monocle\VirtualMap.cs" />
     <Compile Include="Monocle\Wiggler.cs" />
     <Compile Include="Monocle\Engine.cs" />
     <Compile Include="Monocle\Entity.cs" />
@@ -748,14 +759,11 @@
     <Compile Include="Monocle\QuaternionExt.cs" />
     <Compile Include="Monocle\Camera.cs" />
     <Compile Include="Monocle\CheatListener.cs" />
-    <Compile Include="Monocle\ChoiceSet`1.cs" />
-    <Compile Include="Monocle\Chooser`1.cs" />
     <Compile Include="Monocle\Commands.cs" />
     <Compile Include="Monocle\Command.cs" />
     <Compile Include="Monocle\Draw.cs" />
     <Compile Include="Monocle\Ease.cs" />
     <Compile Include="Monocle\ErrorLog.cs" />
-    <Compile Include="Monocle\MethodHandle`1.cs" />
     <Compile Include="Monocle\PixelFontCharacter.cs" />
     <Compile Include="Monocle\PixelFontSize.cs" />
     <Compile Include="Monocle\PixelFont.cs" />
@@ -764,7 +772,6 @@
     <Compile Include="Monocle\Pooled.cs" />
     <Compile Include="Monocle\SaveLoad.cs" />
     <Compile Include="Monocle\SimpleCurve.cs" />
-    <Compile Include="Monocle\SpecEntity`1.cs" />
     <Compile Include="Monocle\Tiler.cs" />
     <Compile Include="Monocle\AutotileData.cs" />
     <Compile Include="Monocle\Tracker.cs" />
@@ -773,7 +780,6 @@
     <Compile Include="Monocle\VirtualTexture.cs" />
     <Compile Include="Monocle\VirtualRenderTarget.cs" />
     <Compile Include="Monocle\VirtualContent.cs" />
-    <Compile Include="Monocle\VirtualMap`1.cs" />
     <Compile Include="FMOD\VERSION.cs" />
     <Compile Include="FMOD\CONSTANTS.cs" />
     <Compile Include="FMOD\RESULT.cs" />

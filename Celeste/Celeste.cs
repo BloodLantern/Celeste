@@ -12,21 +12,14 @@ namespace Celeste
 {
     public class Celeste : Engine
     {
-        public
-        const int GameWidth = 320;
-        public
-        const int GameHeight = 180;
-        public
-        const int TargetWidth = 1920;
-        public
-        const int TargetHeight = 1080;
+        public const int GameWidth = 320;
+        public const int GameHeight = 180;
+        public const int TargetWidth = 1920;
+        public const int TargetHeight = 1080;
         public static PlayModes PlayMode = PlayModes.Normal;
-        public
-        const string EventName = "";
-        public
-        const bool Beta = false;
-        public
-        const string PLATFORM = "PC";
+        public const string EventName = "";
+        public const bool Beta = false;
+        public const string PLATFORM = "PC";
         public static new Celeste Instance;
         public static VirtualRenderTarget HudTarget;
         public static VirtualRenderTarget WipeTarget;
