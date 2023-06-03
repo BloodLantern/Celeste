@@ -36,8 +36,9 @@ namespace Celeste.Editor
                 levels.Add(new LevelTemplate(level));
             foreach (Rectangle rectangle in mapData.Filler)
                 levels.Add(new LevelTemplate(rectangle.X, rectangle.Y, rectangle.Width, rectangle.Height));
-            if (area != area)
+            if (MapEditor.area != area)
             {
+                MapEditor.area = area;
                 Camera = new Camera
                 {
                     Zoom = 6f
@@ -107,9 +108,9 @@ namespace Celeste.Editor
 
         public override void Update()
         {
-            Vector2 vector2;
-            vector2.X = (lastMouseScreenPosition.X - MInput.Mouse.Position.X) / Camera.Zoom;
-            vector2.Y = (lastMouseScreenPosition.Y - MInput.Mouse.Position.Y) / Camera.Zoom;
+            Vector2 mouseDelta;
+            mouseDelta.X = (lastMouseScreenPosition.X - MInput.Mouse.Position.X) / Camera.Zoom;
+            mouseDelta.Y = (lastMouseScreenPosition.Y - MInput.Mouse.Position.Y) / Camera.Zoom;
             if (MInput.Keyboard.Pressed(Keys.Space) && MInput.Keyboard.Check(Keys.LeftControl))
             {
                 Camera.Zoom = 6f;
@@ -209,7 +210,7 @@ namespace Celeste.Editor
             }
             else if (mouseMode == MouseModes.Pan)
             {
-                Camera.Position += vector2;
+                Camera.Position += mouseDelta;
                 if (!MInput.Mouse.CheckLeftButton && !MInput.Mouse.CheckMiddleButton)
                     mouseMode = MouseModes.Hover;
             }
