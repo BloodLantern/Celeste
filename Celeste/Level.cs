@@ -51,7 +51,7 @@ namespace Celeste
         public const float CameraOffsetXInterval = 48f;
         public const float CameraOffsetYInterval = 32f;
         public Camera Camera;
-        public Level.CameraLockModes CameraLockMode;
+        public CameraLockModes CameraLockMode;
         public Vector2 CameraOffset;
         public float CameraUpwardMaxY;
         private Vector2 shakeDirection;
@@ -109,10 +109,10 @@ namespace Celeste
         {
             get
             {
-                Rectangle bounds = this.Bounds;
-                double left = (double) bounds.Left;
-                bounds = this.Bounds;
-                double top = (double) bounds.Top;
+                Rectangle bounds = Bounds;
+                double left = bounds.Left;
+                bounds = Bounds;
+                double top = bounds.Top;
                 return new Vector2((float) left, (float) top);
             }
         }
@@ -121,30 +121,30 @@ namespace Celeste
         {
             get
             {
-                Rectangle bounds = this.Bounds;
-                int x = bounds.Left / 8 - this.TileBounds.X;
-                bounds = this.Bounds;
-                int y = bounds.Top / 8 - this.TileBounds.Y;
+                Rectangle bounds = Bounds;
+                int x = bounds.Left / 8 - TileBounds.X;
+                bounds = Bounds;
+                int y = bounds.Top / 8 - TileBounds.Y;
                 return new Point(x, y);
             }
         }
 
-        public Rectangle TileBounds => this.Session.MapData.TileBounds;
+        public Rectangle TileBounds => Session.MapData.TileBounds;
 
-        public bool Transitioning => this.transition != null;
+        public bool Transitioning => transition != null;
 
         public Vector2 ShakeVector { get; private set; }
 
-        public float VisualWind => this.Wind.X + this.WindSine;
+        public float VisualWind => Wind.X + WindSine;
 
-        public bool FrozenOrPaused => this.Frozen || this.Paused;
+        public bool FrozenOrPaused => Frozen || Paused;
 
         public bool CanPause
         {
             get
             {
-                Player entity = this.Tracker.GetEntity<Player>();
-                if (entity == null || entity.Dead || this.wasPaused || this.Paused || this.PauseLock || this.SkippingCutscene || this.Transitioning || this.Wipe != null || UserIO.Saving)
+                Player entity = Tracker.GetEntity<Player>();
+                if (entity == null || entity.Dead || wasPaused || Paused || PauseLock || SkippingCutscene || Transitioning || Wipe != null || UserIO.Saving)
                     return false;
                 return entity.LastBooster == null || !entity.LastBooster.Ch9HubTransition || !entity.LastBooster.BoostingPlayer;
             }
@@ -156,11 +156,11 @@ namespace Celeste
         {
             get
             {
-                if (this.Completed)
+                if (Completed)
                     return false;
-                if (this.Paused)
+                if (Paused)
                     return true;
-                return this.Tracker.GetEntity<Textbox>() == null && this.Tracker.GetEntity<MiniTextbox>() == null && !this.Frozen && !this.InCutscene;
+                return Tracker.GetEntity<Textbox>() == null && Tracker.GetEntity<MiniTextbox>() == null && !Frozen && !InCutscene;
             }
         }
 
@@ -178,16 +178,16 @@ namespace Celeste
         public override void End()
         {
             base.End();
-            this.Foreground.Ended((Scene) this);
-            this.Background.Ended((Scene) this);
-            this.EndPauseEffects();
+            Foreground.Ended(this);
+            Background.Ended(this);
+            EndPauseEffects();
             Audio.BusStopAll("bus:/gameplay_sfx");
             Audio.MusicUnderwater = false;
-            Audio.SetAmbience((string) null);
-            Audio.SetAltMusic((string) null);
+            Audio.SetAmbience(null);
+            Audio.SetAltMusic(null);
             Audio.EndSnapshot(Level.DialogSnapshot);
             Audio.ReleaseSnapshot(Level.AssistSpeedSnapshot);
-            Level.AssistSpeedSnapshot = (EventInstance) null;
+            Level.AssistSpeedSnapshot = null;
             Level.AssistSpeedSnapshotValue = -1;
             GameplayBuffers.Unload();
             ClutterBlockGenerator.Dispose();
@@ -196,82 +196,82 @@ namespace Celeste
 
         public void LoadLevel(Player.IntroTypes playerIntro, bool isFromLoader = false)
         {
-            this.TimerHidden = false;
-            this.TimerStopped = false;
-            this.LastIntroType = playerIntro;
-            this.Background.Fade = 0.0f;
-            this.CanRetry = true;
-            this.ScreenPadding = 0.0f;
-            this.Displacement.Enabled = true;
-            this.PauseLock = false;
-            this.Frozen = false;
-            this.CameraLockMode = Level.CameraLockModes.None;
-            this.RetryPlayerCorpse = (PlayerDeadBody) null;
-            this.FormationBackdrop.Display = false;
-            this.SaveQuitDisabled = false;
-            this.lastColorGrade = this.Session.ColorGrade;
-            this.colorGradeEase = 0.0f;
-            this.colorGradeEaseSpeed = 1f;
-            this.HasCassetteBlocks = false;
-            this.CassetteBlockTempo = 1f;
-            this.CassetteBlockBeats = 2;
-            this.Raining = false;
+            TimerHidden = false;
+            TimerStopped = false;
+            LastIntroType = playerIntro;
+            Background.Fade = 0.0f;
+            CanRetry = true;
+            ScreenPadding = 0.0f;
+            Displacement.Enabled = true;
+            PauseLock = false;
+            Frozen = false;
+            CameraLockMode = CameraLockModes.None;
+            RetryPlayerCorpse = null;
+            FormationBackdrop.Display = false;
+            SaveQuitDisabled = false;
+            lastColorGrade = Session.ColorGrade;
+            colorGradeEase = 0.0f;
+            colorGradeEaseSpeed = 1f;
+            HasCassetteBlocks = false;
+            CassetteBlockTempo = 1f;
+            CassetteBlockBeats = 2;
+            Raining = false;
             bool flag1 = false;
             bool flag2 = false;
-            if (this.HiccupRandom == null)
-                this.HiccupRandom = new Random(this.Session.Area.ID * 77 + (int) this.Session.Area.Mode * 999);
-            this.Entities.FindFirst<LightningRenderer>()?.Reset();
-            Calc.PushRandom(this.Session.LevelData.LoadSeed);
-            MapData mapData = this.Session.MapData;
-            LevelData levelData = this.Session.LevelData;
-            Vector2 vector2_1 = new Vector2((float) levelData.Bounds.Left, (float) levelData.Bounds.Top);
+            if (HiccupRandom == null)
+                HiccupRandom = new Random(Session.Area.ID * 77 + (int) Session.Area.Mode * 999);
+            Entities.FindFirst<LightningRenderer>()?.Reset();
+            Calc.PushRandom(Session.LevelData.LoadSeed);
+            MapData mapData = Session.MapData;
+            LevelData levelData = Session.LevelData;
+            Vector2 vector2_1 = new(levelData.Bounds.Left, levelData.Bounds.Top);
             bool flag3 = playerIntro != Player.IntroTypes.Fall || levelData.Name == "0";
-            this.DarkRoom = levelData.Dark && !this.Session.GetFlag("ignore_darkness_" + levelData.Name);
-            this.Zoom = 1f;
-            if (this.Session.Audio == null)
-                this.Session.Audio = AreaData.Get(this.Session).Mode[(int) this.Session.Area.Mode].AudioState.Clone();
+            DarkRoom = levelData.Dark && !Session.GetFlag("ignore_darkness_" + levelData.Name);
+            Zoom = 1f;
+            if (Session.Audio == null)
+                Session.Audio = AreaData.Get(Session).Mode[(int) Session.Area.Mode].AudioState.Clone();
             if (!levelData.DelayAltMusic)
                 Audio.SetAltMusic(SFX.EventnameByHandle(levelData.AltMusic));
             if (levelData.Music.Length > 0)
-                this.Session.Audio.Music.Event = SFX.EventnameByHandle(levelData.Music);
-            if (!AreaData.GetMode(this.Session.Area).IgnoreLevelAudioLayerData)
+                Session.Audio.Music.Event = SFX.EventnameByHandle(levelData.Music);
+            if (!AreaData.GetMode(Session.Area).IgnoreLevelAudioLayerData)
             {
                 for (int index = 0; index < 4; ++index)
-                    this.Session.Audio.Music.Layer(index + 1, levelData.MusicLayers[index]);
+                    Session.Audio.Music.Layer(index + 1, levelData.MusicLayers[index]);
             }
             if (levelData.MusicProgress >= 0)
-                this.Session.Audio.Music.Progress = levelData.MusicProgress;
-            this.Session.Audio.Music.Layer(6, levelData.MusicWhispers);
+                Session.Audio.Music.Progress = levelData.MusicProgress;
+            Session.Audio.Music.Layer(6, levelData.MusicWhispers);
             if (levelData.Ambience.Length > 0)
-                this.Session.Audio.Ambience.Event = SFX.EventnameByHandle(levelData.Ambience);
+                Session.Audio.Ambience.Event = SFX.EventnameByHandle(levelData.Ambience);
             if (levelData.AmbienceProgress >= 0)
-                this.Session.Audio.Ambience.Progress = levelData.AmbienceProgress;
-            this.Session.Audio.Apply(isFromLoader);
-            this.CoreMode = this.Session.CoreMode;
-            this.NewLevel = !this.Session.LevelFlags.Contains(levelData.Name);
+                Session.Audio.Ambience.Progress = levelData.AmbienceProgress;
+            Session.Audio.Apply(isFromLoader);
+            CoreMode = Session.CoreMode;
+            NewLevel = !Session.LevelFlags.Contains(levelData.Name);
             if (flag3)
             {
-                if (!this.Session.LevelFlags.Contains(levelData.Name))
-                    this.Session.FurthestSeenLevel = levelData.Name;
-                this.Session.LevelFlags.Add(levelData.Name);
-                this.Session.UpdateLevelStartDashes();
+                if (!Session.LevelFlags.Contains(levelData.Name))
+                    Session.FurthestSeenLevel = levelData.Name;
+                Session.LevelFlags.Add(levelData.Name);
+                Session.UpdateLevelStartDashes();
             }
             Vector2? nullable = new Vector2?();
-            this.CameraOffset = new Vector2(48f, 32f) * levelData.CameraOffset;
-            this.Entities.FindFirst<WindController>()?.RemoveSelf();
-            this.Add((Entity) (this.windController = new WindController(levelData.WindPattern)));
+            CameraOffset = new Vector2(48f, 32f) * levelData.CameraOffset;
+            Entities.FindFirst<WindController>()?.RemoveSelf();
+            Add(windController = new WindController(levelData.WindPattern));
             if (playerIntro != Player.IntroTypes.Transition)
-                this.windController.SetStartPattern();
+                windController.SetStartPattern();
             if (levelData.Underwater)
-                this.Add((Entity) new Water(vector2_1, false, false, (float) levelData.Bounds.Width, (float) levelData.Bounds.Height));
-            this.InSpace = levelData.Space;
-            if (this.InSpace)
-                this.Add((Entity) new SpaceController());
-            if (levelData.Name == "-1" && this.Session.Area.ID == 0 && !SaveData.Instance.CheatMode)
-                this.Add((Entity) new UnlockEverythingThingy());
+                Add(new Water(vector2_1, false, false, levelData.Bounds.Width, levelData.Bounds.Height));
+            InSpace = levelData.Space;
+            if (InSpace)
+                Add(new SpaceController());
+            if (levelData.Name == "-1" && Session.Area.ID == 0 && !SaveData.Instance.CheatMode)
+                Add(new UnlockEverythingThingy());
             int index1 = 0;
-            List<EntityID> entityIdList = new List<EntityID>();
-            Player entity1 = this.Tracker.GetEntity<Player>();
+            List<EntityID> entityIdList = new();
+            Player entity1 = Tracker.GetEntity<Player>();
             if (entity1 != null)
             {
                 foreach (Follower follower in entity1.Leader.Followers)
@@ -280,120 +280,120 @@ namespace Celeste
             foreach (EntityData entity2 in levelData.Entities)
             {
                 int id = entity2.ID;
-                EntityID entityId = new EntityID(levelData.Name, id);
-                if (!this.Session.DoNotLoad.Contains(entityId) && !entityIdList.Contains(entityId))
+                EntityID entityId = new(levelData.Name, id);
+                if (!Session.DoNotLoad.Contains(entityId) && !entityIdList.Contains(entityId))
                 {
                     switch (entity2.Name)
                     {
                         case "SoundTest3d":
-                            this.Add((Entity) new _3dSoundTest(entity2, vector2_1));
+                            Add(new _3dSoundTest(entity2, vector2_1));
                             continue;
                         case "SummitBackgroundManager":
-                            this.Add((Entity) new AscendManager(entity2, vector2_1));
+                            Add(new AscendManager(entity2, vector2_1));
                             continue;
                         case "badelineBoost":
-                            this.Add((Entity) new BadelineBoost(entity2, vector2_1));
+                            Add(new BadelineBoost(entity2, vector2_1));
                             continue;
                         case "bigSpinner":
-                            this.Add((Entity) new Bumper(entity2, vector2_1));
+                            Add(new Bumper(entity2, vector2_1));
                             continue;
                         case "bigWaterfall":
-                            this.Add((Entity) new BigWaterfall(entity2, vector2_1));
+                            Add(new BigWaterfall(entity2, vector2_1));
                             continue;
                         case "bird":
-                            this.Add((Entity) new BirdNPC(entity2, vector2_1));
+                            Add(new BirdNPC(entity2, vector2_1));
                             continue;
                         case "birdForsakenCityGem":
-                            this.Add((Entity) new ForsakenCitySatellite(entity2, vector2_1));
+                            Add(new ForsakenCitySatellite(entity2, vector2_1));
                             continue;
                         case "birdPath":
-                            this.Add((Entity) new BirdPath(entityId, entity2, vector2_1));
+                            Add(new BirdPath(entityId, entity2, vector2_1));
                             continue;
                         case "blackGem":
-                            if (!this.Session.HeartGem || this.Session.Area.Mode != AreaMode.Normal)
+                            if (!Session.HeartGem || Session.Area.Mode != AreaMode.Normal)
                             {
-                                this.Add((Entity) new HeartGem(entity2, vector2_1));
+                                Add(new HeartGem(entity2, vector2_1));
                                 continue;
                             }
                             continue;
                         case "blockField":
-                            this.Add((Entity) new BlockField(entity2, vector2_1));
+                            Add(new BlockField(entity2, vector2_1));
                             continue;
                         case "bonfire":
-                            this.Add((Entity) new Bonfire(entity2, vector2_1));
+                            Add(new Bonfire(entity2, vector2_1));
                             continue;
                         case "booster":
-                            this.Add((Entity) new Booster(entity2, vector2_1));
+                            Add(new Booster(entity2, vector2_1));
                             continue;
                         case "bounceBlock":
-                            this.Add((Entity) new BounceBlock(entity2, vector2_1));
+                            Add(new BounceBlock(entity2, vector2_1));
                             continue;
                         case "bridge":
-                            this.Add((Entity) new Bridge(entity2, vector2_1));
+                            Add(new Bridge(entity2, vector2_1));
                             continue;
                         case "bridgeFixed":
-                            this.Add((Entity) new BridgeFixed(entity2, vector2_1));
+                            Add(new BridgeFixed(entity2, vector2_1));
                             continue;
                         case "cassette":
-                            if (!this.Session.Cassette)
+                            if (!Session.Cassette)
                             {
-                                this.Add((Entity) new Cassette(entity2, vector2_1));
+                                Add(new Cassette(entity2, vector2_1));
                                 continue;
                             }
                             continue;
                         case "cassetteBlock":
-                            CassetteBlock cassetteBlock = new CassetteBlock(entity2, vector2_1, entityId);
-                            this.Add((Entity) cassetteBlock);
-                            this.HasCassetteBlocks = true;
-                            if ((double) this.CassetteBlockTempo == 1.0)
-                                this.CassetteBlockTempo = cassetteBlock.Tempo;
-                            this.CassetteBlockBeats = Math.Max(cassetteBlock.Index + 1, this.CassetteBlockBeats);
+                            CassetteBlock cassetteBlock = new(entity2, vector2_1, entityId);
+                            Add(cassetteBlock);
+                            HasCassetteBlocks = true;
+                            if (CassetteBlockTempo == 1.0)
+                                CassetteBlockTempo = cassetteBlock.Tempo;
+                            CassetteBlockBeats = Math.Max(cassetteBlock.Index + 1, CassetteBlockBeats);
                             if (!flag1)
                             {
                                 flag1 = true;
-                                if (this.Tracker.GetEntity<CassetteBlockManager>() == null && this.ShouldCreateCassetteManager)
+                                if (Tracker.GetEntity<CassetteBlockManager>() == null && ShouldCreateCassetteManager)
                                 {
-                                    this.Add((Entity) new CassetteBlockManager());
+                                    Add(new CassetteBlockManager());
                                     continue;
                                 }
                                 continue;
                             }
                             continue;
                         case "chaserBarrier":
-                            this.Add((Entity) new ChaserBarrier(entity2, vector2_1));
+                            Add(new ChaserBarrier(entity2, vector2_1));
                             continue;
                         case "checkpoint":
                             if (flag3)
                             {
-                                Checkpoint checkpoint = new Checkpoint(entity2, vector2_1);
-                                this.Add((Entity) checkpoint);
+                                Checkpoint checkpoint = new(entity2, vector2_1);
+                                Add(checkpoint);
                                 nullable = new Vector2?(entity2.Position + vector2_1 + checkpoint.SpawnOffset);
                                 continue;
                             }
                             continue;
                         case "cliffflag":
-                            this.Add((Entity) new CliffFlags(entity2, vector2_1));
+                            Add(new CliffFlags(entity2, vector2_1));
                             continue;
                         case "cliffside_flag":
-                            this.Add((Entity) new CliffsideWindFlag(entity2, vector2_1));
+                            Add(new CliffsideWindFlag(entity2, vector2_1));
                             continue;
                         case "clothesline":
-                            this.Add((Entity) new Clothesline(entity2, vector2_1));
+                            Add(new Clothesline(entity2, vector2_1));
                             continue;
                         case "cloud":
-                            this.Add((Entity) new Cloud(entity2, vector2_1));
+                            Add(new Cloud(entity2, vector2_1));
                             continue;
                         case "clutterCabinet":
-                            this.Add((Entity) new ClutterCabinet(entity2, vector2_1));
+                            Add(new ClutterCabinet(entity2, vector2_1));
                             continue;
                         case "clutterDoor":
-                            this.Add((Entity) new ClutterDoor(entity2, vector2_1, this.Session));
+                            Add(new ClutterDoor(entity2, vector2_1, Session));
                             continue;
                         case "cobweb":
-                            this.Add((Entity) new Cobweb(entity2, vector2_1));
+                            Add(new Cobweb(entity2, vector2_1));
                             continue;
                         case "colorSwitch":
-                            this.Add((Entity) new ClutterSwitch(entity2, vector2_1));
+                            Add(new ClutterSwitch(entity2, vector2_1));
                             continue;
                         case "conditionBlock":
                             Level.ConditionBlockModes conditionBlockModes = entity2.Enum<Level.ConditionBlockModes>("condition");
@@ -401,455 +401,447 @@ namespace Celeste
                             string[] strArray = entity2.Attr("conditionID").Split(':');
                             none.Level = strArray[0];
                             none.ID = Convert.ToInt32(strArray[1]);
-                            bool flag4;
-                            switch (conditionBlockModes)
+                            var flag4 = conditionBlockModes switch
                             {
-                                case Level.ConditionBlockModes.Key:
-                                    flag4 = this.Session.DoNotLoad.Contains(none);
-                                    break;
-                                case Level.ConditionBlockModes.Button:
-                                    flag4 = this.Session.GetFlag(DashSwitch.GetFlagName(none));
-                                    break;
-                                case Level.ConditionBlockModes.Strawberry:
-                                    flag4 = this.Session.Strawberries.Contains(none);
-                                    break;
-                                default:
-                                    throw new Exception("Condition type not supported!");
-                            }
+                                Level.ConditionBlockModes.Key => Session.DoNotLoad.Contains(none),
+                                Level.ConditionBlockModes.Button => Session.GetFlag(DashSwitch.GetFlagName(none)),
+                                Level.ConditionBlockModes.Strawberry => Session.Strawberries.Contains(none),
+                                _ => throw new Exception("Condition type not supported!"),
+                            };
                             if (flag4)
                             {
-                                this.Add((Entity) new ExitBlock(entity2, vector2_1));
+                                Add(new ExitBlock(entity2, vector2_1));
                                 continue;
                             }
                             continue;
                         case "coreMessage":
-                            this.Add((Entity) new CoreMessage(entity2, vector2_1));
+                            Add(new CoreMessage(entity2, vector2_1));
                             continue;
                         case "coreModeToggle":
-                            this.Add((Entity) new CoreModeToggle(entity2, vector2_1));
+                            Add(new CoreModeToggle(entity2, vector2_1));
                             continue;
                         case "coverupWall":
-                            this.Add((Entity) new CoverupWall(entity2, vector2_1));
+                            Add(new CoverupWall(entity2, vector2_1));
                             continue;
                         case "crumbleBlock":
-                            this.Add((Entity) new CrumblePlatform(entity2, vector2_1));
+                            Add(new CrumblePlatform(entity2, vector2_1));
                             continue;
                         case "crumbleWallOnRumble":
-                            this.Add((Entity) new CrumbleWallOnRumble(entity2, vector2_1, entityId));
+                            Add(new CrumbleWallOnRumble(entity2, vector2_1, entityId));
                             continue;
                         case "crushBlock":
-                            this.Add((Entity) new CrushBlock(entity2, vector2_1));
+                            Add(new CrushBlock(entity2, vector2_1));
                             continue;
                         case "cutsceneNode":
-                            this.Add((Entity) new CutsceneNode(entity2, vector2_1));
+                            Add(new CutsceneNode(entity2, vector2_1));
                             continue;
                         case "darkChaser":
-                            this.Add((Entity) new BadelineOldsite(entity2, vector2_1, index1));
+                            Add(new BadelineOldsite(entity2, vector2_1, index1));
                             ++index1;
                             continue;
                         case "dashBlock":
-                            this.Add((Entity) new DashBlock(entity2, vector2_1, entityId));
+                            Add(new DashBlock(entity2, vector2_1, entityId));
                             continue;
                         case "dashSwitchH":
                         case "dashSwitchV":
-                            this.Add((Entity) DashSwitch.Create(entity2, vector2_1, entityId));
+                            Add(DashSwitch.Create(entity2, vector2_1, entityId));
                             continue;
                         case "door":
-                            this.Add((Entity) new Door(entity2, vector2_1));
+                            Add(new Door(entity2, vector2_1));
                             continue;
                         case "dreamBlock":
-                            this.Add((Entity) new DreamBlock(entity2, vector2_1));
+                            Add(new DreamBlock(entity2, vector2_1));
                             continue;
                         case "dreamHeartGem":
-                            if (!this.Session.HeartGem)
+                            if (!Session.HeartGem)
                             {
-                                this.Add((Entity) new DreamHeartGem(entity2, vector2_1));
+                                Add(new DreamHeartGem(entity2, vector2_1));
                                 continue;
                             }
                             continue;
                         case "dreammirror":
-                            this.Add((Entity) new DreamMirror(vector2_1 + entity2.Position));
+                            Add(new DreamMirror(vector2_1 + entity2.Position));
                             continue;
                         case "exitBlock":
-                            this.Add((Entity) new ExitBlock(entity2, vector2_1));
+                            Add(new ExitBlock(entity2, vector2_1));
                             continue;
                         case "eyebomb":
-                            this.Add((Entity) new Puffer(entity2, vector2_1));
+                            Add(new Puffer(entity2, vector2_1));
                             continue;
                         case "fakeBlock":
-                            this.Add((Entity) new FakeWall(entityId, entity2, vector2_1, FakeWall.Modes.Block));
+                            Add(new FakeWall(entityId, entity2, vector2_1, FakeWall.Modes.Block));
                             continue;
                         case "fakeHeart":
-                            this.Add((Entity) new FakeHeart(entity2, vector2_1));
+                            Add(new FakeHeart(entity2, vector2_1));
                             continue;
                         case "fakeWall":
-                            this.Add((Entity) new FakeWall(entityId, entity2, vector2_1, FakeWall.Modes.Wall));
+                            Add(new FakeWall(entityId, entity2, vector2_1, FakeWall.Modes.Wall));
                             continue;
                         case "fallingBlock":
-                            this.Add((Entity) new FallingBlock(entity2, vector2_1));
+                            Add(new FallingBlock(entity2, vector2_1));
                             continue;
                         case "finalBoss":
-                            this.Add((Entity) new FinalBoss(entity2, vector2_1));
+                            Add(new FinalBoss(entity2, vector2_1));
                             continue;
                         case "finalBossFallingBlock":
-                            this.Add((Entity) FallingBlock.CreateFinalBossBlock(entity2, vector2_1));
+                            Add(FallingBlock.CreateFinalBossBlock(entity2, vector2_1));
                             continue;
                         case "finalBossMovingBlock":
-                            this.Add((Entity) new FinalBossMovingBlock(entity2, vector2_1));
+                            Add(new FinalBossMovingBlock(entity2, vector2_1));
                             continue;
                         case "fireBall":
-                            this.Add((Entity) new FireBall(entity2, vector2_1));
+                            Add(new FireBall(entity2, vector2_1));
                             continue;
                         case "fireBarrier":
-                            this.Add((Entity) new FireBarrier(entity2, vector2_1));
+                            Add(new FireBarrier(entity2, vector2_1));
                             continue;
                         case "flingBird":
-                            this.Add((Entity) new FlingBird(entity2, vector2_1));
+                            Add(new FlingBird(entity2, vector2_1));
                             continue;
                         case "flingBirdIntro":
-                            this.Add((Entity) new FlingBirdIntro(entity2, vector2_1));
+                            Add(new FlingBirdIntro(entity2, vector2_1));
                             continue;
                         case "floatingDebris":
-                            this.Add((Entity) new FloatingDebris(entity2, vector2_1));
+                            Add(new FloatingDebris(entity2, vector2_1));
                             continue;
                         case "floatySpaceBlock":
-                            this.Add((Entity) new FloatySpaceBlock(entity2, vector2_1));
+                            Add(new FloatySpaceBlock(entity2, vector2_1));
                             continue;
                         case "flutterbird":
-                            this.Add((Entity) new FlutterBird(entity2, vector2_1));
+                            Add(new FlutterBird(entity2, vector2_1));
                             continue;
                         case "foregroundDebris":
-                            this.Add((Entity) new ForegroundDebris(entity2, vector2_1));
+                            Add(new ForegroundDebris(entity2, vector2_1));
                             continue;
                         case "friendlyGhost":
-                            this.Add((Entity) new AngryOshiro(entity2, vector2_1));
+                            Add(new AngryOshiro(entity2, vector2_1));
                             continue;
                         case "glassBlock":
-                            this.Add((Entity) new GlassBlock(entity2, vector2_1));
+                            Add(new GlassBlock(entity2, vector2_1));
                             continue;
                         case "glider":
-                            this.Add((Entity) new Glider(entity2, vector2_1));
+                            Add(new Glider(entity2, vector2_1));
                             continue;
                         case "goldenBerry":
                             int num1 = SaveData.Instance.CheatMode ? 1 : 0;
-                            bool flag5 = this.Session.FurthestSeenLevel == this.Session.Level || this.Session.Deaths == 0;
+                            bool flag5 = Session.FurthestSeenLevel == Session.Level || Session.Deaths == 0;
                             bool flag6 = SaveData.Instance.UnlockedModes >= 3 || SaveData.Instance.DebugMode;
-                            bool completed = SaveData.Instance.Areas[this.Session.Area.ID].Modes[(int) this.Session.Area.Mode].Completed;
+                            bool completed = SaveData.Instance.Areas[Session.Area.ID].Modes[(int) Session.Area.Mode].Completed;
                             if (((num1 != 0 ? 1 : (flag6 & completed ? 1 : 0)) & (flag5 ? 1 : 0)) != 0)
                             {
-                                this.Add((Entity) new Strawberry(entity2, vector2_1, entityId));
+                                Add(new Strawberry(entity2, vector2_1, entityId));
                                 continue;
                             }
                             continue;
                         case "goldenBlock":
-                            this.Add((Entity) new GoldenBlock(entity2, vector2_1));
+                            Add(new GoldenBlock(entity2, vector2_1));
                             continue;
                         case "gondola":
-                            this.Add((Entity) new Gondola(entity2, vector2_1));
+                            Add(new Gondola(entity2, vector2_1));
                             continue;
                         case "greenBlocks":
                             ClutterBlockGenerator.Init(this);
-                            ClutterBlockGenerator.Add((int) ((double) entity2.Position.X / 8.0), (int) ((double) entity2.Position.Y / 8.0), entity2.Width / 8, entity2.Height / 8, ClutterBlock.Colors.Green);
+                            ClutterBlockGenerator.Add((int) (entity2.Position.X / 8.0), (int) (entity2.Position.Y / 8.0), entity2.Width / 8, entity2.Height / 8, ClutterBlock.Colors.Green);
                             continue;
                         case "hahaha":
-                            this.Add((Entity) new Hahaha(entity2, vector2_1));
+                            Add(new Hahaha(entity2, vector2_1));
                             continue;
                         case "hanginglamp":
-                            this.Add((Entity) new HangingLamp(entity2, vector2_1 + entity2.Position));
+                            Add(new HangingLamp(entity2, vector2_1 + entity2.Position));
                             continue;
                         case "heartGemDoor":
-                            this.Add((Entity) new HeartGemDoor(entity2, vector2_1));
+                            Add(new HeartGemDoor(entity2, vector2_1));
                             continue;
                         case "iceBlock":
-                            this.Add((Entity) new IceBlock(entity2, vector2_1));
+                            Add(new IceBlock(entity2, vector2_1));
                             continue;
                         case "infiniteStar":
-                            this.Add((Entity) new FlyFeather(entity2, vector2_1));
+                            Add(new FlyFeather(entity2, vector2_1));
                             continue;
                         case "introCar":
-                            this.Add((Entity) new IntroCar(entity2, vector2_1));
+                            Add(new IntroCar(entity2, vector2_1));
                             continue;
                         case "introCrusher":
-                            this.Add((Entity) new IntroCrusher(entity2, vector2_1));
+                            Add(new IntroCrusher(entity2, vector2_1));
                             continue;
                         case "invisibleBarrier":
-                            this.Add((Entity) new InvisibleBarrier(entity2, vector2_1));
+                            Add(new InvisibleBarrier(entity2, vector2_1));
                             continue;
                         case "jumpThru":
-                            this.Add((Entity) new JumpthruPlatform(entity2, vector2_1));
+                            Add(new JumpthruPlatform(entity2, vector2_1));
                             continue;
                         case "kevins_pc":
-                            this.Add((Entity) new KevinsPC(entity2, vector2_1));
+                            Add(new KevinsPC(entity2, vector2_1));
                             continue;
                         case "key":
-                            this.Add((Entity) new Key(entity2, vector2_1, entityId));
+                            Add(new Key(entity2, vector2_1, entityId));
                             continue;
                         case "killbox":
-                            this.Add((Entity) new Killbox(entity2, vector2_1));
+                            Add(new Killbox(entity2, vector2_1));
                             continue;
                         case "lamp":
-                            this.Add((Entity) new Lamp(vector2_1 + entity2.Position, entity2.Bool("broken")));
+                            Add(new Lamp(vector2_1 + entity2.Position, entity2.Bool("broken")));
                             continue;
                         case "light":
-                            this.Add((Entity) new PropLight(entity2, vector2_1));
+                            Add(new PropLight(entity2, vector2_1));
                             continue;
                         case "lightbeam":
-                            this.Add((Entity) new LightBeam(entity2, vector2_1));
+                            Add(new LightBeam(entity2, vector2_1));
                             continue;
                         case "lightning":
-                            if (entity2.Bool("perLevel") || !this.Session.GetFlag("disable_lightning"))
+                            if (entity2.Bool("perLevel") || !Session.GetFlag("disable_lightning"))
                             {
-                                this.Add((Entity) new Lightning(entity2, vector2_1));
+                                Add(new Lightning(entity2, vector2_1));
                                 flag2 = true;
                                 continue;
                             }
                             continue;
                         case "lightningBlock":
-                            this.Add((Entity) new LightningBreakerBox(entity2, vector2_1));
+                            Add(new LightningBreakerBox(entity2, vector2_1));
                             continue;
                         case "lockBlock":
-                            this.Add((Entity) new LockBlock(entity2, vector2_1, entityId));
+                            Add(new LockBlock(entity2, vector2_1, entityId));
                             continue;
                         case "memorial":
-                            this.Add((Entity) new Memorial(entity2, vector2_1));
+                            Add(new Memorial(entity2, vector2_1));
                             continue;
                         case "memorialTextController":
-                            if (this.Session.Dashes == 0 && this.Session.StartedFromBeginning)
+                            if (Session.Dashes == 0 && Session.StartedFromBeginning)
                             {
-                                this.Add((Entity) new Strawberry(entity2, vector2_1, entityId));
+                                Add(new Strawberry(entity2, vector2_1, entityId));
                                 continue;
                             }
                             continue;
                         case "moonCreature":
-                            this.Add((Entity) new MoonCreature(entity2, vector2_1));
+                            Add(new MoonCreature(entity2, vector2_1));
                             continue;
                         case "moveBlock":
-                            this.Add((Entity) new MoveBlock(entity2, vector2_1));
+                            Add(new MoveBlock(entity2, vector2_1));
                             continue;
                         case "movingPlatform":
-                            this.Add((Entity) new MovingPlatform(entity2, vector2_1));
+                            Add(new MovingPlatform(entity2, vector2_1));
                             continue;
                         case "negaBlock":
-                            this.Add((Entity) new NegaBlock(entity2, vector2_1));
+                            Add(new NegaBlock(entity2, vector2_1));
                             continue;
                         case "npc":
                             string lower = entity2.Attr("npc").ToLower();
                             Vector2 position = entity2.Position + vector2_1;
                             if (lower == "granny_00_house")
                             {
-                                this.Add((Entity) new NPC00_Granny(position));
+                                Add(new NPC00_Granny(position));
                                 continue;
                             }
                             if (lower == "theo_01_campfire")
                             {
-                                this.Add((Entity) new NPC01_Theo(position));
+                                Add(new NPC01_Theo(position));
                                 continue;
                             }
                             if (lower == "theo_02_campfire")
                             {
-                                this.Add((Entity) new NPC02_Theo(position));
+                                Add(new NPC02_Theo(position));
                                 continue;
                             }
                             if (lower == "theo_03_escaping")
                             {
-                                if (!this.Session.GetFlag("resort_theo"))
+                                if (!Session.GetFlag("resort_theo"))
                                 {
-                                    this.Add((Entity) new NPC03_Theo_Escaping(position));
+                                    Add(new NPC03_Theo_Escaping(position));
                                     continue;
                                 }
                                 continue;
                             }
                             if (lower == "theo_03_vents")
                             {
-                                this.Add((Entity) new NPC03_Theo_Vents(position));
+                                Add(new NPC03_Theo_Vents(position));
                                 continue;
                             }
                             if (lower == "oshiro_03_lobby")
                             {
-                                this.Add((Entity) new NPC03_Oshiro_Lobby(position));
+                                Add(new NPC03_Oshiro_Lobby(position));
                                 continue;
                             }
                             if (lower == "oshiro_03_hallway")
                             {
-                                this.Add((Entity) new NPC03_Oshiro_Hallway1(position));
+                                Add(new NPC03_Oshiro_Hallway1(position));
                                 continue;
                             }
                             if (lower == "oshiro_03_hallway2")
                             {
-                                this.Add((Entity) new NPC03_Oshiro_Hallway2(position));
+                                Add(new NPC03_Oshiro_Hallway2(position));
                                 continue;
                             }
                             if (lower == "oshiro_03_bigroom")
                             {
-                                this.Add((Entity) new NPC03_Oshiro_Cluttter(entity2, vector2_1));
+                                Add(new NPC03_Oshiro_Cluttter(entity2, vector2_1));
                                 continue;
                             }
                             if (lower == "oshiro_03_breakdown")
                             {
-                                this.Add((Entity) new NPC03_Oshiro_Breakdown(position));
+                                Add(new NPC03_Oshiro_Breakdown(position));
                                 continue;
                             }
                             if (lower == "oshiro_03_suite")
                             {
-                                this.Add((Entity) new NPC03_Oshiro_Suite(position));
+                                Add(new NPC03_Oshiro_Suite(position));
                                 continue;
                             }
                             if (lower == "oshiro_03_rooftop")
                             {
-                                this.Add((Entity) new NPC03_Oshiro_Rooftop(position));
+                                Add(new NPC03_Oshiro_Rooftop(position));
                                 continue;
                             }
                             if (lower == "granny_04_cliffside")
                             {
-                                this.Add((Entity) new NPC04_Granny(position));
+                                Add(new NPC04_Granny(position));
                                 continue;
                             }
                             if (lower == "theo_04_cliffside")
                             {
-                                this.Add((Entity) new NPC04_Theo(position));
+                                Add(new NPC04_Theo(position));
                                 continue;
                             }
                             if (lower == "theo_05_entrance")
                             {
-                                this.Add((Entity) new NPC05_Theo_Entrance(position));
+                                Add(new NPC05_Theo_Entrance(position));
                                 continue;
                             }
                             if (lower == "theo_05_inmirror")
                             {
-                                this.Add((Entity) new NPC05_Theo_Mirror(position));
+                                Add(new NPC05_Theo_Mirror(position));
                                 continue;
                             }
                             if (lower == "evil_05")
                             {
-                                this.Add((Entity) new NPC05_Badeline(entity2, vector2_1));
+                                Add(new NPC05_Badeline(entity2, vector2_1));
                                 continue;
                             }
                             if (lower == "theo_06_plateau")
                             {
-                                this.Add((Entity) new NPC06_Theo_Plateau(entity2, vector2_1));
+                                Add(new NPC06_Theo_Plateau(entity2, vector2_1));
                                 continue;
                             }
                             if (lower == "granny_06_intro")
                             {
-                                this.Add((Entity) new NPC06_Granny(entity2, vector2_1));
+                                Add(new NPC06_Granny(entity2, vector2_1));
                                 continue;
                             }
                             if (lower == "badeline_06_crying")
                             {
-                                this.Add((Entity) new NPC06_Badeline_Crying(entity2, vector2_1));
+                                Add(new NPC06_Badeline_Crying(entity2, vector2_1));
                                 continue;
                             }
                             if (lower == "granny_06_ending")
                             {
-                                this.Add((Entity) new NPC06_Granny_Ending(entity2, vector2_1));
+                                Add(new NPC06_Granny_Ending(entity2, vector2_1));
                                 continue;
                             }
                             if (lower == "theo_06_ending")
                             {
-                                this.Add((Entity) new NPC06_Theo_Ending(entity2, vector2_1));
+                                Add(new NPC06_Theo_Ending(entity2, vector2_1));
                                 continue;
                             }
                             if (lower == "granny_07x")
                             {
-                                this.Add((Entity) new NPC07X_Granny_Ending(entity2, vector2_1));
+                                Add(new NPC07X_Granny_Ending(entity2, vector2_1));
                                 continue;
                             }
                             if (lower == "theo_08_inside")
                             {
-                                this.Add((Entity) new NPC08_Theo(entity2, vector2_1));
+                                Add(new NPC08_Theo(entity2, vector2_1));
                                 continue;
                             }
                             if (lower == "granny_08_inside")
                             {
-                                this.Add((Entity) new NPC08_Granny(entity2, vector2_1));
+                                Add(new NPC08_Granny(entity2, vector2_1));
                                 continue;
                             }
                             if (lower == "granny_09_outside")
                             {
-                                this.Add((Entity) new NPC09_Granny_Outside(entity2, vector2_1));
+                                Add(new NPC09_Granny_Outside(entity2, vector2_1));
                                 continue;
                             }
                             if (lower == "granny_09_inside")
                             {
-                                this.Add((Entity) new NPC09_Granny_Inside(entity2, vector2_1));
+                                Add(new NPC09_Granny_Inside(entity2, vector2_1));
                                 continue;
                             }
                             if (lower == "gravestone_10")
                             {
-                                this.Add((Entity) new NPC10_Gravestone(entity2, vector2_1));
+                                Add(new NPC10_Gravestone(entity2, vector2_1));
                                 continue;
                             }
                             if (lower == "granny_10_never")
                             {
-                                this.Add((Entity) new NPC07X_Granny_Ending(entity2, vector2_1, true));
+                                Add(new NPC07X_Granny_Ending(entity2, vector2_1, true));
                                 continue;
                             }
                             continue;
                         case "oshirodoor":
-                            this.Add((Entity) new MrOshiroDoor(entity2, vector2_1));
+                            Add(new MrOshiroDoor(entity2, vector2_1));
                             continue;
                         case "payphone":
-                            this.Add((Entity) new Payphone(vector2_1 + entity2.Position));
+                            Add(new Payphone(vector2_1 + entity2.Position));
                             continue;
                         case "picoconsole":
-                            this.Add((Entity) new PicoConsole(entity2, vector2_1));
+                            Add(new PicoConsole(entity2, vector2_1));
                             continue;
                         case "plateau":
-                            this.Add((Entity) new Plateau(entity2, vector2_1));
+                            Add(new Plateau(entity2, vector2_1));
                             continue;
                         case "playbackBillboard":
-                            this.Add((Entity) new PlaybackBillboard(entity2, vector2_1));
+                            Add(new PlaybackBillboard(entity2, vector2_1));
                             continue;
                         case "playbackTutorial":
-                            this.Add((Entity) new PlayerPlayback(entity2, vector2_1));
+                            Add(new PlayerPlayback(entity2, vector2_1));
                             continue;
                         case "playerSeeker":
-                            this.Add((Entity) new PlayerSeeker(entity2, vector2_1));
+                            Add(new PlayerSeeker(entity2, vector2_1));
                             continue;
                         case "powerSourceNumber":
-                            this.Add((Entity) new PowerSourceNumber(entity2.Position + vector2_1, entity2.Int("number", 1), this.GotCollectables(entity2)));
+                            Add(new PowerSourceNumber(entity2.Position + vector2_1, entity2.Int("number", 1), GotCollectables(entity2)));
                             continue;
                         case "redBlocks":
                             ClutterBlockGenerator.Init(this);
-                            ClutterBlockGenerator.Add((int) ((double) entity2.Position.X / 8.0), (int) ((double) entity2.Position.Y / 8.0), entity2.Width / 8, entity2.Height / 8, ClutterBlock.Colors.Red);
+                            ClutterBlockGenerator.Add((int) (entity2.Position.X / 8.0), (int) (entity2.Position.Y / 8.0), entity2.Width / 8, entity2.Height / 8, ClutterBlock.Colors.Red);
                             continue;
                         case "refill":
-                            this.Add((Entity) new Refill(entity2, vector2_1));
+                            Add(new Refill(entity2, vector2_1));
                             continue;
                         case "reflectionHeartStatue":
-                            this.Add((Entity) new ReflectionHeartStatue(entity2, vector2_1));
+                            Add(new ReflectionHeartStatue(entity2, vector2_1));
                             continue;
                         case "resortLantern":
-                            this.Add((Entity) new ResortLantern(entity2, vector2_1));
+                            Add(new ResortLantern(entity2, vector2_1));
                             continue;
                         case "resortRoofEnding":
-                            this.Add((Entity) new ResortRoofEnding(entity2, vector2_1));
+                            Add(new ResortRoofEnding(entity2, vector2_1));
                             continue;
                         case "resortmirror":
-                            this.Add((Entity) new ResortMirror(entity2, vector2_1));
+                            Add(new ResortMirror(entity2, vector2_1));
                             continue;
                         case "ridgeGate":
-                            if (this.GotCollectables(entity2))
+                            if (GotCollectables(entity2))
                             {
-                                this.Add((Entity) new RidgeGate(entity2, vector2_1));
+                                Add(new RidgeGate(entity2, vector2_1));
                                 continue;
                             }
                             continue;
                         case "risingLava":
-                            this.Add((Entity) new RisingLava(entity2, vector2_1));
+                            Add(new RisingLava(entity2, vector2_1));
                             continue;
                         case "rotateSpinner":
-                            if (this.Session.Area.ID == 10)
+                            if (Session.Area.ID == 10)
                             {
-                                this.Add((Entity) new StarRotateSpinner(entity2, vector2_1));
+                                Add(new StarRotateSpinner(entity2, vector2_1));
                                 continue;
                             }
-                            if (this.Session.Area.ID == 3 || this.Session.Area.ID == 7 && this.Session.Level.StartsWith("d-"))
+                            if (Session.Area.ID == 3 || Session.Area.ID == 7 && Session.Level.StartsWith("d-"))
                             {
-                                this.Add((Entity) new DustRotateSpinner(entity2, vector2_1));
+                                Add(new DustRotateSpinner(entity2, vector2_1));
                                 continue;
                             }
-                            this.Add((Entity) new BladeRotateSpinner(entity2, vector2_1));
+                            Add(new BladeRotateSpinner(entity2, vector2_1));
                             continue;
                         case "rotatingPlatforms":
                             Vector2 vector2_2 = entity2.Position + vector2_1;
@@ -859,186 +851,186 @@ namespace Celeste
                             bool clockwise = entity2.Bool("clockwise");
                             float length = (vector2_2 - center).Length();
                             float num3 = (vector2_2 - center).Angle();
-                            float num4 = 6.28318548f / (float) num2;
+                            float num4 = 6.28318548f / num2;
                             for (int index2 = 0; index2 < num2; ++index2)
                             {
-                                float angleRadians = Calc.WrapAngle(num3 + num4 * (float) index2);
-                                this.Add((Entity) new RotatingPlatform(center + Calc.AngleToVector(angleRadians, length), width, center, clockwise));
+                                float angleRadians = Calc.WrapAngle(num3 + num4 * index2);
+                                Add(new RotatingPlatform(center + Calc.AngleToVector(angleRadians, length), width, center, clockwise));
                             }
                             continue;
                         case "sandwichLava":
-                            this.Add((Entity) new SandwichLava(entity2, vector2_1));
+                            Add(new SandwichLava(entity2, vector2_1));
                             continue;
                         case "seeker":
-                            this.Add((Entity) new Seeker(entity2, vector2_1));
+                            Add(new Seeker(entity2, vector2_1));
                             continue;
                         case "seekerBarrier":
-                            this.Add((Entity) new SeekerBarrier(entity2, vector2_1));
+                            Add(new SeekerBarrier(entity2, vector2_1));
                             continue;
                         case "seekerStatue":
-                            this.Add((Entity) new SeekerStatue(entity2, vector2_1));
+                            Add(new SeekerStatue(entity2, vector2_1));
                             continue;
                         case "sinkingPlatform":
-                            this.Add((Entity) new SinkingPlatform(entity2, vector2_1));
+                            Add(new SinkingPlatform(entity2, vector2_1));
                             continue;
                         case "slider":
-                            this.Add((Entity) new Slider(entity2, vector2_1));
+                            Add(new Slider(entity2, vector2_1));
                             continue;
                         case "soundSource":
-                            this.Add((Entity) new SoundSourceEntity(entity2, vector2_1));
+                            Add(new SoundSourceEntity(entity2, vector2_1));
                             continue;
                         case "spikesDown":
-                            this.Add((Entity) new Spikes(entity2, vector2_1, Spikes.Directions.Down));
+                            Add(new Spikes(entity2, vector2_1, Spikes.Directions.Down));
                             continue;
                         case "spikesLeft":
-                            this.Add((Entity) new Spikes(entity2, vector2_1, Spikes.Directions.Left));
+                            Add(new Spikes(entity2, vector2_1, Spikes.Directions.Left));
                             continue;
                         case "spikesRight":
-                            this.Add((Entity) new Spikes(entity2, vector2_1, Spikes.Directions.Right));
+                            Add(new Spikes(entity2, vector2_1, Spikes.Directions.Right));
                             continue;
                         case "spikesUp":
-                            this.Add((Entity) new Spikes(entity2, vector2_1, Spikes.Directions.Up));
+                            Add(new Spikes(entity2, vector2_1, Spikes.Directions.Up));
                             continue;
                         case "spinner":
-                            if (this.Session.Area.ID == 3 || this.Session.Area.ID == 7 && this.Session.Level.StartsWith("d-"))
+                            if (Session.Area.ID == 3 || Session.Area.ID == 7 && Session.Level.StartsWith("d-"))
                             {
-                                this.Add((Entity) new DustStaticSpinner(entity2, vector2_1));
+                                Add(new DustStaticSpinner(entity2, vector2_1));
                                 continue;
                             }
                             CrystalColor color = CrystalColor.Blue;
-                            if (this.Session.Area.ID == 5)
+                            if (Session.Area.ID == 5)
                                 color = CrystalColor.Red;
-                            else if (this.Session.Area.ID == 6)
+                            else if (Session.Area.ID == 6)
                                 color = CrystalColor.Purple;
-                            else if (this.Session.Area.ID == 10)
+                            else if (Session.Area.ID == 10)
                                 color = CrystalColor.Rainbow;
-                            this.Add((Entity) new CrystalStaticSpinner(entity2, vector2_1, color));
+                            Add(new CrystalStaticSpinner(entity2, vector2_1, color));
                             continue;
                         case "spring":
-                            this.Add((Entity) new Spring(entity2, vector2_1, Spring.Orientations.Floor));
+                            Add(new Spring(entity2, vector2_1, Spring.Orientations.Floor));
                             continue;
                         case "starClimbController":
-                            this.Add((Entity) new StarJumpController());
+                            Add(new StarJumpController());
                             continue;
                         case "starJumpBlock":
-                            this.Add((Entity) new StarJumpBlock(entity2, vector2_1));
+                            Add(new StarJumpBlock(entity2, vector2_1));
                             continue;
                         case "strawberry":
-                            this.Add((Entity) new Strawberry(entity2, vector2_1, entityId));
+                            Add(new Strawberry(entity2, vector2_1, entityId));
                             continue;
                         case "summitGemManager":
-                            this.Add((Entity) new SummitGemManager(entity2, vector2_1));
+                            Add(new SummitGemManager(entity2, vector2_1));
                             continue;
                         case "summitcheckpoint":
-                            this.Add((Entity) new SummitCheckpoint(entity2, vector2_1));
+                            Add(new SummitCheckpoint(entity2, vector2_1));
                             continue;
                         case "summitcloud":
-                            this.Add((Entity) new SummitCloud(entity2, vector2_1));
+                            Add(new SummitCloud(entity2, vector2_1));
                             continue;
                         case "summitgem":
-                            this.Add((Entity) new SummitGem(entity2, vector2_1, entityId));
+                            Add(new SummitGem(entity2, vector2_1, entityId));
                             continue;
                         case "swapBlock":
                         case "switchBlock":
-                            this.Add((Entity) new SwapBlock(entity2, vector2_1));
+                            Add(new SwapBlock(entity2, vector2_1));
                             continue;
                         case "switchGate":
-                            this.Add((Entity) new SwitchGate(entity2, vector2_1));
+                            Add(new SwitchGate(entity2, vector2_1));
                             continue;
                         case "templeBigEyeball":
-                            this.Add((Entity) new TempleBigEyeball(entity2, vector2_1));
+                            Add(new TempleBigEyeball(entity2, vector2_1));
                             continue;
                         case "templeCrackedBlock":
-                            this.Add((Entity) new TempleCrackedBlock(entityId, entity2, vector2_1));
+                            Add(new TempleCrackedBlock(entityId, entity2, vector2_1));
                             continue;
                         case "templeEye":
-                            this.Add((Entity) new TempleEye(entity2, vector2_1));
+                            Add(new TempleEye(entity2, vector2_1));
                             continue;
                         case "templeGate":
-                            this.Add((Entity) new TempleGate(entity2, vector2_1, levelData.Name));
+                            Add(new TempleGate(entity2, vector2_1, levelData.Name));
                             continue;
                         case "templeMirror":
-                            this.Add((Entity) new TempleMirror(entity2, vector2_1));
+                            Add(new TempleMirror(entity2, vector2_1));
                             continue;
                         case "templeMirrorPortal":
-                            this.Add((Entity) new TempleMirrorPortal(entity2, vector2_1));
+                            Add(new TempleMirrorPortal(entity2, vector2_1));
                             continue;
                         case "tentacles":
-                            this.Add((Entity) new ReflectionTentacles(entity2, vector2_1));
+                            Add(new ReflectionTentacles(entity2, vector2_1));
                             continue;
                         case "theoCrystal":
-                            this.Add((Entity) new TheoCrystal(entity2, vector2_1));
+                            Add(new TheoCrystal(entity2, vector2_1));
                             continue;
                         case "theoCrystalPedestal":
-                            this.Add((Entity) new TheoCrystalPedestal(entity2, vector2_1));
+                            Add(new TheoCrystalPedestal(entity2, vector2_1));
                             continue;
                         case "torch":
-                            this.Add((Entity) new Torch(entity2, vector2_1, entityId));
+                            Add(new Torch(entity2, vector2_1, entityId));
                             continue;
                         case "touchSwitch":
-                            this.Add((Entity) new TouchSwitch(entity2, vector2_1));
+                            Add(new TouchSwitch(entity2, vector2_1));
                             continue;
                         case "towerviewer":
-                            this.Add((Entity) new Lookout(entity2, vector2_1));
+                            Add(new Lookout(entity2, vector2_1));
                             continue;
                         case "trackSpinner":
-                            if (this.Session.Area.ID == 10)
+                            if (Session.Area.ID == 10)
                             {
-                                this.Add((Entity) new StarTrackSpinner(entity2, vector2_1));
+                                Add(new StarTrackSpinner(entity2, vector2_1));
                                 continue;
                             }
-                            if (this.Session.Area.ID == 3 || this.Session.Area.ID == 7 && this.Session.Level.StartsWith("d-"))
+                            if (Session.Area.ID == 3 || Session.Area.ID == 7 && Session.Level.StartsWith("d-"))
                             {
-                                this.Add((Entity) new DustTrackSpinner(entity2, vector2_1));
+                                Add(new DustTrackSpinner(entity2, vector2_1));
                                 continue;
                             }
-                            this.Add((Entity) new BladeTrackSpinner(entity2, vector2_1));
+                            Add(new BladeTrackSpinner(entity2, vector2_1));
                             continue;
                         case "trapdoor":
-                            this.Add((Entity) new Trapdoor(entity2, vector2_1));
+                            Add(new Trapdoor(entity2, vector2_1));
                             continue;
                         case "triggerSpikesDown":
-                            this.Add((Entity) new TriggerSpikes(entity2, vector2_1, TriggerSpikes.Directions.Down));
+                            Add(new TriggerSpikes(entity2, vector2_1, TriggerSpikes.Directions.Down));
                             continue;
                         case "triggerSpikesLeft":
-                            this.Add((Entity) new TriggerSpikes(entity2, vector2_1, TriggerSpikes.Directions.Left));
+                            Add(new TriggerSpikes(entity2, vector2_1, TriggerSpikes.Directions.Left));
                             continue;
                         case "triggerSpikesRight":
-                            this.Add((Entity) new TriggerSpikes(entity2, vector2_1, TriggerSpikes.Directions.Right));
+                            Add(new TriggerSpikes(entity2, vector2_1, TriggerSpikes.Directions.Right));
                             continue;
                         case "triggerSpikesUp":
-                            this.Add((Entity) new TriggerSpikes(entity2, vector2_1, TriggerSpikes.Directions.Up));
+                            Add(new TriggerSpikes(entity2, vector2_1, TriggerSpikes.Directions.Up));
                             continue;
                         case "wallBooster":
-                            this.Add((Entity) new WallBooster(entity2, vector2_1));
+                            Add(new WallBooster(entity2, vector2_1));
                             continue;
                         case "wallSpringLeft":
-                            this.Add((Entity) new Spring(entity2, vector2_1, Spring.Orientations.WallLeft));
+                            Add(new Spring(entity2, vector2_1, Spring.Orientations.WallLeft));
                             continue;
                         case "wallSpringRight":
-                            this.Add((Entity) new Spring(entity2, vector2_1, Spring.Orientations.WallRight));
+                            Add(new Spring(entity2, vector2_1, Spring.Orientations.WallRight));
                             continue;
                         case "water":
-                            this.Add((Entity) new Water(entity2, vector2_1));
+                            Add(new Water(entity2, vector2_1));
                             continue;
                         case "waterfall":
-                            this.Add((Entity) new WaterFall(entity2, vector2_1));
+                            Add(new WaterFall(entity2, vector2_1));
                             continue;
                         case "wavedashmachine":
-                            this.Add((Entity) new WaveDashTutorialMachine(entity2, vector2_1));
+                            Add(new WaveDashTutorialMachine(entity2, vector2_1));
                             continue;
                         case "whiteblock":
-                            this.Add((Entity) new WhiteBlock(entity2, vector2_1));
+                            Add(new WhiteBlock(entity2, vector2_1));
                             continue;
                         case "wire":
-                            this.Add((Entity) new Wire(entity2, vector2_1));
+                            Add(new Wire(entity2, vector2_1));
                             continue;
                         case "yellowBlocks":
                             ClutterBlockGenerator.Init(this);
-                            ClutterBlockGenerator.Add((int) ((double) entity2.Position.X / 8.0), (int) ((double) entity2.Position.Y / 8.0), entity2.Width / 8, entity2.Height / 8, ClutterBlock.Colors.Yellow);
+                            ClutterBlockGenerator.Add((int) (entity2.Position.X / 8.0), (int) (entity2.Position.Y / 8.0), entity2.Width / 8, entity2.Height / 8, ClutterBlock.Colors.Yellow);
                             continue;
                         case "zipMover":
-                            this.Add((Entity) new ZipMover(entity2, vector2_1));
+                            Add(new ZipMover(entity2, vector2_1));
                             continue;
                         default:
                             continue;
@@ -1049,102 +1041,102 @@ namespace Celeste
             foreach (EntityData trigger in levelData.Triggers)
             {
                 int entityID = trigger.ID + 10000000;
-                EntityID id = new EntityID(levelData.Name, entityID);
-                if (!this.Session.DoNotLoad.Contains(id))
+                EntityID id = new(levelData.Name, entityID);
+                if (!Session.DoNotLoad.Contains(id))
                 {
                     switch (trigger.Name)
                     {
                         case "altMusicTrigger":
-                            this.Add((Entity) new AltMusicTrigger(trigger, vector2_1));
+                            Add(new AltMusicTrigger(trigger, vector2_1));
                             continue;
                         case "ambienceParamTrigger":
-                            this.Add((Entity) new AmbienceParamTrigger(trigger, vector2_1));
+                            Add(new AmbienceParamTrigger(trigger, vector2_1));
                             continue;
                         case "birdPathTrigger":
-                            this.Add((Entity) new BirdPathTrigger(trigger, vector2_1));
+                            Add(new BirdPathTrigger(trigger, vector2_1));
                             continue;
                         case "blackholeStrength":
-                            this.Add((Entity) new BlackholeStrengthTrigger(trigger, vector2_1));
+                            Add(new BlackholeStrengthTrigger(trigger, vector2_1));
                             continue;
                         case "bloomFadeTrigger":
-                            this.Add((Entity) new BloomFadeTrigger(trigger, vector2_1));
+                            Add(new BloomFadeTrigger(trigger, vector2_1));
                             continue;
                         case "cameraAdvanceTargetTrigger":
-                            this.Add((Entity) new CameraAdvanceTargetTrigger(trigger, vector2_1));
+                            Add(new CameraAdvanceTargetTrigger(trigger, vector2_1));
                             continue;
                         case "cameraOffsetTrigger":
-                            this.Add((Entity) new CameraOffsetTrigger(trigger, vector2_1));
+                            Add(new CameraOffsetTrigger(trigger, vector2_1));
                             continue;
                         case "cameraTargetTrigger":
                             string flag7 = trigger.Attr("deleteFlag");
-                            if (string.IsNullOrEmpty(flag7) || !this.Session.GetFlag(flag7))
+                            if (string.IsNullOrEmpty(flag7) || !Session.GetFlag(flag7))
                             {
-                                this.Add((Entity) new CameraTargetTrigger(trigger, vector2_1));
+                                Add(new CameraTargetTrigger(trigger, vector2_1));
                                 continue;
                             }
                             continue;
                         case "changeRespawnTrigger":
-                            this.Add((Entity) new ChangeRespawnTrigger(trigger, vector2_1));
+                            Add(new ChangeRespawnTrigger(trigger, vector2_1));
                             continue;
                         case "checkpointBlockerTrigger":
-                            this.Add((Entity) new CheckpointBlockerTrigger(trigger, vector2_1));
+                            Add(new CheckpointBlockerTrigger(trigger, vector2_1));
                             continue;
                         case "creditsTrigger":
-                            this.Add((Entity) new CreditsTrigger(trigger, vector2_1));
+                            Add(new CreditsTrigger(trigger, vector2_1));
                             continue;
                         case "detachFollowersTrigger":
-                            this.Add((Entity) new DetachStrawberryTrigger(trigger, vector2_1));
+                            Add(new DetachStrawberryTrigger(trigger, vector2_1));
                             continue;
                         case "eventTrigger":
-                            this.Add((Entity) new EventTrigger(trigger, vector2_1));
+                            Add(new EventTrigger(trigger, vector2_1));
                             continue;
                         case "goldenBerryCollectTrigger":
-                            this.Add((Entity) new GoldBerryCollectTrigger(trigger, vector2_1));
+                            Add(new GoldBerryCollectTrigger(trigger, vector2_1));
                             continue;
                         case "interactTrigger":
-                            this.Add((Entity) new InteractTrigger(trigger, vector2_1));
+                            Add(new InteractTrigger(trigger, vector2_1));
                             continue;
                         case "lightFadeTrigger":
-                            this.Add((Entity) new LightFadeTrigger(trigger, vector2_1));
+                            Add(new LightFadeTrigger(trigger, vector2_1));
                             continue;
                         case "lookoutBlocker":
-                            this.Add((Entity) new LookoutBlocker(trigger, vector2_1));
+                            Add(new LookoutBlocker(trigger, vector2_1));
                             continue;
                         case "minitextboxTrigger":
-                            this.Add((Entity) new MiniTextboxTrigger(trigger, vector2_1, id));
+                            Add(new MiniTextboxTrigger(trigger, vector2_1, id));
                             continue;
                         case "moonGlitchBackgroundTrigger":
-                            this.Add((Entity) new MoonGlitchBackgroundTrigger(trigger, vector2_1));
+                            Add(new MoonGlitchBackgroundTrigger(trigger, vector2_1));
                             continue;
                         case "musicFadeTrigger":
-                            this.Add((Entity) new MusicFadeTrigger(trigger, vector2_1));
+                            Add(new MusicFadeTrigger(trigger, vector2_1));
                             continue;
                         case "musicTrigger":
-                            this.Add((Entity) new MusicTrigger(trigger, vector2_1));
+                            Add(new MusicTrigger(trigger, vector2_1));
                             continue;
                         case "noRefillTrigger":
-                            this.Add((Entity) new NoRefillTrigger(trigger, vector2_1));
+                            Add(new NoRefillTrigger(trigger, vector2_1));
                             continue;
                         case "oshiroTrigger":
-                            this.Add((Entity) new OshiroTrigger(trigger, vector2_1));
+                            Add(new OshiroTrigger(trigger, vector2_1));
                             continue;
                         case "respawnTargetTrigger":
-                            this.Add((Entity) new RespawnTargetTrigger(trigger, vector2_1));
+                            Add(new RespawnTargetTrigger(trigger, vector2_1));
                             continue;
                         case "rumbleTrigger":
-                            this.Add((Entity) new RumbleTrigger(trigger, vector2_1, id));
+                            Add(new RumbleTrigger(trigger, vector2_1, id));
                             continue;
                         case "spawnFacingTrigger":
-                            this.Add((Entity) new SpawnFacingTrigger(trigger, vector2_1));
+                            Add(new SpawnFacingTrigger(trigger, vector2_1));
                             continue;
                         case "stopBoostTrigger":
-                            this.Add((Entity) new StopBoostTrigger(trigger, vector2_1));
+                            Add(new StopBoostTrigger(trigger, vector2_1));
                             continue;
                         case "windAttackTrigger":
-                            this.Add((Entity) new WindAttackTrigger(trigger, vector2_1));
+                            Add(new WindAttackTrigger(trigger, vector2_1));
                             continue;
                         case "windTrigger":
-                            this.Add((Entity) new WindTrigger(trigger, vector2_1));
+                            Add(new WindTrigger(trigger, vector2_1));
                             continue;
                         default:
                             continue;
@@ -1152,56 +1144,58 @@ namespace Celeste
                 }
             }
             foreach (DecalData fgDecal in levelData.FgDecals)
-                this.Add((Entity) new Decal(fgDecal.Texture, vector2_1 + fgDecal.Position, fgDecal.Scale, -10500));
+                Add(new Decal(fgDecal.Texture, vector2_1 + fgDecal.Position, fgDecal.Scale, -10500));
             foreach (DecalData bgDecal in levelData.BgDecals)
-                this.Add((Entity) new Decal(bgDecal.Texture, vector2_1 + bgDecal.Position, bgDecal.Scale, 9000));
+                Add(new Decal(bgDecal.Texture, vector2_1 + bgDecal.Position, bgDecal.Scale, 9000));
             if (playerIntro != Player.IntroTypes.Transition)
             {
-                if (this.Session.JustStarted && !this.Session.StartedFromBeginning && nullable.HasValue && !this.StartPosition.HasValue)
-                    this.StartPosition = nullable;
-                if (!this.Session.RespawnPoint.HasValue)
-                    this.Session.RespawnPoint = !this.StartPosition.HasValue ? new Vector2?(this.DefaultSpawnPoint) : new Vector2?(this.GetSpawnPoint(this.StartPosition.Value));
-                Player player = new Player(this.Session.RespawnPoint.Value, this.Session.Inventory.Backpack ? PlayerSpriteMode.Madeline : PlayerSpriteMode.MadelineNoBackpack);
-                player.IntroType = playerIntro;
-                this.Add((Entity) player);
-                this.Entities.UpdateLists();
-                Level.CameraLockModes cameraLockMode = this.CameraLockMode;
-                this.CameraLockMode = Level.CameraLockModes.None;
-                this.Camera.Position = this.GetFullCameraTargetAt(player, player.Position);
-                this.CameraLockMode = cameraLockMode;
-                this.CameraUpwardMaxY = this.Camera.Y + 180f;
-                foreach (EntityID key in this.Session.Keys)
-                    this.Add((Entity) new Key(player, key));
-                SpotlightWipe.FocusPoint = this.Session.RespawnPoint.Value - this.Camera.Position;
-                if (playerIntro != Player.IntroTypes.Respawn && playerIntro != Player.IntroTypes.Fall)
+                if (Session.JustStarted && !Session.StartedFromBeginning && nullable.HasValue && !StartPosition.HasValue)
+                    StartPosition = nullable;
+                if (!Session.RespawnPoint.HasValue)
+                    Session.RespawnPoint = !StartPosition.HasValue ? new Vector2?(DefaultSpawnPoint) : new Vector2?(GetSpawnPoint(StartPosition.Value));
+                Player player = new(Session.RespawnPoint.Value, Session.Inventory.Backpack ? PlayerSpriteMode.Madeline : PlayerSpriteMode.MadelineNoBackpack)
                 {
-                    SpotlightWipe spotlightWipe = new SpotlightWipe((Scene) this, true);
+                    IntroType = playerIntro
+                };
+                Add(player);
+                Entities.UpdateLists();
+                CameraLockModes cameraLockMode = CameraLockMode;
+                CameraLockMode = CameraLockModes.None;
+                Camera.Position = GetFullCameraTargetAt(player, player.Position);
+                CameraLockMode = cameraLockMode;
+                CameraUpwardMaxY = Camera.Y + 180f;
+                foreach (EntityID key in Session.Keys)
+                    Add(new Key(player, key));
+                SpotlightWipe.FocusPoint = Session.RespawnPoint.Value - Camera.Position;
+                if (playerIntro is not Player.IntroTypes.Respawn and not Player.IntroTypes.Fall)
+                {
+                    SpotlightWipe spotlightWipe = new(this, true);
                 }
                 else
-                    this.DoScreenWipe(true);
+                    DoScreenWipe(true);
                 if (isFromLoader)
-                    this.RendererList.UpdateLists();
-                this.Lighting.Alpha = !this.DarkRoom ? this.BaseLightingAlpha + this.Session.LightingAlphaAdd : this.Session.DarkRoomAlpha;
-                this.Bloom.Base = AreaData.Get(this.Session).BloomBase + this.Session.BloomBaseAdd;
+                    RendererList.UpdateLists();
+                Lighting.Alpha = !DarkRoom ? BaseLightingAlpha + Session.LightingAlphaAdd : Session.DarkRoomAlpha;
+                Bloom.Base = AreaData.Get(Session).BloomBase + Session.BloomBaseAdd;
             }
             else
-                this.Entities.UpdateLists();
-            if (this.HasCassetteBlocks && this.ShouldCreateCassetteManager)
-                this.Tracker.GetEntity<CassetteBlockManager>()?.OnLevelStart();
+                Entities.UpdateLists();
+            if (HasCassetteBlocks && ShouldCreateCassetteManager)
+                Tracker.GetEntity<CassetteBlockManager>()?.OnLevelStart();
             if (!string.IsNullOrEmpty(levelData.ObjTiles))
             {
-                Tileset tileset = new Tileset(GFX.Game["tilesets/scenery"], 8, 8);
-                int[,] numArray = Calc.ReadCSVIntGrid(levelData.ObjTiles, this.Bounds.Width / 8, this.Bounds.Height / 8);
+                Tileset tileset = new(GFX.Game["tilesets/scenery"], 8, 8);
+                int[,] numArray = Calc.ReadCSVIntGrid(levelData.ObjTiles, Bounds.Width / 8, Bounds.Height / 8);
                 for (int index3 = 0; index3 < numArray.GetLength(0); ++index3)
                 {
                     for (int index4 = 0; index4 < numArray.GetLength(1); ++index4)
                     {
                         if (numArray[index3, index4] != -1)
-                            TileInterceptor.TileCheck((Scene) this, tileset[numArray[index3, index4]], new Vector2((float) (index3 * 8), (float) (index4 * 8)) + this.LevelOffset);
+                            TileInterceptor.TileCheck(this, tileset[numArray[index3, index4]], new Vector2(index3 * 8, index4 * 8) + LevelOffset);
                     }
                 }
             }
-            LightningRenderer entity3 = this.Tracker.GetEntity<LightningRenderer>();
+            LightningRenderer entity3 = Tracker.GetEntity<LightningRenderer>();
             if (entity3 != null)
             {
                 if (flag2)
@@ -1214,52 +1208,52 @@ namespace Celeste
 
         public void UnloadLevel()
         {
-            List<Entity> excludingTagMask = this.GetEntitiesExcludingTagMask((int) Tags.Global);
-            foreach (Entity entity in this.Tracker.GetEntities<Textbox>())
+            List<Entity> excludingTagMask = GetEntitiesExcludingTagMask((int) Tags.Global);
+            foreach (Entity entity in Tracker.GetEntities<Textbox>())
                 excludingTagMask.Add(entity);
-            this.UnloadEntities(excludingTagMask);
-            this.Entities.UpdateLists();
+            UnloadEntities(excludingTagMask);
+            Entities.UpdateLists();
         }
 
         public void Reload()
         {
-            if (this.Completed)
+            if (Completed)
                 return;
-            if (this.Session.FirstLevel && this.Session.Strawberries.Count <= 0 && !this.Session.Cassette && !this.Session.HeartGem && !this.Session.HitCheckpoint)
+            if (Session.FirstLevel && Session.Strawberries.Count <= 0 && !Session.Cassette && !Session.HeartGem && !Session.HitCheckpoint)
             {
-                this.Session.Time = 0L;
-                this.Session.Deaths = 0;
-                this.TimerStarted = false;
+                Session.Time = 0L;
+                Session.Deaths = 0;
+                TimerStarted = false;
             }
-            this.Session.Dashes = this.Session.DashesAtLevelStart;
+            Session.Dashes = Session.DashesAtLevelStart;
             Glitch.Value = 0.0f;
             Engine.TimeRate = 1f;
             Distort.Anxiety = 0.0f;
             Distort.GameRate = 1f;
             Audio.SetMusicParam("fade", 1f);
-            this.ParticlesBG.Clear();
-            this.Particles.Clear();
-            this.ParticlesFG.Clear();
+            ParticlesBG.Clear();
+            Particles.Clear();
+            ParticlesFG.Clear();
             TrailManager.Clear();
-            this.UnloadLevel();
+            UnloadLevel();
             GC.Collect();
             GC.WaitForPendingFinalizers();
-            this.LoadLevel(Player.IntroTypes.Respawn);
-            this.strawberriesDisplay.DrawLerp = 0.0f;
-            WindController first = this.Entities.FindFirst<WindController>();
+            LoadLevel(Player.IntroTypes.Respawn);
+            strawberriesDisplay.DrawLerp = 0.0f;
+            WindController first = Entities.FindFirst<WindController>();
             if (first != null)
                 first.SnapWind();
             else
-                this.Wind = Vector2.Zero;
+                Wind = Vector2.Zero;
         }
 
-        private bool ShouldCreateCassetteManager => this.Session.Area.Mode != AreaMode.Normal || !this.Session.Cassette;
+        private bool ShouldCreateCassetteManager => Session.Area.Mode != AreaMode.Normal || !Session.Cassette;
 
         private bool GotCollectables(EntityData e)
         {
             bool flag1 = true;
             bool flag2 = true;
-            List<EntityID> entityIdList1 = new List<EntityID>();
+            List<EntityID> entityIdList1 = new();
             if (e.Attr("strawberries").Length > 0)
             {
                 string str1 = e.Attr("strawberries");
@@ -1276,13 +1270,13 @@ namespace Celeste
             }
             foreach (EntityID entityId in entityIdList1)
             {
-                if (!this.Session.Strawberries.Contains(entityId))
+                if (!Session.Strawberries.Contains(entityId))
                 {
                     flag1 = false;
                     break;
                 }
             }
-            List<EntityID> entityIdList2 = new List<EntityID>();
+            List<EntityID> entityIdList2 = new();
             if (e.Attr("keys").Length > 0)
             {
                 string str3 = e.Attr("keys");
@@ -1299,7 +1293,7 @@ namespace Celeste
             }
             foreach (EntityID entityId in entityIdList2)
             {
-                if (!this.Session.DoNotLoad.Contains(entityId))
+                if (!Session.DoNotLoad.Contains(entityId))
                 {
                     flag2 = false;
                     break;
@@ -1310,8 +1304,8 @@ namespace Celeste
 
         public void TransitionTo(LevelData next, Vector2 direction)
         {
-            this.Session.CoreMode = this.CoreMode;
-            this.transition = new Coroutine(this.TransitionRoutine(next, direction));
+            Session.CoreMode = CoreMode;
+            transition = new Coroutine(TransitionRoutine(next, direction));
         }
 
         private IEnumerator TransitionRoutine(LevelData next, Vector2 direction)
@@ -1333,7 +1327,7 @@ namespace Celeste
             level.LoadLevel(Player.IntroTypes.Transition);
             Audio.SetParameter(Audio.CurrentAmbienceEventInstance, "has_conveyors", level.Tracker.GetEntities<WallBooster>().Count > 0 ? 1f : 0.0f);
             List<Component> transitionIn = level.Tracker.GetComponentsCopy<TransitionListener>();
-            transitionIn.RemoveAll((Predicate<Component>) (c => transitionOut.Contains(c)));
+            transitionIn.RemoveAll(c => transitionOut.Contains(c));
             GC.Collect();
             float cameraAt = 0.0f;
             Vector2 cameraFrom = level.Camera.Position;
@@ -1341,7 +1335,7 @@ namespace Celeste
             if (direction == Vector2.UnitY)
                 dirPad = direction * 12f;
             Vector2 playerTo = player.Position;
-            while ((double) direction.X != 0.0 && (double) playerTo.Y >= (double) level.Bounds.Bottom)
+            while (direction.X != 0.0 && playerTo.Y >= (double) level.Bounds.Bottom)
                 --playerTo.Y;
             while (!level.IsInBounds(playerTo, dirPad))
                 playerTo += direction;
@@ -1370,17 +1364,17 @@ namespace Celeste
             }
             float lightingStart = level.Lighting.Alpha;
             float lightingEnd = level.DarkRoom ? level.Session.DarkRoomAlpha : level.BaseLightingAlpha + level.Session.LightingAlphaAdd;
-            bool lightingWait = (double) lightingStart >= (double) level.Session.DarkRoomAlpha || (double) lightingEnd >= (double) level.Session.DarkRoomAlpha;
+            bool lightingWait = (double) lightingStart >= level.Session.DarkRoomAlpha || (double) lightingEnd >= level.Session.DarkRoomAlpha;
             if ((double) lightingEnd > (double) lightingStart & lightingWait)
             {
                 Audio.Play("event:/game/05_mirror_temple/room_lightlevel_down");
-                for (; (double) level.Lighting.Alpha != (double) lightingEnd; level.Lighting.Alpha = Calc.Approach(level.Lighting.Alpha, lightingEnd, 2f * Engine.DeltaTime))
-                    yield return (object) null;
+                for (; level.Lighting.Alpha != (double) lightingEnd; level.Lighting.Alpha = Calc.Approach(level.Lighting.Alpha, lightingEnd, 2f * Engine.DeltaTime))
+                    yield return null;
             }
             bool cameraFinished = false;
             while (!player.TransitionTo(playerTo, direction) || (double) cameraAt < 1.0)
             {
-                yield return (object) null;
+                yield return null;
                 if (!cameraFinished)
                 {
                     cameraAt = Calc.Approach(cameraAt, 1f, Engine.DeltaTime / level.NextTransitionDuration);
@@ -1404,8 +1398,8 @@ namespace Celeste
             if ((double) lightingEnd < (double) lightingStart & lightingWait)
             {
                 Audio.Play("event:/game/05_mirror_temple/room_lightlevel_up");
-                for (; (double) level.Lighting.Alpha != (double) lightingEnd; level.Lighting.Alpha = Calc.Approach(level.Lighting.Alpha, lightingEnd, 2f * Engine.DeltaTime))
-                    yield return (object) null;
+                for (; level.Lighting.Alpha != (double) lightingEnd; level.Lighting.Alpha = Calc.Approach(level.Lighting.Alpha, lightingEnd, 2f * Engine.DeltaTime))
+                    yield return null;
             }
             level.UnloadEntities(toRemove);
             level.Entities.UpdateLists();
@@ -1429,34 +1423,34 @@ namespace Celeste
             playerTo = new Vector2();
             cameraTo = new Vector2();
             level.NextTransitionDuration = 0.65f;
-            level.transition = (Coroutine) null;
+            level.transition = null;
         }
 
         public void UnloadEntities(List<Entity> entities)
         {
             foreach (Entity entity in entities)
-                this.Remove(entity);
+                Remove(entity);
         }
 
         public Vector2 DefaultSpawnPoint
         {
             get
             {
-                Rectangle bounds = this.Bounds;
-                double left = (double) bounds.Left;
-                bounds = this.Bounds;
-                double bottom = (double) bounds.Bottom;
-                return this.GetSpawnPoint(new Vector2((float) left, (float) bottom));
+                Rectangle bounds = Bounds;
+                double left = bounds.Left;
+                bounds = Bounds;
+                double bottom = bounds.Bottom;
+                return GetSpawnPoint(new Vector2((float) left, (float) bottom));
             }
         }
 
-        public Vector2 GetSpawnPoint(Vector2 from) => this.Session.GetSpawnPoint(from);
+        public Vector2 GetSpawnPoint(Vector2 from) => Session.GetSpawnPoint(from);
 
         public Vector2 GetFullCameraTargetAt(Player player, Vector2 at)
         {
             Vector2 position = player.Position;
             player.Position = at;
-            foreach (Entity entity in this.Tracker.GetEntities<Trigger>())
+            foreach (Entity entity in Tracker.GetEntities<Trigger>())
             {
                 if (entity is CameraTargetTrigger && player.CollideCheck(entity))
                     (entity as CameraTargetTrigger).OnStay(player);
@@ -1468,7 +1462,7 @@ namespace Celeste
             return cameraTarget;
         }
 
-        public Rectangle Bounds => this.Session.LevelData.Bounds;
+        public Rectangle Bounds => Session.LevelData.Bounds;
 
         public Rectangle? PreviousBounds { get; private set; }
 
@@ -1480,145 +1474,143 @@ namespace Celeste
         {
             Leader.StoreStrawberries(player.Leader);
             Vector2 position = player.Position;
-            this.Remove((Entity) player);
-            this.UnloadLevel();
-            this.Session.Level = nextLevel;
-            Session session = this.Session;
-            Rectangle bounds = this.Bounds;
-            double left = (double) bounds.Left;
-            bounds = this.Bounds;
-            double top = (double) bounds.Top;
-            Vector2? nullable = new Vector2?(this.GetSpawnPoint(new Vector2((float) left, (float) top) + (nearestSpawn.HasValue ? nearestSpawn.Value : Vector2.Zero)));
+            Remove(player);
+            UnloadLevel();
+            Session.Level = nextLevel;
+            Session session = Session;
+            Rectangle bounds = Bounds;
+            double left = bounds.Left;
+            bounds = Bounds;
+            double top = bounds.Top;
+            Vector2? nullable = new Vector2?(GetSpawnPoint(new Vector2((float) left, (float) top) + (nearestSpawn.HasValue ? nearestSpawn.Value : Vector2.Zero)));
             session.RespawnPoint = nullable;
             if (introType == Player.IntroTypes.Transition)
             {
-                player.Position = this.Session.RespawnPoint.Value;
+                player.Position = Session.RespawnPoint.Value;
                 player.Hair.MoveHairBy(player.Position - position);
                 player.MuffleLanding = true;
-                this.Add((Entity) player);
-                this.LoadLevel(Player.IntroTypes.Transition);
-                this.Entities.UpdateLists();
+                Add(player);
+                LoadLevel(Player.IntroTypes.Transition);
+                Entities.UpdateLists();
             }
             else
             {
-                this.LoadLevel(introType);
-                this.Entities.UpdateLists();
-                player = this.Tracker.GetEntity<Player>();
+                LoadLevel(introType);
+                Entities.UpdateLists();
+                player = Tracker.GetEntity<Player>();
             }
-            this.Camera.Position = player.CameraTarget;
-            this.Update();
+            Camera.Position = player.CameraTarget;
+            Update();
             Leader.RestoreStrawberries(player.Leader);
         }
 
         public void AutoSave()
         {
-            if (this.saving != null)
+            if (saving != null)
                 return;
-            this.saving = new Coroutine(this.SavingRoutine());
+            saving = new Coroutine(SavingRoutine());
         }
 
-        public bool IsAutoSaving() => this.saving != null;
+        public bool IsAutoSaving() => saving != null;
 
         private IEnumerator SavingRoutine()
         {
             UserIO.SaveHandler(true, false);
             while (UserIO.Saving)
-                yield return (object) null;
-            this.saving = (Coroutine) null;
+                yield return null;
+            saving = null;
         }
 
         public void UpdateTime()
         {
-            if (this.InCredits || this.Session.Area.ID == 8 || this.TimerStopped)
+            if (InCredits || Session.Area.ID == 8 || TimerStopped)
                 return;
             long ticks = TimeSpan.FromSeconds((double) Engine.RawDeltaTime).Ticks;
-            SaveData.Instance.AddTime(this.Session.Area, ticks);
-            if (!this.TimerStarted && !this.InCutscene)
+            SaveData.Instance.AddTime(Session.Area, ticks);
+            if (!TimerStarted && !InCutscene)
             {
-                Player entity = this.Tracker.GetEntity<Player>();
+                Player entity = Tracker.GetEntity<Player>();
                 if (entity != null && !entity.TimePaused)
-                    this.TimerStarted = true;
+                    TimerStarted = true;
             }
-            if (this.Completed || !this.TimerStarted)
+            if (Completed || !TimerStarted)
                 return;
-            this.Session.Time += ticks;
+            Session.Time += ticks;
         }
 
         public override void Update()
         {
-            if ((double) this.unpauseTimer > 0.0)
+            if (unpauseTimer > 0.0)
             {
-                this.unpauseTimer -= Engine.RawDeltaTime;
-                this.UpdateTime();
+                unpauseTimer -= Engine.RawDeltaTime;
+                UpdateTime();
             }
-            else if (this.Overlay != null)
+            else if (Overlay != null)
             {
-                this.Overlay.Update();
-                this.Entities.UpdateLists();
+                Overlay.Update();
+                Entities.UpdateLists();
             }
             else
             {
                 int num1 = 10;
-                if (!this.InCutscene && this.Tracker.GetEntity<Player>() != null && this.Wipe == null && !this.Frozen)
+                if (!InCutscene && Tracker.GetEntity<Player>() != null && Wipe == null && !Frozen)
                     num1 = SaveData.Instance.Assists.GameSpeed;
-                Engine.TimeRateB = (float) num1 / 10f;
+                Engine.TimeRateB = num1 / 10f;
                 if (num1 != 10)
                 {
-                    if ((HandleBase) Level.AssistSpeedSnapshot == (HandleBase) null || Level.AssistSpeedSnapshotValue != num1)
+                    if (AssistSpeedSnapshot == null || Level.AssistSpeedSnapshotValue != num1)
                     {
                         Audio.ReleaseSnapshot(Level.AssistSpeedSnapshot);
-                        Level.AssistSpeedSnapshot = (EventInstance) null;
+                        Level.AssistSpeedSnapshot = null;
                         Level.AssistSpeedSnapshotValue = num1;
                         if (Level.AssistSpeedSnapshotValue < 10)
-                            Level.AssistSpeedSnapshot = Audio.CreateSnapshot("snapshot:/assist_game_speed/assist_speed_" + (object) (Level.AssistSpeedSnapshotValue * 10));
+                            Level.AssistSpeedSnapshot = Audio.CreateSnapshot("snapshot:/assist_game_speed/assist_speed_" + Level.AssistSpeedSnapshotValue * 10);
                         else if (Level.AssistSpeedSnapshotValue <= 16)
-                            Level.AssistSpeedSnapshot = Audio.CreateSnapshot("snapshot:/variant_speed/variant_speed_" + (object) (Level.AssistSpeedSnapshotValue * 10));
+                            Level.AssistSpeedSnapshot = Audio.CreateSnapshot("snapshot:/variant_speed/variant_speed_" + Level.AssistSpeedSnapshotValue * 10);
                     }
                 }
-                else if ((HandleBase) Level.AssistSpeedSnapshot != (HandleBase) null)
+                else if (AssistSpeedSnapshot != null)
                 {
                     Audio.ReleaseSnapshot(Level.AssistSpeedSnapshot);
-                    Level.AssistSpeedSnapshot = (EventInstance) null;
+                    Level.AssistSpeedSnapshot = null;
                     Level.AssistSpeedSnapshotValue = -1;
                 }
-                if (this.wasPaused && !this.Paused)
-                    this.EndPauseEffects();
-                if (this.CanPause && Input.QuickRestart.Pressed)
+                if (wasPaused && !Paused)
+                    EndPauseEffects();
+                if (CanPause && Input.QuickRestart.Pressed)
                 {
                     Input.QuickRestart.ConsumeBuffer();
-                    this.Pause(quickReset: true);
+                    Pause(quickReset: true);
                 }
-                else if (this.CanPause && (Input.Pause.Pressed || Input.ESC.Pressed))
+                else if (CanPause && (Input.Pause.Pressed || Input.ESC.Pressed))
                 {
                     Input.Pause.ConsumeBuffer();
                     Input.ESC.ConsumeBuffer();
-                    this.Pause();
+                    Pause();
                 }
-                if (this.wasPaused && !this.Paused)
-                    this.wasPaused = false;
-                if (this.Paused)
-                    this.wasPausedTimer = 0.0f;
+                if (wasPaused && !Paused)
+                    wasPaused = false;
+                if (Paused)
+                    wasPausedTimer = 0.0f;
                 else
-                    this.wasPausedTimer += Engine.DeltaTime;
-                this.UpdateTime();
-                if (this.saving != null)
-                    this.saving.Update();
-                if (!this.Paused)
+                    wasPausedTimer += Engine.DeltaTime;
+                UpdateTime();
+                saving?.Update();
+                if (!Paused)
                 {
-                    this.glitchTimer += Engine.DeltaTime;
-                    this.glitchSeed = Calc.Random.NextFloat();
+                    glitchTimer += Engine.DeltaTime;
+                    glitchSeed = Calc.Random.NextFloat();
                 }
-                if (this.SkippingCutscene)
+                if (SkippingCutscene)
                 {
-                    if (this.skipCoroutine != null)
-                        this.skipCoroutine.Update();
-                    this.RendererList.Update();
+                    skipCoroutine?.Update();
+                    RendererList.Update();
                 }
-                else if (this.FrozenOrPaused)
+                else if (FrozenOrPaused)
                 {
                     bool disabled = MInput.Disabled;
                     MInput.Disabled = false;
-                    if (!this.Paused)
+                    if (!Paused)
                     {
                         foreach (Entity entity in this[Tags.FrozenUpdate])
                         {
@@ -1632,22 +1624,20 @@ namespace Celeste
                             entity.Update();
                     }
                     MInput.Disabled = disabled;
-                    if (this.Wipe != null)
-                        this.Wipe.Update((Scene) this);
-                    if (this.HiresSnow != null)
-                        this.HiresSnow.Update((Scene) this);
-                    this.Entities.UpdateLists();
+                    Wipe?.Update(this);
+                    HiresSnow?.Update(this);
+                    Entities.UpdateLists();
                 }
-                else if (!this.Transitioning)
+                else if (!Transitioning)
                 {
-                    if (this.RetryPlayerCorpse == null)
+                    if (RetryPlayerCorpse == null)
                     {
                         base.Update();
                     }
                     else
                     {
-                        this.RetryPlayerCorpse.Update();
-                        this.RendererList.Update();
+                        RetryPlayerCorpse.Update();
+                        RendererList.Update();
                         foreach (Entity entity in this[Tags.PauseUpdate])
                         {
                             if (entity.Active)
@@ -1659,104 +1649,102 @@ namespace Celeste
                 {
                     foreach (Entity entity in this[Tags.TransitionUpdate])
                         entity.Update();
-                    this.transition.Update();
-                    this.RendererList.Update();
+                    transition.Update();
+                    RendererList.Update();
                 }
-                this.HudRenderer.BackgroundFade = Calc.Approach(this.HudRenderer.BackgroundFade, this.Paused ? 1f : 0.0f, 8f * Engine.RawDeltaTime);
-                if (!this.FrozenOrPaused)
+                HudRenderer.BackgroundFade = Calc.Approach(HudRenderer.BackgroundFade, Paused ? 1f : 0.0f, 8f * Engine.RawDeltaTime);
+                if (!FrozenOrPaused)
                 {
-                    this.WindSineTimer += Engine.DeltaTime;
-                    this.WindSine = (float) (Math.Sin((double) this.WindSineTimer) + 1.0) / 2f;
+                    WindSineTimer += Engine.DeltaTime;
+                    WindSine = (float) (Math.Sin(WindSineTimer) + 1.0) / 2f;
                 }
-                foreach (PostUpdateHook component in this.Tracker.GetComponents<PostUpdateHook>())
+                foreach (PostUpdateHook component in Tracker.GetComponents<PostUpdateHook>())
                 {
                     if (component.Entity.Active)
                         component.OnPostUpdate();
                 }
-                if (this.updateHair)
+                if (updateHair)
                 {
-                    foreach (Component component in this.Tracker.GetComponents<PlayerHair>())
+                    foreach (Component component in Tracker.GetComponents<PlayerHair>())
                     {
                         if (component.Active && component.Entity.Active)
                             (component as PlayerHair).AfterUpdate();
                     }
-                    if (this.FrozenOrPaused)
-                        this.updateHair = false;
+                    if (FrozenOrPaused)
+                        updateHair = false;
                 }
-                else if (!this.FrozenOrPaused)
-                    this.updateHair = true;
-                if ((double) this.shakeTimer > 0.0)
+                else if (!FrozenOrPaused)
+                    updateHair = true;
+                if (shakeTimer > 0.0)
                 {
-                    if (this.OnRawInterval(0.04f))
+                    if (OnRawInterval(0.04f))
                     {
-                        int num2 = (int) Math.Ceiling((double) this.shakeTimer * 10.0);
-                        if (this.shakeDirection == Vector2.Zero)
+                        int num2 = (int) Math.Ceiling(shakeTimer * 10.0);
+                        if (shakeDirection == Vector2.Zero)
                         {
-                            this.ShakeVector = new Vector2((float) (-num2 + Calc.Random.Next(num2 * 2 + 1)), (float) (-num2 + Calc.Random.Next(num2 * 2 + 1)));
+                            ShakeVector = new Vector2(-num2 + Calc.Random.Next(num2 * 2 + 1), -num2 + Calc.Random.Next(num2 * 2 + 1));
                         }
                         else
                         {
-                            if (this.lastDirectionalShake == 0)
-                                this.lastDirectionalShake = 1;
+                            if (lastDirectionalShake == 0)
+                                lastDirectionalShake = 1;
                             else
-                                this.lastDirectionalShake *= -1;
-                            this.ShakeVector = -this.shakeDirection * (float) this.lastDirectionalShake * (float) num2;
+                                lastDirectionalShake *= -1;
+                            ShakeVector = -shakeDirection * lastDirectionalShake * num2;
                         }
                         if (Settings.Instance.ScreenShake == ScreenshakeAmount.Half)
-                            this.ShakeVector = new Vector2((float) Math.Sign(this.ShakeVector.X), (float) Math.Sign(this.ShakeVector.Y));
+                            ShakeVector = new Vector2(Math.Sign(ShakeVector.X), Math.Sign(ShakeVector.Y));
                     }
-                    this.shakeTimer -= Engine.RawDeltaTime * (Settings.Instance.ScreenShake == ScreenshakeAmount.Half ? 1.5f : 1f);
+                    shakeTimer -= Engine.RawDeltaTime * (Settings.Instance.ScreenShake == ScreenshakeAmount.Half ? 1.5f : 1f);
                 }
                 else
-                    this.ShakeVector = Vector2.Zero;
-                if (this.doFlash)
+                    ShakeVector = Vector2.Zero;
+                if (doFlash)
                 {
-                    this.flash = Calc.Approach(this.flash, 1f, Engine.DeltaTime * 10f);
-                    if ((double) this.flash >= 1.0)
-                        this.doFlash = false;
+                    flash = Calc.Approach(flash, 1f, Engine.DeltaTime * 10f);
+                    if (flash >= 1.0)
+                        doFlash = false;
                 }
-                else if ((double) this.flash > 0.0)
-                    this.flash = Calc.Approach(this.flash, 0.0f, Engine.DeltaTime * 3f);
-                if (this.lastColorGrade != this.Session.ColorGrade)
+                else if (flash > 0.0)
+                    flash = Calc.Approach(flash, 0.0f, Engine.DeltaTime * 3f);
+                if (lastColorGrade != Session.ColorGrade)
                 {
-                    if ((double) this.colorGradeEase >= 1.0)
+                    if (colorGradeEase >= 1.0)
                     {
-                        this.colorGradeEase = 0.0f;
-                        this.lastColorGrade = this.Session.ColorGrade;
+                        colorGradeEase = 0.0f;
+                        lastColorGrade = Session.ColorGrade;
                     }
                     else
-                        this.colorGradeEase = Calc.Approach(this.colorGradeEase, 1f, Engine.DeltaTime * this.colorGradeEaseSpeed);
+                        colorGradeEase = Calc.Approach(colorGradeEase, 1f, Engine.DeltaTime * colorGradeEaseSpeed);
                 }
                 if (Celeste.PlayMode != Celeste.PlayModes.Debug)
                     return;
                 if (MInput.Keyboard.Pressed(Keys.Tab) && Engine.Scene.Tracker.GetEntity<KeyboardConfigUI>() == null && Engine.Scene.Tracker.GetEntity<ButtonConfigUI>() == null)
-                    Engine.Scene = (Scene) new MapEditor(this.Session.Area);
+                    Engine.Scene = new MapEditor(Session.Area);
                 if (MInput.Keyboard.Pressed(Keys.F1))
                 {
-                    Celeste.ReloadAssets(true, false, false, new AreaKey?(this.Session.Area));
-                    Engine.Scene = (Scene) new LevelLoader(this.Session);
+                    Celeste.ReloadAssets(true, false, false, new AreaKey?(Session.Area));
+                    Engine.Scene = new LevelLoader(Session);
                 }
                 else if (MInput.Keyboard.Pressed(Keys.F2))
                 {
-                    Celeste.ReloadAssets(true, true, false, new AreaKey?(this.Session.Area));
-                    Engine.Scene = (Scene) new LevelLoader(this.Session);
+                    Celeste.ReloadAssets(true, true, false, new AreaKey?(Session.Area));
+                    Engine.Scene = new LevelLoader(Session);
                 }
-                else
+                else if(MInput.Keyboard.Pressed(Keys.F3))
                 {
-                    if (!MInput.Keyboard.Pressed(Keys.F3))
-                        return;
-                    Celeste.ReloadAssets(true, true, true, new AreaKey?(this.Session.Area));
-                    Engine.Scene = (Scene) new LevelLoader(this.Session);
+                    Celeste.ReloadAssets(true, true, true, new AreaKey?(Session.Area));
+                    Engine.Scene = new LevelLoader(Session);
                 }
             }
         }
 
         public override void BeforeRender()
         {
-            this.cameraPreShake = this.Camera.Position;
-            this.Camera.Position += this.ShakeVector;
-            this.Camera.Position = this.Camera.Position.Floor();
-            foreach (BeforeRenderHook component in this.Tracker.GetComponents<BeforeRenderHook>())
+            cameraPreShake = Camera.Position;
+            Camera.Position += ShakeVector;
+            Camera.Position = Camera.Position.Floor();
+            foreach (BeforeRenderHook component in Tracker.GetComponents<BeforeRenderHook>())
             {
                 if (component.Visible)
                     component.Callback();
@@ -1769,81 +1757,80 @@ namespace Celeste
         {
             Engine.Instance.GraphicsDevice.SetRenderTarget((RenderTarget2D) GameplayBuffers.Gameplay);
             Engine.Instance.GraphicsDevice.Clear(Color.Transparent);
-            this.GameplayRenderer.Render((Scene) this);
-            this.Lighting.Render((Scene) this);
+            GameplayRenderer.Render(this);
+            Lighting.Render(this);
             Engine.Instance.GraphicsDevice.SetRenderTarget((RenderTarget2D) GameplayBuffers.Level);
-            Engine.Instance.GraphicsDevice.Clear(this.BackgroundColor);
-            this.Background.Render((Scene) this);
-            Distort.Render((Texture2D) (RenderTarget2D) GameplayBuffers.Gameplay, (Texture2D) (RenderTarget2D) GameplayBuffers.Displacement, this.Displacement.HasDisplacement((Scene) this));
-            this.Bloom.Apply(GameplayBuffers.Level, (Scene) this);
-            this.Foreground.Render((Scene) this);
-            Glitch.Apply(GameplayBuffers.Level, this.glitchTimer * 2f, this.glitchSeed, 6.28318548f);
+            Engine.Instance.GraphicsDevice.Clear(BackgroundColor);
+            Background.Render(this);
+            Distort.Render((RenderTarget2D)GameplayBuffers.Gameplay, (RenderTarget2D)GameplayBuffers.Displacement, Displacement.HasDisplacement(this));
+            Bloom.Apply(GameplayBuffers.Level, this);
+            Foreground.Render(this);
+            Glitch.Apply(GameplayBuffers.Level, glitchTimer * 2f, glitchSeed, 6.28318548f);
             if (Engine.DashAssistFreeze)
             {
-                PlayerDashAssist entity = this.Tracker.GetEntity<PlayerDashAssist>();
+                PlayerDashAssist entity = Tracker.GetEntity<PlayerDashAssist>();
                 if (entity != null)
                 {
-                    Draw.SpriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, SamplerState.PointClamp, DepthStencilState.Default, RasterizerState.CullNone, (Effect) null, this.Camera.Matrix);
+                    Draw.SpriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, SamplerState.PointClamp, DepthStencilState.Default, RasterizerState.CullNone, null, Camera.Matrix);
                     entity.Render();
                     Draw.SpriteBatch.End();
                 }
             }
-            if ((double) this.flash > 0.0)
+            if (flash > 0.0)
             {
-                Draw.SpriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, SamplerState.PointClamp, DepthStencilState.Default, RasterizerState.CullNone, (Effect) null);
-                Draw.Rect(-1f, -1f, 322f, 182f, this.flashColor * this.flash);
+                Draw.SpriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, SamplerState.PointClamp, DepthStencilState.Default, RasterizerState.CullNone, null);
+                Draw.Rect(-1f, -1f, 322f, 182f, flashColor * flash);
                 Draw.SpriteBatch.End();
-                if (this.flashDrawPlayer)
+                if (flashDrawPlayer)
                 {
-                    Draw.SpriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, SamplerState.PointClamp, DepthStencilState.Default, RasterizerState.CullNone, (Effect) null, this.Camera.Matrix);
-                    Player entity = this.Tracker.GetEntity<Player>();
+                    Draw.SpriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, SamplerState.PointClamp, DepthStencilState.Default, RasterizerState.CullNone, null, Camera.Matrix);
+                    Player entity = Tracker.GetEntity<Player>();
                     if (entity != null && entity.Visible)
                         entity.Render();
                     Draw.SpriteBatch.End();
                 }
             }
-            Engine.Instance.GraphicsDevice.SetRenderTarget((RenderTarget2D) null);
+            Engine.Instance.GraphicsDevice.SetRenderTarget(null);
             Engine.Instance.GraphicsDevice.Clear(Color.Black);
             Engine.Instance.GraphicsDevice.Viewport = Engine.Viewport;
             Matrix transformMatrix = Matrix.CreateScale(6f) * Engine.ScreenMatrix;
-            Vector2 vector2_1 = new Vector2(320f, 180f);
-            Vector2 vector2_2 = vector2_1 / this.ZoomTarget;
-            Vector2 origin = (double) this.ZoomTarget != 1.0 ? (this.ZoomFocusPoint - vector2_2 / 2f) / (vector2_1 - vector2_2) * vector2_1 : Vector2.Zero;
-            MTexture orDefault1 = GFX.ColorGrades.GetOrDefault(this.lastColorGrade, GFX.ColorGrades["none"]);
-            MTexture orDefault2 = GFX.ColorGrades.GetOrDefault(this.Session.ColorGrade, GFX.ColorGrades["none"]);
-            if ((double) this.colorGradeEase > 0.0 && orDefault1 != orDefault2)
-                ColorGrade.Set(orDefault1, orDefault2, this.colorGradeEase);
+            Vector2 vector2_1 = new(320f, 180f);
+            Vector2 vector2_2 = vector2_1 / ZoomTarget;
+            Vector2 origin = ZoomTarget != 1.0 ? (ZoomFocusPoint - vector2_2 / 2f) / (vector2_1 - vector2_2) * vector2_1 : Vector2.Zero;
+            MTexture orDefault1 = GFX.ColorGrades.GetOrDefault(lastColorGrade, GFX.ColorGrades["none"]);
+            MTexture orDefault2 = GFX.ColorGrades.GetOrDefault(Session.ColorGrade, GFX.ColorGrades["none"]);
+            if (colorGradeEase > 0.0 && orDefault1 != orDefault2)
+                ColorGrade.Set(orDefault1, orDefault2, colorGradeEase);
             else
                 ColorGrade.Set(orDefault2);
-            float scale = this.Zoom * (float) ((320.0 - (double) this.ScreenPadding * 2.0) / 320.0);
-            Vector2 vector2_3 = new Vector2(this.ScreenPadding, this.ScreenPadding * (9f / 16f));
+            float scale = Zoom * (float) ((320.0 - ScreenPadding * 2.0) / 320.0);
+            Vector2 vector2_3 = new(ScreenPadding, ScreenPadding * (9f / 16f));
             if (SaveData.Instance.Assists.MirrorMode)
             {
                 vector2_3.X = -vector2_3.X;
-                origin.X = (float) (160.0 - ((double) origin.X - 160.0));
+                origin.X = (float) (160.0 - (origin.X - 160.0));
             }
             Draw.SpriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, SamplerState.PointClamp, DepthStencilState.Default, RasterizerState.CullNone, ColorGrade.Effect, transformMatrix);
-            Draw.SpriteBatch.Draw((Texture2D) (RenderTarget2D) GameplayBuffers.Level, origin + vector2_3, new Rectangle?(GameplayBuffers.Level.Bounds), Color.White, 0.0f, origin, scale, SaveData.Instance.Assists.MirrorMode ? SpriteEffects.FlipHorizontally : SpriteEffects.None, 0.0f);
+            Draw.SpriteBatch.Draw((RenderTarget2D)GameplayBuffers.Level, origin + vector2_3, new Rectangle?(GameplayBuffers.Level.Bounds), Color.White, 0.0f, origin, scale, SaveData.Instance.Assists.MirrorMode ? SpriteEffects.FlipHorizontally : SpriteEffects.None, 0.0f);
             Draw.SpriteBatch.End();
-            if (this.Pathfinder != null && this.Pathfinder.DebugRenderEnabled)
+            if (Pathfinder != null && Pathfinder.DebugRenderEnabled)
             {
-                Draw.SpriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, SamplerState.PointClamp, DepthStencilState.Default, RasterizerState.CullNone, (Effect) null, this.Camera.Matrix * transformMatrix);
-                this.Pathfinder.Render();
+                Draw.SpriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, SamplerState.PointClamp, DepthStencilState.Default, RasterizerState.CullNone, null, Camera.Matrix * transformMatrix);
+                Pathfinder.Render();
                 Draw.SpriteBatch.End();
             }
-            if ((!this.Paused || !this.PauseMainMenuOpen) && (double) this.wasPausedTimer >= 1.0 || !Input.MenuJournal.Check || !this.AllowHudHide)
-                this.HudRenderer.Render((Scene) this);
-            if (this.Wipe != null)
-                this.Wipe.Render((Scene) this);
-            if (this.HiresSnow == null)
+            if ((!Paused || !PauseMainMenuOpen) && wasPausedTimer >= 1.0 || !Input.MenuJournal.Check || !AllowHudHide)
+                HudRenderer.Render(this);
+            Wipe?.Render(this);
+            if (HiresSnow == null)
                 return;
-            this.HiresSnow.Render((Scene) this);
+            HiresSnow.Render(this);
         }
 
         public override void AfterRender()
         {
             base.AfterRender();
-            this.Camera.Position = this.cameraPreShake;
+            Camera.Position = cameraPreShake;
         }
 
         private void StartPauseEffects()
@@ -1852,7 +1839,7 @@ namespace Celeste
                 Audio.PauseMusic = true;
             Audio.PauseGameplaySfx = true;
             Audio.Play("event:/ui/game/pause");
-            if (!((HandleBase) Level.PauseSnapshot == (HandleBase) null))
+            if (!(PauseSnapshot == null))
                 return;
             Level.PauseSnapshot = Audio.CreateSnapshot("snapshot:/pause_menu");
         }
@@ -1862,300 +1849,299 @@ namespace Celeste
             Audio.PauseMusic = false;
             Audio.PauseGameplaySfx = false;
             Audio.ReleaseSnapshot(Level.PauseSnapshot);
-            Level.PauseSnapshot = (EventInstance) null;
+            Level.PauseSnapshot = null;
         }
 
         public void Pause(int startIndex = 0, bool minimal = false, bool quickReset = false)
         {
-            this.wasPaused = true;
-            Player player = this.Tracker.GetEntity<Player>();
-            if (!this.Paused)
-                this.StartPauseEffects();
-            this.Paused = true;
+            wasPaused = true;
+            Player player = Tracker.GetEntity<Player>();
+            if (!Paused)
+                StartPauseEffects();
+            Paused = true;
             if (quickReset)
             {
                 Audio.Play("event:/ui/main/message_confirm");
-                this.PauseMainMenuOpen = false;
-                this.GiveUp(0, true, minimal, false);
+                PauseMainMenuOpen = false;
+                GiveUp(0, true, minimal, false);
             }
             else
             {
-                this.PauseMainMenuOpen = true;
-                TextMenu menu = new TextMenu();
+                PauseMainMenuOpen = true;
+                TextMenu menu = new();
                 if (!minimal)
-                    menu.Add((TextMenu.Item) new TextMenu.Header(Dialog.Clean("menu_pause_title")));
-                menu.Add(new TextMenu.Button(Dialog.Clean("menu_pause_resume")).Pressed((Action) (() => menu.OnCancel())));
-                if (this.InCutscene && !this.SkippingCutscene)
-                    menu.Add(new TextMenu.Button(Dialog.Clean("menu_pause_skip_cutscene")).Pressed((Action) (() =>
+                    menu.Add(new TextMenu.Header(Dialog.Clean("menu_pause_title")));
+                menu.Add(new TextMenu.Button(Dialog.Clean("menu_pause_resume")).Pressed(() => menu.OnCancel()));
+                if (InCutscene && !SkippingCutscene)
+                    menu.Add(new TextMenu.Button(Dialog.Clean("menu_pause_skip_cutscene")).Pressed(() =>
                     {
-                        this.SkipCutscene();
-                        this.Paused = false;
-                        this.PauseMainMenuOpen = false;
+                        SkipCutscene();
+                        Paused = false;
+                        PauseMainMenuOpen = false;
                         menu.RemoveSelf();
-                    })));
-                if (!minimal && !this.InCutscene && !this.SkippingCutscene)
+                    }));
+                if (!minimal && !InCutscene && !SkippingCutscene)
                 {
                     TextMenu.Item obj;
-                    menu.Add(obj = new TextMenu.Button(Dialog.Clean("menu_pause_retry")).Pressed((Action) (() =>
+                    menu.Add(obj = new TextMenu.Button(Dialog.Clean("menu_pause_retry")).Pressed(() =>
                     {
                         if (player != null && !player.Dead)
                         {
                             Engine.TimeRate = 1f;
                             Distort.GameRate = 1f;
                             Distort.Anxiety = 0.0f;
-                            this.InCutscene = this.SkippingCutscene = false;
-                            this.RetryPlayerCorpse = player.Die(Vector2.Zero, true);
-                            foreach (LevelEndingHook component in this.Tracker.GetComponents<LevelEndingHook>())
+                            InCutscene = SkippingCutscene = false;
+                            RetryPlayerCorpse = player.Die(Vector2.Zero, true);
+                            foreach (LevelEndingHook component in Tracker.GetComponents<LevelEndingHook>())
                             {
                                 if (component.OnEnd != null)
                                     component.OnEnd();
                             }
                         }
-                        this.Paused = false;
-                        this.PauseMainMenuOpen = false;
-                        this.EndPauseEffects();
+                        Paused = false;
+                        PauseMainMenuOpen = false;
+                        EndPauseEffects();
                         menu.RemoveSelf();
-                    })));
-                    obj.Disabled = !this.CanRetry || player != null && !player.CanRetry || this.Frozen || this.Completed;
+                    }));
+                    obj.Disabled = !CanRetry || player != null && !player.CanRetry || Frozen || Completed;
                 }
                 if (!minimal && SaveData.Instance.AssistMode)
                 {
-                    TextMenu.Item item = (TextMenu.Item) null;
-                    menu.Add(item = new TextMenu.Button(Dialog.Clean("menu_pause_assist")).Pressed((Action) (() =>
+                    TextMenu.Item item = null;
+                    menu.Add(item = new TextMenu.Button(Dialog.Clean("menu_pause_assist")).Pressed(() =>
                     {
                         menu.RemoveSelf();
-                        this.PauseMainMenuOpen = false;
-                        this.AssistMode(menu.IndexOf(item), minimal);
-                    })));
+                        PauseMainMenuOpen = false;
+                        AssistMode(menu.IndexOf(item), minimal);
+                    }));
                 }
                 if (!minimal && SaveData.Instance.VariantMode)
                 {
-                    TextMenu.Item item = (TextMenu.Item) null;
-                    menu.Add(item = new TextMenu.Button(Dialog.Clean("menu_pause_variant")).Pressed((Action) (() =>
+                    TextMenu.Item item = null;
+                    menu.Add(item = new TextMenu.Button(Dialog.Clean("menu_pause_variant")).Pressed(() =>
                     {
                         menu.RemoveSelf();
-                        this.PauseMainMenuOpen = false;
-                        this.VariantMode(menu.IndexOf(item), minimal);
-                    })));
+                        PauseMainMenuOpen = false;
+                        VariantMode(menu.IndexOf(item), minimal);
+                    }));
                 }
-                TextMenu.Item item1 = (TextMenu.Item) null;
-                menu.Add(item1 = new TextMenu.Button(Dialog.Clean("menu_pause_options")).Pressed((Action) (() =>
+                TextMenu.Item item1 = null;
+                menu.Add(item1 = new TextMenu.Button(Dialog.Clean("menu_pause_options")).Pressed(() =>
                 {
                     menu.RemoveSelf();
-                    this.PauseMainMenuOpen = false;
-                    this.Options(menu.IndexOf(item1), minimal);
-                })));
+                    PauseMainMenuOpen = false;
+                    Options(menu.IndexOf(item1), minimal);
+                }));
                 if (!minimal && Celeste.PlayMode != Celeste.PlayModes.Event)
                 {
                     TextMenu.Item obj;
-                    menu.Add(obj = new TextMenu.Button(Dialog.Clean("menu_pause_savequit")).Pressed((Action) (() =>
+                    _ = menu.Add(obj = new TextMenu.Button(Dialog.Clean("menu_pause_savequit")).Pressed(() =>
                     {
                         menu.Focused = false;
                         Engine.TimeRate = 1f;
-                        Audio.SetMusic((string) null);
+                        Audio.SetMusic(null);
                         Audio.BusStopAll("bus:/gameplay_sfx", true);
-                        this.Session.InArea = true;
-                        ++this.Session.Deaths;
-                        ++this.Session.DeathsInCurrentLevel;
-                        SaveData.Instance.AddDeath(this.Session.Area);
-                        this.DoScreenWipe(false, (Action) (() => Engine.Scene = (Scene) new LevelExit(LevelExit.Mode.SaveAndQuit, this.Session, this.HiresSnow)), true);
-                        foreach (LevelEndingHook component in this.Tracker.GetComponents<LevelEndingHook>())
+                        Session.InArea = true;
+                        ++Session.Deaths;
+                        ++Session.DeathsInCurrentLevel;
+                        SaveData.Instance.AddDeath(Session.Area);
+                        DoScreenWipe(false, () => Engine.Scene = new LevelExit(LevelExit.Mode.SaveAndQuit, Session, HiresSnow), true);
+                        foreach (LevelEndingHook component in Tracker.GetComponents<LevelEndingHook>())
                         {
-                            if (component.OnEnd != null)
-                                component.OnEnd();
+                            component.OnEnd?.Invoke();
                         }
-                    })));
-                    if (this.SaveQuitDisabled || player != null && player.StateMachine.State == 18)
+                    }));
+                    if (SaveQuitDisabled || player != null && player.StateMachine.State == 18)
                         obj.Disabled = true;
                 }
                 if (!minimal)
                 {
-                    menu.Add((TextMenu.Item) new TextMenu.SubHeader(""));
-                    TextMenu.Item item2 = (TextMenu.Item) null;
-                    menu.Add(item2 = new TextMenu.Button(Dialog.Clean("menu_pause_restartarea")).Pressed((Action) (() =>
+                    menu.Add(new TextMenu.SubHeader(""));
+                    TextMenu.Item item2 = null;
+                    menu.Add(item2 = new TextMenu.Button(Dialog.Clean("menu_pause_restartarea")).Pressed(() =>
                     {
-                        this.PauseMainMenuOpen = false;
+                        PauseMainMenuOpen = false;
                         menu.RemoveSelf();
-                        this.GiveUp(menu.IndexOf(item2), true, minimal, true);
-                    })));
+                        GiveUp(menu.IndexOf(item2), true, minimal, true);
+                    }));
                     (item2 as TextMenu.Button).ConfirmSfx = "event:/ui/main/message_confirm";
                     if (SaveData.Instance.Areas[0].Modes[0].Completed || SaveData.Instance.DebugMode || SaveData.Instance.CheatMode)
                     {
-                        TextMenu.Item item3 = (TextMenu.Item) null;
-                        menu.Add(item3 = new TextMenu.Button(Dialog.Clean("menu_pause_return")).Pressed((Action) (() =>
+                        TextMenu.Item item3 = null;
+                        menu.Add(item3 = new TextMenu.Button(Dialog.Clean("menu_pause_return")).Pressed(() =>
                         {
-                            this.PauseMainMenuOpen = false;
+                            PauseMainMenuOpen = false;
                             menu.RemoveSelf();
-                            this.GiveUp(menu.IndexOf(item3), false, minimal, false);
-                        })));
+                            GiveUp(menu.IndexOf(item3), false, minimal, false);
+                        }));
                         (item3 as TextMenu.Button).ConfirmSfx = "event:/ui/main/message_confirm";
                     }
                     if (Celeste.PlayMode == Celeste.PlayModes.Event)
-                        menu.Add(new TextMenu.Button(Dialog.Clean("menu_pause_restartdemo")).Pressed((Action) (() =>
+                        menu.Add(new TextMenu.Button(Dialog.Clean("menu_pause_restartdemo")).Pressed(() =>
                         {
-                            this.EndPauseEffects();
-                            Audio.SetMusic((string) null);
+                            EndPauseEffects();
+                            Audio.SetMusic(null);
                             menu.Focused = false;
-                            this.DoScreenWipe(false, (Action) (() => LevelEnter.Go(new Session(new AreaKey(0)), false)));
-                        })));
+                            DoScreenWipe(false, () => LevelEnter.Go(new Session(new AreaKey(0)), false));
+                        }));
                 }
-                menu.OnESC = menu.OnCancel = menu.OnPause = (Action) (() =>
+                menu.OnESC = menu.OnCancel = menu.OnPause = () =>
                 {
-                    this.PauseMainMenuOpen = false;
+                    PauseMainMenuOpen = false;
                     menu.RemoveSelf();
-                    this.Paused = false;
+                    Paused = false;
                     Audio.Play("event:/ui/game/unpause");
-                    this.unpauseTimer = 0.15f;
-                });
+                    unpauseTimer = 0.15f;
+                };
                 if (startIndex > 0)
                     menu.Selection = startIndex;
-                this.Add((Entity) menu);
+                Add(menu);
             }
         }
 
         private void GiveUp(int returnIndex, bool restartArea, bool minimal, bool showHint)
         {
-            this.Paused = true;
-            QuickResetHint quickHint = (QuickResetHint) null;
-            ReturnMapHint returnHint = (ReturnMapHint) null;
+            Paused = true;
+            QuickResetHint quickHint = null;
+            ReturnMapHint returnHint = null;
             if (!restartArea)
-                this.Add((Entity) (returnHint = new ReturnMapHint()));
-            TextMenu menu = new TextMenu();
+                Add(returnHint = new ReturnMapHint());
+            TextMenu menu = new();
             menu.AutoScroll = false;
-            menu.Position = new Vector2((float) Engine.Width / 2f, (float) ((double) Engine.Height / 2.0 - 100.0));
-            menu.Add((TextMenu.Item) new TextMenu.Header(Dialog.Clean(restartArea ? "menu_restart_title" : "menu_return_title")));
-            menu.Add(new TextMenu.Button(Dialog.Clean(restartArea ? "menu_restart_continue" : "menu_return_continue")).Pressed((Action) (() =>
+            menu.Position = new Vector2(Engine.Width / 2f, (float) (Engine.Height / 2.0 - 100.0));
+            menu.Add(new TextMenu.Header(Dialog.Clean(restartArea ? "menu_restart_title" : "menu_return_title")));
+            menu.Add(new TextMenu.Button(Dialog.Clean(restartArea ? "menu_restart_continue" : "menu_return_continue")).Pressed(() =>
             {
                 Engine.TimeRate = 1f;
                 menu.Focused = false;
-                this.Session.InArea = false;
-                Audio.SetMusic((string) null);
+                Session.InArea = false;
+                Audio.SetMusic(null);
                 Audio.BusStopAll("bus:/gameplay_sfx", true);
                 if (restartArea)
-                    this.DoScreenWipe(false, (Action) (() => Engine.Scene = (Scene) new LevelExit(LevelExit.Mode.Restart, this.Session)));
+                    DoScreenWipe(false, () => Engine.Scene = new LevelExit(LevelExit.Mode.Restart, Session));
                 else
-                    this.DoScreenWipe(false, (Action) (() => Engine.Scene = (Scene) new LevelExit(LevelExit.Mode.GiveUp, this.Session, this.HiresSnow)), true);
-                foreach (LevelEndingHook component in this.Tracker.GetComponents<LevelEndingHook>())
+                    DoScreenWipe(false, () => Engine.Scene = new LevelExit(LevelExit.Mode.GiveUp, Session, HiresSnow), true);
+                foreach (LevelEndingHook component in Tracker.GetComponents<LevelEndingHook>())
                 {
                     if (component.OnEnd != null)
                         component.OnEnd();
                 }
-            })));
-            menu.Add(new TextMenu.Button(Dialog.Clean(restartArea ? "menu_restart_cancel" : "menu_return_cancel")).Pressed((Action) (() => menu.OnCancel())));
-            menu.OnPause = menu.OnESC = (Action) (() =>
+            }));
+            menu.Add(new TextMenu.Button(Dialog.Clean(restartArea ? "menu_restart_cancel" : "menu_return_cancel")).Pressed(() => menu.OnCancel()));
+            menu.OnPause = menu.OnESC = () =>
             {
                 menu.RemoveSelf();
                 quickHint?.RemoveSelf();
                 returnHint?.RemoveSelf();
-                this.Paused = false;
-                this.unpauseTimer = 0.15f;
+                Paused = false;
+                unpauseTimer = 0.15f;
                 Audio.Play("event:/ui/game/unpause");
-            });
-            menu.OnCancel = (Action) (() =>
+            };
+            menu.OnCancel = () =>
             {
                 Audio.Play("event:/ui/main/button_back");
                 menu.RemoveSelf();
                 quickHint?.RemoveSelf();
                 returnHint?.RemoveSelf();
-                this.Pause(returnIndex, minimal);
-            });
-            this.Add((Entity) menu);
+                Pause(returnIndex, minimal);
+            };
+            Add(menu);
         }
 
         private void Options(int returnIndex, bool minimal)
         {
-            this.Paused = true;
-            bool oldAllowHudHide = this.AllowHudHide;
-            this.AllowHudHide = false;
+            Paused = true;
+            bool oldAllowHudHide = AllowHudHide;
+            AllowHudHide = false;
             TextMenu options = MenuOptions.Create(true, Level.PauseSnapshot);
-            options.OnESC = options.OnCancel = (Action) (() =>
+            options.OnESC = options.OnCancel = () =>
             {
                 Audio.Play("event:/ui/main/button_back");
-                this.AllowHudHide = oldAllowHudHide;
-                options.CloseAndRun(this.SaveFromOptions(), (Action) (() => this.Pause(returnIndex, minimal)));
-            });
-            options.OnPause = (Action) (() =>
+                AllowHudHide = oldAllowHudHide;
+                options.CloseAndRun(SaveFromOptions(), () => Pause(returnIndex, minimal));
+            };
+            options.OnPause = () =>
             {
                 Audio.Play("event:/ui/main/button_back");
-                options.CloseAndRun(this.SaveFromOptions(), (Action) (() =>
+                options.CloseAndRun(SaveFromOptions(), () =>
                 {
-                    this.AllowHudHide = oldAllowHudHide;
-                    this.Paused = false;
-                    this.unpauseTimer = 0.15f;
-                }));
-            });
-            this.Add((Entity) options);
+                    AllowHudHide = oldAllowHudHide;
+                    Paused = false;
+                    unpauseTimer = 0.15f;
+                });
+            };
+            Add(options);
         }
 
         private IEnumerator SaveFromOptions()
         {
             UserIO.SaveHandler(false, true);
             while (UserIO.Saving)
-                yield return (object) null;
+                yield return null;
         }
 
         private void AssistMode(int returnIndex, bool minimal)
         {
-            this.Paused = true;
-            TextMenu menu = new TextMenu();
-            menu.Add((TextMenu.Item) new TextMenu.Header(Dialog.Clean("MENU_ASSIST_TITLE")));
-            menu.Add((TextMenu.Item) new TextMenu.Slider(Dialog.Clean("MENU_ASSIST_GAMESPEED"), (Func<int, string>) (i => (i * 10).ToString() + "%"), 5, 10, SaveData.Instance.Assists.GameSpeed).Change((Action<int>) (i =>
+            Paused = true;
+            TextMenu menu = new();
+            menu.Add(new TextMenu.Header(Dialog.Clean("MENU_ASSIST_TITLE")));
+            menu.Add(new TextMenu.Slider(Dialog.Clean("MENU_ASSIST_GAMESPEED"), i => (i * 10).ToString() + "%", 5, 10, SaveData.Instance.Assists.GameSpeed).Change(i =>
             {
                 SaveData.Instance.Assists.GameSpeed = i;
-                Engine.TimeRateB = (float) SaveData.Instance.Assists.GameSpeed / 10f;
-            })));
-            menu.Add((TextMenu.Item) new TextMenu.OnOff(Dialog.Clean("MENU_ASSIST_INFINITE_STAMINA"), SaveData.Instance.Assists.InfiniteStamina).Change((Action<bool>) (on => SaveData.Instance.Assists.InfiniteStamina = on)));
+                Engine.TimeRateB = SaveData.Instance.Assists.GameSpeed / 10f;
+            }));
+            menu.Add(new TextMenu.OnOff(Dialog.Clean("MENU_ASSIST_INFINITE_STAMINA"), SaveData.Instance.Assists.InfiniteStamina).Change(on => SaveData.Instance.Assists.InfiniteStamina = on));
             TextMenu textMenu = menu;
             string label = Dialog.Clean("MENU_ASSIST_AIR_DASHES");
             int dashMode = (int) SaveData.Instance.Assists.DashMode;
             TextMenu.Option<int> option1;
-            TextMenu.Option<int> option2 = option1 = new TextMenu.Slider(label, (Func<int, string>) (i =>
+            TextMenu.Option<int> option2 = option1 = new TextMenu.Slider(label, i =>
             {
                 if (i == 0)
                     return Dialog.Clean("MENU_ASSIST_AIR_DASHES_NORMAL");
                 return i == 1 ? Dialog.Clean("MENU_ASSIST_AIR_DASHES_TWO") : Dialog.Clean("MENU_ASSIST_AIR_DASHES_INFINITE");
-            }), 0, 2, dashMode).Change((Action<int>) (on =>
+            }, 0, 2, dashMode).Change(on =>
             {
-                SaveData.Instance.Assists.DashMode = (Assists.DashModes) on;
-                Player entity = this.Tracker.GetEntity<Player>();
+                SaveData.Instance.Assists.DashMode = (Assists.DashModes)on;
+                Player entity = Tracker.GetEntity<Player>();
                 if (entity == null)
                     return;
                 entity.Dashes = Math.Min(entity.Dashes, entity.MaxDashes);
-            }));
-            textMenu.Add((TextMenu.Item) option1);
-            if (this.Session.Area.ID == 0)
+            });
+            textMenu.Add(option1);
+            if (Session.Area.ID == 0)
                 option2.Disabled = true;
-            menu.Add((TextMenu.Item) new TextMenu.OnOff(Dialog.Clean("MENU_ASSIST_DASH_ASSIST"), SaveData.Instance.Assists.DashAssist).Change((Action<bool>) (on => SaveData.Instance.Assists.DashAssist = on)));
-            menu.Add((TextMenu.Item) new TextMenu.OnOff(Dialog.Clean("MENU_ASSIST_INVINCIBLE"), SaveData.Instance.Assists.Invincible).Change((Action<bool>) (on => SaveData.Instance.Assists.Invincible = on)));
-            menu.OnESC = menu.OnCancel = (Action) (() =>
+            menu.Add(new TextMenu.OnOff(Dialog.Clean("MENU_ASSIST_DASH_ASSIST"), SaveData.Instance.Assists.DashAssist).Change(on => SaveData.Instance.Assists.DashAssist = on));
+            menu.Add(new TextMenu.OnOff(Dialog.Clean("MENU_ASSIST_INVINCIBLE"), SaveData.Instance.Assists.Invincible).Change(on => SaveData.Instance.Assists.Invincible = on));
+            menu.OnESC = menu.OnCancel = () =>
             {
                 Audio.Play("event:/ui/main/button_back");
-                this.Pause(returnIndex, minimal);
+                Pause(returnIndex, minimal);
                 menu.Close();
-            });
-            menu.OnPause = (Action) (() =>
+            };
+            menu.OnPause = () =>
             {
                 Audio.Play("event:/ui/main/button_back");
-                this.Paused = false;
-                this.unpauseTimer = 0.15f;
+                Paused = false;
+                unpauseTimer = 0.15f;
                 menu.Close();
-            });
-            this.Add((Entity) menu);
+            };
+            Add(menu);
         }
 
         private void VariantMode(int returnIndex, bool minimal)
         {
-            this.Paused = true;
-            TextMenu menu = new TextMenu();
-            menu.Add((TextMenu.Item) new TextMenu.Header(Dialog.Clean("MENU_VARIANT_TITLE")));
-            menu.Add((TextMenu.Item) new TextMenu.SubHeader(Dialog.Clean("MENU_VARIANT_SUBTITLE")));
+            Paused = true;
+            TextMenu menu = new();
+            menu.Add(new TextMenu.Header(Dialog.Clean("MENU_VARIANT_TITLE")));
+            menu.Add(new TextMenu.SubHeader(Dialog.Clean("MENU_VARIANT_SUBTITLE")));
             TextMenu textMenu1 = menu;
             string label1 = Dialog.Clean("MENU_ASSIST_GAMESPEED");
             int gameSpeed = SaveData.Instance.Assists.GameSpeed;
             TextMenu.Slider speed;
-            TextMenu.Slider slider = speed = new TextMenu.Slider(label1, (Func<int, string>) (i => (i * 10).ToString() + "%"), 5, 16, gameSpeed);
-            textMenu1.Add((TextMenu.Item) slider);
-            speed.Change((Action<int>) (i =>
+            TextMenu.Slider slider = speed = new TextMenu.Slider(label1, i => (i * 10).ToString() + "%", 5, 16, gameSpeed);
+            textMenu1.Add(slider);
+            speed.Change(i =>
             {
                 if (i > 10)
                 {
@@ -2166,23 +2152,23 @@ namespace Celeste
                 }
                 speed.Index = i - 5;
                 SaveData.Instance.Assists.GameSpeed = i;
-                Engine.TimeRateB = (float) SaveData.Instance.Assists.GameSpeed / 10f;
-            }));
-            menu.Add((TextMenu.Item) new TextMenu.OnOff(Dialog.Clean("MENU_VARIANT_MIRROR"), SaveData.Instance.Assists.MirrorMode).Change((Action<bool>) (on =>
+                Engine.TimeRateB = SaveData.Instance.Assists.GameSpeed / 10f;
+            });
+            menu.Add(new TextMenu.OnOff(Dialog.Clean("MENU_VARIANT_MIRROR"), SaveData.Instance.Assists.MirrorMode).Change(on =>
             {
                 SaveData.Instance.Assists.MirrorMode = on;
                 Input.MoveX.Inverted = Input.Aim.InvertedX = Input.Feather.InvertedX = on;
-            })));
-            menu.Add((TextMenu.Item) new TextMenu.OnOff(Dialog.Clean("MENU_VARIANT_360DASHING"), SaveData.Instance.Assists.ThreeSixtyDashing).Change((Action<bool>) (on => SaveData.Instance.Assists.ThreeSixtyDashing = on)));
-            menu.Add((TextMenu.Item) new TextMenu.OnOff(Dialog.Clean("MENU_VARIANT_INVISMOTION"), SaveData.Instance.Assists.InvisibleMotion).Change((Action<bool>) (on => SaveData.Instance.Assists.InvisibleMotion = on)));
-            menu.Add((TextMenu.Item) new TextMenu.OnOff(Dialog.Clean("MENU_VARIANT_NOGRABBING"), SaveData.Instance.Assists.NoGrabbing).Change((Action<bool>) (on => SaveData.Instance.Assists.NoGrabbing = on)));
-            menu.Add((TextMenu.Item) new TextMenu.OnOff(Dialog.Clean("MENU_VARIANT_LOWFRICTION"), SaveData.Instance.Assists.LowFriction).Change((Action<bool>) (on => SaveData.Instance.Assists.LowFriction = on)));
-            menu.Add((TextMenu.Item) new TextMenu.OnOff(Dialog.Clean("MENU_VARIANT_SUPERDASHING"), SaveData.Instance.Assists.SuperDashing).Change((Action<bool>) (on => SaveData.Instance.Assists.SuperDashing = on)));
-            menu.Add((TextMenu.Item) new TextMenu.OnOff(Dialog.Clean("MENU_VARIANT_HICCUPS"), SaveData.Instance.Assists.Hiccups).Change((Action<bool>) (on => SaveData.Instance.Assists.Hiccups = on)));
-            menu.Add((TextMenu.Item) new TextMenu.OnOff(Dialog.Clean("MENU_VARIANT_PLAYASBADELINE"), SaveData.Instance.Assists.PlayAsBadeline).Change((Action<bool>) (on =>
+            }));
+            menu.Add(new TextMenu.OnOff(Dialog.Clean("MENU_VARIANT_360DASHING"), SaveData.Instance.Assists.ThreeSixtyDashing).Change(on => SaveData.Instance.Assists.ThreeSixtyDashing = on));
+            menu.Add(new TextMenu.OnOff(Dialog.Clean("MENU_VARIANT_INVISMOTION"), SaveData.Instance.Assists.InvisibleMotion).Change(on => SaveData.Instance.Assists.InvisibleMotion = on));
+            menu.Add(new TextMenu.OnOff(Dialog.Clean("MENU_VARIANT_NOGRABBING"), SaveData.Instance.Assists.NoGrabbing).Change(on => SaveData.Instance.Assists.NoGrabbing = on));
+            menu.Add(new TextMenu.OnOff(Dialog.Clean("MENU_VARIANT_LOWFRICTION"), SaveData.Instance.Assists.LowFriction).Change(on => SaveData.Instance.Assists.LowFriction = on));
+            menu.Add(new TextMenu.OnOff(Dialog.Clean("MENU_VARIANT_SUPERDASHING"), SaveData.Instance.Assists.SuperDashing).Change(on => SaveData.Instance.Assists.SuperDashing = on));
+            menu.Add(new TextMenu.OnOff(Dialog.Clean("MENU_VARIANT_HICCUPS"), SaveData.Instance.Assists.Hiccups).Change(on => SaveData.Instance.Assists.Hiccups = on));
+            menu.Add(new TextMenu.OnOff(Dialog.Clean("MENU_VARIANT_PLAYASBADELINE"), SaveData.Instance.Assists.PlayAsBadeline).Change(on =>
             {
                 SaveData.Instance.Assists.PlayAsBadeline = on;
-                Player entity = this.Tracker.GetEntity<Player>();
+                Player entity = Tracker.GetEntity<Player>();
                 if (entity == null)
                     return;
                 PlayerSpriteMode mode = SaveData.Instance.Assists.PlayAsBadeline ? PlayerSpriteMode.MadelineAsBadeline : entity.DefaultSpriteMode;
@@ -2190,112 +2176,112 @@ namespace Celeste
                     entity.ResetSpriteNextFrame(mode);
                 else
                     entity.ResetSprite(mode);
-            })));
-            menu.Add((TextMenu.Item) new TextMenu.SubHeader(Dialog.Clean("MENU_ASSIST_SUBTITLE")));
-            menu.Add((TextMenu.Item) new TextMenu.OnOff(Dialog.Clean("MENU_ASSIST_INFINITE_STAMINA"), SaveData.Instance.Assists.InfiniteStamina).Change((Action<bool>) (on => SaveData.Instance.Assists.InfiniteStamina = on)));
+            }));
+            menu.Add(new TextMenu.SubHeader(Dialog.Clean("MENU_ASSIST_SUBTITLE")));
+            menu.Add(new TextMenu.OnOff(Dialog.Clean("MENU_ASSIST_INFINITE_STAMINA"), SaveData.Instance.Assists.InfiniteStamina).Change(on => SaveData.Instance.Assists.InfiniteStamina = on));
             TextMenu textMenu2 = menu;
             string label2 = Dialog.Clean("MENU_ASSIST_AIR_DASHES");
             int dashMode = (int) SaveData.Instance.Assists.DashMode;
             TextMenu.Option<int> option1;
-            TextMenu.Option<int> option2 = option1 = new TextMenu.Slider(label2, (Func<int, string>) (i =>
+            TextMenu.Option<int> option2 = option1 = new TextMenu.Slider(label2, i =>
             {
                 if (i == 0)
                     return Dialog.Clean("MENU_ASSIST_AIR_DASHES_NORMAL");
                 return i == 1 ? Dialog.Clean("MENU_ASSIST_AIR_DASHES_TWO") : Dialog.Clean("MENU_ASSIST_AIR_DASHES_INFINITE");
-            }), 0, 2, dashMode).Change((Action<int>) (on =>
+            }, 0, 2, dashMode).Change(on =>
             {
-                SaveData.Instance.Assists.DashMode = (Assists.DashModes) on;
-                Player entity = this.Tracker.GetEntity<Player>();
+                SaveData.Instance.Assists.DashMode = (Assists.DashModes)on;
+                Player entity = Tracker.GetEntity<Player>();
                 if (entity == null)
                     return;
                 entity.Dashes = Math.Min(entity.Dashes, entity.MaxDashes);
-            }));
-            textMenu2.Add((TextMenu.Item) option1);
-            if (this.Session.Area.ID == 0)
+            });
+            textMenu2.Add(option1);
+            if (Session.Area.ID == 0)
                 option2.Disabled = true;
-            menu.Add((TextMenu.Item) new TextMenu.OnOff(Dialog.Clean("MENU_ASSIST_DASH_ASSIST"), SaveData.Instance.Assists.DashAssist).Change((Action<bool>) (on => SaveData.Instance.Assists.DashAssist = on)));
-            menu.Add((TextMenu.Item) new TextMenu.OnOff(Dialog.Clean("MENU_ASSIST_INVINCIBLE"), SaveData.Instance.Assists.Invincible).Change((Action<bool>) (on => SaveData.Instance.Assists.Invincible = on)));
-            menu.OnESC = menu.OnCancel = (Action) (() =>
+            menu.Add(new TextMenu.OnOff(Dialog.Clean("MENU_ASSIST_DASH_ASSIST"), SaveData.Instance.Assists.DashAssist).Change(on => SaveData.Instance.Assists.DashAssist = on));
+            menu.Add(new TextMenu.OnOff(Dialog.Clean("MENU_ASSIST_INVINCIBLE"), SaveData.Instance.Assists.Invincible).Change(on => SaveData.Instance.Assists.Invincible = on));
+            menu.OnESC = menu.OnCancel = () =>
             {
                 Audio.Play("event:/ui/main/button_back");
-                this.Pause(returnIndex, minimal);
+                Pause(returnIndex, minimal);
                 menu.Close();
-            });
-            menu.OnPause = (Action) (() =>
+            };
+            menu.OnPause = () =>
             {
                 Audio.Play("event:/ui/main/button_back");
-                this.Paused = false;
-                this.unpauseTimer = 0.15f;
+                Paused = false;
+                unpauseTimer = 0.15f;
                 menu.Close();
-            });
-            this.Add((Entity) menu);
+            };
+            Add(menu);
         }
 
         public void SnapColorGrade(string next)
         {
-            if (!(this.Session.ColorGrade != next))
+            if (!(Session.ColorGrade != next))
                 return;
-            this.lastColorGrade = next;
-            this.colorGradeEase = 0.0f;
-            this.colorGradeEaseSpeed = 1f;
-            this.Session.ColorGrade = next;
+            lastColorGrade = next;
+            colorGradeEase = 0.0f;
+            colorGradeEaseSpeed = 1f;
+            Session.ColorGrade = next;
         }
 
         public void NextColorGrade(string next, float speed = 1f)
         {
-            if (!(this.Session.ColorGrade != next))
+            if (!(Session.ColorGrade != next))
                 return;
-            this.colorGradeEase = 0.0f;
-            this.colorGradeEaseSpeed = speed;
-            this.Session.ColorGrade = next;
+            colorGradeEase = 0.0f;
+            colorGradeEaseSpeed = speed;
+            Session.ColorGrade = next;
         }
 
         public void Shake(float time = 0.3f)
         {
             if (Settings.Instance.ScreenShake == ScreenshakeAmount.Off)
                 return;
-            this.shakeDirection = Vector2.Zero;
-            this.shakeTimer = Math.Max(this.shakeTimer, time);
+            shakeDirection = Vector2.Zero;
+            shakeTimer = Math.Max(shakeTimer, time);
         }
 
-        public void StopShake() => this.shakeTimer = 0.0f;
+        public void StopShake() => shakeTimer = 0.0f;
 
         public void DirectionalShake(Vector2 dir, float time = 0.3f)
         {
             if (Settings.Instance.ScreenShake == ScreenshakeAmount.Off)
                 return;
-            this.shakeDirection = dir.SafeNormalize();
-            this.lastDirectionalShake = 0;
-            this.shakeTimer = Math.Max(this.shakeTimer, time);
+            shakeDirection = dir.SafeNormalize();
+            lastDirectionalShake = 0;
+            shakeTimer = Math.Max(shakeTimer, time);
         }
 
         public void Flash(Color color, bool drawPlayerOver = false)
         {
             if (Settings.Instance.DisableFlashes)
                 return;
-            this.doFlash = true;
-            this.flashDrawPlayer = drawPlayerOver;
-            this.flash = 1f;
-            this.flashColor = color;
+            doFlash = true;
+            flashDrawPlayer = drawPlayerOver;
+            flash = 1f;
+            flashColor = color;
         }
 
         public void ZoomSnap(Vector2 screenSpaceFocusPoint, float zoom)
         {
-            this.ZoomFocusPoint = screenSpaceFocusPoint;
-            this.ZoomTarget = this.Zoom = zoom;
+            ZoomFocusPoint = screenSpaceFocusPoint;
+            ZoomTarget = Zoom = zoom;
         }
 
         public IEnumerator ZoomTo(Vector2 screenSpaceFocusPoint, float zoom, float duration)
         {
-            this.ZoomFocusPoint = screenSpaceFocusPoint;
-            this.ZoomTarget = zoom;
-            float from = this.Zoom;
+            ZoomFocusPoint = screenSpaceFocusPoint;
+            ZoomTarget = zoom;
+            float from = Zoom;
             for (float p = 0.0f; (double) p < 1.0; p += Engine.DeltaTime / duration)
             {
-                this.Zoom = MathHelper.Lerp(from, this.ZoomTarget, Ease.SineInOut(MathHelper.Clamp(p, 0.0f, 1f)));
-                yield return (object) null;
+                Zoom = MathHelper.Lerp(from, ZoomTarget, Ease.SineInOut(MathHelper.Clamp(p, 0.0f, 1f)));
+                yield return null;
             }
-            this.Zoom = this.ZoomTarget;
+            Zoom = ZoomTarget;
         }
 
         public IEnumerator ZoomAcross(
@@ -2303,65 +2289,65 @@ namespace Celeste
             float zoom,
             float duration)
         {
-            float fromZoom = this.Zoom;
-            Vector2 fromFocus = this.ZoomFocusPoint;
+            float fromZoom = Zoom;
+            Vector2 fromFocus = ZoomFocusPoint;
             for (float p = 0.0f; (double) p < 1.0; p += Engine.DeltaTime / duration)
             {
                 float amount = Ease.SineInOut(MathHelper.Clamp(p, 0.0f, 1f));
-                this.Zoom = this.ZoomTarget = MathHelper.Lerp(fromZoom, zoom, amount);
-                this.ZoomFocusPoint = Vector2.Lerp(fromFocus, screenSpaceFocusPoint, amount);
-                yield return (object) null;
+                Zoom = ZoomTarget = MathHelper.Lerp(fromZoom, zoom, amount);
+                ZoomFocusPoint = Vector2.Lerp(fromFocus, screenSpaceFocusPoint, amount);
+                yield return null;
             }
-            this.Zoom = this.ZoomTarget;
-            this.ZoomFocusPoint = screenSpaceFocusPoint;
+            Zoom = ZoomTarget;
+            ZoomFocusPoint = screenSpaceFocusPoint;
         }
 
         public IEnumerator ZoomBack(float duration)
         {
-            float from = this.Zoom;
+            float from = Zoom;
             float to = 1f;
             for (float p = 0.0f; (double) p < 1.0; p += Engine.DeltaTime / duration)
             {
-                this.Zoom = MathHelper.Lerp(from, to, Ease.SineInOut(MathHelper.Clamp(p, 0.0f, 1f)));
-                yield return (object) null;
+                Zoom = MathHelper.Lerp(from, to, Ease.SineInOut(MathHelper.Clamp(p, 0.0f, 1f)));
+                yield return null;
             }
-            this.ResetZoom();
+            ResetZoom();
         }
 
         public void ResetZoom()
         {
-            this.Zoom = 1f;
-            this.ZoomTarget = 1f;
-            this.ZoomFocusPoint = new Vector2(320f, 180f) / 2f;
+            Zoom = 1f;
+            ZoomTarget = 1f;
+            ZoomFocusPoint = new Vector2(320f, 180f) / 2f;
         }
 
         public void DoScreenWipe(bool wipeIn, Action onComplete = null, bool hiresSnow = false)
         {
-            AreaData.Get(this.Session).DoScreenWipe((Scene) this, wipeIn, onComplete);
+            AreaData.Get(Session).DoScreenWipe(this, wipeIn, onComplete);
             if (!hiresSnow)
                 return;
-            this.Add((Monocle.Renderer) (this.HiresSnow = new HiresSnow()));
-            this.HiresSnow.Alpha = 0.0f;
-            this.HiresSnow.AttachAlphaTo = this.Wipe;
+            Add(HiresSnow = new HiresSnow());
+            HiresSnow.Alpha = 0.0f;
+            HiresSnow.AttachAlphaTo = Wipe;
         }
 
         public Session.CoreModes CoreMode
         {
-            get => this.coreMode;
+            get => coreMode;
             set
             {
-                if (this.coreMode == value)
+                if (coreMode == value)
                     return;
-                this.coreMode = value;
-                this.Session.SetFlag("cold", this.coreMode == Session.CoreModes.Cold);
-                Audio.SetParameter(Audio.CurrentAmbienceEventInstance, "room_state", this.coreMode == Session.CoreModes.Hot ? 0.0f : 1f);
+                coreMode = value;
+                Session.SetFlag("cold", coreMode == Session.CoreModes.Cold);
+                Audio.SetParameter(Audio.CurrentAmbienceEventInstance, "room_state", coreMode == Session.CoreModes.Hot ? 0.0f : 1f);
                 if (Audio.CurrentMusic == "event:/music/lvl9/main")
                 {
-                    this.Session.Audio.Music.Layer(1, this.coreMode == Session.CoreModes.Hot);
-                    this.Session.Audio.Music.Layer(2, this.coreMode == Session.CoreModes.Cold);
-                    this.Session.Audio.Apply();
+                    Session.Audio.Music.Layer(1, coreMode == Session.CoreModes.Hot);
+                    Session.Audio.Music.Layer(2, coreMode == Session.CoreModes.Cold);
+                    Session.Audio.Apply();
                 }
-                foreach (CoreModeListener component in this.Tracker.GetComponents<CoreModeListener>())
+                foreach (CoreModeListener component in Tracker.GetComponents<CoreModeListener>())
                 {
                     if (component.OnChange != null)
                         component.OnChange(value);
@@ -2369,93 +2355,93 @@ namespace Celeste
             }
         }
 
-        public bool InsideCamera(Vector2 position, float expand = 0.0f) => (double) position.X >= (double) this.Camera.Left - (double) expand && (double) position.X < (double) this.Camera.Right + (double) expand && (double) position.Y >= (double) this.Camera.Top - (double) expand && (double) position.Y < (double) this.Camera.Bottom + (double) expand;
+        public bool InsideCamera(Vector2 position, float expand = 0.0f) => position.X >= (double) Camera.Left - (double) expand && position.X < (double) Camera.Right + (double) expand && position.Y >= (double) Camera.Top - (double) expand && position.Y < (double) Camera.Bottom + (double) expand;
 
         public void EnforceBounds(Player player)
         {
-            Rectangle bounds = this.Bounds;
-            Rectangle rectangle = new Rectangle((int) this.Camera.Left, (int) this.Camera.Top, 320, 180);
-            if (this.transition != null)
+            Rectangle bounds = Bounds;
+            Rectangle rectangle = new((int) Camera.Left, (int) Camera.Top, 320, 180);
+            if (transition != null)
                 return;
-            if (this.CameraLockMode == Level.CameraLockModes.FinalBoss && (double) player.Left < (double) rectangle.Left)
+            if (CameraLockMode == CameraLockModes.FinalBoss && (double) player.Left < rectangle.Left)
             {
-                player.Left = (float) rectangle.Left;
+                player.Left = rectangle.Left;
                 player.OnBoundsH();
             }
-            else if ((double) player.Left < (double) bounds.Left)
+            else if ((double) player.Left < bounds.Left)
             {
-                if ((double) player.Top >= (double) bounds.Top && (double) player.Bottom < (double) bounds.Bottom && this.Session.MapData.CanTransitionTo(this, player.Center + Vector2.UnitX * -8f))
+                if ((double) player.Top >= bounds.Top && (double) player.Bottom < bounds.Bottom && Session.MapData.CanTransitionTo(this, player.Center + Vector2.UnitX * -8f))
                 {
                     player.BeforeSideTransition();
-                    this.NextLevel(player.Center + Vector2.UnitX * -8f, -Vector2.UnitX);
+                    NextLevel(player.Center + Vector2.UnitX * -8f, -Vector2.UnitX);
                     return;
                 }
-                player.Left = (float) bounds.Left;
+                player.Left = bounds.Left;
                 player.OnBoundsH();
             }
-            TheoCrystal entity = this.Tracker.GetEntity<TheoCrystal>();
-            if (this.CameraLockMode == Level.CameraLockModes.FinalBoss && (double) player.Right > (double) rectangle.Right && rectangle.Right < bounds.Right - 4)
+            TheoCrystal entity = Tracker.GetEntity<TheoCrystal>();
+            if (CameraLockMode == CameraLockModes.FinalBoss && (double) player.Right > rectangle.Right && rectangle.Right < bounds.Right - 4)
             {
-                player.Right = (float) rectangle.Right;
+                player.Right = rectangle.Right;
                 player.OnBoundsH();
             }
-            else if (entity != null && (player.Holding == null || !player.Holding.IsHeld) && (double) player.Right > (double) (bounds.Right - 1))
-                player.Right = (float) (bounds.Right - 1);
-            else if ((double) player.Right > (double) bounds.Right)
+            else if (entity != null && (player.Holding == null || !player.Holding.IsHeld) && (double) player.Right > bounds.Right - 1)
+                player.Right = bounds.Right - 1;
+            else if ((double) player.Right > bounds.Right)
             {
-                if ((double) player.Top >= (double) bounds.Top && (double) player.Bottom < (double) bounds.Bottom && this.Session.MapData.CanTransitionTo(this, player.Center + Vector2.UnitX * 8f))
+                if ((double) player.Top >= bounds.Top && (double) player.Bottom < bounds.Bottom && Session.MapData.CanTransitionTo(this, player.Center + Vector2.UnitX * 8f))
                 {
                     player.BeforeSideTransition();
-                    this.NextLevel(player.Center + Vector2.UnitX * 8f, Vector2.UnitX);
+                    NextLevel(player.Center + Vector2.UnitX * 8f, Vector2.UnitX);
                     return;
                 }
-                player.Right = (float) bounds.Right;
+                player.Right = bounds.Right;
                 player.OnBoundsH();
             }
-            if (this.CameraLockMode != Level.CameraLockModes.None && (double) player.Top < (double) rectangle.Top)
+            if (CameraLockMode != CameraLockModes.None && (double) player.Top < rectangle.Top)
             {
-                player.Top = (float) rectangle.Top;
+                player.Top = rectangle.Top;
                 player.OnBoundsV();
             }
-            else if ((double) player.CenterY < (double) bounds.Top)
+            else if ((double) player.CenterY < bounds.Top)
             {
-                if (this.Session.MapData.CanTransitionTo(this, player.Center - Vector2.UnitY * 12f))
+                if (Session.MapData.CanTransitionTo(this, player.Center - Vector2.UnitY * 12f))
                 {
                     player.BeforeUpTransition();
-                    this.NextLevel(player.Center - Vector2.UnitY * 12f, -Vector2.UnitY);
+                    NextLevel(player.Center - Vector2.UnitY * 12f, -Vector2.UnitY);
                     return;
                 }
-                if ((double) player.Top < (double) (bounds.Top - 24))
+                if ((double) player.Top < bounds.Top - 24)
                 {
-                    player.Top = (float) (bounds.Top - 24);
+                    player.Top = bounds.Top - 24;
                     player.OnBoundsV();
                 }
             }
-            if (this.CameraLockMode != Level.CameraLockModes.None && rectangle.Bottom < bounds.Bottom - 4 && (double) player.Top > (double) rectangle.Bottom)
+            if (CameraLockMode != CameraLockModes.None && rectangle.Bottom < bounds.Bottom - 4 && (double) player.Top > rectangle.Bottom)
             {
                 if (SaveData.Instance.Assists.Invincible)
                 {
                     player.Play("event:/game/general/assist_screenbottom");
-                    player.Bounce((float) rectangle.Bottom);
+                    player.Bounce(rectangle.Bottom);
                 }
                 else
                     player.Die(Vector2.Zero);
             }
-            else if ((double) player.Bottom > (double) bounds.Bottom && this.Session.MapData.CanTransitionTo(this, player.Center + Vector2.UnitY * 12f) && !this.Session.LevelData.DisableDownTransition)
+            else if ((double) player.Bottom > bounds.Bottom && Session.MapData.CanTransitionTo(this, player.Center + Vector2.UnitY * 12f) && !Session.LevelData.DisableDownTransition)
             {
                 if (player.CollideCheck<Solid>(player.Position + Vector2.UnitY * 4f))
                     return;
                 player.BeforeDownTransition();
-                this.NextLevel(player.Center + Vector2.UnitY * 12f, Vector2.UnitY);
+                NextLevel(player.Center + Vector2.UnitY * 12f, Vector2.UnitY);
             }
-            else if ((double) player.Top > (double) bounds.Bottom && SaveData.Instance.Assists.Invincible)
+            else if ((double) player.Top > bounds.Bottom && SaveData.Instance.Assists.Invincible)
             {
                 player.Play("event:/game/general/assist_screenbottom");
-                player.Bounce((float) bounds.Bottom);
+                player.Bounce(bounds.Bottom);
             }
             else
             {
-                if ((double) player.Top <= (double) (bounds.Bottom + 4))
+                if ((double) player.Top <= bounds.Bottom + 4)
                     return;
                 player.Die(Vector2.Zero);
             }
@@ -2463,20 +2449,20 @@ namespace Celeste
 
         public bool IsInBounds(Entity entity)
         {
-            Rectangle bounds = this.Bounds;
-            return (double) entity.Right > (double) bounds.Left && (double) entity.Bottom > (double) bounds.Top && (double) entity.Left < (double) bounds.Right && (double) entity.Top < (double) bounds.Bottom;
+            Rectangle bounds = Bounds;
+            return (double) entity.Right > bounds.Left && (double) entity.Bottom > bounds.Top && (double) entity.Left < bounds.Right && (double) entity.Top < bounds.Bottom;
         }
 
         public bool IsInBounds(Vector2 position)
         {
-            Rectangle bounds = this.Bounds;
-            return (double) position.X >= (double) bounds.Left && (double) position.Y >= (double) bounds.Top && (double) position.X < (double) bounds.Right && (double) position.Y < (double) bounds.Bottom;
+            Rectangle bounds = Bounds;
+            return position.X >= (double) bounds.Left && position.Y >= (double) bounds.Top && position.X < (double) bounds.Right && position.Y < (double) bounds.Bottom;
         }
 
         public bool IsInBounds(Vector2 position, float pad)
         {
-            Rectangle bounds = this.Bounds;
-            return (double) position.X >= (double) bounds.Left - (double) pad && (double) position.Y >= (double) bounds.Top - (double) pad && (double) position.X < (double) bounds.Right + (double) pad && (double) position.Y < (double) bounds.Bottom + (double) pad;
+            Rectangle bounds = Bounds;
+            return position.X >= bounds.Left - (double) pad && position.Y >= bounds.Top - (double) pad && position.X < bounds.Right + (double) pad && position.Y < bounds.Bottom + (double) pad;
         }
 
         public bool IsInBounds(Vector2 position, Vector2 dirPad)
@@ -2485,14 +2471,14 @@ namespace Celeste
             float num2 = Math.Max(-dirPad.X, 0.0f);
             float num3 = Math.Max(dirPad.Y, 0.0f);
             float num4 = Math.Max(-dirPad.Y, 0.0f);
-            Rectangle bounds = this.Bounds;
-            return (double) position.X >= (double) bounds.Left + (double) num1 && (double) position.Y >= (double) bounds.Top + (double) num3 && (double) position.X < (double) bounds.Right - (double) num2 && (double) position.Y < (double) bounds.Bottom - (double) num4;
+            Rectangle bounds = Bounds;
+            return position.X >= bounds.Left + (double) num1 && position.Y >= bounds.Top + (double) num3 && position.X < bounds.Right - (double) num2 && position.Y < bounds.Bottom - (double) num4;
         }
 
         public bool IsInCamera(Vector2 position, float pad)
         {
-            Rectangle rectangle = new Rectangle((int) this.Camera.X, (int) this.Camera.Y, 320, 180);
-            return (double) position.X >= (double) rectangle.Left - (double) pad && (double) position.Y >= (double) rectangle.Top - (double) pad && (double) position.X < (double) rectangle.Right + (double) pad && (double) position.Y < (double) rectangle.Bottom + (double) pad;
+            Rectangle rectangle = new((int) Camera.X, (int) Camera.Y, 320, 180);
+            return position.X >= rectangle.Left - (double) pad && position.Y >= rectangle.Top - (double) pad && position.X < rectangle.Right + (double) pad && position.Y < rectangle.Bottom + (double) pad;
         }
 
         public void StartCutscene(
@@ -2502,40 +2488,40 @@ namespace Celeste
             bool resetZoomOnSkip = true)
         {
             this.endingChapterAfterCutscene = endingChapterAfterCutscene;
-            this.InCutscene = true;
-            this.onCutsceneSkip = onSkip;
-            this.onCutsceneSkipFadeIn = fadeInOnSkip;
-            this.onCutsceneSkipResetZoom = resetZoomOnSkip;
+            InCutscene = true;
+            onCutsceneSkip = onSkip;
+            onCutsceneSkipFadeIn = fadeInOnSkip;
+            onCutsceneSkipResetZoom = resetZoomOnSkip;
         }
 
         public void CancelCutscene()
         {
-            this.InCutscene = false;
-            this.SkippingCutscene = false;
+            InCutscene = false;
+            SkippingCutscene = false;
         }
 
         public void SkipCutscene()
         {
-            this.SkippingCutscene = true;
+            SkippingCutscene = true;
             Engine.TimeRate = 1f;
             Distort.Anxiety = 0.0f;
             Distort.GameRate = 1f;
-            if (this.endingChapterAfterCutscene)
+            if (endingChapterAfterCutscene)
                 Audio.BusStopAll("bus:/gameplay_sfx", true);
-            List<Entity> entityList = new List<Entity>();
-            foreach (Entity entity in this.Tracker.GetEntities<Textbox>())
+            List<Entity> entityList = new();
+            foreach (Entity entity in Tracker.GetEntities<Textbox>())
                 entityList.Add(entity);
             foreach (Entity entity in entityList)
                 entity.RemoveSelf();
-            this.skipCoroutine = new Coroutine(this.SkipCutsceneRoutine());
+            skipCoroutine = new Coroutine(SkipCutsceneRoutine());
         }
 
         private IEnumerator SkipCutsceneRoutine()
         {
             Level level = this;
-            FadeWipe fadeWipe1 = new FadeWipe((Scene) level, false);
+            FadeWipe fadeWipe1 = new(level, false);
             fadeWipe1.Duration = 0.25f;
-            yield return (object) fadeWipe1.Wait();
+            yield return fadeWipe1.Wait();
             level.onCutsceneSkip(level);
             level.strawberriesDisplay.DrawLerp = 0.0f;
             if (level.onCutsceneSkipResetZoom)
@@ -2545,10 +2531,10 @@ namespace Celeste
                 first.DrawLerp = 0.0f;
             if (level.onCutsceneSkipFadeIn)
             {
-                FadeWipe fadeWipe2 = new FadeWipe((Scene) level, true);
+                FadeWipe fadeWipe2 = new(level, true);
                 fadeWipe2.Duration = 0.25f;
                 level.RendererList.UpdateLists();
-                yield return (object) fadeWipe2.Wait();
+                yield return fadeWipe2.Wait();
             }
             level.SkippingCutscene = false;
             level.EndCutscene();
@@ -2556,27 +2542,27 @@ namespace Celeste
 
         public void EndCutscene()
         {
-            if (this.SkippingCutscene)
+            if (SkippingCutscene)
                 return;
-            this.InCutscene = false;
+            InCutscene = false;
         }
 
-        private void NextLevel(Vector2 at, Vector2 dir) => this.OnEndOfFrame += (Action) (() =>
+        private void NextLevel(Vector2 at, Vector2 dir) => OnEndOfFrame += () =>
         {
             Engine.TimeRate = 1f;
             Distort.Anxiety = 0.0f;
             Distort.GameRate = 1f;
-            this.TransitionTo(this.Session.MapData.GetAt(at), dir);
-        });
+            TransitionTo(Session.MapData.GetAt(at), dir);
+        };
 
         public void RegisterAreaComplete()
         {
-            if (this.Completed)
+            if (Completed)
                 return;
-            Player entity = this.Tracker.GetEntity<Player>();
+            Player entity = Tracker.GetEntity<Player>();
             if (entity != null)
             {
-                List<Strawberry> strawberryList = new List<Strawberry>();
+                List<Strawberry> strawberryList = new();
                 foreach (Follower follower in entity.Leader.Followers)
                 {
                     if (follower.Entity is Strawberry)
@@ -2585,8 +2571,8 @@ namespace Celeste
                 foreach (Strawberry strawberry in strawberryList)
                     strawberry.OnCollect();
             }
-            this.Completed = true;
-            SaveData.Instance.RegisterCompletion(this.Session);
+            Completed = true;
+            SaveData.Instance.RegisterCompletion(Session);
         }
 
         public ScreenWipe CompleteArea(
@@ -2594,21 +2580,21 @@ namespace Celeste
             bool skipScreenWipe = false,
             bool skipCompleteScreen = false)
         {
-            this.RegisterAreaComplete();
-            this.PauseLock = true;
-            Action onComplete = !(AreaData.Get(this.Session).Interlude | skipCompleteScreen) ? (Action) (() => Engine.Scene = (Scene) new LevelExit(LevelExit.Mode.Completed, this.Session)) : (Action) (() => Engine.Scene = (Scene) new LevelExit(LevelExit.Mode.CompletedInterlude, this.Session, this.HiresSnow));
-            if (!this.SkippingCutscene && !skipScreenWipe)
+            RegisterAreaComplete();
+            PauseLock = true;
+            Action onComplete = !(AreaData.Get(Session).Interlude | skipCompleteScreen) ? (() => Engine.Scene = new LevelExit(LevelExit.Mode.Completed, Session)) : (() => Engine.Scene = new LevelExit(LevelExit.Mode.CompletedInterlude, Session, HiresSnow));
+            if (!SkippingCutscene && !skipScreenWipe)
             {
                 if (!spotlightWipe)
-                    return (ScreenWipe) new FadeWipe((Scene) this, false, onComplete);
-                Player entity = this.Tracker.GetEntity<Player>();
+                    return new FadeWipe(this, false, onComplete);
+                Player entity = Tracker.GetEntity<Player>();
                 if (entity != null)
-                    SpotlightWipe.FocusPoint = entity.Position - this.Camera.Position - new Vector2(0.0f, 8f);
-                return (ScreenWipe) new SpotlightWipe((Scene) this, false, onComplete);
+                    SpotlightWipe.FocusPoint = entity.Position - Camera.Position - new Vector2(0.0f, 8f);
+                return new SpotlightWipe(this, false, onComplete);
             }
             Audio.BusStopAll("bus:/gameplay_sfx", true);
             onComplete();
-            return (ScreenWipe) null;
+            return null;
         }
 
         public enum CameraLockModes

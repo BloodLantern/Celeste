@@ -6,11 +6,11 @@ namespace Monocle
     public class StateMachine : Component
     {
         private int state;
-        private Action[] begins;
-        private Func<int>[] updates;
-        private Action[] ends;
-        private Func<IEnumerator>[] coroutines;
-        private Coroutine currentCoroutine;
+        private readonly Action[] begins;
+        private readonly Func<int>[] updates;
+        private readonly Action[] ends;
+        private readonly Func<IEnumerator>[] coroutines;
+        private readonly Coroutine currentCoroutine;
         public bool ChangedStates;
         public bool Log;
         public bool Locked;
@@ -20,99 +20,99 @@ namespace Monocle
         public StateMachine(int maxStates = 10)
             : base(true, false)
         {
-            this.PreviousState = this.state = -1;
-            this.begins = new Action[maxStates];
-            this.updates = new Func<int>[maxStates];
-            this.ends = new Action[maxStates];
-            this.coroutines = new Func<IEnumerator>[maxStates];
-            this.currentCoroutine = new Coroutine();
-            this.currentCoroutine.RemoveOnComplete = false;
+            PreviousState = state = -1;
+            begins = new Action[maxStates];
+            updates = new Func<int>[maxStates];
+            ends = new Action[maxStates];
+            coroutines = new Func<IEnumerator>[maxStates];
+            currentCoroutine = new Coroutine();
+            currentCoroutine.RemoveOnComplete = false;
         }
 
         public override void Added(Entity entity)
         {
             base.Added(entity);
-            if (this.Entity.Scene == null || this.state != -1)
+            if (Entity.Scene == null || state != -1)
                 return;
-            this.State = 0;
+            State = 0;
         }
 
         public override void EntityAdded(Scene scene)
         {
             base.EntityAdded(scene);
-            if (this.state != -1)
+            if (state != -1)
                 return;
-            this.State = 0;
+            State = 0;
         }
 
         public int State
         {
-            get => this.state;
+            get => state;
             set
             {
-                if (this.Locked || this.state == value)
+                if (Locked || state == value)
                     return;
-                if (this.Log)
-                    Calc.Log((object) ("Enter State " + (object) value + " (leaving " + (object) this.state + ")"));
-                this.ChangedStates = true;
-                this.PreviousState = this.state;
-                this.state = value;
-                if (this.PreviousState != -1 && this.ends[this.PreviousState] != null)
+                if (Log)
+                    Calc.Log("Enter State " + value + " (leaving " + state + ")");
+                ChangedStates = true;
+                PreviousState = state;
+                state = value;
+                if (PreviousState != -1 && ends[PreviousState] != null)
                 {
-                    if (this.Log)
-                        Calc.Log((object) ("Calling End " + (object) this.PreviousState));
-                    this.ends[this.PreviousState]();
+                    if (Log)
+                        Calc.Log("Calling End " + PreviousState);
+                    ends[PreviousState]();
                 }
-                if (this.begins[this.state] != null)
+                if (begins[state] != null)
                 {
-                    if (this.Log)
-                        Calc.Log((object) ("Calling Begin " + (object) this.state));
-                    this.begins[this.state]();
+                    if (Log)
+                        Calc.Log("Calling Begin " + state);
+                    begins[state]();
                 }
-                if (this.coroutines[this.state] != null)
+                if (coroutines[state] != null)
                 {
-                    if (this.Log)
-                        Calc.Log((object) ("Starting Coroutine " + (object) this.state));
-                    this.currentCoroutine.Replace(this.coroutines[this.state]());
+                    if (Log)
+                        Calc.Log("Starting Coroutine " + state);
+                    currentCoroutine.Replace(coroutines[state]());
                 }
                 else
-                    this.currentCoroutine.Cancel();
+                    currentCoroutine.Cancel();
             }
         }
 
         public void ForceState(int toState)
         {
-            if (this.state != toState)
+            if (state != toState)
             {
-                this.State = toState;
+                State = toState;
             }
             else
             {
-                if (this.Log)
-                    Calc.Log((object) ("Enter State " + (object) toState + " (leaving " + (object) this.state + ")"));
-                this.ChangedStates = true;
-                this.PreviousState = this.state;
-                this.state = toState;
-                if (this.PreviousState != -1 && this.ends[this.PreviousState] != null)
+                if (Log)
+                    Calc.Log("Enter State " + toState + " (leaving " + state + ")");
+                ChangedStates = true;
+                PreviousState = state;
+                state = toState;
+                if (PreviousState != -1 && ends[PreviousState] != null)
                 {
-                    if (this.Log)
-                        Calc.Log((object) ("Calling End " + (object) this.state));
-                    this.ends[this.PreviousState]();
+                    if (Log)
+                        Calc.Log("Calling End " + state);
+                    ends[PreviousState]();
                 }
-                if (this.begins[this.state] != null)
+                if (begins[state] != null)
                 {
-                    if (this.Log)
-                        Calc.Log((object) ("Calling Begin " + (object) this.state));
-                    this.begins[this.state]();
+                    if (Log)
+                        Calc.Log("Calling Begin " + state);
+                    begins[state]();
                 }
-                if (this.coroutines[this.state] != null)
+                if (coroutines[state] != null)
                 {
-                    if (this.Log)
-                        Calc.Log((object) ("Starting Coroutine " + (object) this.state));
-                    this.currentCoroutine.Replace(this.coroutines[this.state]());
+                    if (Log)
+                        Calc.Log("Starting Coroutine " + state);
+                    currentCoroutine.Replace(coroutines[state]());
                 }
                 else
-                    this.currentCoroutine.Cancel();
+                    currentCoroutine.Cancel();
             }
         }
 
@@ -123,41 +123,41 @@ namespace Monocle
             Action begin = null,
             Action end = null)
         {
-            this.updates[state] = onUpdate;
-            this.begins[state] = begin;
-            this.ends[state] = end;
-            this.coroutines[state] = coroutine;
+            updates[state] = onUpdate;
+            begins[state] = begin;
+            ends[state] = end;
+            coroutines[state] = coroutine;
         }
 
         public void ReflectState(Entity from, int index, string name)
         {
-            this.updates[index] = (Func<int>) Calc.GetMethod<Func<int>>((object) from, name + "Update");
-            this.begins[index] = (Action) Calc.GetMethod<Action>((object) from, name + "Begin");
-            this.ends[index] = (Action) Calc.GetMethod<Action>((object) from, name + "End");
-            this.coroutines[index] = (Func<IEnumerator>) Calc.GetMethod<Func<IEnumerator>>((object) from, name + "Coroutine");
+            updates[index] = (Func<int>) Calc.GetMethod<Func<int>>(from, name + "Update");
+            begins[index] = (Action) Calc.GetMethod<Action>(from, name + "Begin");
+            ends[index] = (Action) Calc.GetMethod<Action>(from, name + "End");
+            coroutines[index] = (Func<IEnumerator>) Calc.GetMethod<Func<IEnumerator>>(from, name + "Coroutine");
         }
 
         public override void Update()
         {
-            this.ChangedStates = false;
-            if (this.updates[this.state] != null)
-                this.State = this.updates[this.state]();
-            if (!this.currentCoroutine.Active)
+            ChangedStates = false;
+            if (updates[state] != null)
+                State = updates[state]();
+            if (!currentCoroutine.Active)
                 return;
-            this.currentCoroutine.Update();
-            if (this.ChangedStates || !this.Log || !this.currentCoroutine.Finished)
+            currentCoroutine.Update();
+            if (ChangedStates || !Log || !currentCoroutine.Finished)
                 return;
-            Calc.Log((object) ("Finished Coroutine " + (object) this.state));
+            Calc.Log("Finished Coroutine " + state);
         }
 
         public static implicit operator int(StateMachine s) => s.state;
 
         public void LogAllStates()
         {
-            for (int index = 0; index < this.updates.Length; ++index)
-                this.LogState(index);
+            for (int index = 0; index < updates.Length; ++index)
+                LogState(index);
         }
 
-        public void LogState(int index) => Calc.Log((object) ("State " + (object) index + ": " + (this.updates[index] != null ? (object) "U" : (object) "") + (this.begins[index] != null ? (object) "B" : (object) "") + (this.ends[index] != null ? (object) "E" : (object) "") + (this.coroutines[index] != null ? (object) "C" : (object) "")));
+        public void LogState(int index) => Calc.Log("State " + index + ": " + (updates[index] != null ? "U" : (object)"") + (begins[index] != null ? "B" : (object)"") + (ends[index] != null ? "E" : (object)"") + (coroutines[index] != null ? "C" : (object)""));
     }
 }

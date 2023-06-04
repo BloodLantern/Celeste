@@ -19,18 +19,16 @@ namespace Celeste
             Mode = mode;
         }
 
-        public int ChapterIndex
+        public readonly int ChapterIndex
         {
             get
             {
                 if (AreaData.Areas[ID].Interlude)
                     return -1;
                 int chapterIndex = 0;
-                for (int index = 0; index <= ID; ++index)
-                {
-                    if (!AreaData.Areas[index].Interlude)
+                for (int i = 0; i <= ID; i++)
+                    if (!AreaData.Areas[i].Interlude)
                         ++chapterIndex;
-                }
                 return chapterIndex;
             }
         }

@@ -2,7 +2,6 @@
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
-using Steamworks;
 using System;
 using System.IO;
 using System.Reflection;
@@ -13,7 +12,7 @@ namespace Monocle
     public class Engine : Game
     {
         public string Title;
-        public System.Version Version;
+        public Version Version;
         public static Action OverloadGameLoop;
         private static int viewPadding = 0;
         private static bool resizing;
@@ -25,7 +24,7 @@ namespace Monocle
         public static int FPS;
         private TimeSpan counterElapsed = TimeSpan.Zero;
         private int fpsCounter;
-        private static string AssemblyDirectory = Path.GetDirectoryName(Assembly.GetEntryAssembly().Location);
+        private static readonly string AssemblyDirectory = Path.GetDirectoryName(Assembly.GetEntryAssembly().Location);
         public static Color ClearColor;
         public static bool ExitOnEscapeKeypress;
         private Scene scene;
@@ -50,11 +49,11 @@ namespace Monocle
 
         public static int ViewPadding
         {
-            get => Engine.viewPadding;
+            get => viewPadding;
             set
             {
-                Engine.viewPadding = value;
-                Engine.Instance.UpdateView();
+                viewPadding = value;
+                Instance.UpdateView();
             }
         }
 
@@ -64,7 +63,7 @@ namespace Monocle
 
         public static ulong FrameCounter { get; private set; }
 
-        public static string ContentDirectory => Path.Combine(Engine.AssemblyDirectory, Engine.Instance.Content.RootDirectory);
+        public static string ContentDirectory => Path.Combine(AssemblyDirectory, Instance.Content.RootDirectory);
 
         public Engine(
             int width,
@@ -75,85 +74,83 @@ namespace Monocle
             bool fullscreen,
             bool vsync)
         {
-            Engine.Instance = this;
-            this.Title = this.Window.Title = windowTitle;
-            Engine.Width = width;
-            Engine.Height = height;
-            Engine.ClearColor = Color.Black;
-            this.InactiveSleepTime = new TimeSpan(0L);
-            Engine.Graphics = new GraphicsDeviceManager((Game) this);
-            Engine.Graphics.DeviceReset += new EventHandler<EventArgs>(this.OnGraphicsReset);
-            Engine.Graphics.DeviceCreated += new EventHandler<EventArgs>(this.OnGraphicsCreate);
-            Engine.Graphics.SynchronizeWithVerticalRetrace = vsync;
-            Engine.Graphics.PreferMultiSampling = false;
-            Engine.Graphics.GraphicsProfile = GraphicsProfile.HiDef;
-            Engine.Graphics.PreferredBackBufferFormat = SurfaceFormat.Color;
-            Engine.Graphics.PreferredDepthStencilFormat = DepthFormat.Depth24Stencil8;
-            this.Window.AllowUserResizing = true;
-            this.Window.ClientSizeChanged += new EventHandler<EventArgs>(this.OnClientSizeChanged);
+            Instance = this;
+            Title = Window.Title = windowTitle;
+            Width = width;
+            Height = height;
+            ClearColor = Color.Black;
+            InactiveSleepTime = new TimeSpan(0L);
+            Graphics = new GraphicsDeviceManager(this);
+            Graphics.DeviceReset += new EventHandler<EventArgs>(OnGraphicsReset);
+            Graphics.DeviceCreated += new EventHandler<EventArgs>(OnGraphicsCreate);
+            Graphics.SynchronizeWithVerticalRetrace = vsync;
+            Graphics.PreferMultiSampling = false;
+            Graphics.GraphicsProfile = GraphicsProfile.HiDef;
+            Graphics.PreferredBackBufferFormat = SurfaceFormat.Color;
+            Graphics.PreferredDepthStencilFormat = DepthFormat.Depth24Stencil8;
+            Window.AllowUserResizing = true;
+            Window.ClientSizeChanged += new EventHandler<EventArgs>(OnClientSizeChanged);
             if (fullscreen)
             {
-                Engine.Graphics.PreferredBackBufferWidth = GraphicsAdapter.DefaultAdapter.CurrentDisplayMode.Width;
-                Engine.Graphics.PreferredBackBufferHeight = GraphicsAdapter.DefaultAdapter.CurrentDisplayMode.Height;
-                Engine.Graphics.IsFullScreen = true;
+                Graphics.PreferredBackBufferWidth = GraphicsAdapter.DefaultAdapter.CurrentDisplayMode.Width;
+                Graphics.PreferredBackBufferHeight = GraphicsAdapter.DefaultAdapter.CurrentDisplayMode.Height;
+                Graphics.IsFullScreen = true;
             }
             else
             {
-                Engine.Graphics.PreferredBackBufferWidth = windowWidth;
-                Engine.Graphics.PreferredBackBufferHeight = windowHeight;
-                Engine.Graphics.IsFullScreen = false;
+                Graphics.PreferredBackBufferWidth = windowWidth;
+                Graphics.PreferredBackBufferHeight = windowHeight;
+                Graphics.IsFullScreen = false;
             }
-            this.Content.RootDirectory = "Content";
-            this.IsMouseVisible = false;
-            Engine.ExitOnEscapeKeypress = true;
+            Content.RootDirectory = "Content";
+            IsMouseVisible = false;
+            ExitOnEscapeKeypress = true;
             GCSettings.LatencyMode = GCLatencyMode.SustainedLowLatency;
         }
 
         protected virtual void OnClientSizeChanged(object sender, EventArgs e)
         {
-            if (this.Window.ClientBounds.Width <= 0 || this.Window.ClientBounds.Height <= 0 || Engine.resizing)
+            if (Window.ClientBounds.Width <= 0 || Window.ClientBounds.Height <= 0 || resizing)
                 return;
-            Engine.resizing = true;
-            Engine.Graphics.PreferredBackBufferWidth = this.Window.ClientBounds.Width;
-            Engine.Graphics.PreferredBackBufferHeight = this.Window.ClientBounds.Height;
-            this.UpdateView();
-            Engine.resizing = false;
+            resizing = true;
+            Graphics.PreferredBackBufferWidth = Window.ClientBounds.Width;
+            Graphics.PreferredBackBufferHeight = Window.ClientBounds.Height;
+            UpdateView();
+            resizing = false;
         }
 
         protected virtual void OnGraphicsReset(object sender, EventArgs e)
         {
-            this.UpdateView();
-            if (this.scene != null)
-                this.scene.HandleGraphicsReset();
-            if (this.nextScene == null || this.nextScene == this.scene)
+            UpdateView();
+            scene?.HandleGraphicsReset();
+            if (nextScene == null || nextScene == scene)
                 return;
-            this.nextScene.HandleGraphicsReset();
+            nextScene.HandleGraphicsReset();
         }
 
         protected virtual void OnGraphicsCreate(object sender, EventArgs e)
         {
-            this.UpdateView();
-            if (this.scene != null)
-                this.scene.HandleGraphicsCreate();
-            if (this.nextScene == null || this.nextScene == this.scene)
+            UpdateView();
+            scene?.HandleGraphicsCreate();
+            if (nextScene == null || nextScene == scene)
                 return;
-            this.nextScene.HandleGraphicsCreate();
+            nextScene.HandleGraphicsCreate();
         }
 
         protected override void OnActivated(object sender, EventArgs args)
         {
             base.OnActivated(sender, args);
-            if (this.scene == null)
+            if (scene == null)
                 return;
-            this.scene.GainFocus();
+            scene.GainFocus();
         }
 
         protected override void OnDeactivated(object sender, EventArgs args)
         {
             base.OnDeactivated(sender, args);
-            if (this.scene == null)
+            if (scene == null)
                 return;
-            this.scene.LoseFocus();
+            scene.LoseFocus();
         }
 
         protected override void Initialize()
@@ -161,15 +158,15 @@ namespace Monocle
             base.Initialize();
             MInput.Initialize();
             Tracker.Initialize();
-            Engine.Pooler = new Pooler();
-            Engine.Commands = new Commands();
+            Pooler = new Pooler();
+            Commands = new Commands();
         }
 
         protected override void LoadContent()
         {
             base.LoadContent();
             VirtualContent.Reload();
-            Monocle.Draw.Initialize(this.GraphicsDevice);
+            Monocle.Draw.Initialize(GraphicsDevice);
         }
 
         protected override void UnloadContent()
@@ -180,60 +177,58 @@ namespace Monocle
 
         protected override void Update(GameTime gameTime)
         {
-            Engine.RawDeltaTime = (float) gameTime.ElapsedGameTime.TotalSeconds;
-            Engine.DeltaTime = Engine.RawDeltaTime * Engine.TimeRate * Engine.TimeRateB;
-            ++Engine.FrameCounter;
+            RawDeltaTime = (float) gameTime.ElapsedGameTime.TotalSeconds;
+            DeltaTime = RawDeltaTime * TimeRate * TimeRateB;
+            ++FrameCounter;
             MInput.Update();
-            if (Engine.ExitOnEscapeKeypress && MInput.Keyboard.Pressed(Keys.Escape))
-                this.Exit();
-            else if (Engine.OverloadGameLoop != null)
+            if (ExitOnEscapeKeypress && MInput.Keyboard.Pressed(Keys.Escape))
+                Exit();
+            else if (OverloadGameLoop != null)
             {
-                Engine.OverloadGameLoop();
+                OverloadGameLoop();
                 base.Update(gameTime);
             }
             else
             {
-                if (Engine.DashAssistFreeze)
+                if (DashAssistFreeze)
                 {
-                    if (Celeste.Input.Dash.Check || !Engine.DashAssistFreezePress)
+                    if (Celeste.Input.Dash.Check || !DashAssistFreezePress)
                     {
                         if (Celeste.Input.Dash.Check)
-                            Engine.DashAssistFreezePress = true;
-                        if (this.scene != null)
+                            DashAssistFreezePress = true;
+                        if (scene != null)
                         {
-                            this.scene.Tracker.GetEntity<PlayerDashAssist>()?.Update();
-                            if (this.scene is Level)
-                                (this.scene as Level).UpdateTime();
-                            this.scene.Entities.UpdateLists();
+                            scene.Tracker.GetEntity<PlayerDashAssist>()?.Update();
+                            if (scene is Level)
+                                (scene as Level).UpdateTime();
+                            scene.Entities.UpdateLists();
                         }
                     }
                     else
-                        Engine.DashAssistFreeze = false;
+                        DashAssistFreeze = false;
                 }
-                if (!Engine.DashAssistFreeze)
+                if (!DashAssistFreeze)
                 {
-                    if ((double) Engine.FreezeTimer > 0.0)
-                        Engine.FreezeTimer = Math.Max(Engine.FreezeTimer - Engine.RawDeltaTime, 0.0f);
-                    else if (this.scene != null)
+                    if (FreezeTimer > 0.0)
+                        FreezeTimer = Math.Max(FreezeTimer - RawDeltaTime, 0.0f);
+                    else if (scene != null)
                     {
-                        this.scene.BeforeUpdate();
-                        this.scene.Update();
-                        this.scene.AfterUpdate();
+                        scene.BeforeUpdate();
+                        scene.Update();
+                        scene.AfterUpdate();
                     }
                 }
-                if (Engine.Commands.Open)
-                    Engine.Commands.UpdateOpen();
-                else if (Engine.Commands.Enabled)
-                    Engine.Commands.UpdateClosed();
-                if (this.scene != this.nextScene)
+                if (Commands.Open)
+                    Commands.UpdateOpen();
+                else if (Commands.Enabled)
+                    Commands.UpdateClosed();
+                if (scene != nextScene)
                 {
                     Scene scene = this.scene;
-                    if (this.scene != null)
-                        this.scene.End();
-                    this.scene = this.nextScene;
-                    this.OnSceneTransition(scene, this.nextScene);
-                    if (this.scene != null)
-                        this.scene.Begin();
+                    this.scene?.End();
+                    this.scene = nextScene;
+                    OnSceneTransition(scene, nextScene);
+                    this.scene?.Begin();
                 }
                 base.Update(gameTime);
             }
@@ -241,30 +236,29 @@ namespace Monocle
 
         protected override void Draw(GameTime gameTime)
         {
-            this.RenderCore();
+            RenderCore();
             base.Draw(gameTime);
-            if (Engine.Commands.Open)
-                Engine.Commands.Render();
-            ++this.fpsCounter;
-            this.counterElapsed += gameTime.ElapsedGameTime;
-            if (!(this.counterElapsed >= TimeSpan.FromSeconds(1.0)))
+            if (Commands.Open)
+                Commands.Render();
+            ++fpsCounter;
+            counterElapsed += gameTime.ElapsedGameTime;
+            if (!(counterElapsed >= TimeSpan.FromSeconds(1.0)))
                 return;
-            Engine.FPS = this.fpsCounter;
-            this.fpsCounter = 0;
-            this.counterElapsed -= TimeSpan.FromSeconds(1.0);
+            FPS = fpsCounter;
+            fpsCounter = 0;
+            counterElapsed -= TimeSpan.FromSeconds(1.0);
         }
 
         protected virtual void RenderCore()
         {
-            if (this.scene != null)
-                this.scene.BeforeRender();
-            this.GraphicsDevice.SetRenderTarget((RenderTarget2D) null);
-            this.GraphicsDevice.Viewport = Engine.Viewport;
-            this.GraphicsDevice.Clear(Engine.ClearColor);
-            if (this.scene == null)
+            scene?.BeforeRender();
+            GraphicsDevice.SetRenderTarget(null);
+            GraphicsDevice.Viewport = Viewport;
+            GraphicsDevice.Clear(ClearColor);
+            if (scene == null)
                 return;
-            this.scene.Render();
-            this.scene.AfterRender();
+            scene.Render();
+            scene.AfterRender();
         }
 
         protected override void OnExiting(object sender, EventArgs args)
@@ -277,7 +271,7 @@ namespace Monocle
         {
             try
             {
-                this.Run();
+                Run();
             }
             catch (Exception ex)
             {
@@ -291,14 +285,14 @@ namespace Monocle
         {
             GC.Collect();
             GC.WaitForPendingFinalizers();
-            Engine.TimeRate = 1f;
-            Engine.DashAssistFreeze = false;
+            TimeRate = 1f;
+            DashAssistFreeze = false;
         }
 
         public static Scene Scene
         {
-            get => Engine.Instance.scene;
-            set => Engine.Instance.nextScene = value;
+            get => Instance.scene;
+            set => Instance.nextScene = value;
         }
 
         public static Viewport Viewport { get; private set; }
@@ -307,50 +301,50 @@ namespace Monocle
         {
             if (width <= 0 || height <= 0)
                 return;
-            Engine.resizing = true;
-            Engine.Graphics.PreferredBackBufferWidth = width;
-            Engine.Graphics.PreferredBackBufferHeight = height;
-            Engine.Graphics.IsFullScreen = false;
-            Engine.Graphics.ApplyChanges();
-            Console.WriteLine("WINDOW-" + (object) width + "x" + (object) height);
-            Engine.resizing = false;
+            resizing = true;
+            Graphics.PreferredBackBufferWidth = width;
+            Graphics.PreferredBackBufferHeight = height;
+            Graphics.IsFullScreen = false;
+            Graphics.ApplyChanges();
+            Console.WriteLine("WINDOW-" + width + "x" + height);
+            resizing = false;
         }
 
         public static void SetFullscreen()
         {
-            Engine.resizing = true;
-            Engine.Graphics.PreferredBackBufferWidth = Engine.Graphics.GraphicsDevice.Adapter.CurrentDisplayMode.Width;
-            Engine.Graphics.PreferredBackBufferHeight = Engine.Graphics.GraphicsDevice.Adapter.CurrentDisplayMode.Height;
-            Engine.Graphics.IsFullScreen = true;
-            Engine.Graphics.ApplyChanges();
+            resizing = true;
+            Graphics.PreferredBackBufferWidth = Graphics.GraphicsDevice.Adapter.CurrentDisplayMode.Width;
+            Graphics.PreferredBackBufferHeight = Graphics.GraphicsDevice.Adapter.CurrentDisplayMode.Height;
+            Graphics.IsFullScreen = true;
+            Graphics.ApplyChanges();
             Console.WriteLine("FULLSCREEN");
-            Engine.resizing = false;
+            resizing = false;
         }
 
         private void UpdateView()
         {
-            float backBufferWidth = (float) this.GraphicsDevice.PresentationParameters.BackBufferWidth;
-            float backBufferHeight = (float) this.GraphicsDevice.PresentationParameters.BackBufferHeight;
-            if ((double) backBufferWidth / (double) Engine.Width > (double) backBufferHeight / (double) Engine.Height)
+            float backBufferWidth = GraphicsDevice.PresentationParameters.BackBufferWidth;
+            float backBufferHeight = GraphicsDevice.PresentationParameters.BackBufferHeight;
+            if ((double) backBufferWidth / Width > (double) backBufferHeight / Height)
             {
-                Engine.ViewWidth = (int) ((double) backBufferHeight / (double) Engine.Height * (double) Engine.Width);
-                Engine.ViewHeight = (int) backBufferHeight;
+                ViewWidth = (int) ((double) backBufferHeight / Height * Width);
+                ViewHeight = (int) backBufferHeight;
             }
             else
             {
-                Engine.ViewWidth = (int) backBufferWidth;
-                Engine.ViewHeight = (int) ((double) backBufferWidth / (double) Engine.Width * (double) Engine.Height);
+                ViewWidth = (int) backBufferWidth;
+                ViewHeight = (int) ((double) backBufferWidth / Width * Height);
             }
-            float num = (float) Engine.ViewHeight / (float) Engine.ViewWidth;
-            Engine.ViewWidth -= Engine.ViewPadding * 2;
-            Engine.ViewHeight -= (int) ((double) num * (double) Engine.ViewPadding * 2.0);
-            Engine.ScreenMatrix = Matrix.CreateScale((float) Engine.ViewWidth / (float) Engine.Width);
-            Engine.Viewport = new Viewport()
+            float num = ViewHeight / (float) ViewWidth;
+            ViewWidth -= ViewPadding * 2;
+            ViewHeight -= (int) ((double) num * ViewPadding * 2.0);
+            ScreenMatrix = Matrix.CreateScale(ViewWidth / (float) Width);
+            Viewport = new Viewport()
             {
-                X = (int) ((double) backBufferWidth / 2.0 - (double) (Engine.ViewWidth / 2)),
-                Y = (int) ((double) backBufferHeight / 2.0 - (double) (Engine.ViewHeight / 2)),
-                Width = Engine.ViewWidth,
-                Height = Engine.ViewHeight,
+                X = (int) ((double) backBufferWidth / 2.0 - ViewWidth / 2),
+                Y = (int) ((double) backBufferHeight / 2.0 - ViewHeight / 2),
+                Width = ViewWidth,
+                Height = ViewHeight,
                 MinDepth = 0.0f,
                 MaxDepth = 1f
             };

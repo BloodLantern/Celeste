@@ -24,88 +24,88 @@ namespace Monocle
             float bufferTime,
             float triggerThreshold)
         {
-            this.Binding = binding;
-            this.GamepadIndex = gamepadIndex;
-            this.BufferTime = bufferTime;
-            this.Threshold = triggerThreshold;
+            Binding = binding;
+            GamepadIndex = gamepadIndex;
+            BufferTime = bufferTime;
+            Threshold = triggerThreshold;
         }
 
         public VirtualButton()
         {
         }
 
-        public void SetRepeat(float repeatTime) => this.SetRepeat(repeatTime, repeatTime);
+        public void SetRepeat(float repeatTime) => SetRepeat(repeatTime, repeatTime);
 
         public void SetRepeat(float firstRepeatTime, float multiRepeatTime)
         {
             this.firstRepeatTime = firstRepeatTime;
             this.multiRepeatTime = multiRepeatTime;
-            this.canRepeat = (double) this.firstRepeatTime > 0.0;
-            if (this.canRepeat)
+            canRepeat = this.firstRepeatTime > 0.0;
+            if (canRepeat)
                 return;
-            this.Repeating = false;
+            Repeating = false;
         }
 
         public override void Update()
         {
-            this.consumed = false;
-            this.bufferCounter -= Engine.DeltaTime;
+            consumed = false;
+            bufferCounter -= Engine.DeltaTime;
             bool flag = false;
-            if (this.Binding.Pressed(this.GamepadIndex, this.Threshold))
+            if (Binding.Pressed(GamepadIndex, Threshold))
             {
-                this.bufferCounter = this.BufferTime;
+                bufferCounter = BufferTime;
                 flag = true;
             }
-            else if (this.Binding.Check(this.GamepadIndex, this.Threshold))
+            else if (Binding.Check(GamepadIndex, Threshold))
                 flag = true;
             if (!flag)
             {
-                this.Repeating = false;
-                this.repeatCounter = 0.0f;
-                this.bufferCounter = 0.0f;
+                Repeating = false;
+                repeatCounter = 0.0f;
+                bufferCounter = 0.0f;
             }
             else
             {
-                if (!this.canRepeat)
+                if (!canRepeat)
                     return;
-                this.Repeating = false;
-                if ((double) this.repeatCounter == 0.0)
+                Repeating = false;
+                if (repeatCounter == 0.0)
                 {
-                    this.repeatCounter = this.firstRepeatTime;
+                    repeatCounter = firstRepeatTime;
                 }
                 else
                 {
-                    this.repeatCounter -= Engine.DeltaTime;
-                    if ((double) this.repeatCounter > 0.0)
+                    repeatCounter -= Engine.DeltaTime;
+                    if (repeatCounter > 0.0)
                         return;
-                    this.Repeating = true;
-                    this.repeatCounter = this.multiRepeatTime;
+                    Repeating = true;
+                    repeatCounter = multiRepeatTime;
                 }
             }
         }
 
-        public bool Check => !MInput.Disabled && this.Binding.Check(this.GamepadIndex, this.Threshold);
+        public bool Check => !MInput.Disabled && Binding.Check(GamepadIndex, Threshold);
 
         public bool Pressed
         {
             get
             {
-                if (this.DebugOverridePressed.HasValue && MInput.Keyboard.Check(this.DebugOverridePressed.Value))
+                if (DebugOverridePressed.HasValue && MInput.Keyboard.Check(DebugOverridePressed.Value))
                     return true;
-                if (MInput.Disabled || this.consumed)
+                if (MInput.Disabled || consumed)
                     return false;
-                return (double) this.bufferCounter > 0.0 || this.Repeating || this.Binding.Pressed(this.GamepadIndex, this.Threshold);
+                return bufferCounter > 0.0 || Repeating || Binding.Pressed(GamepadIndex, Threshold);
             }
         }
 
-        public bool Released => !MInput.Disabled && this.Binding.Released(this.GamepadIndex, this.Threshold);
+        public bool Released => !MInput.Disabled && Binding.Released(GamepadIndex, Threshold);
 
-        public void ConsumeBuffer() => this.bufferCounter = 0.0f;
+        public void ConsumeBuffer() => bufferCounter = 0.0f;
 
         public void ConsumePress()
         {
-            this.bufferCounter = 0.0f;
-            this.consumed = true;
+            bufferCounter = 0.0f;
+            consumed = true;
         }
 
         public static implicit operator bool(VirtualButton button) => button.Check;

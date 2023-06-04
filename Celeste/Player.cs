@@ -108,7 +108,7 @@ namespace Celeste
         private const float JumpThruAssistSpeed = -40f;
         private const float FlyPowerFlashTime = 0.5f;
         private const float ThrowRecoil = 80f;
-        private static readonly Vector2 CarryOffsetTarget = new Vector2(0.0f, -12f);
+        private static readonly Vector2 CarryOffsetTarget = new(0.0f, -12f);
         private const float ChaserStateMaxTime = 4f;
         public const float WalkSpeed = 64f;
         private const float LowFrictionMult = 0.35f;
@@ -181,8 +181,8 @@ namespace Celeste
         public bool JustRespawned;
         public bool EnforceLevelBounds = true;
         private Level level;
-        private Collision onCollideH;
-        private Collision onCollideV;
+        private readonly Collision onCollideH;
+        private readonly Collision onCollideV;
         private bool onGround;
         private bool wasOnGround;
         private int moveX;
@@ -192,9 +192,9 @@ namespace Celeste
         private bool holdCannotDuck;
         private bool windMovedUp;
         private float idleTimer;
-        private static Chooser<string> idleColdOptions = new Chooser<string>().Add("idleA", 5f).Add("idleB", 3f).Add("idleC", 1f);
-        private static Chooser<string> idleNoBackpackOptions = new Chooser<string>().Add("idleA", 1f).Add("idleB", 3f).Add("idleC", 3f);
-        private static Chooser<string> idleWarmOptions = new Chooser<string>().Add("idleA", 5f).Add("idleB", 3f);
+        private static readonly Chooser<string> idleColdOptions = new Chooser<string>().Add("idleA", 5f).Add("idleB", 3f).Add("idleC", 1f);
+        private static readonly Chooser<string> idleNoBackpackOptions = new Chooser<string>().Add("idleA", 1f).Add("idleB", 3f).Add("idleC", 3f);
+        private static readonly Chooser<string> idleWarmOptions = new Chooser<string>().Add("idleA", 5f).Add("idleB", 3f);
         public int StrawberryCollectIndex;
         public float StrawberryCollectResetTimer;
         private Hitbox hurtbox;
@@ -224,9 +224,9 @@ namespace Celeste
         private float maxFall;
         private float dashAttackTimer;
         private float gliderBoostTimer;
-        public List<Player.ChaserState> ChaserStates;
+        public List<ChaserState> ChaserStates;
         private bool wasTired;
-        private HashSet<Trigger> triggersInside;
+        private readonly HashSet<Trigger> triggersInside;
         private float highestAirY;
         private bool dashStartedOnGround;
         private bool fastJump;
@@ -235,16 +235,16 @@ namespace Celeste
         private float dreamDashCanEndTimer;
         private Solid climbHopSolid;
         private Vector2 climbHopSolidPosition;
-        private SoundSource wallSlideSfx;
-        private SoundSource swimSurfaceLoopSfx;
+        private readonly SoundSource wallSlideSfx;
+        private readonly SoundSource swimSurfaceLoopSfx;
         private float playFootstepOnLand;
         private float minHoldTimer;
         public Booster CurrentBooster;
         public Booster LastBooster;
         private bool calledDashEvents;
         private int lastDashes;
-        private Monocle.Sprite sweatSprite;
-        private int startHairCount;
+        private readonly Sprite sweatSprite;
+        private readonly int startHairCount;
         private bool launched;
         private float launchedTimer;
         private float dashTrailTimer;
@@ -252,38 +252,38 @@ namespace Celeste
         private bool canCurveDash;
         private float lowFrictionStopTimer;
         private float hiccupTimer;
-        private List<Player.ChaserStateSound> activeSounds = new List<Player.ChaserStateSound>();
+        private readonly List<ChaserStateSound> activeSounds = new();
         private EventInstance idleSfx;
         public bool MuffleLanding;
         private Vector2 gliderBoostDir;
         private float explodeLaunchBoostTimer;
         private float explodeLaunchBoostSpeed;
         private bool demoDashed;
-        private readonly Hitbox normalHitbox = new Hitbox(8f, 11f, -4f, -11f);
-        private readonly Hitbox duckHitbox = new Hitbox(8f, 6f, -4f, -6f);
-        private readonly Hitbox normalHurtbox = new Hitbox(8f, 9f, -4f, -11f);
-        private readonly Hitbox duckHurtbox = new Hitbox(8f, 4f, -4f, -6f);
-        private readonly Hitbox starFlyHitbox = new Hitbox(8f, 8f, -4f, -10f);
-        private readonly Hitbox starFlyHurtbox = new Hitbox(6f, 6f, -3f, -9f);
-        private Vector2 normalLightOffset = new Vector2(0.0f, -8f);
-        private Vector2 duckingLightOffset = new Vector2(0.0f, -3f);
-        private List<Entity> temp = new List<Entity>();
+        private readonly Hitbox normalHitbox = new(8f, 11f, -4f, -11f);
+        private readonly Hitbox duckHitbox = new(8f, 6f, -4f, -6f);
+        private readonly Hitbox normalHurtbox = new(8f, 9f, -4f, -11f);
+        private readonly Hitbox duckHurtbox = new(8f, 4f, -4f, -6f);
+        private readonly Hitbox starFlyHitbox = new(8f, 8f, -4f, -10f);
+        private readonly Hitbox starFlyHurtbox = new(6f, 6f, -3f, -9f);
+        private Vector2 normalLightOffset = new(0.0f, -8f);
+        private Vector2 duckingLightOffset = new(0.0f, -3f);
+        private readonly List<Entity> temp = new();
         public static readonly Color NormalHairColor = Calc.HexToColor("AC3232");
         public static readonly Color FlyPowerHairColor = Calc.HexToColor("F2EB6D");
         public static readonly Color UsedHairColor = Calc.HexToColor("44B7FF");
         public static readonly Color FlashHairColor = Color.White;
         public static readonly Color TwoDashesHairColor = Calc.HexToColor("ff6def");
         public static readonly Color NormalBadelineHairColor = BadelineOldsite.HairColor;
-        public static readonly Color UsedBadelineHairColor = Player.UsedHairColor;
-        public static readonly Color TwoDashesBadelineHairColor = Player.TwoDashesHairColor;
+        public static readonly Color UsedBadelineHairColor = UsedHairColor;
+        public static readonly Color TwoDashesBadelineHairColor = TwoDashesHairColor;
         private float hairFlashTimer;
         private bool startHairCalled;
         public Color? OverrideHairColor;
         private Vector2 windDirection;
         private float windTimeout;
         private float windHairTimer;
-        public Player.IntroTypes IntroType;
-        private MirrorReflection reflection;
+        public IntroTypes IntroType;
+        private readonly MirrorReflection reflection;
         public PlayerSpriteMode DefaultSpriteMode;
         private PlayerSpriteMode? nextSpriteMode;
         private const float LaunchedBoostCheckSpeedSq = 10000f;
@@ -363,981 +363,981 @@ namespace Celeste
         public bool Dead { get; private set; }
 
         public Player(Vector2 position, PlayerSpriteMode spriteMode)
-            : base(new Vector2((float) (int) position.X, (float) (int) position.Y))
+            : base(new Vector2((int)position.X, (int)position.Y))
         {
             Input.ResetGrab();
-            this.DefaultSpriteMode = spriteMode;
-            this.Depth = 0;
-            this.Tag = (int) Tags.Persistent;
+            DefaultSpriteMode = spriteMode;
+            Depth = 0;
+            Tag = (int) Tags.Persistent;
             if (SaveData.Instance != null && SaveData.Instance.Assists.PlayAsBadeline)
                 spriteMode = PlayerSpriteMode.MadelineAsBadeline;
-            this.Sprite = new PlayerSprite(spriteMode);
-            this.Add((Component) (this.Hair = new PlayerHair(this.Sprite)));
-            this.Add((Component) this.Sprite);
-            this.Hair.Color = spriteMode != PlayerSpriteMode.MadelineAsBadeline ? Player.NormalHairColor : Player.NormalBadelineHairColor;
-            this.startHairCount = this.Sprite.HairCount;
-            this.sweatSprite = GFX.SpriteBank.Create("player_sweat");
-            this.Add((Component) this.sweatSprite);
-            this.Collider = (Collider) this.normalHitbox;
-            this.hurtbox = this.normalHurtbox;
-            this.onCollideH = new Collision(this.OnCollideH);
-            this.onCollideV = new Collision(this.OnCollideV);
-            this.StateMachine = new StateMachine(26);
-            this.StateMachine.SetCallbacks(0, new Func<int>(this.NormalUpdate), begin: new Action(this.NormalBegin), end: new Action(this.NormalEnd));
-            this.StateMachine.SetCallbacks(1, new Func<int>(this.ClimbUpdate), begin: new Action(this.ClimbBegin), end: new Action(this.ClimbEnd));
-            this.StateMachine.SetCallbacks(2, new Func<int>(this.DashUpdate), new Func<IEnumerator>(this.DashCoroutine), new Action(this.DashBegin), new Action(this.DashEnd));
-            this.StateMachine.SetCallbacks(3, new Func<int>(this.SwimUpdate), begin: new Action(this.SwimBegin));
-            this.StateMachine.SetCallbacks(4, new Func<int>(this.BoostUpdate), new Func<IEnumerator>(this.BoostCoroutine), new Action(this.BoostBegin), new Action(this.BoostEnd));
-            this.StateMachine.SetCallbacks(5, new Func<int>(this.RedDashUpdate), new Func<IEnumerator>(this.RedDashCoroutine), new Action(this.RedDashBegin), new Action(this.RedDashEnd));
-            this.StateMachine.SetCallbacks(6, new Func<int>(this.HitSquashUpdate), begin: new Action(this.HitSquashBegin));
-            this.StateMachine.SetCallbacks(7, new Func<int>(this.LaunchUpdate), begin: new Action(this.LaunchBegin));
-            this.StateMachine.SetCallbacks(8, (Func<int>) null, new Func<IEnumerator>(this.PickupCoroutine));
-            this.StateMachine.SetCallbacks(9, new Func<int>(this.DreamDashUpdate), begin: new Action(this.DreamDashBegin), end: new Action(this.DreamDashEnd));
-            this.StateMachine.SetCallbacks(10, new Func<int>(this.SummitLaunchUpdate), begin: new Action(this.SummitLaunchBegin));
-            this.StateMachine.SetCallbacks(11, new Func<int>(this.DummyUpdate), begin: new Action(this.DummyBegin));
-            this.StateMachine.SetCallbacks(12, (Func<int>) null, new Func<IEnumerator>(this.IntroWalkCoroutine));
-            this.StateMachine.SetCallbacks(13, (Func<int>) null, new Func<IEnumerator>(this.IntroJumpCoroutine));
-            this.StateMachine.SetCallbacks(14, (Func<int>) null, begin: new Action(this.IntroRespawnBegin), end: new Action(this.IntroRespawnEnd));
-            this.StateMachine.SetCallbacks(15, (Func<int>) null, new Func<IEnumerator>(this.IntroWakeUpCoroutine));
-            this.StateMachine.SetCallbacks(20, new Func<int>(this.TempleFallUpdate), new Func<IEnumerator>(this.TempleFallCoroutine));
-            this.StateMachine.SetCallbacks(18, new Func<int>(this.ReflectionFallUpdate), new Func<IEnumerator>(this.ReflectionFallCoroutine), new Action(this.ReflectionFallBegin), new Action(this.ReflectionFallEnd));
-            this.StateMachine.SetCallbacks(16, new Func<int>(this.BirdDashTutorialUpdate), new Func<IEnumerator>(this.BirdDashTutorialCoroutine), new Action(this.BirdDashTutorialBegin));
-            this.StateMachine.SetCallbacks(17, new Func<int>(this.FrozenUpdate));
-            this.StateMachine.SetCallbacks(19, new Func<int>(this.StarFlyUpdate), new Func<IEnumerator>(this.StarFlyCoroutine), new Action(this.StarFlyBegin), new Action(this.StarFlyEnd));
-            this.StateMachine.SetCallbacks(21, new Func<int>(this.CassetteFlyUpdate), new Func<IEnumerator>(this.CassetteFlyCoroutine), new Action(this.CassetteFlyBegin), new Action(this.CassetteFlyEnd));
-            this.StateMachine.SetCallbacks(22, new Func<int>(this.AttractUpdate), begin: new Action(this.AttractBegin), end: new Action(this.AttractEnd));
-            this.StateMachine.SetCallbacks(23, (Func<int>) null, new Func<IEnumerator>(this.IntroMoonJumpCoroutine));
-            this.StateMachine.SetCallbacks(24, new Func<int>(this.FlingBirdUpdate), new Func<IEnumerator>(this.FlingBirdCoroutine), new Action(this.FlingBirdBegin), new Action(this.FlingBirdEnd));
-            this.StateMachine.SetCallbacks(25, (Func<int>) null, new Func<IEnumerator>(this.IntroThinkForABitCoroutine));
-            this.Add((Component) this.StateMachine);
-            this.Add((Component) (this.Leader = new Leader(new Vector2(0.0f, -8f))));
-            this.lastAim = Vector2.UnitX;
-            this.Facing = Facings.Right;
-            this.ChaserStates = new List<Player.ChaserState>();
-            this.triggersInside = new HashSet<Trigger>();
-            this.Add((Component) (this.Light = new VertexLight(this.normalLightOffset, Color.White, 1f, 32, 64)));
-            this.Add((Component) new WaterInteraction((Func<bool>) (() => this.StateMachine.State == 2 || this.StateMachine.State == 18)));
-            this.Add((Component) new WindMover(new Action<Vector2>(this.WindMove)));
-            this.Add((Component) (this.wallSlideSfx = new SoundSource()));
-            this.Add((Component) (this.swimSurfaceLoopSfx = new SoundSource()));
-            this.Sprite.OnFrameChange = (Action<string>) (anim =>
+            Sprite = new PlayerSprite(spriteMode);
+            Add(Hair = new PlayerHair(Sprite));
+            Add(Sprite);
+            Hair.Color = spriteMode != PlayerSpriteMode.MadelineAsBadeline ? Player.NormalHairColor : Player.NormalBadelineHairColor;
+            startHairCount = Sprite.HairCount;
+            sweatSprite = GFX.SpriteBank.Create("player_sweat");
+            Add(sweatSprite);
+            Collider = normalHitbox;
+            hurtbox = normalHurtbox;
+            onCollideH = new Collision(OnCollideH);
+            onCollideV = new Collision(OnCollideV);
+            StateMachine = new StateMachine(26);
+            StateMachine.SetCallbacks(0, new Func<int>(NormalUpdate), begin: new Action(NormalBegin), end: new Action(NormalEnd));
+            StateMachine.SetCallbacks(1, new Func<int>(ClimbUpdate), begin: new Action(ClimbBegin), end: new Action(ClimbEnd));
+            StateMachine.SetCallbacks(2, new Func<int>(DashUpdate), new Func<IEnumerator>(DashCoroutine), new Action(DashBegin), new Action(DashEnd));
+            StateMachine.SetCallbacks(3, new Func<int>(SwimUpdate), begin: new Action(SwimBegin));
+            StateMachine.SetCallbacks(4, new Func<int>(BoostUpdate), new Func<IEnumerator>(BoostCoroutine), new Action(BoostBegin), new Action(BoostEnd));
+            StateMachine.SetCallbacks(5, new Func<int>(RedDashUpdate), new Func<IEnumerator>(RedDashCoroutine), new Action(RedDashBegin), new Action(RedDashEnd));
+            StateMachine.SetCallbacks(6, new Func<int>(HitSquashUpdate), begin: new Action(HitSquashBegin));
+            StateMachine.SetCallbacks(7, new Func<int>(LaunchUpdate), begin: new Action(LaunchBegin));
+            StateMachine.SetCallbacks(8, null, new Func<IEnumerator>(PickupCoroutine));
+            StateMachine.SetCallbacks(9, new Func<int>(DreamDashUpdate), begin: new Action(DreamDashBegin), end: new Action(DreamDashEnd));
+            StateMachine.SetCallbacks(10, new Func<int>(SummitLaunchUpdate), begin: new Action(SummitLaunchBegin));
+            StateMachine.SetCallbacks(11, new Func<int>(DummyUpdate), begin: new Action(DummyBegin));
+            StateMachine.SetCallbacks(12, null, new Func<IEnumerator>(IntroWalkCoroutine));
+            StateMachine.SetCallbacks(13, null, new Func<IEnumerator>(IntroJumpCoroutine));
+            StateMachine.SetCallbacks(14, null, begin: new Action(IntroRespawnBegin), end: new Action(IntroRespawnEnd));
+            StateMachine.SetCallbacks(15, null, new Func<IEnumerator>(IntroWakeUpCoroutine));
+            StateMachine.SetCallbacks(20, new Func<int>(TempleFallUpdate), new Func<IEnumerator>(TempleFallCoroutine));
+            StateMachine.SetCallbacks(18, new Func<int>(ReflectionFallUpdate), new Func<IEnumerator>(ReflectionFallCoroutine), new Action(ReflectionFallBegin), new Action(ReflectionFallEnd));
+            StateMachine.SetCallbacks(16, new Func<int>(BirdDashTutorialUpdate), new Func<IEnumerator>(BirdDashTutorialCoroutine), new Action(BirdDashTutorialBegin));
+            StateMachine.SetCallbacks(17, new Func<int>(FrozenUpdate));
+            StateMachine.SetCallbacks(19, new Func<int>(StarFlyUpdate), new Func<IEnumerator>(StarFlyCoroutine), new Action(StarFlyBegin), new Action(StarFlyEnd));
+            StateMachine.SetCallbacks(21, new Func<int>(CassetteFlyUpdate), new Func<IEnumerator>(CassetteFlyCoroutine), new Action(CassetteFlyBegin), new Action(CassetteFlyEnd));
+            StateMachine.SetCallbacks(22, new Func<int>(AttractUpdate), begin: new Action(AttractBegin), end: new Action(AttractEnd));
+            StateMachine.SetCallbacks(23, null, new Func<IEnumerator>(IntroMoonJumpCoroutine));
+            StateMachine.SetCallbacks(24, new Func<int>(FlingBirdUpdate), new Func<IEnumerator>(FlingBirdCoroutine), new Action(FlingBirdBegin), new Action(FlingBirdEnd));
+            StateMachine.SetCallbacks(25, null, new Func<IEnumerator>(IntroThinkForABitCoroutine));
+            Add(StateMachine);
+            Add(Leader = new Leader(new Vector2(0.0f, -8f)));
+            lastAim = Vector2.UnitX;
+            Facing = Facings.Right;
+            ChaserStates = new List<ChaserState>();
+            triggersInside = new HashSet<Trigger>();
+            Add(Light = new VertexLight(normalLightOffset, Color.White, 1f, 32, 64));
+            Add(new WaterInteraction(() => StateMachine.State is 2 or 18));
+            Add(new WindMover(new Action<Vector2>(WindMove)));
+            Add(wallSlideSfx = new SoundSource());
+            Add(swimSurfaceLoopSfx = new SoundSource());
+            Sprite.OnFrameChange = anim =>
             {
-                if (this.Scene == null || this.Dead || !this.Sprite.Visible)
+                if (Scene == null || Dead || !Sprite.Visible)
                     return;
-                int currentAnimationFrame = this.Sprite.CurrentAnimationFrame;
-                if (anim.Equals("runSlow_carry") && (currentAnimationFrame == 0 || currentAnimationFrame == 6) || anim.Equals("runFast") && (currentAnimationFrame == 0 || currentAnimationFrame == 6) || anim.Equals("runSlow") && (currentAnimationFrame == 0 || currentAnimationFrame == 6) || anim.Equals("walk") && (currentAnimationFrame == 0 || currentAnimationFrame == 6) || anim.Equals("runStumble") && currentAnimationFrame == 6 || anim.Equals("flip") && currentAnimationFrame == 4 || anim.Equals("runWind") && (currentAnimationFrame == 0 || currentAnimationFrame == 6) || anim.Equals("idleC") && this.Sprite.Mode == PlayerSpriteMode.MadelineNoBackpack && (currentAnimationFrame == 3 || currentAnimationFrame == 6 || currentAnimationFrame == 8 || currentAnimationFrame == 11) || anim.Equals("carryTheoWalk") && (currentAnimationFrame == 0 || currentAnimationFrame == 6) || anim.Equals("push") && (currentAnimationFrame == 8 || currentAnimationFrame == 15))
+                int currentAnimationFrame = Sprite.CurrentAnimationFrame;
+                if (anim.Equals("runSlow_carry") && (currentAnimationFrame == 0 || currentAnimationFrame == 6) || anim.Equals("runFast") && (currentAnimationFrame == 0 || currentAnimationFrame == 6) || anim.Equals("runSlow") && (currentAnimationFrame == 0 || currentAnimationFrame == 6) || anim.Equals("walk") && (currentAnimationFrame == 0 || currentAnimationFrame == 6) || anim.Equals("runStumble") && currentAnimationFrame == 6 || anim.Equals("flip") && currentAnimationFrame == 4 || anim.Equals("runWind") && (currentAnimationFrame == 0 || currentAnimationFrame == 6) || anim.Equals("idleC") && Sprite.Mode == PlayerSpriteMode.MadelineNoBackpack && (currentAnimationFrame == 3 || currentAnimationFrame == 6 || currentAnimationFrame == 8 || currentAnimationFrame == 11) || anim.Equals("carryTheoWalk") && (currentAnimationFrame == 0 || currentAnimationFrame == 6) || anim.Equals("push") && (currentAnimationFrame == 8 || currentAnimationFrame == 15))
                 {
-                    Platform platformByPriority = SurfaceIndex.GetPlatformByPriority(this.CollideAll<Platform>(this.Position + Vector2.UnitY, this.temp));
+                    Platform platformByPriority = SurfaceIndex.GetPlatformByPriority(CollideAll<Platform>(Position + Vector2.UnitY, temp));
                     if (platformByPriority != null)
-                        this.Play("event:/char/madeline/footstep", "surface_index", (float) platformByPriority.GetStepSoundIndex((Entity) this));
+                        Play("event:/char/madeline/footstep", "surface_index", platformByPriority.GetStepSoundIndex(this));
                 }
                 else if (anim.Equals("climbUp") && currentAnimationFrame == 5 || anim.Equals("climbDown") && currentAnimationFrame == 5)
                 {
-                    Platform platformByPriority = SurfaceIndex.GetPlatformByPriority(this.CollideAll<Solid>(this.Center + Vector2.UnitX * (float) this.Facing, this.temp));
+                    Platform platformByPriority = SurfaceIndex.GetPlatformByPriority(CollideAll<Solid>(Center + Vector2.UnitX * (float)Facing, temp));
                     if (platformByPriority != null)
-                        this.Play("event:/char/madeline/handhold", "surface_index", (float) platformByPriority.GetWallSoundIndex(this, (int) this.Facing));
+                        Play("event:/char/madeline/handhold", "surface_index", platformByPriority.GetWallSoundIndex(this, (int)Facing));
                 }
                 else if (anim.Equals("wakeUp") && currentAnimationFrame == 19)
-                    this.Play("event:/char/madeline/campfire_stand");
+                    Play("event:/char/madeline/campfire_stand");
                 else if (anim.Equals("sitDown") && currentAnimationFrame == 12)
-                    this.Play("event:/char/madeline/summit_sit");
+                    Play("event:/char/madeline/summit_sit");
                 if (!anim.Equals("push") || currentAnimationFrame != 8 && currentAnimationFrame != 15)
                     return;
-                Dust.BurstFG(this.Position + new Vector2((float) (-(int) this.Facing * 5), -1f), new Vector2((float) -(int) this.Facing, -0.5f).Angle(), range: 0.0f);
-            });
-            this.Sprite.OnLastFrame = (Action<string>) (anim =>
+                Dust.BurstFG(Position + new Vector2(-(int)Facing * 5, -1f), new Vector2(-(int)Facing, -0.5f).Angle(), range: 0.0f);
+            };
+            Sprite.OnLastFrame = anim =>
             {
-                if (this.Scene == null || this.Dead || !(this.Sprite.CurrentAnimationID == "idle") || this.level.InCutscene || (double) this.idleTimer <= 3.0 || !Calc.Random.Chance(0.2f))
+                if (Scene == null || Dead || !(Sprite.CurrentAnimationID == "idle") || level.InCutscene || idleTimer <= 3.0 || !Calc.Random.Chance(0.2f))
                     return;
-                string id = this.Sprite.Mode != PlayerSpriteMode.Madeline ? Player.idleNoBackpackOptions.Choose() : (this.level.CoreMode == Session.CoreModes.Hot ? Player.idleWarmOptions : Player.idleColdOptions).Choose();
-                if (string.IsNullOrEmpty(id) || !this.Sprite.Has(id))
+                string id = Sprite.Mode != PlayerSpriteMode.Madeline ? Player.idleNoBackpackOptions.Choose() : (level.CoreMode == Session.CoreModes.Hot ? Player.idleWarmOptions : Player.idleColdOptions).Choose();
+                if (string.IsNullOrEmpty(id) || !Sprite.Has(id))
                     return;
-                this.Sprite.Play(id);
-                if (this.Sprite.Mode == PlayerSpriteMode.Madeline)
+                Sprite.Play(id);
+                if (Sprite.Mode == PlayerSpriteMode.Madeline)
                 {
                     if (id == "idleB")
                     {
-                        this.idleSfx = this.Play("event:/char/madeline/idle_scratch");
+                        idleSfx = Play("event:/char/madeline/idle_scratch");
                     }
                     else
                     {
                         if (!(id == "idleC"))
                             return;
-                        this.idleSfx = this.Play("event:/char/madeline/idle_sneeze");
+                        idleSfx = Play("event:/char/madeline/idle_sneeze");
                     }
                 }
                 else
                 {
                     if (!(id == "idleA"))
                         return;
-                    this.idleSfx = this.Play("event:/char/madeline/idle_crackknuckles");
+                    idleSfx = Play("event:/char/madeline/idle_crackknuckles");
                 }
-            });
-            this.Sprite.OnChange = (Action<string, string>) ((last, next) =>
+            };
+            Sprite.OnChange = (last, next) =>
             {
-                if (!(last == "idleB") && !(last == "idleC") || next == null || next.StartsWith("idle") || !((HandleBase) this.idleSfx != (HandleBase) null))
+                if (!(last == "idleB") && !(last == "idleC") || next == null || next.StartsWith("idle") || !(idleSfx != null))
                     return;
-                Audio.Stop(this.idleSfx);
-            });
-            this.Add((Component) (this.reflection = new MirrorReflection()));
+                Audio.Stop(idleSfx);
+            };
+            Add(reflection = new MirrorReflection());
         }
 
-        public void ResetSpriteNextFrame(PlayerSpriteMode mode) => this.nextSpriteMode = new PlayerSpriteMode?(mode);
+        public void ResetSpriteNextFrame(PlayerSpriteMode mode) => nextSpriteMode = new PlayerSpriteMode?(mode);
 
         public void ResetSprite(PlayerSpriteMode mode)
         {
-            string currentAnimationId = this.Sprite.CurrentAnimationID;
-            int currentAnimationFrame = this.Sprite.CurrentAnimationFrame;
-            this.Sprite.RemoveSelf();
-            this.Add((Component) (this.Sprite = new PlayerSprite(mode)));
-            if (this.Sprite.Has(currentAnimationId))
+            string currentAnimationId = Sprite.CurrentAnimationID;
+            int currentAnimationFrame = Sprite.CurrentAnimationFrame;
+            Sprite.RemoveSelf();
+            Add(Sprite = new PlayerSprite(mode));
+            if (Sprite.Has(currentAnimationId))
             {
-                this.Sprite.Play(currentAnimationId);
-                if (currentAnimationFrame < this.Sprite.CurrentAnimationTotalFrames)
-                    this.Sprite.SetAnimationFrame(currentAnimationFrame);
+                Sprite.Play(currentAnimationId);
+                if (currentAnimationFrame < Sprite.CurrentAnimationTotalFrames)
+                    Sprite.SetAnimationFrame(currentAnimationFrame);
             }
-            this.Hair.Sprite = this.Sprite;
+            Hair.Sprite = Sprite;
         }
 
         public override void Added(Scene scene)
         {
             base.Added(scene);
-            this.level = this.SceneAs<Level>();
-            this.lastDashes = this.Dashes = this.MaxDashes;
-            SpawnFacingTrigger spawnFacingTrigger = this.CollideFirst<SpawnFacingTrigger>();
+            level = SceneAs<Level>();
+            lastDashes = Dashes = MaxDashes;
+            SpawnFacingTrigger spawnFacingTrigger = CollideFirst<SpawnFacingTrigger>();
             if (spawnFacingTrigger != null)
-                this.Facing = spawnFacingTrigger.Facing;
-            else if ((double) this.X > (double) this.level.Bounds.Center.X && this.IntroType != Player.IntroTypes.None)
-                this.Facing = Facings.Left;
-            switch (this.IntroType)
+                Facing = spawnFacingTrigger.Facing;
+            else if ((double) X > level.Bounds.Center.X && IntroType != IntroTypes.None)
+                Facing = Facings.Left;
+            switch (IntroType)
             {
-                case Player.IntroTypes.Respawn:
-                    this.StateMachine.State = 14;
-                    this.JustRespawned = true;
+                case IntroTypes.Respawn:
+                    StateMachine.State = 14;
+                    JustRespawned = true;
                     break;
-                case Player.IntroTypes.WalkInRight:
-                    this.IntroWalkDirection = Facings.Right;
-                    this.StateMachine.State = 12;
+                case IntroTypes.WalkInRight:
+                    IntroWalkDirection = Facings.Right;
+                    StateMachine.State = 12;
                     break;
-                case Player.IntroTypes.WalkInLeft:
-                    this.IntroWalkDirection = Facings.Left;
-                    this.StateMachine.State = 12;
+                case IntroTypes.WalkInLeft:
+                    IntroWalkDirection = Facings.Left;
+                    StateMachine.State = 12;
                     break;
-                case Player.IntroTypes.Jump:
-                    this.StateMachine.State = 13;
+                case IntroTypes.Jump:
+                    StateMachine.State = 13;
                     break;
-                case Player.IntroTypes.WakeUp:
-                    this.Sprite.Play("asleep");
-                    this.Facing = Facings.Right;
-                    this.StateMachine.State = 15;
+                case IntroTypes.WakeUp:
+                    Sprite.Play("asleep");
+                    Facing = Facings.Right;
+                    StateMachine.State = 15;
                     break;
-                case Player.IntroTypes.Fall:
-                    this.StateMachine.State = 18;
+                case IntroTypes.Fall:
+                    StateMachine.State = 18;
                     break;
-                case Player.IntroTypes.TempleMirrorVoid:
-                    this.StartTempleMirrorVoidSleep();
+                case IntroTypes.TempleMirrorVoid:
+                    StartTempleMirrorVoidSleep();
                     break;
-                case Player.IntroTypes.None:
-                    this.StateMachine.State = 0;
+                case IntroTypes.None:
+                    StateMachine.State = 0;
                     break;
-                case Player.IntroTypes.ThinkForABit:
-                    this.StateMachine.State = 25;
+                case IntroTypes.ThinkForABit:
+                    StateMachine.State = 25;
                     break;
             }
-            this.IntroType = Player.IntroTypes.Transition;
-            this.StartHair();
-            this.PreviousPosition = this.Position;
+            IntroType = IntroTypes.Transition;
+            StartHair();
+            PreviousPosition = Position;
         }
 
         public void StartTempleMirrorVoidSleep()
         {
-            this.Sprite.Play("asleep");
-            this.Facing = Facings.Right;
-            this.StateMachine.State = 11;
-            this.StateMachine.Locked = true;
-            this.DummyAutoAnimate = false;
-            this.DummyGravity = false;
+            Sprite.Play("asleep");
+            Facing = Facings.Right;
+            StateMachine.State = 11;
+            StateMachine.Locked = true;
+            DummyAutoAnimate = false;
+            DummyGravity = false;
         }
 
         public override void Removed(Scene scene)
         {
             base.Removed(scene);
-            this.level = (Level) null;
-            Audio.Stop(this.conveyorLoopSfx);
-            foreach (Trigger trigger in this.triggersInside)
+            level = null;
+            Audio.Stop(conveyorLoopSfx);
+            foreach (Trigger trigger in triggersInside)
             {
                 trigger.Triggered = false;
                 trigger.OnLeave(this);
             }
-            this.triggersInside.Clear();
+            triggersInside.Clear();
         }
 
         public override void SceneEnd(Scene scene)
         {
             base.SceneEnd(scene);
-            Audio.Stop(this.conveyorLoopSfx);
+            Audio.Stop(conveyorLoopSfx);
         }
 
         public override void Render()
         {
-            if (SaveData.Instance.Assists.InvisibleMotion && this.InControl && (!this.onGround && this.StateMachine.State != 1 && this.StateMachine.State != 3 || (double) this.Speed.LengthSquared() > 800.0))
+            if (SaveData.Instance.Assists.InvisibleMotion && InControl && (!onGround && StateMachine.State != 1 && StateMachine.State != 3 || (double) Speed.LengthSquared() > 800.0))
                 return;
-            Vector2 renderPosition = this.Sprite.RenderPosition;
-            this.Sprite.RenderPosition = this.Sprite.RenderPosition.Floor();
-            if (this.StateMachine.State == 14)
+            Vector2 renderPosition = Sprite.RenderPosition;
+            Sprite.RenderPosition = Sprite.RenderPosition.Floor();
+            if (StateMachine.State == 14)
             {
-                DeathEffect.Draw(this.Center + this.deadOffset, this.Hair.Color, this.introEase);
+                DeathEffect.Draw(Center + deadOffset, Hair.Color, introEase);
             }
             else
             {
-                if (this.StateMachine.State != 19)
+                if (StateMachine.State != 19)
                 {
-                    if (this.IsTired && this.flash)
-                        this.Sprite.Color = Color.Red;
+                    if (IsTired && flash)
+                        Sprite.Color = Color.Red;
                     else
-                        this.Sprite.Color = Color.White;
+                        Sprite.Color = Color.White;
                 }
-                if (this.reflection.IsRendering && this.FlipInReflection)
+                if (reflection.IsRendering && FlipInReflection)
                 {
-                    this.Facing = (Facings) (-(int) this.Facing);
-                    this.Hair.Facing = this.Facing;
+                    Facing = (Facings) (-(int) Facing);
+                    Hair.Facing = Facing;
                 }
-                this.Sprite.Scale.X *= (float) this.Facing;
-                if (this.sweatSprite.LastAnimationID == "idle")
+                Sprite.Scale.X *= (float) Facing;
+                if (sweatSprite.LastAnimationID == "idle")
                 {
-                    this.sweatSprite.Scale = this.Sprite.Scale;
+                    sweatSprite.Scale = Sprite.Scale;
                 }
                 else
                 {
-                    this.sweatSprite.Scale.Y = this.Sprite.Scale.Y;
-                    this.sweatSprite.Scale.X = Math.Abs(this.Sprite.Scale.X) * (float) Math.Sign(this.sweatSprite.Scale.X);
+                    sweatSprite.Scale.Y = Sprite.Scale.Y;
+                    sweatSprite.Scale.X = Math.Abs(Sprite.Scale.X) * Math.Sign(sweatSprite.Scale.X);
                 }
                 base.Render();
-                if (this.Sprite.CurrentAnimationID == "startStarFly")
+                if (Sprite.CurrentAnimationID == "startStarFly")
                 {
-                    float num = (float) this.Sprite.CurrentAnimationFrame / (float) this.Sprite.CurrentAnimationTotalFrames;
-                    GFX.Game.GetAtlasSubtexturesAt("characters/player/startStarFlyWhite", this.Sprite.CurrentAnimationFrame).Draw(this.Sprite.RenderPosition, this.Sprite.Origin, this.starFlyColor * num, this.Sprite.Scale, this.Sprite.Rotation, SpriteEffects.None);
+                    float num = Sprite.CurrentAnimationFrame / (float) Sprite.CurrentAnimationTotalFrames;
+                    GFX.Game.GetAtlasSubtexturesAt("characters/player/startStarFlyWhite", Sprite.CurrentAnimationFrame).Draw(Sprite.RenderPosition, Sprite.Origin, starFlyColor * num, Sprite.Scale, Sprite.Rotation, SpriteEffects.None);
                 }
-                this.Sprite.Scale.X *= (float) this.Facing;
-                if (this.reflection.IsRendering && this.FlipInReflection)
+                Sprite.Scale.X *= (float) Facing;
+                if (reflection.IsRendering && FlipInReflection)
                 {
-                    this.Facing = (Facings) (-(int) this.Facing);
-                    this.Hair.Facing = this.Facing;
+                    Facing = (Facings) (-(int) Facing);
+                    Hair.Facing = Facing;
                 }
             }
-            this.Sprite.RenderPosition = renderPosition;
+            Sprite.RenderPosition = renderPosition;
         }
 
         public override void DebugRender(Camera camera)
         {
             base.DebugRender(camera);
-            Collider collider = this.Collider;
-            this.Collider = (Collider) this.hurtbox;
-            Draw.HollowRect(this.Collider, Color.Lime);
-            this.Collider = collider;
+            Collider collider = Collider;
+            Collider = hurtbox;
+            Draw.HollowRect(Collider, Color.Lime);
+            Collider = collider;
         }
 
         public override void Update()
         {
             if (SaveData.Instance.Assists.InfiniteStamina)
-                this.Stamina = 110f;
-            this.PreviousPosition = this.Position;
-            if (this.nextSpriteMode.HasValue)
+                Stamina = 110f;
+            PreviousPosition = Position;
+            if (nextSpriteMode.HasValue)
             {
-                this.ResetSprite(this.nextSpriteMode.Value);
-                this.nextSpriteMode = new PlayerSpriteMode?();
+                ResetSprite(nextSpriteMode.Value);
+                nextSpriteMode = new PlayerSpriteMode?();
             }
-            this.climbTriggerDir = 0;
+            climbTriggerDir = 0;
             if (SaveData.Instance.Assists.Hiccups)
             {
-                if ((double) this.hiccupTimer <= 0.0)
-                    this.hiccupTimer = this.level.HiccupRandom.Range(1.2f, 1.8f);
-                if (this.Ducking)
-                    this.hiccupTimer -= Engine.DeltaTime * 0.5f;
+                if (hiccupTimer <= 0.0)
+                    hiccupTimer = level.HiccupRandom.Range(1.2f, 1.8f);
+                if (Ducking)
+                    hiccupTimer -= Engine.DeltaTime * 0.5f;
                 else
-                    this.hiccupTimer -= Engine.DeltaTime;
-                if ((double) this.hiccupTimer <= 0.0)
-                    this.HiccupJump();
+                    hiccupTimer -= Engine.DeltaTime;
+                if (hiccupTimer <= 0.0)
+                    HiccupJump();
             }
-            if ((double) this.gliderBoostTimer > 0.0)
-                this.gliderBoostTimer -= Engine.DeltaTime;
-            if ((double) this.lowFrictionStopTimer > 0.0)
-                this.lowFrictionStopTimer -= Engine.DeltaTime;
-            if ((double) this.explodeLaunchBoostTimer > 0.0)
+            if (gliderBoostTimer > 0.0)
+                gliderBoostTimer -= Engine.DeltaTime;
+            if (lowFrictionStopTimer > 0.0)
+                lowFrictionStopTimer -= Engine.DeltaTime;
+            if (explodeLaunchBoostTimer > 0.0)
             {
-                if (Input.MoveX.Value == Math.Sign(this.explodeLaunchBoostSpeed))
+                if (Input.MoveX.Value == Math.Sign(explodeLaunchBoostSpeed))
                 {
-                    this.Speed.X = this.explodeLaunchBoostSpeed;
-                    this.explodeLaunchBoostTimer = 0.0f;
+                    Speed.X = explodeLaunchBoostSpeed;
+                    explodeLaunchBoostTimer = 0.0f;
                 }
                 else
-                    this.explodeLaunchBoostTimer -= Engine.DeltaTime;
+                    explodeLaunchBoostTimer -= Engine.DeltaTime;
             }
-            this.StrawberryCollectResetTimer -= Engine.DeltaTime;
-            if ((double) this.StrawberryCollectResetTimer <= 0.0)
-                this.StrawberryCollectIndex = 0;
-            this.idleTimer += Engine.DeltaTime;
-            if (this.level != null && this.level.InCutscene)
-                this.idleTimer = -5f;
-            else if ((double) this.Speed.X != 0.0 || (double) this.Speed.Y != 0.0)
-                this.idleTimer = 0.0f;
-            if (!this.Dead)
-                Audio.MusicUnderwater = this.UnderwaterMusicCheck();
-            if (this.JustRespawned && this.Speed != Vector2.Zero)
-                this.JustRespawned = false;
-            if (this.StateMachine.State == 9)
-                this.onGround = this.OnSafeGround = false;
-            else if ((double) this.Speed.Y >= 0.0)
+            StrawberryCollectResetTimer -= Engine.DeltaTime;
+            if (StrawberryCollectResetTimer <= 0.0)
+                StrawberryCollectIndex = 0;
+            idleTimer += Engine.DeltaTime;
+            if (level != null && level.InCutscene)
+                idleTimer = -5f;
+            else if (Speed.X != 0.0 || Speed.Y != 0.0)
+                idleTimer = 0.0f;
+            if (!Dead)
+                Audio.MusicUnderwater = UnderwaterMusicCheck();
+            if (JustRespawned && Speed != Vector2.Zero)
+                JustRespawned = false;
+            if (StateMachine.State == 9)
+                onGround = OnSafeGround = false;
+            else if (Speed.Y >= 0.0)
             {
-                Platform platform = (Platform) this.CollideFirst<Solid>(this.Position + Vector2.UnitY) ?? (Platform) this.CollideFirstOutside<JumpThru>(this.Position + Vector2.UnitY);
+                Platform platform = (Platform) CollideFirst<Solid>(Position + Vector2.UnitY) ?? CollideFirstOutside<JumpThru>(Position + Vector2.UnitY);
                 if (platform != null)
                 {
-                    this.onGround = true;
-                    this.OnSafeGround = platform.Safe;
+                    onGround = true;
+                    OnSafeGround = platform.Safe;
                 }
                 else
-                    this.onGround = this.OnSafeGround = false;
+                    onGround = OnSafeGround = false;
             }
             else
-                this.onGround = this.OnSafeGround = false;
-            if (this.StateMachine.State == 3)
-                this.OnSafeGround = true;
-            if (this.OnSafeGround)
+                onGround = OnSafeGround = false;
+            if (StateMachine.State == 3)
+                OnSafeGround = true;
+            if (OnSafeGround)
             {
-                foreach (SafeGroundBlocker component in this.Scene.Tracker.GetComponents<SafeGroundBlocker>())
+                foreach (SafeGroundBlocker component in Scene.Tracker.GetComponents<SafeGroundBlocker>())
                 {
                     if (component.Check(this))
                     {
-                        this.OnSafeGround = false;
+                        OnSafeGround = false;
                         break;
                     }
                 }
             }
-            this.playFootstepOnLand -= Engine.DeltaTime;
-            this.highestAirY = !this.onGround ? Math.Min(this.Y, this.highestAirY) : this.Y;
-            if (this.Scene.OnInterval(0.05f))
-                this.flash = !this.flash;
-            if (this.wallSlideDir != 0)
+            playFootstepOnLand -= Engine.DeltaTime;
+            highestAirY = !onGround ? Math.Min(Y, highestAirY) : Y;
+            if (Scene.OnInterval(0.05f))
+                flash = !flash;
+            if (wallSlideDir != 0)
             {
-                this.wallSlideTimer = Math.Max(this.wallSlideTimer - Engine.DeltaTime, 0.0f);
-                this.wallSlideDir = 0;
+                wallSlideTimer = Math.Max(wallSlideTimer - Engine.DeltaTime, 0.0f);
+                wallSlideDir = 0;
             }
-            if ((double) this.wallBoostTimer > 0.0)
+            if (wallBoostTimer > 0.0)
             {
-                this.wallBoostTimer -= Engine.DeltaTime;
-                if (this.moveX == this.wallBoostDir)
+                wallBoostTimer -= Engine.DeltaTime;
+                if (moveX == wallBoostDir)
                 {
-                    this.Speed.X = 130f * (float) this.moveX;
-                    this.Stamina += 27.5f;
-                    this.wallBoostTimer = 0.0f;
-                    this.sweatSprite.Play("idle");
+                    Speed.X = 130f * moveX;
+                    Stamina += 27.5f;
+                    wallBoostTimer = 0.0f;
+                    sweatSprite.Play("idle");
                 }
             }
-            if (this.onGround && this.StateMachine.State != 1)
+            if (onGround && StateMachine.State != 1)
             {
-                this.AutoJump = false;
-                this.Stamina = 110f;
-                this.wallSlideTimer = 1.2f;
+                AutoJump = false;
+                Stamina = 110f;
+                wallSlideTimer = 1.2f;
             }
-            if ((double) this.dashAttackTimer > 0.0)
-                this.dashAttackTimer -= Engine.DeltaTime;
-            if (this.onGround)
+            if (dashAttackTimer > 0.0)
+                dashAttackTimer -= Engine.DeltaTime;
+            if (onGround)
             {
-                this.dreamJump = false;
-                this.jumpGraceTimer = 0.1f;
+                dreamJump = false;
+                jumpGraceTimer = 0.1f;
             }
-            else if ((double) this.jumpGraceTimer > 0.0)
-                this.jumpGraceTimer -= Engine.DeltaTime;
-            if ((double) this.dashCooldownTimer > 0.0)
-                this.dashCooldownTimer -= Engine.DeltaTime;
-            if ((double) this.dashRefillCooldownTimer > 0.0)
-                this.dashRefillCooldownTimer -= Engine.DeltaTime;
-            else if (SaveData.Instance.Assists.DashMode == Assists.DashModes.Infinite && !this.level.InCutscene)
-                this.RefillDash();
-            else if (!this.Inventory.NoRefills)
+            else if (jumpGraceTimer > 0.0)
+                jumpGraceTimer -= Engine.DeltaTime;
+            if (dashCooldownTimer > 0.0)
+                dashCooldownTimer -= Engine.DeltaTime;
+            if (dashRefillCooldownTimer > 0.0)
+                dashRefillCooldownTimer -= Engine.DeltaTime;
+            else if (SaveData.Instance.Assists.DashMode == Assists.DashModes.Infinite && !level.InCutscene)
+                RefillDash();
+            else if (!Inventory.NoRefills)
             {
-                if (this.StateMachine.State == 3)
-                    this.RefillDash();
-                else if (this.onGround && (this.CollideCheck<Solid, NegaBlock>(this.Position + Vector2.UnitY) || this.CollideCheckOutside<JumpThru>(this.Position + Vector2.UnitY)) && (!this.CollideCheck<Spikes>(this.Position) || SaveData.Instance.Assists.Invincible))
-                    this.RefillDash();
+                if (StateMachine.State == 3)
+                    RefillDash();
+                else if (onGround && (CollideCheck<Solid, NegaBlock>(Position + Vector2.UnitY) || CollideCheckOutside<JumpThru>(Position + Vector2.UnitY)) && (!CollideCheck<Spikes>(Position) || SaveData.Instance.Assists.Invincible))
+                    RefillDash();
             }
-            if ((double) this.varJumpTimer > 0.0)
-                this.varJumpTimer -= Engine.DeltaTime;
-            if ((double) this.AutoJumpTimer > 0.0)
+            if (varJumpTimer > 0.0)
+                varJumpTimer -= Engine.DeltaTime;
+            if (AutoJumpTimer > 0.0)
             {
-                if (this.AutoJump)
+                if (AutoJump)
                 {
-                    this.AutoJumpTimer -= Engine.DeltaTime;
-                    if ((double) this.AutoJumpTimer <= 0.0)
-                        this.AutoJump = false;
+                    AutoJumpTimer -= Engine.DeltaTime;
+                    if (AutoJumpTimer <= 0.0)
+                        AutoJump = false;
                 }
                 else
-                    this.AutoJumpTimer = 0.0f;
+                    AutoJumpTimer = 0.0f;
             }
-            if ((double) this.forceMoveXTimer > 0.0)
+            if (forceMoveXTimer > 0.0)
             {
-                this.forceMoveXTimer -= Engine.DeltaTime;
-                this.moveX = this.forceMoveX;
+                forceMoveXTimer -= Engine.DeltaTime;
+                moveX = forceMoveX;
             }
             else
             {
-                this.moveX = Input.MoveX.Value;
-                this.climbHopSolid = (Solid) null;
+                moveX = Input.MoveX.Value;
+                climbHopSolid = null;
             }
-            if (this.climbHopSolid != null && !this.climbHopSolid.Collidable)
-                this.climbHopSolid = (Solid) null;
-            else if (this.climbHopSolid != null && this.climbHopSolid.Position != this.climbHopSolidPosition)
+            if (climbHopSolid != null && !climbHopSolid.Collidable)
+                climbHopSolid = null;
+            else if (climbHopSolid != null && climbHopSolid.Position != climbHopSolidPosition)
             {
-                Vector2 vector2 = this.climbHopSolid.Position - this.climbHopSolidPosition;
-                this.climbHopSolidPosition = this.climbHopSolid.Position;
-                this.MoveHExact((int) vector2.X);
-                this.MoveVExact((int) vector2.Y);
+                Vector2 vector2 = climbHopSolid.Position - climbHopSolidPosition;
+                climbHopSolidPosition = climbHopSolid.Position;
+                MoveHExact((int) vector2.X);
+                MoveVExact((int) vector2.Y);
             }
-            if ((double) this.noWindTimer > 0.0)
-                this.noWindTimer -= Engine.DeltaTime;
-            if (this.moveX != 0 && this.InControl && this.StateMachine.State != 1 && this.StateMachine.State != 8 && this.StateMachine.State != 5 && this.StateMachine.State != 6)
+            if (noWindTimer > 0.0)
+                noWindTimer -= Engine.DeltaTime;
+            if (moveX != 0 && InControl && StateMachine.State != 1 && StateMachine.State != 8 && StateMachine.State != 5 && StateMachine.State != 6)
             {
                 Facings moveX = (Facings) this.moveX;
-                if (moveX != this.Facing && this.Ducking)
-                    this.Sprite.Scale = new Vector2(0.8f, 1.2f);
-                this.Facing = moveX;
+                if (moveX != Facing && Ducking)
+                    Sprite.Scale = new Vector2(0.8f, 1.2f);
+                Facing = moveX;
             }
-            this.lastAim = Input.GetAimVector(this.Facing);
-            if ((double) this.wallSpeedRetentionTimer > 0.0)
+            lastAim = Input.GetAimVector(Facing);
+            if (wallSpeedRetentionTimer > 0.0)
             {
-                if (Math.Sign(this.Speed.X) == -Math.Sign(this.wallSpeedRetained))
-                    this.wallSpeedRetentionTimer = 0.0f;
-                else if (!this.CollideCheck<Solid>(this.Position + Vector2.UnitX * (float) Math.Sign(this.wallSpeedRetained)))
+                if (Math.Sign(Speed.X) == -Math.Sign(wallSpeedRetained))
+                    wallSpeedRetentionTimer = 0.0f;
+                else if (!CollideCheck<Solid>(Position + Vector2.UnitX * Math.Sign(wallSpeedRetained)))
                 {
-                    this.Speed.X = this.wallSpeedRetained;
-                    this.wallSpeedRetentionTimer = 0.0f;
+                    Speed.X = wallSpeedRetained;
+                    wallSpeedRetentionTimer = 0.0f;
                 }
                 else
-                    this.wallSpeedRetentionTimer -= Engine.DeltaTime;
+                    wallSpeedRetentionTimer -= Engine.DeltaTime;
             }
-            if (this.hopWaitX != 0)
+            if (hopWaitX != 0)
             {
-                if (Math.Sign(this.Speed.X) == -this.hopWaitX || (double) this.Speed.Y > 0.0)
-                    this.hopWaitX = 0;
-                else if (!this.CollideCheck<Solid>(this.Position + Vector2.UnitX * (float) this.hopWaitX))
+                if (Math.Sign(Speed.X) == -hopWaitX || Speed.Y > 0.0)
+                    hopWaitX = 0;
+                else if (!CollideCheck<Solid>(Position + Vector2.UnitX * hopWaitX))
                 {
-                    this.lowFrictionStopTimer = 0.15f;
-                    this.Speed.X = this.hopWaitXSpeed;
-                    this.hopWaitX = 0;
+                    lowFrictionStopTimer = 0.15f;
+                    Speed.X = hopWaitXSpeed;
+                    hopWaitX = 0;
                 }
             }
-            if ((double) this.windTimeout > 0.0)
-                this.windTimeout -= Engine.DeltaTime;
-            Vector2 vector2_1 = this.windDirection;
-            if ((double) this.ForceStrongWindHair.Length() > 0.0)
-                vector2_1 = this.ForceStrongWindHair;
-            if ((double) this.windTimeout > 0.0 && (double) vector2_1.X != 0.0)
+            if (windTimeout > 0.0)
+                windTimeout -= Engine.DeltaTime;
+            Vector2 vector2_1 = windDirection;
+            if ((double) ForceStrongWindHair.Length() > 0.0)
+                vector2_1 = ForceStrongWindHair;
+            if (windTimeout > 0.0 && vector2_1.X != 0.0)
             {
-                this.windHairTimer += Engine.DeltaTime * 8f;
-                this.Hair.StepPerSegment = new Vector2(vector2_1.X * 5f, (float) Math.Sin((double) this.windHairTimer));
-                this.Hair.StepInFacingPerSegment = 0.0f;
-                this.Hair.StepApproach = 128f;
-                this.Hair.StepYSinePerSegment = 0.0f;
+                windHairTimer += Engine.DeltaTime * 8f;
+                Hair.StepPerSegment = new Vector2(vector2_1.X * 5f, (float) Math.Sin(windHairTimer));
+                Hair.StepInFacingPerSegment = 0.0f;
+                Hair.StepApproach = 128f;
+                Hair.StepYSinePerSegment = 0.0f;
             }
-            else if (this.Dashes > 1)
+            else if (Dashes > 1)
             {
-                this.Hair.StepPerSegment = new Vector2((float) Math.Sin((double) this.Scene.TimeActive * 2.0) * 0.7f - (float) ((int) this.Facing * 3), (float) Math.Sin((double) this.Scene.TimeActive * 1.0));
-                this.Hair.StepInFacingPerSegment = 0.0f;
-                this.Hair.StepApproach = 90f;
-                this.Hair.StepYSinePerSegment = 1f;
-                this.Hair.StepPerSegment.Y += vector2_1.Y * 2f;
+                Hair.StepPerSegment = new Vector2((float) Math.Sin(Scene.TimeActive * 2.0) * 0.7f - (int)Facing * 3, (float) Math.Sin(Scene.TimeActive * 1.0));
+                Hair.StepInFacingPerSegment = 0.0f;
+                Hair.StepApproach = 90f;
+                Hair.StepYSinePerSegment = 1f;
+                Hair.StepPerSegment.Y += vector2_1.Y * 2f;
             }
             else
             {
-                this.Hair.StepPerSegment = new Vector2(0.0f, 2f);
-                this.Hair.StepInFacingPerSegment = 0.5f;
-                this.Hair.StepApproach = 64f;
-                this.Hair.StepYSinePerSegment = 0.0f;
-                this.Hair.StepPerSegment.Y += vector2_1.Y * 0.5f;
+                Hair.StepPerSegment = new Vector2(0.0f, 2f);
+                Hair.StepInFacingPerSegment = 0.5f;
+                Hair.StepApproach = 64f;
+                Hair.StepYSinePerSegment = 0.0f;
+                Hair.StepPerSegment.Y += vector2_1.Y * 0.5f;
             }
-            if (this.StateMachine.State == 5)
-                this.Sprite.HairCount = 1;
-            else if (this.StateMachine.State != 19)
-                this.Sprite.HairCount = this.Dashes > 1 ? 5 : this.startHairCount;
-            if ((double) this.minHoldTimer > 0.0)
-                this.minHoldTimer -= Engine.DeltaTime;
-            if (this.launched)
+            if (StateMachine.State == 5)
+                Sprite.HairCount = 1;
+            else if (StateMachine.State != 19)
+                Sprite.HairCount = Dashes > 1 ? 5 : startHairCount;
+            if (minHoldTimer > 0.0)
+                minHoldTimer -= Engine.DeltaTime;
+            if (launched)
             {
-                if ((double) this.Speed.LengthSquared() < 19600.0)
+                if ((double) Speed.LengthSquared() < 19600.0)
                 {
-                    this.launched = false;
+                    launched = false;
                 }
                 else
                 {
                     float launchedTimer = this.launchedTimer;
                     this.launchedTimer += Engine.DeltaTime;
-                    if ((double) this.launchedTimer >= 0.5)
+                    if (this.launchedTimer >= 0.5)
                     {
-                        this.launched = false;
+                        launched = false;
                         this.launchedTimer = 0.0f;
                     }
                     else if (Calc.OnInterval(this.launchedTimer, launchedTimer, 0.15f))
-                        this.level.Add((Entity) Engine.Pooler.Create<SpeedRing>().Init(this.Center, this.Speed.Angle(), Color.White));
+                        level.Add(Engine.Pooler.Create<SpeedRing>().Init(Center, Speed.Angle(), Color.White));
                 }
             }
             else
-                this.launchedTimer = 0.0f;
-            if (this.IsTired)
+                launchedTimer = 0.0f;
+            if (IsTired)
             {
                 Input.Rumble(RumbleStrength.Light, RumbleLength.Short);
-                if (!this.wasTired)
-                    this.wasTired = true;
+                if (!wasTired)
+                    wasTired = true;
             }
             else
-                this.wasTired = false;
+                wasTired = false;
             base.Update();
-            this.Light.Position = !this.Ducking ? this.normalLightOffset : this.duckingLightOffset;
-            if (!this.onGround && (double) this.Speed.Y <= 0.0 && (this.StateMachine.State != 1 || this.lastClimbMove == -1) && this.CollideCheck<JumpThru>() && !this.JumpThruBoostBlockedCheck())
-                this.MoveV(-40f * Engine.DeltaTime);
-            if (!this.onGround && this.DashAttacking && (double) this.DashDir.Y == 0.0 && (this.CollideCheck<Solid>(this.Position + Vector2.UnitY * 3f) || this.CollideCheckOutside<JumpThru>(this.Position + Vector2.UnitY * 3f)) && !this.DashCorrectCheck(Vector2.UnitY * 3f))
-                this.MoveVExact(3);
-            if ((double) this.Speed.Y > 0.0 && this.CanUnDuck && this.Collider != this.starFlyHitbox && !this.onGround && (double) this.jumpGraceTimer <= 0.0)
-                this.Ducking = false;
-            if (this.StateMachine.State != 9 && this.StateMachine.State != 22)
-                this.MoveH(this.Speed.X * Engine.DeltaTime, this.onCollideH);
-            if (this.StateMachine.State != 9 && this.StateMachine.State != 22)
-                this.MoveV(this.Speed.Y * Engine.DeltaTime, this.onCollideV);
-            if (this.StateMachine.State == 3)
+            Light.Position = !Ducking ? normalLightOffset : duckingLightOffset;
+            if (!onGround && Speed.Y <= 0.0 && (StateMachine.State != 1 || lastClimbMove == -1) && CollideCheck<JumpThru>() && !JumpThruBoostBlockedCheck())
+                MoveV(-40f * Engine.DeltaTime);
+            if (!onGround && DashAttacking && DashDir.Y == 0.0 && (CollideCheck<Solid>(Position + Vector2.UnitY * 3f) || CollideCheckOutside<JumpThru>(Position + Vector2.UnitY * 3f)) && !DashCorrectCheck(Vector2.UnitY * 3f))
+                MoveVExact(3);
+            if (Speed.Y > 0.0 && CanUnDuck && Collider != starFlyHitbox && !onGround && jumpGraceTimer <= 0.0)
+                Ducking = false;
+            if (StateMachine.State is not 9 and not 22)
+                MoveH(Speed.X * Engine.DeltaTime, onCollideH);
+            if (StateMachine.State is not 9 and not 22)
+                MoveV(Speed.Y * Engine.DeltaTime, onCollideV);
+            if (StateMachine.State == 3)
             {
-                if ((double) this.Speed.Y < 0.0 && (double) this.Speed.Y >= -60.0)
+                if ((double) Speed.Y is < 0.0 and >= (-60.0))
                 {
-                    while (!this.SwimCheck())
+                    while (!SwimCheck())
                     {
-                        this.Speed.Y = 0.0f;
-                        if (this.MoveVExact(1))
+                        Speed.Y = 0.0f;
+                        if (MoveVExact(1))
                             break;
                     }
                 }
             }
-            else if (this.StateMachine.State == 0 && this.SwimCheck())
-                this.StateMachine.State = 3;
-            else if (this.StateMachine.State == 1 && this.SwimCheck())
+            else if (StateMachine.State == 0 && SwimCheck())
+                StateMachine.State = 3;
+            else if (StateMachine.State == 1 && SwimCheck())
             {
-                Water water = this.CollideFirst<Water>(this.Position);
-                if (water != null && (double) this.Center.Y < (double) water.Center.Y)
+                Water water = CollideFirst<Water>(Position);
+                if (water != null && Center.Y < (double) water.Center.Y)
                 {
-                    while (this.SwimCheck() && !this.MoveVExact(-1));
-                    if (this.SwimCheck())
-                        this.StateMachine.State = 3;
+                    while (SwimCheck() && !MoveVExact(-1));
+                    if (SwimCheck())
+                        StateMachine.State = 3;
                 }
                 else
-                    this.StateMachine.State = 3;
+                    StateMachine.State = 3;
             }
-            if ((this.Sprite.CurrentAnimationID == null || !this.Sprite.CurrentAnimationID.Equals("wallslide") ? 0 : ((double) this.Speed.Y > 0.0 ? 1 : 0)) != 0)
+            if ((Sprite.CurrentAnimationID == null || !Sprite.CurrentAnimationID.Equals("wallslide") ? 0 : (Speed.Y > 0.0 ? 1 : 0)) != 0)
             {
-                if (!this.wallSlideSfx.Playing)
-                    this.Loop(this.wallSlideSfx, "event:/char/madeline/wallslide");
-                Platform platformByPriority = SurfaceIndex.GetPlatformByPriority(this.CollideAll<Solid>(this.Center + Vector2.UnitX * (float) this.Facing, this.temp));
+                if (!wallSlideSfx.Playing)
+                    Loop(wallSlideSfx, "event:/char/madeline/wallslide");
+                Platform platformByPriority = SurfaceIndex.GetPlatformByPriority(CollideAll<Solid>(Center + Vector2.UnitX * (float) Facing, temp));
                 if (platformByPriority != null)
-                    this.wallSlideSfx.Param("surface_index", (float) platformByPriority.GetWallSoundIndex(this, (int) this.Facing));
+                    wallSlideSfx.Param("surface_index", platformByPriority.GetWallSoundIndex(this, (int)Facing));
             }
             else
-                this.Stop(this.wallSlideSfx);
-            this.UpdateSprite();
-            this.UpdateCarry();
-            if (this.StateMachine.State != 18)
+                Stop(wallSlideSfx);
+            UpdateSprite();
+            UpdateCarry();
+            if (StateMachine.State != 18)
             {
-                foreach (Trigger entity in this.Scene.Tracker.GetEntities<Trigger>())
+                foreach (Trigger entity in Scene.Tracker.GetEntities<Trigger>())
                 {
-                    if (this.CollideCheck((Entity) entity))
+                    if (CollideCheck(entity))
                     {
                         if (!entity.Triggered)
                         {
                             entity.Triggered = true;
-                            this.triggersInside.Add(entity);
+                            triggersInside.Add(entity);
                             entity.OnEnter(this);
                         }
                         entity.OnStay(this);
                     }
                     else if (entity.Triggered)
                     {
-                        this.triggersInside.Remove(entity);
+                        triggersInside.Remove(entity);
                         entity.Triggered = false;
                         entity.OnLeave(this);
                     }
                 }
             }
-            this.StrawberriesBlocked = this.CollideCheck<BlockField>();
-            if (this.InControl || this.ForceCameraUpdate)
+            StrawberriesBlocked = CollideCheck<BlockField>();
+            if (InControl || ForceCameraUpdate)
             {
-                if (this.StateMachine.State == 18)
+                if (StateMachine.State == 18)
                 {
-                    this.level.Camera.Position = this.CameraTarget;
+                    level.Camera.Position = CameraTarget;
                 }
                 else
                 {
-                    Vector2 position = this.level.Camera.Position;
-                    Vector2 cameraTarget = this.CameraTarget;
-                    float num = this.StateMachine.State == 20 ? 8f : 1f;
-                    this.level.Camera.Position = position + (cameraTarget - position) * (1f - (float) Math.Pow(0.0099999997764825821 / (double) num, (double) Engine.DeltaTime));
+                    Vector2 position = level.Camera.Position;
+                    Vector2 cameraTarget = CameraTarget;
+                    float num = StateMachine.State == 20 ? 8f : 1f;
+                    level.Camera.Position = position + (cameraTarget - position) * (1f - (float) Math.Pow(0.0099999997764825821 / (double) num, (double) Engine.DeltaTime));
                 }
             }
-            if (!this.Dead && this.StateMachine.State != 21)
+            if (!Dead && StateMachine.State != 21)
             {
-                Collider collider = this.Collider;
-                this.Collider = (Collider) this.hurtbox;
-                foreach (PlayerCollider component in this.Scene.Tracker.GetComponents<PlayerCollider>())
+                Collider collider = Collider;
+                Collider = hurtbox;
+                foreach (PlayerCollider component in Scene.Tracker.GetComponents<PlayerCollider>())
                 {
-                    if (component.Check(this) && this.Dead)
+                    if (component.Check(this) && Dead)
                     {
-                        this.Collider = collider;
+                        Collider = collider;
                         return;
                     }
                 }
-                if (this.Collider == this.hurtbox)
-                    this.Collider = collider;
+                if (Collider == hurtbox)
+                    Collider = collider;
             }
-            if (this.InControl && !this.Dead && this.StateMachine.State != 9 && this.EnforceLevelBounds)
-                this.level.EnforceBounds(this);
-            this.UpdateChaserStates();
-            this.UpdateHair(true);
-            if (this.wasDucking != this.Ducking)
+            if (InControl && !Dead && StateMachine.State != 9 && EnforceLevelBounds)
+                level.EnforceBounds(this);
+            UpdateChaserStates();
+            UpdateHair(true);
+            if (wasDucking != Ducking)
             {
-                this.wasDucking = this.Ducking;
-                if (this.wasDucking)
-                    this.Play("event:/char/madeline/duck");
-                else if (this.onGround)
-                    this.Play("event:/char/madeline/stand");
+                wasDucking = Ducking;
+                if (wasDucking)
+                    Play("event:/char/madeline/duck");
+                else if (onGround)
+                    Play("event:/char/madeline/stand");
             }
-            if ((double) this.Speed.X != 0.0 && (this.StateMachine.State == 3 && !this.SwimUnderwaterCheck() || this.StateMachine.State == 0 && this.CollideCheck<Water>(this.Position)))
+            if (Speed.X != 0.0 && (StateMachine.State == 3 && !SwimUnderwaterCheck() || StateMachine.State == 0 && CollideCheck<Water>(Position)))
             {
-                if (!this.swimSurfaceLoopSfx.Playing)
-                    this.swimSurfaceLoopSfx.Play("event:/char/madeline/water_move_shallow");
+                if (!swimSurfaceLoopSfx.Playing)
+                    swimSurfaceLoopSfx.Play("event:/char/madeline/water_move_shallow");
             }
             else
-                this.swimSurfaceLoopSfx.Stop();
-            this.wasOnGround = this.onGround;
-            this.windMovedUp = false;
+                swimSurfaceLoopSfx.Stop();
+            wasOnGround = onGround;
+            windMovedUp = false;
         }
 
         private void CreateTrail()
         {
-            Vector2 scale = new Vector2(Math.Abs(this.Sprite.Scale.X) * (float) this.Facing, this.Sprite.Scale.Y);
-            if (this.Sprite.Mode == PlayerSpriteMode.MadelineAsBadeline)
-                TrailManager.Add((Entity) this, scale, this.wasDashB ? Player.NormalBadelineHairColor : Player.UsedBadelineHairColor);
+            Vector2 scale = new(Math.Abs(Sprite.Scale.X) * (float) Facing, Sprite.Scale.Y);
+            if (Sprite.Mode == PlayerSpriteMode.MadelineAsBadeline)
+                TrailManager.Add(this, scale, wasDashB ? Player.NormalBadelineHairColor : Player.UsedBadelineHairColor);
             else
-                TrailManager.Add((Entity) this, scale, this.wasDashB ? Player.NormalHairColor : Player.UsedHairColor);
+                TrailManager.Add(this, scale, wasDashB ? Player.NormalHairColor : UsedHairColor);
         }
 
         public void CleanUpTriggers()
         {
-            if (this.triggersInside.Count <= 0)
+            if (triggersInside.Count <= 0)
                 return;
-            foreach (Trigger trigger in this.triggersInside)
+            foreach (Trigger trigger in triggersInside)
             {
                 trigger.OnLeave(this);
                 trigger.Triggered = false;
             }
-            this.triggersInside.Clear();
+            triggersInside.Clear();
         }
 
         private void UpdateChaserStates()
         {
-            while (this.ChaserStates.Count > 0 && (double) this.Scene.TimeActive - (double) this.ChaserStates[0].TimeStamp > 4.0)
-                this.ChaserStates.RemoveAt(0);
-            this.ChaserStates.Add(new Player.ChaserState(this));
-            this.activeSounds.Clear();
+            while (ChaserStates.Count > 0 && Scene.TimeActive - (double) ChaserStates[0].TimeStamp > 4.0)
+                ChaserStates.RemoveAt(0);
+            ChaserStates.Add(new ChaserState(this));
+            activeSounds.Clear();
         }
 
         private void StartHair()
         {
-            if (this.startHairCalled)
+            if (startHairCalled)
                 return;
-            this.startHairCalled = true;
-            this.Hair.Facing = this.Facing;
-            this.Hair.Start();
-            this.UpdateHair(true);
+            startHairCalled = true;
+            Hair.Facing = Facing;
+            Hair.Start();
+            UpdateHair(true);
         }
 
         public void UpdateHair(bool applyGravity)
         {
-            if (this.StateMachine.State == 19)
+            if (StateMachine.State == 19)
             {
-                this.Hair.Color = this.Sprite.Color;
+                Hair.Color = Sprite.Color;
                 applyGravity = false;
             }
-            else if (this.Dashes == 0 && this.Dashes < this.MaxDashes)
+            else if (Dashes == 0 && Dashes < MaxDashes)
             {
-                this.Hair.Color = this.Sprite.Mode != PlayerSpriteMode.MadelineAsBadeline ? Color.Lerp(this.Hair.Color, Player.UsedHairColor, 6f * Engine.DeltaTime) : Color.Lerp(this.Hair.Color, Player.UsedBadelineHairColor, 6f * Engine.DeltaTime);
+                Hair.Color = Sprite.Mode != PlayerSpriteMode.MadelineAsBadeline ? Color.Lerp(Hair.Color, UsedHairColor, 6f * Engine.DeltaTime) : Color.Lerp(Hair.Color, Player.UsedBadelineHairColor, 6f * Engine.DeltaTime);
             }
             else
             {
                 Color color;
-                if (this.lastDashes != this.Dashes)
+                if (lastDashes != Dashes)
                 {
                     color = Player.FlashHairColor;
-                    this.hairFlashTimer = 0.12f;
+                    hairFlashTimer = 0.12f;
                 }
-                else if ((double) this.hairFlashTimer > 0.0)
+                else if (hairFlashTimer > 0.0)
                 {
                     color = Player.FlashHairColor;
-                    this.hairFlashTimer -= Engine.DeltaTime;
+                    hairFlashTimer -= Engine.DeltaTime;
                 }
                 else
-                    color = this.Sprite.Mode != PlayerSpriteMode.MadelineAsBadeline ? (this.Dashes != 2 ? Player.NormalHairColor : Player.TwoDashesHairColor) : (this.Dashes != 2 ? Player.NormalBadelineHairColor : Player.TwoDashesBadelineHairColor);
-                this.Hair.Color = color;
+                    color = Sprite.Mode != PlayerSpriteMode.MadelineAsBadeline ? (Dashes != 2 ? Player.NormalHairColor : TwoDashesHairColor) : (Dashes != 2 ? Player.NormalBadelineHairColor : Player.TwoDashesBadelineHairColor);
+                Hair.Color = color;
             }
-            if (this.OverrideHairColor.HasValue)
-                this.Hair.Color = this.OverrideHairColor.Value;
-            this.Hair.Facing = this.Facing;
-            this.Hair.SimulateMotion = applyGravity;
-            this.lastDashes = this.Dashes;
+            if (OverrideHairColor.HasValue)
+                Hair.Color = OverrideHairColor.Value;
+            Hair.Facing = Facing;
+            Hair.SimulateMotion = applyGravity;
+            lastDashes = Dashes;
         }
 
         private void UpdateSprite()
         {
-            this.Sprite.Scale.X = Calc.Approach(this.Sprite.Scale.X, 1f, 1.75f * Engine.DeltaTime);
-            this.Sprite.Scale.Y = Calc.Approach(this.Sprite.Scale.Y, 1f, 1.75f * Engine.DeltaTime);
-            if (this.InControl && this.Sprite.CurrentAnimationID != "throw" && this.StateMachine.State != 20 && this.StateMachine.State != 18 && this.StateMachine.State != 19 && this.StateMachine.State != 21)
+            Sprite.Scale.X = Calc.Approach(Sprite.Scale.X, 1f, 1.75f * Engine.DeltaTime);
+            Sprite.Scale.Y = Calc.Approach(Sprite.Scale.Y, 1f, 1.75f * Engine.DeltaTime);
+            if (InControl && Sprite.CurrentAnimationID != "throw" && StateMachine.State != 20 && StateMachine.State != 18 && StateMachine.State != 19 && StateMachine.State != 21)
             {
-                if (this.StateMachine.State == 22)
-                    this.Sprite.Play("fallFast");
-                else if (this.StateMachine.State == 10)
-                    this.Sprite.Play("launch");
-                else if (this.StateMachine.State == 8)
-                    this.Sprite.Play("pickup");
-                else if (this.StateMachine.State == 3)
+                if (StateMachine.State == 22)
+                    Sprite.Play("fallFast");
+                else if (StateMachine.State == 10)
+                    Sprite.Play("launch");
+                else if (StateMachine.State == 8)
+                    Sprite.Play("pickup");
+                else if (StateMachine.State == 3)
                 {
                     if (Input.MoveY.Value > 0)
-                        this.Sprite.Play("swimDown");
+                        Sprite.Play("swimDown");
                     else if (Input.MoveY.Value < 0)
-                        this.Sprite.Play("swimUp");
+                        Sprite.Play("swimUp");
                     else
-                        this.Sprite.Play("swimIdle");
+                        Sprite.Play("swimIdle");
                 }
-                else if (this.StateMachine.State == 9)
+                else if (StateMachine.State == 9)
                 {
-                    if (this.Sprite.CurrentAnimationID != "dreamDashIn" && this.Sprite.CurrentAnimationID != "dreamDashLoop")
-                        this.Sprite.Play("dreamDashIn");
+                    if (Sprite.CurrentAnimationID is not "dreamDashIn" and not "dreamDashLoop")
+                        Sprite.Play("dreamDashIn");
                 }
-                else if (this.Sprite.DreamDashing && this.Sprite.LastAnimationID != "dreamDashOut")
-                    this.Sprite.Play("dreamDashOut");
-                else if (this.Sprite.CurrentAnimationID != "dreamDashOut")
+                else if (Sprite.DreamDashing && Sprite.LastAnimationID != "dreamDashOut")
+                    Sprite.Play("dreamDashOut");
+                else if (Sprite.CurrentAnimationID != "dreamDashOut")
                 {
-                    if (this.DashAttacking)
+                    if (DashAttacking)
                     {
-                        if (this.onGround && (double) this.DashDir.Y == 0.0 && !this.Ducking && (double) this.Speed.X != 0.0 && this.moveX == -Math.Sign(this.Speed.X))
+                        if (onGround && DashDir.Y == 0.0 && !Ducking && Speed.X != 0.0 && moveX == -Math.Sign(Speed.X))
                         {
-                            if (this.Scene.OnInterval(0.02f))
-                                Dust.Burst(this.Position, -1.57079637f);
-                            this.Sprite.Play("skid");
+                            if (Scene.OnInterval(0.02f))
+                                Dust.Burst(Position, -1.57079637f);
+                            Sprite.Play("skid");
                         }
-                        else if (this.Ducking)
-                            this.Sprite.Play("duck");
+                        else if (Ducking)
+                            Sprite.Play("duck");
                         else
-                            this.Sprite.Play("dash");
+                            Sprite.Play("dash");
                     }
-                    else if (this.StateMachine.State == 1)
+                    else if (StateMachine.State == 1)
                     {
-                        if (this.lastClimbMove < 0)
-                            this.Sprite.Play("climbUp");
-                        else if (this.lastClimbMove > 0)
-                            this.Sprite.Play("wallslide");
-                        else if (!this.CollideCheck<Solid>(this.Position + new Vector2((float) this.Facing, 6f)))
-                            this.Sprite.Play("dangling");
-                        else if ((double) (float) Input.MoveX == (double) -(int) this.Facing)
+                        if (lastClimbMove < 0)
+                            Sprite.Play("climbUp");
+                        else if (lastClimbMove > 0)
+                            Sprite.Play("wallslide");
+                        else if (!CollideCheck<Solid>(Position + new Vector2((float) Facing, 6f)))
+                            Sprite.Play("dangling");
+                        else if ((double) (float) Input.MoveX == -(int)Facing)
                         {
-                            if (this.Sprite.CurrentAnimationID != "climbLookBack")
-                                this.Sprite.Play("climbLookBackStart");
+                            if (Sprite.CurrentAnimationID != "climbLookBack")
+                                Sprite.Play("climbLookBackStart");
                         }
                         else
-                            this.Sprite.Play("wallslide");
+                            Sprite.Play("wallslide");
                     }
-                    else if (this.Ducking && this.StateMachine.State == 0)
-                        this.Sprite.Play("duck");
-                    else if (this.onGround)
+                    else if (Ducking && StateMachine.State == 0)
+                        Sprite.Play("duck");
+                    else if (onGround)
                     {
-                        this.fastJump = false;
-                        if (this.Holding == null && this.moveX != 0 && this.CollideCheck<Solid>(this.Position + Vector2.UnitX * (float) this.moveX) && !ClimbBlocker.EdgeCheck((Scene) this.level, (Entity) this, this.moveX))
-                            this.Sprite.Play("push");
-                        else if ((double) Math.Abs(this.Speed.X) <= 25.0 && this.moveX == 0)
+                        fastJump = false;
+                        if (Holding == null && moveX != 0 && CollideCheck<Solid>(Position + Vector2.UnitX * moveX) && !ClimbBlocker.EdgeCheck(level, this, moveX))
+                            Sprite.Play("push");
+                        else if ((double) Math.Abs(Speed.X) <= 25.0 && moveX == 0)
                         {
-                            if (this.Holding != null)
-                                this.Sprite.Play("idle_carry");
-                            else if (!this.Scene.CollideCheck<Solid>(this.Position + new Vector2((float) this.Facing, 2f)) && !this.Scene.CollideCheck<Solid>(this.Position + new Vector2((float) ((int) this.Facing * 4), 2f)) && !this.CollideCheck<JumpThru>(this.Position + new Vector2((float) ((int) this.Facing * 4), 2f)))
-                                this.Sprite.Play("edge");
-                            else if (!this.Scene.CollideCheck<Solid>(this.Position + new Vector2((float) -(int) this.Facing, 2f)) && !this.Scene.CollideCheck<Solid>(this.Position + new Vector2((float) (-(int) this.Facing * 4), 2f)) && !this.CollideCheck<JumpThru>(this.Position + new Vector2((float) (-(int) this.Facing * 4), 2f)))
-                                this.Sprite.Play("edgeBack");
+                            if (Holding != null)
+                                Sprite.Play("idle_carry");
+                            else if (!Scene.CollideCheck<Solid>(Position + new Vector2((float) Facing, 2f)) && !Scene.CollideCheck<Solid>(Position + new Vector2((int)Facing * 4, 2f)) && !CollideCheck<JumpThru>(Position + new Vector2((int)Facing * 4, 2f)))
+                                Sprite.Play("edge");
+                            else if (!Scene.CollideCheck<Solid>(Position + new Vector2(-(int)Facing, 2f)) && !Scene.CollideCheck<Solid>(Position + new Vector2(-(int)Facing * 4, 2f)) && !CollideCheck<JumpThru>(Position + new Vector2(-(int)Facing * 4, 2f)))
+                                Sprite.Play("edgeBack");
                             else if (Input.MoveY.Value == -1)
                             {
-                                if (this.Sprite.LastAnimationID != "lookUp")
-                                    this.Sprite.Play("lookUp");
+                                if (Sprite.LastAnimationID != "lookUp")
+                                    Sprite.Play("lookUp");
                             }
-                            else if (this.Sprite.CurrentAnimationID != null && (!this.Sprite.CurrentAnimationID.Contains("idle") || this.Sprite.CurrentAnimationID == "idle_carry" && this.Holding == null))
-                                this.Sprite.Play("idle");
+                            else if (Sprite.CurrentAnimationID != null && (!Sprite.CurrentAnimationID.Contains("idle") || Sprite.CurrentAnimationID == "idle_carry" && Holding == null))
+                                Sprite.Play("idle");
                         }
-                        else if (this.Holding != null)
-                            this.Sprite.Play("runSlow_carry");
-                        else if (Math.Sign(this.Speed.X) == -this.moveX && this.moveX != 0)
+                        else if (Holding != null)
+                            Sprite.Play("runSlow_carry");
+                        else if (Math.Sign(Speed.X) == -moveX && moveX != 0)
                         {
-                            if ((double) Math.Abs(this.Speed.X) > 90.0)
-                                this.Sprite.Play("skid");
-                            else if (this.Sprite.CurrentAnimationID != "skid")
-                                this.Sprite.Play("flip");
+                            if ((double) Math.Abs(Speed.X) > 90.0)
+                                Sprite.Play("skid");
+                            else if (Sprite.CurrentAnimationID != "skid")
+                                Sprite.Play("flip");
                         }
-                        else if ((double) this.windDirection.X != 0.0 && (double) this.windTimeout > 0.0 && this.Facing == (Facings) (-Math.Sign(this.windDirection.X)))
-                            this.Sprite.Play("runWind");
-                        else if (!this.Sprite.Running || this.Sprite.CurrentAnimationID == "runWind" || this.Sprite.CurrentAnimationID == "runSlow_carry" && this.Holding == null)
+                        else if (windDirection.X != 0.0 && windTimeout > 0.0 && Facing == (Facings) (-Math.Sign(windDirection.X)))
+                            Sprite.Play("runWind");
+                        else if (!Sprite.Running || Sprite.CurrentAnimationID == "runWind" || Sprite.CurrentAnimationID == "runSlow_carry" && Holding == null)
                         {
-                            if ((double) Math.Abs(this.Speed.X) < 45.0)
-                                this.Sprite.Play("runSlow");
+                            if ((double) Math.Abs(Speed.X) < 45.0)
+                                Sprite.Play("runSlow");
                             else
-                                this.Sprite.Play("runFast");
+                                Sprite.Play("runFast");
                         }
                     }
-                    else if (this.wallSlideDir != 0 && this.Holding == null)
-                        this.Sprite.Play("wallslide");
-                    else if ((double) this.Speed.Y < 0.0)
+                    else if (wallSlideDir != 0 && Holding == null)
+                        Sprite.Play("wallslide");
+                    else if (Speed.Y < 0.0)
                     {
-                        if (this.Holding != null)
-                            this.Sprite.Play("jumpSlow_carry");
-                        else if (this.fastJump || (double) Math.Abs(this.Speed.X) > 90.0)
+                        if (Holding != null)
+                            Sprite.Play("jumpSlow_carry");
+                        else if (fastJump || (double) Math.Abs(Speed.X) > 90.0)
                         {
-                            this.fastJump = true;
-                            this.Sprite.Play("jumpFast");
+                            fastJump = true;
+                            Sprite.Play("jumpFast");
                         }
                         else
-                            this.Sprite.Play("jumpSlow");
+                            Sprite.Play("jumpSlow");
                     }
-                    else if (this.Holding != null)
-                        this.Sprite.Play("fallSlow_carry");
-                    else if (this.fastJump || (double) this.Speed.Y >= 160.0 || this.level.InSpace)
+                    else if (Holding != null)
+                        Sprite.Play("fallSlow_carry");
+                    else if (fastJump || Speed.Y >= 160.0 || level.InSpace)
                     {
-                        this.fastJump = true;
-                        if (this.Sprite.LastAnimationID != "fallFast")
-                            this.Sprite.Play("fallFast");
+                        fastJump = true;
+                        if (Sprite.LastAnimationID != "fallFast")
+                            Sprite.Play("fallFast");
                     }
                     else
-                        this.Sprite.Play("fallSlow");
+                        Sprite.Play("fallSlow");
                 }
             }
-            if (this.StateMachine.State == 11)
+            if (StateMachine.State == 11)
                 return;
-            if (this.level.InSpace)
-                this.Sprite.Rate = 0.5f;
+            if (level.InSpace)
+                Sprite.Rate = 0.5f;
             else
-                this.Sprite.Rate = 1f;
+                Sprite.Rate = 1f;
         }
 
-        public void CreateSplitParticles() => this.level.Particles.Emit(Player.P_Split, 16, this.Center, Vector2.One * 6f);
+        public void CreateSplitParticles() => level.Particles.Emit(Player.P_Split, 16, Center, Vector2.One * 6f);
 
         public Vector2 CameraTarget
         {
             get
             {
-                Vector2 cameraTarget = new Vector2();
-                Vector2 vector2 = new Vector2(this.X - 160f, this.Y - 90f);
-                if (this.StateMachine.State != 18)
-                    vector2 += new Vector2(this.level.CameraOffset.X, this.level.CameraOffset.Y);
-                if (this.StateMachine.State == 19)
+                Vector2 cameraTarget = new();
+                Vector2 vector2 = new(X - 160f, Y - 90f);
+                if (StateMachine.State != 18)
+                    vector2 += new Vector2(level.CameraOffset.X, level.CameraOffset.Y);
+                if (StateMachine.State == 19)
                 {
-                    vector2.X += 0.2f * this.Speed.X;
-                    vector2.Y += 0.2f * this.Speed.Y;
+                    vector2.X += 0.2f * Speed.X;
+                    vector2.Y += 0.2f * Speed.Y;
                 }
-                else if (this.StateMachine.State == 5)
+                else if (StateMachine.State == 5)
                 {
-                    vector2.X += (float) (48 * Math.Sign(this.Speed.X));
-                    vector2.Y += (float) (48 * Math.Sign(this.Speed.Y));
+                    vector2.X += 48 * Math.Sign(Speed.X);
+                    vector2.Y += 48 * Math.Sign(Speed.Y);
                 }
-                else if (this.StateMachine.State == 10)
+                else if (StateMachine.State == 10)
                     vector2.Y -= 64f;
-                else if (this.StateMachine.State == 18)
+                else if (StateMachine.State == 18)
                     vector2.Y += 32f;
-                if ((double) this.CameraAnchorLerp.Length() > 0.0)
+                if ((double) CameraAnchorLerp.Length() > 0.0)
                 {
-                    if (this.CameraAnchorIgnoreX && !this.CameraAnchorIgnoreY)
-                        vector2.Y = MathHelper.Lerp(vector2.Y, this.CameraAnchor.Y, this.CameraAnchorLerp.Y);
-                    else if (!this.CameraAnchorIgnoreX && this.CameraAnchorIgnoreY)
-                        vector2.X = MathHelper.Lerp(vector2.X, this.CameraAnchor.X, this.CameraAnchorLerp.X);
-                    else if ((double) this.CameraAnchorLerp.X == (double) this.CameraAnchorLerp.Y)
+                    if (CameraAnchorIgnoreX && !CameraAnchorIgnoreY)
+                        vector2.Y = MathHelper.Lerp(vector2.Y, CameraAnchor.Y, CameraAnchorLerp.Y);
+                    else if (!CameraAnchorIgnoreX && CameraAnchorIgnoreY)
+                        vector2.X = MathHelper.Lerp(vector2.X, CameraAnchor.X, CameraAnchorLerp.X);
+                    else if (CameraAnchorLerp.X == (double) CameraAnchorLerp.Y)
                     {
-                        vector2 = Vector2.Lerp(vector2, this.CameraAnchor, this.CameraAnchorLerp.X);
+                        vector2 = Vector2.Lerp(vector2, CameraAnchor, CameraAnchorLerp.X);
                     }
                     else
                     {
-                        vector2.X = MathHelper.Lerp(vector2.X, this.CameraAnchor.X, this.CameraAnchorLerp.X);
-                        vector2.Y = MathHelper.Lerp(vector2.Y, this.CameraAnchor.Y, this.CameraAnchorLerp.Y);
+                        vector2.X = MathHelper.Lerp(vector2.X, CameraAnchor.X, CameraAnchorLerp.X);
+                        vector2.Y = MathHelper.Lerp(vector2.Y, CameraAnchor.Y, CameraAnchorLerp.Y);
                     }
                 }
                 Rectangle bounds;
-                if (this.EnforceLevelBounds)
+                if (EnforceLevelBounds)
                 {
-                    cameraTarget.X = MathHelper.Clamp(vector2.X, (float) this.level.Bounds.Left, (float) (this.level.Bounds.Right - 320));
+                    cameraTarget.X = MathHelper.Clamp(vector2.X, level.Bounds.Left, level.Bounds.Right - 320);
                     ref Vector2 local = ref cameraTarget;
-                    double y = (double) vector2.Y;
-                    bounds = this.level.Bounds;
-                    double top = (double) bounds.Top;
-                    bounds = this.level.Bounds;
-                    double max = (double) (bounds.Bottom - 180);
+                    double y = vector2.Y;
+                    bounds = level.Bounds;
+                    double top = bounds.Top;
+                    bounds = level.Bounds;
+                    double max = bounds.Bottom - 180;
                     double num = (double) MathHelper.Clamp((float) y, (float) top, (float) max);
                     local.Y = (float) num;
                 }
                 else
                     cameraTarget = vector2;
-                if (this.level.CameraLockMode != Level.CameraLockModes.None)
+                if (level.CameraLockMode != Level.CameraLockModes.None)
                 {
-                    CameraLocker component = this.Scene.Tracker.GetComponent<CameraLocker>();
-                    if (this.level.CameraLockMode != Level.CameraLockModes.BoostSequence)
+                    CameraLocker component = Scene.Tracker.GetComponent<CameraLocker>();
+                    if (level.CameraLockMode != Level.CameraLockModes.BoostSequence)
                     {
-                        cameraTarget.X = Math.Max(cameraTarget.X, this.level.Camera.X);
+                        cameraTarget.X = Math.Max(cameraTarget.X, level.Camera.X);
                         if (component != null)
                         {
                             ref Vector2 local = ref cameraTarget;
-                            double x = (double) cameraTarget.X;
-                            bounds = this.level.Bounds;
-                            double val2 = (double) Math.Max((float) bounds.Left, component.Entity.X - component.MaxXOffset);
+                            double x = cameraTarget.X;
+                            bounds = level.Bounds;
+                            double val2 = (double) Math.Max(bounds.Left, component.Entity.X - component.MaxXOffset);
                             double num = (double) Math.Min((float) x, (float) val2);
                             local.X = (float) num;
                         }
                     }
-                    if (this.level.CameraLockMode == Level.CameraLockModes.FinalBoss)
+                    if (level.CameraLockMode == Level.CameraLockModes.FinalBoss)
                     {
-                        cameraTarget.Y = Math.Max(cameraTarget.Y, this.level.Camera.Y);
+                        cameraTarget.Y = Math.Max(cameraTarget.Y, level.Camera.Y);
                         if (component != null)
                         {
                             ref Vector2 local = ref cameraTarget;
-                            double y = (double) cameraTarget.Y;
-                            bounds = this.level.Bounds;
-                            double val2 = (double) Math.Max((float) bounds.Top, component.Entity.Y - component.MaxYOffset);
+                            double y = cameraTarget.Y;
+                            bounds = level.Bounds;
+                            double val2 = (double) Math.Max(bounds.Top, component.Entity.Y - component.MaxYOffset);
                             double num = (double) Math.Min((float) y, (float) val2);
                             local.Y = (float) num;
                         }
                     }
-                    else if (this.level.CameraLockMode == Level.CameraLockModes.BoostSequence)
+                    else if (level.CameraLockMode == Level.CameraLockModes.BoostSequence)
                     {
-                        this.level.CameraUpwardMaxY = Math.Min(this.level.Camera.Y + 180f, this.level.CameraUpwardMaxY);
-                        cameraTarget.Y = Math.Min(cameraTarget.Y, this.level.CameraUpwardMaxY);
+                        level.CameraUpwardMaxY = Math.Min(level.Camera.Y + 180f, level.CameraUpwardMaxY);
+                        cameraTarget.Y = Math.Min(cameraTarget.Y, level.CameraUpwardMaxY);
                         if (component != null)
                         {
                             ref Vector2 local = ref cameraTarget;
-                            double y = (double) cameraTarget.Y;
-                            bounds = this.level.Bounds;
-                            double val2 = (double) Math.Min((float) (bounds.Bottom - 180), component.Entity.Y - component.MaxYOffset);
+                            double y = cameraTarget.Y;
+                            bounds = level.Bounds;
+                            double val2 = (double) Math.Min(bounds.Bottom - 180, component.Entity.Y - component.MaxYOffset);
                             double num = (double) Math.Max((float) y, (float) val2);
                             local.Y = (float) num;
                         }
                     }
                 }
-                foreach (Entity entity in this.Scene.Tracker.GetEntities<Killbox>())
+                foreach (Entity entity in Scene.Tracker.GetEntities<Killbox>())
                 {
-                    if (entity.Collidable && (double) this.Top < (double) entity.Bottom && (double) this.Right > (double) entity.Left && (double) this.Left < (double) entity.Right)
+                    if (entity.Collidable && (double) Top < (double) entity.Bottom && (double) Right > (double) entity.Left && (double) Left < (double) entity.Right)
                         cameraTarget.Y = Math.Min(cameraTarget.Y, entity.Top - 180f);
                 }
                 return cameraTarget;
             }
         }
 
-        public bool GetChasePosition(float sceneTime, float timeAgo, out Player.ChaserState chaseState)
+        public bool GetChasePosition(float sceneTime, float timeAgo, out ChaserState chaseState)
         {
-            if (!this.Dead)
+            if (!Dead)
             {
                 bool flag = false;
-                foreach (Player.ChaserState chaserState in this.ChaserStates)
+                foreach (ChaserState chaserState in ChaserStates)
                 {
                     float num = sceneTime - chaserState.TimeStamp;
                     if ((double) num <= (double) timeAgo)
@@ -1347,13 +1347,13 @@ namespace Celeste
                             chaseState = chaserState;
                             return true;
                         }
-                        chaseState = new Player.ChaserState();
+                        chaseState = new ChaserState();
                         return false;
                     }
                     flag = true;
                 }
             }
-            chaseState = new Player.ChaserState();
+            chaseState = new ChaserState();
             return false;
         }
 
@@ -1361,18 +1361,11 @@ namespace Celeste
         {
             get
             {
-                switch (this.StateMachine.State)
+                return StateMachine.State switch
                 {
-                    case 12:
-                    case 13:
-                    case 14:
-                    case 15:
-                    case 18:
-                    case 25:
-                        return false;
-                    default:
-                        return true;
-                }
+                    12 or 13 or 14 or 15 or 18 or 25 => false,
+                    _ => true,
+                };
             }
         }
 
@@ -1380,20 +1373,13 @@ namespace Celeste
         {
             get
             {
-                if (this.Dead)
+                if (Dead)
                     return true;
-                switch (this.StateMachine.State)
+                return StateMachine.State switch
                 {
-                    case 10:
-                    case 12:
-                    case 13:
-                    case 14:
-                    case 15:
-                    case 25:
-                        return true;
-                    default:
-                        return false;
-                }
+                    10 or 12 or 13 or 14 or 15 or 25 => true,
+                    _ => false,
+                };
             }
         }
 
@@ -1401,49 +1387,39 @@ namespace Celeste
         {
             get
             {
-                switch (this.StateMachine.State)
+                return StateMachine.State switch
                 {
-                    case 11:
-                    case 12:
-                    case 13:
-                    case 14:
-                    case 15:
-                    case 16:
-                    case 17:
-                    case 23:
-                    case 25:
-                        return false;
-                    default:
-                        return true;
-                }
+                    11 or 12 or 13 or 14 or 15 or 16 or 17 or 23 or 25 => false,
+                    _ => true,
+                };
             }
         }
 
-        public PlayerInventory Inventory => this.level != null && this.level.Session != null ? this.level.Session.Inventory : PlayerInventory.Default;
+        public PlayerInventory Inventory => level != null && level.Session != null ? level.Session.Inventory : PlayerInventory.Default;
 
         public void OnTransition()
         {
-            this.wallSlideTimer = 1.2f;
-            this.jumpGraceTimer = 0.0f;
-            this.forceMoveXTimer = 0.0f;
-            this.ChaserStates.Clear();
-            this.RefillDash();
-            this.RefillStamina();
-            this.Leader.TransferFollowers();
+            wallSlideTimer = 1.2f;
+            jumpGraceTimer = 0.0f;
+            forceMoveXTimer = 0.0f;
+            ChaserStates.Clear();
+            RefillDash();
+            RefillStamina();
+            Leader.TransferFollowers();
         }
 
         public bool TransitionTo(Vector2 target, Vector2 direction)
         {
-            this.MoveTowardsX(target.X, 60f * Engine.DeltaTime);
-            this.MoveTowardsY(target.Y, 60f * Engine.DeltaTime);
-            this.UpdateHair(false);
-            this.UpdateCarry();
-            if (!(this.Position == target))
+            MoveTowardsX(target.X, 60f * Engine.DeltaTime);
+            MoveTowardsY(target.Y, 60f * Engine.DeltaTime);
+            UpdateHair(false);
+            UpdateCarry();
+            if (!(Position == target))
                 return false;
-            this.ZeroRemainderX();
-            this.ZeroRemainderY();
-            this.Speed.X = (float) (int) Math.Round((double) this.Speed.X);
-            this.Speed.Y = (float) (int) Math.Round((double) this.Speed.Y);
+            ZeroRemainderX();
+            ZeroRemainderY();
+            Speed.X = (int)Math.Round(Speed.X);
+            Speed.Y = (int)Math.Round(Speed.Y);
             return true;
         }
 
@@ -1453,70 +1429,70 @@ namespace Celeste
 
         public void BeforeDownTransition()
         {
-            if (this.StateMachine.State != 5 && this.StateMachine.State != 18 && this.StateMachine.State != 19)
+            if (StateMachine.State is not 5 and not 18 and not 19)
             {
-                this.StateMachine.State = 0;
-                this.Speed.Y = Math.Max(0.0f, this.Speed.Y);
-                this.AutoJump = false;
-                this.varJumpTimer = 0.0f;
+                StateMachine.State = 0;
+                Speed.Y = Math.Max(0.0f, Speed.Y);
+                AutoJump = false;
+                varJumpTimer = 0.0f;
             }
-            foreach (Entity entity in this.Scene.Tracker.GetEntities<Platform>())
+            foreach (Entity entity in Scene.Tracker.GetEntities<Platform>())
             {
-                if (!(entity is SolidTiles) && this.CollideCheckOutside(entity, this.Position + Vector2.UnitY * this.Height))
+                if (entity is not SolidTiles && CollideCheckOutside(entity, Position + Vector2.UnitY * Height))
                     entity.Collidable = false;
             }
         }
 
         public void BeforeUpTransition()
         {
-            this.Speed.X = 0.0f;
-            if (this.StateMachine.State != 5 && this.StateMachine.State != 18 && this.StateMachine.State != 19)
+            Speed.X = 0.0f;
+            if (StateMachine.State is not 5 and not 18 and not 19)
             {
-                this.varJumpSpeed = this.Speed.Y = -105f;
-                this.StateMachine.State = this.StateMachine.State != 10 ? 0 : 13;
-                this.AutoJump = true;
-                this.AutoJumpTimer = 0.0f;
-                this.varJumpTimer = 0.2f;
+                varJumpSpeed = Speed.Y = -105f;
+                StateMachine.State = StateMachine.State != 10 ? 0 : 13;
+                AutoJump = true;
+                AutoJumpTimer = 0.0f;
+                varJumpTimer = 0.2f;
             }
-            this.dashCooldownTimer = 0.2f;
+            dashCooldownTimer = 0.2f;
         }
 
         public bool OnSafeGround { get; private set; }
 
-        public bool LoseShards => this.onGround;
+        public bool LoseShards => onGround;
 
         private bool LaunchedBoostCheck()
         {
-            if ((double) this.LiftBoost.LengthSquared() >= 10000.0 && (double) this.Speed.LengthSquared() >= 48400.0)
+            if ((double) LiftBoost.LengthSquared() >= 10000.0 && (double) Speed.LengthSquared() >= 48400.0)
             {
-                this.launched = true;
+                launched = true;
                 return true;
             }
-            this.launched = false;
+            launched = false;
             return false;
         }
 
         public void HiccupJump()
         {
-            switch (this.StateMachine.State)
+            switch (StateMachine.State)
             {
                 case 1:
-                    this.StateMachine.State = 0;
-                    this.varJumpSpeed = this.Speed.Y = -60f;
-                    this.varJumpTimer = 0.15f;
-                    this.Speed.X = 130f * (float) -(int) this.Facing;
-                    this.AutoJump = true;
-                    this.AutoJumpTimer = 0.0f;
-                    this.sweatSprite.Play("jump", true);
+                    StateMachine.State = 0;
+                    varJumpSpeed = Speed.Y = -60f;
+                    varJumpTimer = 0.15f;
+                    Speed.X = 130f * -(int)Facing;
+                    AutoJump = true;
+                    AutoJumpTimer = 0.0f;
+                    sweatSprite.Play("jump", true);
                     break;
                 case 4:
                 case 7:
                 case 22:
-                    this.sweatSprite.Play("jump", true);
+                    sweatSprite.Play("jump", true);
                     break;
                 case 5:
                 case 9:
-                    this.Speed = (double) this.Speed.X < 0.0 || (double) this.Speed.X == 0.0 && (double) this.Speed.Y < 0.0 ? this.Speed.Rotate(0.17453292f) : this.Speed.Rotate(-0.17453292f);
+                    Speed = Speed.X < 0.0 || Speed.X == 0.0 && Speed.Y < 0.0 ? Speed.Rotate(0.17453292f) : Speed.Rotate(-0.17453292f);
                     break;
                 case 10:
                     return;
@@ -1537,63 +1513,63 @@ namespace Celeste
                 case 18:
                     return;
                 case 19:
-                    this.Speed = (double) this.Speed.X <= 0.0 ? this.Speed.Rotate(-0.6981317f) : this.Speed.Rotate(0.6981317f);
+                    Speed = Speed.X <= 0.0 ? Speed.Rotate(-0.6981317f) : Speed.Rotate(0.6981317f);
                     break;
                 case 21:
                     return;
                 case 24:
                     return;
                 default:
-                    this.StateMachine.State = 0;
-                    this.Speed.X = Calc.Approach(this.Speed.X, 0.0f, 40f);
-                    if ((double) this.Speed.Y > -60.0)
+                    StateMachine.State = 0;
+                    Speed.X = Calc.Approach(Speed.X, 0.0f, 40f);
+                    if (Speed.Y > -60.0)
                     {
-                        this.varJumpSpeed = this.Speed.Y = -60f;
-                        this.varJumpTimer = 0.15f;
-                        this.AutoJump = true;
-                        this.AutoJumpTimer = 0.0f;
-                        if ((double) this.jumpGraceTimer > 0.0)
-                            this.jumpGraceTimer = 0.6f;
+                        varJumpSpeed = Speed.Y = -60f;
+                        varJumpTimer = 0.15f;
+                        AutoJump = true;
+                        AutoJumpTimer = 0.0f;
+                        if (jumpGraceTimer > 0.0)
+                            jumpGraceTimer = 0.6f;
                     }
-                    this.sweatSprite.Play("jump", true);
+                    sweatSprite.Play("jump", true);
                     break;
             }
             Input.Rumble(RumbleStrength.Strong, RumbleLength.Short);
-            this.Play(this.Ducking ? "event:/new_content/char/madeline/hiccup_ducking" : "event:/new_content/char/madeline/hiccup_standing");
+            Play(Ducking ? "event:/new_content/char/madeline/hiccup_ducking" : "event:/new_content/char/madeline/hiccup_standing");
         }
 
         public void Jump(bool particles = true, bool playSfx = true)
         {
             Input.Jump.ConsumeBuffer();
-            this.jumpGraceTimer = 0.0f;
-            this.varJumpTimer = 0.2f;
-            this.AutoJump = false;
-            this.dashAttackTimer = 0.0f;
-            this.gliderBoostTimer = 0.0f;
-            this.wallSlideTimer = 1.2f;
-            this.wallBoostTimer = 0.0f;
-            this.Speed.X += 40f * (float) this.moveX;
-            this.Speed.Y = -105f;
-            this.Speed += this.LiftBoost;
-            this.varJumpSpeed = this.Speed.Y;
-            this.LaunchedBoostCheck();
+            jumpGraceTimer = 0.0f;
+            varJumpTimer = 0.2f;
+            AutoJump = false;
+            dashAttackTimer = 0.0f;
+            gliderBoostTimer = 0.0f;
+            wallSlideTimer = 1.2f;
+            wallBoostTimer = 0.0f;
+            Speed.X += 40f * moveX;
+            Speed.Y = -105f;
+            Speed += LiftBoost;
+            varJumpSpeed = Speed.Y;
+            LaunchedBoostCheck();
             if (playSfx)
             {
-                if (this.launched)
-                    this.Play("event:/char/madeline/jump_assisted");
-                if (this.dreamJump)
-                    this.Play("event:/char/madeline/jump_dreamblock");
+                if (launched)
+                    Play("event:/char/madeline/jump_assisted");
+                if (dreamJump)
+                    Play("event:/char/madeline/jump_dreamblock");
                 else
-                    this.Play("event:/char/madeline/jump");
+                    Play("event:/char/madeline/jump");
             }
-            this.Sprite.Scale = new Vector2(0.6f, 1.4f);
+            Sprite.Scale = new Vector2(0.6f, 1.4f);
             if (particles)
             {
                 int index = -1;
-                Platform platformByPriority = SurfaceIndex.GetPlatformByPriority(this.CollideAll<Platform>(this.Position + Vector2.UnitY, this.temp));
+                Platform platformByPriority = SurfaceIndex.GetPlatformByPriority(CollideAll<Platform>(Position + Vector2.UnitY, temp));
                 if (platformByPriority != null)
-                    index = platformByPriority.GetLandSoundIndex((Entity) this);
-                Dust.Burst(this.BottomCenter, -1.57079637f, 4, this.DustParticleFromSurfaceIndex(index));
+                    index = platformByPriority.GetLandSoundIndex(this);
+                Dust.Burst(BottomCenter, -1.57079637f, 4, DustParticleFromSurfaceIndex(index));
             }
             ++SaveData.Instance.TotalJumps;
         }
@@ -1601,52 +1577,52 @@ namespace Celeste
         private void SuperJump()
         {
             Input.Jump.ConsumeBuffer();
-            this.jumpGraceTimer = 0.0f;
-            this.varJumpTimer = 0.2f;
-            this.AutoJump = false;
-            this.dashAttackTimer = 0.0f;
-            this.gliderBoostTimer = 0.0f;
-            this.wallSlideTimer = 1.2f;
-            this.wallBoostTimer = 0.0f;
-            this.Speed.X = 260f * (float) this.Facing;
-            this.Speed.Y = -105f;
-            this.Speed += this.LiftBoost;
-            this.gliderBoostTimer = 0.55f;
-            this.Play("event:/char/madeline/jump");
-            if (this.Ducking)
+            jumpGraceTimer = 0.0f;
+            varJumpTimer = 0.2f;
+            AutoJump = false;
+            dashAttackTimer = 0.0f;
+            gliderBoostTimer = 0.0f;
+            wallSlideTimer = 1.2f;
+            wallBoostTimer = 0.0f;
+            Speed.X = 260f * (float) Facing;
+            Speed.Y = -105f;
+            Speed += LiftBoost;
+            gliderBoostTimer = 0.55f;
+            Play("event:/char/madeline/jump");
+            if (Ducking)
             {
-                this.Ducking = false;
-                this.Speed.X *= 1.25f;
-                this.Speed.Y *= 0.5f;
-                this.Play("event:/char/madeline/jump_superslide");
-                this.gliderBoostDir = Calc.AngleToVector(-3f * (float) Math.PI / 16f, 1f);
+                Ducking = false;
+                Speed.X *= 1.25f;
+                Speed.Y *= 0.5f;
+                Play("event:/char/madeline/jump_superslide");
+                gliderBoostDir = Calc.AngleToVector(-3f * (float) Math.PI / 16f, 1f);
             }
             else
             {
-                this.gliderBoostDir = Calc.AngleToVector(-0.7853982f, 1f);
-                this.Play("event:/char/madeline/jump_super");
+                gliderBoostDir = Calc.AngleToVector(-0.7853982f, 1f);
+                Play("event:/char/madeline/jump_super");
             }
-            this.varJumpSpeed = this.Speed.Y;
-            this.launched = true;
-            this.Sprite.Scale = new Vector2(0.6f, 1.4f);
+            varJumpSpeed = Speed.Y;
+            launched = true;
+            Sprite.Scale = new Vector2(0.6f, 1.4f);
             int index = -1;
-            Platform platformByPriority = SurfaceIndex.GetPlatformByPriority(this.CollideAll<Platform>(this.Position + Vector2.UnitY, this.temp));
+            Platform platformByPriority = SurfaceIndex.GetPlatformByPriority(CollideAll<Platform>(Position + Vector2.UnitY, temp));
             if (platformByPriority != null)
-                index = platformByPriority.GetLandSoundIndex((Entity) this);
-            Dust.Burst(this.BottomCenter, -1.57079637f, 4, this.DustParticleFromSurfaceIndex(index));
+                index = platformByPriority.GetLandSoundIndex(this);
+            Dust.Burst(BottomCenter, -1.57079637f, 4, DustParticleFromSurfaceIndex(index));
             ++SaveData.Instance.TotalJumps;
         }
 
         private bool WallJumpCheck(int dir)
         {
             int num = 3;
-            bool flag = this.DashAttacking && (double) this.DashDir.X == 0.0 && (double) this.DashDir.Y == -1.0;
+            bool flag = DashAttacking && DashDir.X == 0.0 && DashDir.Y == -1.0;
             if (flag)
             {
                 Spikes.Directions directions = dir <= 0 ? Spikes.Directions.Right : Spikes.Directions.Left;
-                foreach (Spikes entity in this.level.Tracker.GetEntities<Spikes>())
+                foreach (Spikes entity in level.Tracker.GetEntities<Spikes>())
                 {
-                    if (entity.Direction == directions && this.CollideCheck((Entity) entity, this.Position + Vector2.UnitX * (float) dir * 5f))
+                    if (entity.Direction == directions && CollideCheck(entity, Position + Vector2.UnitX * dir * 5f))
                     {
                         flag = false;
                         break;
@@ -1655,323 +1631,322 @@ namespace Celeste
             }
             if (flag)
                 num = 5;
-            return this.ClimbBoundsCheck(dir) && !ClimbBlocker.EdgeCheck((Scene) this.level, (Entity) this, dir * num) && this.CollideCheck<Solid>(this.Position + Vector2.UnitX * (float) dir * (float) num);
+            return ClimbBoundsCheck(dir) && !ClimbBlocker.EdgeCheck(level, this, dir * num) && CollideCheck<Solid>(Position + Vector2.UnitX * dir * num);
         }
 
         private void WallJump(int dir)
         {
-            this.Ducking = false;
+            Ducking = false;
             Input.Jump.ConsumeBuffer();
-            this.jumpGraceTimer = 0.0f;
-            this.varJumpTimer = 0.2f;
-            this.AutoJump = false;
-            this.dashAttackTimer = 0.0f;
-            this.gliderBoostTimer = 0.0f;
-            this.wallSlideTimer = 1.2f;
-            this.wallBoostTimer = 0.0f;
-            this.lowFrictionStopTimer = 0.15f;
-            if (this.Holding != null && this.Holding.SlowFall)
+            jumpGraceTimer = 0.0f;
+            varJumpTimer = 0.2f;
+            AutoJump = false;
+            dashAttackTimer = 0.0f;
+            gliderBoostTimer = 0.0f;
+            wallSlideTimer = 1.2f;
+            wallBoostTimer = 0.0f;
+            lowFrictionStopTimer = 0.15f;
+            if (Holding != null && Holding.SlowFall)
             {
-                this.forceMoveX = dir;
-                this.forceMoveXTimer = 0.26f;
+                forceMoveX = dir;
+                forceMoveXTimer = 0.26f;
             }
-            else if (this.moveX != 0)
+            else if (moveX != 0)
             {
-                this.forceMoveX = dir;
-                this.forceMoveXTimer = 0.16f;
+                forceMoveX = dir;
+                forceMoveXTimer = 0.16f;
             }
-            if (this.LiftSpeed == Vector2.Zero)
+            if (LiftSpeed == Vector2.Zero)
             {
-                Solid solid = this.CollideFirst<Solid>(this.Position + Vector2.UnitX * 3f * (float) -dir);
+                Solid solid = CollideFirst<Solid>(Position + Vector2.UnitX * 3f * -dir);
                 if (solid != null)
-                    this.LiftSpeed = solid.LiftSpeed;
+                    LiftSpeed = solid.LiftSpeed;
             }
-            this.Speed.X = 130f * (float) dir;
-            this.Speed.Y = -105f;
-            this.Speed += this.LiftBoost;
-            this.varJumpSpeed = this.Speed.Y;
-            this.LaunchedBoostCheck();
+            Speed.X = 130f * dir;
+            Speed.Y = -105f;
+            Speed += LiftBoost;
+            varJumpSpeed = Speed.Y;
+            LaunchedBoostCheck();
             int index = -1;
-            Platform platformByPriority = SurfaceIndex.GetPlatformByPriority(this.CollideAll<Platform>(this.Position - Vector2.UnitX * (float) dir * 4f, this.temp));
+            Platform platformByPriority = SurfaceIndex.GetPlatformByPriority(CollideAll<Platform>(Position - Vector2.UnitX * dir * 4f, temp));
             if (platformByPriority != null)
             {
                 index = platformByPriority.GetWallSoundIndex(this, -dir);
-                this.Play("event:/char/madeline/landing", "surface_index", (float) index);
+                Play("event:/char/madeline/landing", "surface_index", index);
                 if (platformByPriority is DreamBlock)
-                    (platformByPriority as DreamBlock).FootstepRipple(this.Position + new Vector2((float) (dir * 3), -4f));
+                    (platformByPriority as DreamBlock).FootstepRipple(Position + new Vector2(dir * 3, -4f));
             }
-            this.Play(dir < 0 ? "event:/char/madeline/jump_wall_right" : "event:/char/madeline/jump_wall_left");
-            this.Sprite.Scale = new Vector2(0.6f, 1.4f);
+            Play(dir < 0 ? "event:/char/madeline/jump_wall_right" : "event:/char/madeline/jump_wall_left");
+            Sprite.Scale = new Vector2(0.6f, 1.4f);
             if (dir == -1)
-                Dust.Burst(this.Center + Vector2.UnitX * 2f, -2.3561945f, 4, this.DustParticleFromSurfaceIndex(index));
+                Dust.Burst(Center + Vector2.UnitX * 2f, -2.3561945f, 4, DustParticleFromSurfaceIndex(index));
             else
-                Dust.Burst(this.Center + Vector2.UnitX * -2f, -0.7853982f, 4, this.DustParticleFromSurfaceIndex(index));
+                Dust.Burst(Center + Vector2.UnitX * -2f, -0.7853982f, 4, DustParticleFromSurfaceIndex(index));
             ++SaveData.Instance.TotalWallJumps;
         }
 
         private void SuperWallJump(int dir)
         {
-            this.Ducking = false;
+            Ducking = false;
             Input.Jump.ConsumeBuffer();
-            this.jumpGraceTimer = 0.0f;
-            this.varJumpTimer = 0.25f;
-            this.AutoJump = false;
-            this.dashAttackTimer = 0.0f;
-            this.gliderBoostTimer = 0.55f;
-            this.gliderBoostDir = -Vector2.UnitY;
-            this.wallSlideTimer = 1.2f;
-            this.wallBoostTimer = 0.0f;
-            this.Speed.X = 170f * (float) dir;
-            this.Speed.Y = -160f;
-            this.Speed += this.LiftBoost;
-            this.varJumpSpeed = this.Speed.Y;
-            this.launched = true;
-            this.Play(dir < 0 ? "event:/char/madeline/jump_wall_right" : "event:/char/madeline/jump_wall_left");
-            this.Play("event:/char/madeline/jump_superwall");
-            this.Sprite.Scale = new Vector2(0.6f, 1.4f);
+            jumpGraceTimer = 0.0f;
+            varJumpTimer = 0.25f;
+            AutoJump = false;
+            dashAttackTimer = 0.0f;
+            gliderBoostTimer = 0.55f;
+            gliderBoostDir = -Vector2.UnitY;
+            wallSlideTimer = 1.2f;
+            wallBoostTimer = 0.0f;
+            Speed.X = 170f * dir;
+            Speed.Y = -160f;
+            Speed += LiftBoost;
+            varJumpSpeed = Speed.Y;
+            launched = true;
+            Play(dir < 0 ? "event:/char/madeline/jump_wall_right" : "event:/char/madeline/jump_wall_left");
+            Play("event:/char/madeline/jump_superwall");
+            Sprite.Scale = new Vector2(0.6f, 1.4f);
             int index = -1;
-            Platform platformByPriority = SurfaceIndex.GetPlatformByPriority(this.CollideAll<Platform>(this.Position - Vector2.UnitX * (float) dir * 4f, this.temp));
+            Platform platformByPriority = SurfaceIndex.GetPlatformByPriority(CollideAll<Platform>(Position - Vector2.UnitX * dir * 4f, temp));
             if (platformByPriority != null)
                 index = platformByPriority.GetWallSoundIndex(this, dir);
             if (dir == -1)
-                Dust.Burst(this.Center + Vector2.UnitX * 2f, -2.3561945f, 4, this.DustParticleFromSurfaceIndex(index));
+                Dust.Burst(Center + Vector2.UnitX * 2f, -2.3561945f, 4, DustParticleFromSurfaceIndex(index));
             else
-                Dust.Burst(this.Center + Vector2.UnitX * -2f, -0.7853982f, 4, this.DustParticleFromSurfaceIndex(index));
+                Dust.Burst(Center + Vector2.UnitX * -2f, -0.7853982f, 4, DustParticleFromSurfaceIndex(index));
             ++SaveData.Instance.TotalWallJumps;
         }
 
         private void ClimbJump()
         {
-            if (!this.onGround)
+            if (!onGround)
             {
-                this.Stamina -= 27.5f;
-                this.sweatSprite.Play("jump", true);
+                Stamina -= 27.5f;
+                sweatSprite.Play("jump", true);
                 Input.Rumble(RumbleStrength.Light, RumbleLength.Medium);
             }
-            this.dreamJump = false;
-            this.Jump(false, false);
-            if (this.moveX == 0)
+            dreamJump = false;
+            Jump(false, false);
+            if (moveX == 0)
             {
-                this.wallBoostDir = -(int) this.Facing;
-                this.wallBoostTimer = 0.2f;
+                wallBoostDir = -(int) Facing;
+                wallBoostTimer = 0.2f;
             }
             int index = -1;
-            Platform platformByPriority = SurfaceIndex.GetPlatformByPriority(this.CollideAll<Platform>(this.Position - Vector2.UnitX * (float) this.Facing * 4f, this.temp));
+            Platform platformByPriority = SurfaceIndex.GetPlatformByPriority(CollideAll<Platform>(Position - Vector2.UnitX * (float) Facing * 4f, temp));
             if (platformByPriority != null)
-                index = platformByPriority.GetWallSoundIndex(this, (int) this.Facing);
-            if (this.Facing == Facings.Right)
+                index = platformByPriority.GetWallSoundIndex(this, (int) Facing);
+            if (Facing == Facings.Right)
             {
-                this.Play("event:/char/madeline/jump_climb_right");
-                Dust.Burst(this.Center + Vector2.UnitX * 2f, -2.3561945f, 4, this.DustParticleFromSurfaceIndex(index));
+                Play("event:/char/madeline/jump_climb_right");
+                Dust.Burst(Center + Vector2.UnitX * 2f, -2.3561945f, 4, DustParticleFromSurfaceIndex(index));
             }
             else
             {
-                this.Play("event:/char/madeline/jump_climb_left");
-                Dust.Burst(this.Center + Vector2.UnitX * -2f, -0.7853982f, 4, this.DustParticleFromSurfaceIndex(index));
+                Play("event:/char/madeline/jump_climb_left");
+                Dust.Burst(Center + Vector2.UnitX * -2f, -0.7853982f, 4, DustParticleFromSurfaceIndex(index));
             }
         }
 
         public void Bounce(float fromY)
         {
-            if (this.StateMachine.State == 4 && this.CurrentBooster != null)
+            if (StateMachine.State == 4 && CurrentBooster != null)
             {
-                this.CurrentBooster.PlayerReleased();
-                this.CurrentBooster = (Booster) null;
+                CurrentBooster.PlayerReleased();
+                CurrentBooster = null;
             }
-            Collider collider = this.Collider;
-            this.Collider = (Collider) this.normalHitbox;
-            this.MoveVExact((int) ((double) fromY - (double) this.Bottom));
-            if (!this.Inventory.NoRefills)
-                this.RefillDash();
-            this.RefillStamina();
-            this.StateMachine.State = 0;
-            this.jumpGraceTimer = 0.0f;
-            this.varJumpTimer = 0.2f;
-            this.AutoJump = true;
-            this.AutoJumpTimer = 0.1f;
-            this.dashAttackTimer = 0.0f;
-            this.gliderBoostTimer = 0.0f;
-            this.wallSlideTimer = 1.2f;
-            this.wallBoostTimer = 0.0f;
-            this.varJumpSpeed = this.Speed.Y = -140f;
-            this.launched = false;
+            Collider collider = Collider;
+            Collider = normalHitbox;
+            MoveVExact((int) ((double) fromY - (double) Bottom));
+            if (!Inventory.NoRefills)
+                RefillDash();
+            RefillStamina();
+            StateMachine.State = 0;
+            jumpGraceTimer = 0.0f;
+            varJumpTimer = 0.2f;
+            AutoJump = true;
+            AutoJumpTimer = 0.1f;
+            dashAttackTimer = 0.0f;
+            gliderBoostTimer = 0.0f;
+            wallSlideTimer = 1.2f;
+            wallBoostTimer = 0.0f;
+            varJumpSpeed = Speed.Y = -140f;
+            launched = false;
             Input.Rumble(RumbleStrength.Light, RumbleLength.Medium);
-            this.Sprite.Scale = new Vector2(0.6f, 1.4f);
-            this.Collider = collider;
+            Sprite.Scale = new Vector2(0.6f, 1.4f);
+            Collider = collider;
         }
 
         public void SuperBounce(float fromY)
         {
-            if (this.StateMachine.State == 4 && this.CurrentBooster != null)
+            if (StateMachine.State == 4 && CurrentBooster != null)
             {
-                this.CurrentBooster.PlayerReleased();
-                this.CurrentBooster = (Booster) null;
+                CurrentBooster.PlayerReleased();
+                CurrentBooster = null;
             }
-            Collider collider = this.Collider;
-            this.Collider = (Collider) this.normalHitbox;
-            this.MoveV(fromY - this.Bottom);
-            if (!this.Inventory.NoRefills)
-                this.RefillDash();
-            this.RefillStamina();
-            this.StateMachine.State = 0;
-            this.jumpGraceTimer = 0.0f;
-            this.varJumpTimer = 0.2f;
-            this.AutoJump = true;
-            this.AutoJumpTimer = 0.0f;
-            this.dashAttackTimer = 0.0f;
-            this.gliderBoostTimer = 0.0f;
-            this.wallSlideTimer = 1.2f;
-            this.wallBoostTimer = 0.0f;
-            this.Speed.X = 0.0f;
-            this.varJumpSpeed = this.Speed.Y = -185f;
-            this.launched = false;
-            this.level.DirectionalShake(-Vector2.UnitY, 0.1f);
+            Collider collider = Collider;
+            Collider = normalHitbox;
+            MoveV(fromY - Bottom);
+            if (!Inventory.NoRefills)
+                RefillDash();
+            RefillStamina();
+            StateMachine.State = 0;
+            jumpGraceTimer = 0.0f;
+            varJumpTimer = 0.2f;
+            AutoJump = true;
+            AutoJumpTimer = 0.0f;
+            dashAttackTimer = 0.0f;
+            gliderBoostTimer = 0.0f;
+            wallSlideTimer = 1.2f;
+            wallBoostTimer = 0.0f;
+            Speed.X = 0.0f;
+            varJumpSpeed = Speed.Y = -185f;
+            launched = false;
+            level.DirectionalShake(-Vector2.UnitY, 0.1f);
             Input.Rumble(RumbleStrength.Medium, RumbleLength.Medium);
-            this.Sprite.Scale = new Vector2(0.5f, 1.5f);
-            this.Collider = collider;
+            Sprite.Scale = new Vector2(0.5f, 1.5f);
+            Collider = collider;
         }
 
         public bool SideBounce(int dir, float fromX, float fromY)
         {
-            if ((double) Math.Abs(this.Speed.X) > 240.0 && Math.Sign(this.Speed.X) == dir)
+            if ((double) Math.Abs(Speed.X) > 240.0 && Math.Sign(Speed.X) == dir)
                 return false;
-            Collider collider = this.Collider;
-            this.Collider = (Collider) this.normalHitbox;
-            this.MoveV(Calc.Clamp(fromY - this.Bottom, -4f, 4f));
+            Collider collider = Collider;
+            Collider = normalHitbox;
+            MoveV(Calc.Clamp(fromY - Bottom, -4f, 4f));
             if (dir > 0)
-                this.MoveH(fromX - this.Left);
+                MoveH(fromX - Left);
             else if (dir < 0)
-                this.MoveH(fromX - this.Right);
-            if (!this.Inventory.NoRefills)
-                this.RefillDash();
-            this.RefillStamina();
-            this.StateMachine.State = 0;
-            this.jumpGraceTimer = 0.0f;
-            this.varJumpTimer = 0.2f;
-            this.AutoJump = true;
-            this.AutoJumpTimer = 0.0f;
-            this.dashAttackTimer = 0.0f;
-            this.gliderBoostTimer = 0.0f;
-            this.wallSlideTimer = 1.2f;
-            this.forceMoveX = dir;
-            this.forceMoveXTimer = 0.3f;
-            this.wallBoostTimer = 0.0f;
-            this.launched = false;
-            this.Speed.X = 240f * (float) dir;
-            this.varJumpSpeed = this.Speed.Y = -140f;
-            this.level.DirectionalShake(Vector2.UnitX * (float) dir, 0.1f);
+                MoveH(fromX - Right);
+            if (!Inventory.NoRefills)
+                RefillDash();
+            RefillStamina();
+            StateMachine.State = 0;
+            jumpGraceTimer = 0.0f;
+            varJumpTimer = 0.2f;
+            AutoJump = true;
+            AutoJumpTimer = 0.0f;
+            dashAttackTimer = 0.0f;
+            gliderBoostTimer = 0.0f;
+            wallSlideTimer = 1.2f;
+            forceMoveX = dir;
+            forceMoveXTimer = 0.3f;
+            wallBoostTimer = 0.0f;
+            launched = false;
+            Speed.X = 240f * dir;
+            varJumpSpeed = Speed.Y = -140f;
+            level.DirectionalShake(Vector2.UnitX * dir, 0.1f);
             Input.Rumble(RumbleStrength.Medium, RumbleLength.Medium);
-            this.Sprite.Scale = new Vector2(1.5f, 0.5f);
-            this.Collider = collider;
+            Sprite.Scale = new Vector2(1.5f, 0.5f);
+            Collider = collider;
             return true;
         }
 
         public void Rebound(int direction = 0)
         {
-            this.Speed.X = (float) direction * 120f;
-            this.Speed.Y = -120f;
-            this.varJumpSpeed = this.Speed.Y;
-            this.varJumpTimer = 0.15f;
-            this.AutoJump = true;
-            this.AutoJumpTimer = 0.0f;
-            this.dashAttackTimer = 0.0f;
-            this.gliderBoostTimer = 0.0f;
-            this.wallSlideTimer = 1.2f;
-            this.wallBoostTimer = 0.0f;
-            this.launched = false;
-            this.lowFrictionStopTimer = 0.15f;
-            this.forceMoveXTimer = 0.0f;
-            this.StateMachine.State = 0;
+            Speed.X = direction * 120f;
+            Speed.Y = -120f;
+            varJumpSpeed = Speed.Y;
+            varJumpTimer = 0.15f;
+            AutoJump = true;
+            AutoJumpTimer = 0.0f;
+            dashAttackTimer = 0.0f;
+            gliderBoostTimer = 0.0f;
+            wallSlideTimer = 1.2f;
+            wallBoostTimer = 0.0f;
+            launched = false;
+            lowFrictionStopTimer = 0.15f;
+            forceMoveXTimer = 0.0f;
+            StateMachine.State = 0;
         }
 
         public void ReflectBounce(Vector2 direction)
         {
-            if ((double) direction.X != 0.0)
-                this.Speed.X = direction.X * 220f;
-            if ((double) direction.Y != 0.0)
-                this.Speed.Y = direction.Y * 220f;
-            this.AutoJumpTimer = 0.0f;
-            this.dashAttackTimer = 0.0f;
-            this.gliderBoostTimer = 0.0f;
-            this.wallSlideTimer = 1.2f;
-            this.wallBoostTimer = 0.0f;
-            this.launched = false;
-            this.dashAttackTimer = 0.0f;
-            this.gliderBoostTimer = 0.0f;
-            this.forceMoveXTimer = 0.0f;
-            this.StateMachine.State = 0;
+            if (direction.X != 0.0)
+                Speed.X = direction.X * 220f;
+            if (direction.Y != 0.0)
+                Speed.Y = direction.Y * 220f;
+            AutoJumpTimer = 0.0f;
+            dashAttackTimer = 0.0f;
+            gliderBoostTimer = 0.0f;
+            wallSlideTimer = 1.2f;
+            wallBoostTimer = 0.0f;
+            launched = false;
+            dashAttackTimer = 0.0f;
+            gliderBoostTimer = 0.0f;
+            forceMoveXTimer = 0.0f;
+            StateMachine.State = 0;
         }
 
-        public int MaxDashes => SaveData.Instance.Assists.DashMode != Assists.DashModes.Normal && !this.level.InCutscene ? 2 : this.Inventory.Dashes;
+        public int MaxDashes => SaveData.Instance.Assists.DashMode != Assists.DashModes.Normal && !level.InCutscene ? 2 : Inventory.Dashes;
 
         public bool RefillDash()
         {
-            if (this.Dashes >= this.MaxDashes)
+            if (Dashes >= MaxDashes)
                 return false;
-            this.Dashes = this.MaxDashes;
+            Dashes = MaxDashes;
             return true;
         }
 
         public bool UseRefill(bool twoDashes)
         {
-            int num = this.MaxDashes;
+            int num = MaxDashes;
             if (twoDashes)
                 num = 2;
-            if (this.Dashes >= num && (double) this.Stamina >= 20.0)
+            if (Dashes >= num && Stamina >= 20.0)
                 return false;
-            this.Dashes = num;
-            this.RefillStamina();
+            Dashes = num;
+            RefillStamina();
             return true;
         }
 
-        public void RefillStamina() => this.Stamina = 110f;
+        public void RefillStamina() => Stamina = 110f;
 
         public PlayerDeadBody Die(
             Vector2 direction,
             bool evenIfInvincible = false,
             bool registerDeathInStats = true)
         {
-            Session session = this.level.Session;
+            Session session = level.Session;
             bool flag = !evenIfInvincible && SaveData.Instance.Assists.Invincible;
-            if (this.Dead || flag || this.StateMachine.State == 18)
-                return (PlayerDeadBody) null;
-            this.Stop(this.wallSlideSfx);
+            if (Dead || flag || StateMachine.State == 18)
+                return null;
+            Stop(wallSlideSfx);
             if (registerDeathInStats)
             {
                 ++session.Deaths;
                 ++session.DeathsInCurrentLevel;
                 SaveData.Instance.AddDeath(session.Area);
             }
-            Strawberry goldenStrawb = (Strawberry) null;
-            foreach (Follower follower in this.Leader.Followers)
+            Strawberry goldenStrawb = null;
+            foreach (Follower follower in Leader.Followers)
             {
                 if (follower.Entity is Strawberry && (follower.Entity as Strawberry).Golden && !(follower.Entity as Strawberry).Winged)
                     goldenStrawb = follower.Entity as Strawberry;
             }
-            this.Dead = true;
-            this.Leader.LoseFollowers();
-            this.Depth = -1000000;
-            this.Speed = Vector2.Zero;
-            this.StateMachine.Locked = true;
-            this.Collidable = false;
-            this.Drop();
-            if (this.LastBooster != null)
-                this.LastBooster.PlayerDied();
-            this.level.InCutscene = false;
-            this.level.Shake();
+            Dead = true;
+            Leader.LoseFollowers();
+            Depth = -1000000;
+            Speed = Vector2.Zero;
+            StateMachine.Locked = true;
+            Collidable = false;
+            Drop();
+            LastBooster?.PlayerDied();
+            level.InCutscene = false;
+            level.Shake();
             Input.Rumble(RumbleStrength.Light, RumbleLength.Medium);
-            PlayerDeadBody playerDeadBody = new PlayerDeadBody(this, direction);
+            PlayerDeadBody playerDeadBody = new(this, direction);
             if (goldenStrawb != null)
             {
                 playerDeadBody.HasGolden = true;
-                playerDeadBody.DeathAction = (Action) (() => Engine.Scene = (Scene) new LevelExit(LevelExit.Mode.GoldenBerryRestart, session)
+                playerDeadBody.DeathAction = () => Engine.Scene = new LevelExit(LevelExit.Mode.GoldenBerryRestart, session)
                 {
                     GoldenStrawberryEntryLevel = goldenStrawb.ID.Level
-                });
+                };
             }
-            this.Scene.Add((Entity) playerDeadBody);
-            this.Scene.Remove((Entity) this);
-            this.Scene.Tracker.GetEntity<Lookout>()?.StopInteracting();
+            Scene.Add(playerDeadBody);
+            Scene.Remove(this);
+            Scene.Tracker.GetEntity<Lookout>()?.StopInteracting();
             return playerDeadBody;
         }
 
@@ -1979,12 +1954,12 @@ namespace Celeste
         {
             get
             {
-                Vector2 liftSpeed = this.LiftSpeed;
+                Vector2 liftSpeed = LiftSpeed;
                 if ((double) Math.Abs(liftSpeed.X) > 250.0)
-                    liftSpeed.X = 250f * (float) Math.Sign(liftSpeed.X);
-                if ((double) liftSpeed.Y > 0.0)
+                    liftSpeed.X = 250f * Math.Sign(liftSpeed.X);
+                if (liftSpeed.Y > 0.0)
                     liftSpeed.Y = 0.0f;
-                else if ((double) liftSpeed.Y < -130.0)
+                else if (liftSpeed.Y < -130.0)
                     liftSpeed.Y = -130f;
                 return liftSpeed;
             }
@@ -1992,18 +1967,18 @@ namespace Celeste
 
         public bool Ducking
         {
-            get => this.Collider == this.duckHitbox || this.Collider == this.duckHurtbox;
+            get => Collider == duckHitbox || Collider == duckHurtbox;
             set
             {
                 if (value)
                 {
-                    this.Collider = (Collider) this.duckHitbox;
-                    this.hurtbox = this.duckHurtbox;
+                    Collider = duckHitbox;
+                    hurtbox = duckHurtbox;
                 }
                 else
                 {
-                    this.Collider = (Collider) this.normalHitbox;
-                    this.hurtbox = this.normalHurtbox;
+                    Collider = normalHitbox;
+                    hurtbox = normalHurtbox;
                 }
             }
         }
@@ -2012,460 +1987,460 @@ namespace Celeste
         {
             get
             {
-                if (!this.Ducking)
+                if (!Ducking)
                     return true;
-                Collider collider = this.Collider;
-                this.Collider = (Collider) this.normalHitbox;
-                int num = !this.CollideCheck<Solid>() ? 1 : 0;
-                this.Collider = collider;
+                Collider collider = Collider;
+                Collider = normalHitbox;
+                int num = !CollideCheck<Solid>() ? 1 : 0;
+                Collider = collider;
                 return num != 0;
             }
         }
 
         public bool CanUnDuckAt(Vector2 at)
         {
-            Vector2 position = this.Position;
-            this.Position = at;
-            int num = this.CanUnDuck ? 1 : 0;
-            this.Position = position;
+            Vector2 position = Position;
+            Position = at;
+            int num = CanUnDuck ? 1 : 0;
+            Position = position;
             return num != 0;
         }
 
         public bool DuckFreeAt(Vector2 at)
         {
-            Vector2 position = this.Position;
-            Collider collider = this.Collider;
-            this.Position = at;
-            this.Collider = (Collider) this.duckHitbox;
-            int num = !this.CollideCheck<Solid>() ? 1 : 0;
-            this.Position = position;
-            this.Collider = collider;
+            Vector2 position = Position;
+            Collider collider = Collider;
+            Position = at;
+            Collider = duckHitbox;
+            int num = !CollideCheck<Solid>() ? 1 : 0;
+            Position = position;
+            Collider = collider;
             return num != 0;
         }
 
-        private void Duck() => this.Collider = (Collider) this.duckHitbox;
+        private void Duck() => Collider = duckHitbox;
 
-        private void UnDuck() => this.Collider = (Collider) this.normalHitbox;
+        private void UnDuck() => Collider = normalHitbox;
 
         public Holdable Holding { get; set; }
 
         public void UpdateCarry()
         {
-            if (this.Holding == null)
+            if (Holding == null)
                 return;
-            if (this.Holding.Scene == null)
-                this.Holding = (Holdable) null;
+            if (Holding.Scene == null)
+                Holding = null;
             else
-                this.Holding.Carry(this.Position + this.carryOffset + Vector2.UnitY * this.Sprite.CarryYOffset);
+                Holding.Carry(Position + carryOffset + Vector2.UnitY * Sprite.CarryYOffset);
         }
 
         public void Swat(int dir)
         {
-            if (this.Holding == null)
+            if (Holding == null)
                 return;
-            this.Holding.Release(new Vector2(0.8f * (float) dir, -0.25f));
-            this.Holding = (Holdable) null;
+            Holding.Release(new Vector2(0.8f * dir, -0.25f));
+            Holding = null;
         }
 
         private bool Pickup(Holdable pickup)
         {
             if (!pickup.Pickup(this))
                 return false;
-            this.Ducking = false;
-            this.Holding = pickup;
-            this.minHoldTimer = 0.35f;
+            Ducking = false;
+            Holding = pickup;
+            minHoldTimer = 0.35f;
             return true;
         }
 
         public void Throw()
         {
-            if (this.Holding == null)
+            if (Holding == null)
                 return;
             if (Input.MoveY.Value == 1)
             {
-                this.Drop();
+                Drop();
             }
             else
             {
                 Input.Rumble(RumbleStrength.Strong, RumbleLength.Short);
-                this.Holding.Release(Vector2.UnitX * (float) this.Facing);
-                this.Speed.X += 80f * (float) -(int) this.Facing;
-                this.Play("event:/char/madeline/crystaltheo_throw");
-                this.Sprite.Play("throw");
+                Holding.Release(Vector2.UnitX * (float) Facing);
+                Speed.X += 80f * -(int)Facing;
+                Play("event:/char/madeline/crystaltheo_throw");
+                Sprite.Play("throw");
             }
-            this.Holding = (Holdable) null;
+            Holding = null;
         }
 
         public void Drop()
         {
-            if (this.Holding == null)
+            if (Holding == null)
                 return;
             Input.Rumble(RumbleStrength.Light, RumbleLength.Short);
-            this.Holding.Release(Vector2.Zero);
-            this.Holding = (Holdable) null;
+            Holding.Release(Vector2.Zero);
+            Holding = null;
         }
 
-        public void StartJumpGraceTime() => this.jumpGraceTimer = 0.1f;
+        public void StartJumpGraceTime() => jumpGraceTimer = 0.1f;
 
         public override bool IsRiding(Solid solid)
         {
-            if (this.StateMachine.State == 23)
+            if (StateMachine.State == 23)
                 return false;
-            if (this.StateMachine.State == 9)
-                return this.CollideCheck((Entity) solid);
-            if (this.StateMachine.State == 1 || this.StateMachine.State == 6)
-                return this.CollideCheck((Entity) solid, this.Position + Vector2.UnitX * (float) this.Facing);
-            return this.climbTriggerDir != 0 ? this.CollideCheck((Entity) solid, this.Position + Vector2.UnitX * (float) this.climbTriggerDir) : base.IsRiding(solid);
+            if (StateMachine.State == 9)
+                return CollideCheck(solid);
+            if (StateMachine.State is 1 or 6)
+                return CollideCheck(solid, Position + Vector2.UnitX * (float) Facing);
+            return climbTriggerDir != 0 ? CollideCheck(solid, Position + Vector2.UnitX * climbTriggerDir) : base.IsRiding(solid);
         }
 
-        public override bool IsRiding(JumpThru jumpThru) => this.StateMachine.State != 9 && this.StateMachine.State != 1 && (double) this.Speed.Y >= 0.0 && base.IsRiding(jumpThru);
+        public override bool IsRiding(JumpThru jumpThru) => StateMachine.State != 9 && StateMachine.State != 1 && Speed.Y >= 0.0 && base.IsRiding(jumpThru);
 
-        public bool BounceCheck(float y) => (double) this.Bottom <= (double) y + 3.0;
+        public bool BounceCheck(float y) => (double) Bottom <= (double) y + 3.0;
 
         public void PointBounce(Vector2 from)
         {
-            if (this.StateMachine.State == 2)
-                this.StateMachine.State = 0;
-            if (this.StateMachine.State == 4 && this.CurrentBooster != null)
-                this.CurrentBooster.PlayerReleased();
-            this.RefillDash();
-            this.RefillStamina();
-            Vector2 vector2 = (this.Center - from).SafeNormalize();
-            if ((double) vector2.Y > -0.20000000298023224 && (double) vector2.Y <= 0.40000000596046448)
+            if (StateMachine.State == 2)
+                StateMachine.State = 0;
+            if (StateMachine.State == 4 && CurrentBooster != null)
+                CurrentBooster.PlayerReleased();
+            RefillDash();
+            RefillStamina();
+            Vector2 vector2 = (Center - from).SafeNormalize();
+            if ((double) vector2.Y is > (-0.20000000298023224) and <= 0.40000000596046448)
                 vector2.Y = -0.2f;
-            this.Speed = vector2 * 220f;
-            this.Speed.X *= 1.5f;
-            if ((double) Math.Abs(this.Speed.X) >= 100.0)
+            Speed = vector2 * 220f;
+            Speed.X *= 1.5f;
+            if ((double) Math.Abs(Speed.X) >= 100.0)
                 return;
-            if ((double) this.Speed.X == 0.0)
-                this.Speed.X = (float) -(int) this.Facing * 100f;
+            if (Speed.X == 0.0)
+                Speed.X = -(int)Facing * 100f;
             else
-                this.Speed.X = (float) Math.Sign(this.Speed.X) * 100f;
+                Speed.X = Math.Sign(Speed.X) * 100f;
         }
 
         private void WindMove(Vector2 move)
         {
-            if (this.JustRespawned || (double) this.noWindTimer > 0.0 || !this.InControl || this.StateMachine.State == 4 || this.StateMachine.State == 2 || this.StateMachine.State == 10)
+            if (JustRespawned || noWindTimer > 0.0 || !InControl || StateMachine.State == 4 || StateMachine.State == 2 || StateMachine.State == 10)
                 return;
-            if ((double) move.X != 0.0 && this.StateMachine.State != 1)
+            if (move.X != 0.0 && StateMachine.State != 1)
             {
-                this.windTimeout = 0.2f;
-                this.windDirection.X = (float) Math.Sign(move.X);
-                if (!this.CollideCheck<Solid>(this.Position + Vector2.UnitX * (float) -Math.Sign(move.X) * 3f))
+                windTimeout = 0.2f;
+                windDirection.X = Math.Sign(move.X);
+                if (!CollideCheck<Solid>(Position + Vector2.UnitX * -Math.Sign(move.X) * 3f))
                 {
-                    if (this.Ducking && this.onGround)
+                    if (Ducking && onGround)
                         move.X *= 0.0f;
-                    move.X = (double) move.X >= 0.0 ? Math.Min(move.X, (float) this.level.Bounds.Right - (this.ExactPosition.X + this.Collider.Right)) : Math.Max(move.X, (float) this.level.Bounds.Left - (this.ExactPosition.X + this.Collider.Left));
-                    this.MoveH(move.X);
+                    move.X = move.X >= 0.0 ? Math.Min(move.X, level.Bounds.Right - (ExactPosition.X + Collider.Right)) : Math.Max(move.X, level.Bounds.Left - (ExactPosition.X + Collider.Left));
+                    MoveH(move.X);
                 }
             }
-            if ((double) move.Y == 0.0)
+            if (move.Y == 0.0)
                 return;
-            this.windTimeout = 0.2f;
-            this.windDirection.Y = (float) Math.Sign(move.Y);
-            if ((double) this.Bottom <= (double) this.level.Bounds.Top || (double) this.Speed.Y >= 0.0 && this.OnGround())
+            windTimeout = 0.2f;
+            windDirection.Y = Math.Sign(move.Y);
+            if ((double) Bottom <= level.Bounds.Top || Speed.Y >= 0.0 && OnGround())
                 return;
-            if (this.StateMachine.State == 1)
+            if (StateMachine.State == 1)
             {
-                if ((double) move.Y <= 0.0 || (double) this.climbNoMoveTimer > 0.0)
+                if (move.Y <= 0.0 || climbNoMoveTimer > 0.0)
                     return;
                 move.Y *= 0.4f;
             }
-            if ((double) move.Y < 0.0)
-                this.windMovedUp = true;
-            this.MoveV(move.Y);
+            if (move.Y < 0.0)
+                windMovedUp = true;
+            MoveV(move.Y);
         }
 
         private void OnCollideH(CollisionData data)
         {
-            this.canCurveDash = false;
-            if (this.StateMachine.State == 19)
+            canCurveDash = false;
+            if (StateMachine.State == 19)
             {
-                if ((double) this.starFlyTimer < 0.20000000298023224)
+                if (starFlyTimer < 0.20000000298023224)
                 {
-                    this.Speed.X = 0.0f;
+                    Speed.X = 0.0f;
                 }
                 else
                 {
-                    this.Play("event:/game/06_reflection/feather_state_bump");
+                    Play("event:/game/06_reflection/feather_state_bump");
                     Input.Rumble(RumbleStrength.Light, RumbleLength.Medium);
-                    this.Speed.X *= -0.5f;
+                    Speed.X *= -0.5f;
                 }
             }
             else
             {
-                if (this.StateMachine.State == 9)
+                if (StateMachine.State == 9)
                     return;
-                if (this.DashAttacking && data.Hit != null && data.Hit.OnDashCollide != null && (double) data.Direction.X == (double) Math.Sign(this.DashDir.X))
+                if (DashAttacking && data.Hit != null && data.Hit.OnDashCollide != null && data.Direction.X == (double) Math.Sign(DashDir.X))
                 {
                     DashCollisionResults collisionResults = data.Hit.OnDashCollide(this, data.Direction);
                     if (collisionResults == DashCollisionResults.NormalOverride)
                         collisionResults = DashCollisionResults.NormalCollision;
-                    else if (this.StateMachine.State == 5)
+                    else if (StateMachine.State == 5)
                         collisionResults = DashCollisionResults.Ignore;
                     switch (collisionResults)
                     {
                         case DashCollisionResults.Rebound:
-                            this.Rebound(-Math.Sign(this.Speed.X));
+                            Rebound(-Math.Sign(Speed.X));
                             return;
                         case DashCollisionResults.Bounce:
-                            this.ReflectBounce(new Vector2((float) -Math.Sign(this.Speed.X), 0.0f));
+                            ReflectBounce(new Vector2(-Math.Sign(Speed.X), 0.0f));
                             return;
                         case DashCollisionResults.Ignore:
                             return;
                     }
                 }
-                if (this.StateMachine.State == 2 || this.StateMachine.State == 5)
+                if (StateMachine.State is 2 or 5)
                 {
-                    if (this.onGround && this.DuckFreeAt(this.Position + Vector2.UnitX * (float) Math.Sign(this.Speed.X)))
+                    if (onGround && DuckFreeAt(Position + Vector2.UnitX * Math.Sign(Speed.X)))
                     {
-                        this.Ducking = true;
+                        Ducking = true;
                         return;
                     }
-                    if ((double) this.Speed.Y == 0.0 && (double) this.Speed.X != 0.0)
+                    if (Speed.Y == 0.0 && Speed.X != 0.0)
                     {
                         for (int index1 = 1; index1 <= 4; ++index1)
                         {
                             for (int index2 = 1; index2 >= -1; index2 -= 2)
                             {
-                                Vector2 add = new Vector2((float) Math.Sign(this.Speed.X), (float) (index1 * index2));
-                                Vector2 at = this.Position + add;
-                                if (!this.CollideCheck<Solid>(at) && this.CollideCheck<Solid>(at - Vector2.UnitY * (float) index2) && !this.DashCorrectCheck(add))
+                                Vector2 add = new(Math.Sign(Speed.X), index1 * index2);
+                                Vector2 at = Position + add;
+                                if (!CollideCheck<Solid>(at) && CollideCheck<Solid>(at - Vector2.UnitY * index2) && !DashCorrectCheck(add))
                                 {
-                                    this.MoveVExact(index1 * index2);
-                                    this.MoveHExact(Math.Sign(this.Speed.X));
+                                    MoveVExact(index1 * index2);
+                                    MoveHExact(Math.Sign(Speed.X));
                                     return;
                                 }
                             }
                         }
                     }
                 }
-                if (this.DreamDashCheck(Vector2.UnitX * (float) Math.Sign(this.Speed.X)))
+                if (DreamDashCheck(Vector2.UnitX * Math.Sign(Speed.X)))
                 {
-                    this.StateMachine.State = 9;
-                    this.dashAttackTimer = 0.0f;
-                    this.gliderBoostTimer = 0.0f;
+                    StateMachine.State = 9;
+                    dashAttackTimer = 0.0f;
+                    gliderBoostTimer = 0.0f;
                 }
                 else
                 {
-                    if ((double) this.wallSpeedRetentionTimer <= 0.0)
+                    if (wallSpeedRetentionTimer <= 0.0)
                     {
-                        this.wallSpeedRetained = this.Speed.X;
-                        this.wallSpeedRetentionTimer = 0.06f;
+                        wallSpeedRetained = Speed.X;
+                        wallSpeedRetentionTimer = 0.06f;
                     }
                     if (data.Hit != null && data.Hit.OnCollide != null)
                         data.Hit.OnCollide(data.Direction);
-                    this.Speed.X = 0.0f;
-                    this.dashAttackTimer = 0.0f;
-                    this.gliderBoostTimer = 0.0f;
-                    if (this.StateMachine.State != 5)
+                    Speed.X = 0.0f;
+                    dashAttackTimer = 0.0f;
+                    gliderBoostTimer = 0.0f;
+                    if (StateMachine.State != 5)
                         return;
                     Input.Rumble(RumbleStrength.Medium, RumbleLength.Short);
-                    this.level.Displacement.AddBurst(this.Center, 0.5f, 8f, 48f, 0.4f, Ease.QuadOut, Ease.QuadOut);
-                    this.StateMachine.State = 6;
+                    level.Displacement.AddBurst(Center, 0.5f, 8f, 48f, 0.4f, Ease.QuadOut, Ease.QuadOut);
+                    StateMachine.State = 6;
                 }
             }
         }
 
         private void OnCollideV(CollisionData data)
         {
-            this.canCurveDash = false;
-            if (this.StateMachine.State == 19)
+            canCurveDash = false;
+            if (StateMachine.State == 19)
             {
-                if ((double) this.starFlyTimer < 0.20000000298023224)
+                if (starFlyTimer < 0.20000000298023224)
                 {
-                    this.Speed.Y = 0.0f;
+                    Speed.Y = 0.0f;
                 }
                 else
                 {
-                    this.Play("event:/game/06_reflection/feather_state_bump");
+                    Play("event:/game/06_reflection/feather_state_bump");
                     Input.Rumble(RumbleStrength.Light, RumbleLength.Medium);
-                    this.Speed.Y *= -0.5f;
+                    Speed.Y *= -0.5f;
                 }
             }
-            else if (this.StateMachine.State == 3)
+            else if (StateMachine.State == 3)
             {
-                this.Speed.Y = 0.0f;
+                Speed.Y = 0.0f;
             }
             else
             {
-                if (this.StateMachine.State == 9)
+                if (StateMachine.State == 9)
                     return;
                 if (data.Hit != null && data.Hit.OnDashCollide != null)
                 {
-                    if (this.DashAttacking && (double) data.Direction.Y == (double) Math.Sign(this.DashDir.Y))
+                    if (DashAttacking && data.Direction.Y == (double) Math.Sign(DashDir.Y))
                     {
                         DashCollisionResults collisionResults = data.Hit.OnDashCollide(this, data.Direction);
-                        if (this.StateMachine.State == 5)
+                        if (StateMachine.State == 5)
                             collisionResults = DashCollisionResults.Ignore;
                         switch (collisionResults)
                         {
                             case DashCollisionResults.Rebound:
-                                this.Rebound();
+                                Rebound();
                                 return;
                             case DashCollisionResults.Bounce:
-                                this.ReflectBounce(new Vector2(0.0f, (float) -Math.Sign(this.Speed.Y)));
+                                ReflectBounce(new Vector2(0.0f, -Math.Sign(Speed.Y)));
                                 return;
                             case DashCollisionResults.Ignore:
                                 return;
                         }
                     }
-                    else if (this.StateMachine.State == 10)
+                    else if (StateMachine.State == 10)
                     {
                         int num = (int) data.Hit.OnDashCollide(this, data.Direction);
                         return;
                     }
                 }
-                if ((double) this.Speed.Y > 0.0)
+                if (Speed.Y > 0.0)
                 {
-                    if ((this.StateMachine.State == 2 || this.StateMachine.State == 5) && !this.dashStartedOnGround)
+                    if ((StateMachine.State == 2 || StateMachine.State == 5) && !dashStartedOnGround)
                     {
-                        if ((double) this.Speed.X <= 0.0099999997764825821)
+                        if (Speed.X <= 0.0099999997764825821)
                         {
                             for (int index = -1; index >= -4; --index)
                             {
-                                if (!this.OnGround(this.Position + new Vector2((float) index, 0.0f)))
+                                if (!OnGround(Position + new Vector2(index, 0.0f)))
                                 {
-                                    this.MoveHExact(index);
-                                    this.MoveVExact(1);
+                                    MoveHExact(index);
+                                    MoveVExact(1);
                                     return;
                                 }
                             }
                         }
-                        if ((double) this.Speed.X >= -0.0099999997764825821)
+                        if (Speed.X >= -0.0099999997764825821)
                         {
                             for (int index = 1; index <= 4; ++index)
                             {
-                                if (!this.OnGround(this.Position + new Vector2((float) index, 0.0f)))
+                                if (!OnGround(Position + new Vector2(index, 0.0f)))
                                 {
-                                    this.MoveHExact(index);
-                                    this.MoveVExact(1);
+                                    MoveHExact(index);
+                                    MoveVExact(1);
                                     return;
                                 }
                             }
                         }
                     }
-                    if (this.DreamDashCheck(Vector2.UnitY * (float) Math.Sign(this.Speed.Y)))
+                    if (DreamDashCheck(Vector2.UnitY * Math.Sign(Speed.Y)))
                     {
-                        this.StateMachine.State = 9;
-                        this.dashAttackTimer = 0.0f;
-                        this.gliderBoostTimer = 0.0f;
+                        StateMachine.State = 9;
+                        dashAttackTimer = 0.0f;
+                        gliderBoostTimer = 0.0f;
                         return;
                     }
-                    if ((double) this.DashDir.X != 0.0 && (double) this.DashDir.Y > 0.0 && (double) this.Speed.Y > 0.0)
+                    if (DashDir.X != 0.0 && DashDir.Y > 0.0 && Speed.Y > 0.0)
                     {
-                        this.DashDir.X = (float) Math.Sign(this.DashDir.X);
-                        this.DashDir.Y = 0.0f;
-                        this.Speed.Y = 0.0f;
-                        this.Speed.X *= 1.2f;
-                        this.Ducking = true;
+                        DashDir.X = Math.Sign(DashDir.X);
+                        DashDir.Y = 0.0f;
+                        Speed.Y = 0.0f;
+                        Speed.X *= 1.2f;
+                        Ducking = true;
                     }
-                    if (this.StateMachine.State != 1)
+                    if (StateMachine.State != 1)
                     {
-                        float amount = Math.Min(this.Speed.Y / 240f, 1f);
-                        this.Sprite.Scale.X = MathHelper.Lerp(1f, 1.6f, amount);
-                        this.Sprite.Scale.Y = MathHelper.Lerp(1f, 0.4f, amount);
-                        if ((double) this.highestAirY < (double) this.Y - 50.0 && (double) this.Speed.Y >= 160.0 && (double) Math.Abs(this.Speed.X) >= 90.0)
-                            this.Sprite.Play("runStumble");
+                        float amount = Math.Min(Speed.Y / 240f, 1f);
+                        Sprite.Scale.X = MathHelper.Lerp(1f, 1.6f, amount);
+                        Sprite.Scale.Y = MathHelper.Lerp(1f, 0.4f, amount);
+                        if (highestAirY < (double) Y - 50.0 && Speed.Y >= 160.0 && (double) Math.Abs(Speed.X) >= 90.0)
+                            Sprite.Play("runStumble");
                         Input.Rumble(RumbleStrength.Light, RumbleLength.Short);
-                        Platform platformByPriority = SurfaceIndex.GetPlatformByPriority(this.CollideAll<Platform>(this.Position + new Vector2(0.0f, 1f), this.temp));
+                        Platform platformByPriority = SurfaceIndex.GetPlatformByPriority(CollideAll<Platform>(Position + new Vector2(0.0f, 1f), temp));
                         int index = -1;
                         if (platformByPriority != null)
                         {
-                            index = platformByPriority.GetLandSoundIndex((Entity) this);
-                            if (index >= 0 && !this.MuffleLanding)
-                                this.Play((double) this.playFootstepOnLand > 0.0 ? "event:/char/madeline/footstep" : "event:/char/madeline/landing", "surface_index", (float) index);
+                            index = platformByPriority.GetLandSoundIndex(this);
+                            if (index >= 0 && !MuffleLanding)
+                                Play(playFootstepOnLand > 0.0 ? "event:/char/madeline/footstep" : "event:/char/madeline/landing", "surface_index", index);
                             if (platformByPriority is DreamBlock)
-                                (platformByPriority as DreamBlock).FootstepRipple(this.Position);
-                            this.MuffleLanding = false;
+                                (platformByPriority as DreamBlock).FootstepRipple(Position);
+                            MuffleLanding = false;
                         }
-                        if ((double) this.Speed.Y >= 80.0)
-                            Dust.Burst(this.Position, new Vector2(0.0f, -1f).Angle(), 8, this.DustParticleFromSurfaceIndex(index));
-                        this.playFootstepOnLand = 0.0f;
+                        if (Speed.Y >= 80.0)
+                            Dust.Burst(Position, new Vector2(0.0f, -1f).Angle(), 8, DustParticleFromSurfaceIndex(index));
+                        playFootstepOnLand = 0.0f;
                     }
                 }
                 else
                 {
-                    if ((double) this.Speed.Y < 0.0)
+                    if (Speed.Y < 0.0)
                     {
                         int num = 4;
-                        if (this.DashAttacking && (double) Math.Abs(this.Speed.X) < 0.0099999997764825821)
+                        if (DashAttacking && (double) Math.Abs(Speed.X) < 0.0099999997764825821)
                             num = 5;
-                        if ((double) this.Speed.X <= 0.0099999997764825821)
+                        if (Speed.X <= 0.0099999997764825821)
                         {
                             for (int index = 1; index <= num; ++index)
                             {
-                                if (!this.CollideCheck<Solid>(this.Position + new Vector2((float) -index, -1f)))
+                                if (!CollideCheck<Solid>(Position + new Vector2(-index, -1f)))
                                 {
-                                    this.Position = this.Position + new Vector2((float) -index, -1f);
+                                    Position = Position + new Vector2(-index, -1f);
                                     return;
                                 }
                             }
                         }
-                        if ((double) this.Speed.X >= -0.0099999997764825821)
+                        if (Speed.X >= -0.0099999997764825821)
                         {
                             for (int x = 1; x <= num; ++x)
                             {
-                                if (!this.CollideCheck<Solid>(this.Position + new Vector2((float) x, -1f)))
+                                if (!CollideCheck<Solid>(Position + new Vector2(x, -1f)))
                                 {
-                                    this.Position = this.Position + new Vector2((float) x, -1f);
+                                    Position = Position + new Vector2(x, -1f);
                                     return;
                                 }
                             }
                         }
-                        if ((double) this.varJumpTimer < 0.15000000596046448)
-                            this.varJumpTimer = 0.0f;
+                        if (varJumpTimer < 0.15000000596046448)
+                            varJumpTimer = 0.0f;
                     }
-                    if (this.DreamDashCheck(Vector2.UnitY * (float) Math.Sign(this.Speed.Y)))
+                    if (DreamDashCheck(Vector2.UnitY * Math.Sign(Speed.Y)))
                     {
-                        this.StateMachine.State = 9;
-                        this.dashAttackTimer = 0.0f;
-                        this.gliderBoostTimer = 0.0f;
+                        StateMachine.State = 9;
+                        dashAttackTimer = 0.0f;
+                        gliderBoostTimer = 0.0f;
                         return;
                     }
                 }
                 if (data.Hit != null && data.Hit.OnCollide != null)
                     data.Hit.OnCollide(data.Direction);
-                this.dashAttackTimer = 0.0f;
-                this.gliderBoostTimer = 0.0f;
-                this.Speed.Y = 0.0f;
-                if (this.StateMachine.State != 5)
+                dashAttackTimer = 0.0f;
+                gliderBoostTimer = 0.0f;
+                Speed.Y = 0.0f;
+                if (StateMachine.State != 5)
                     return;
                 Input.Rumble(RumbleStrength.Medium, RumbleLength.Short);
-                this.level.Displacement.AddBurst(this.Center, 0.5f, 8f, 48f, 0.4f, Ease.QuadOut, Ease.QuadOut);
-                this.StateMachine.State = 6;
+                level.Displacement.AddBurst(Center, 0.5f, 8f, 48f, 0.4f, Ease.QuadOut, Ease.QuadOut);
+                StateMachine.State = 6;
             }
         }
 
         private bool DreamDashCheck(Vector2 dir)
         {
-            if (this.Inventory.DreamDash && this.DashAttacking && ((double) dir.X == (double) Math.Sign(this.DashDir.X) || (double) dir.Y == (double) Math.Sign(this.DashDir.Y)))
+            if (Inventory.DreamDash && DashAttacking && (dir.X == (double) Math.Sign(DashDir.X) || dir.Y == (double) Math.Sign(DashDir.Y)))
             {
-                DreamBlock dreamBlock = this.CollideFirst<DreamBlock>(this.Position + dir);
+                DreamBlock dreamBlock = CollideFirst<DreamBlock>(Position + dir);
                 if (dreamBlock != null)
                 {
-                    if (this.CollideCheck<Solid, DreamBlock>(this.Position + dir))
+                    if (CollideCheck<Solid, DreamBlock>(Position + dir))
                     {
-                        Vector2 vector2 = new Vector2(Math.Abs(dir.Y), Math.Abs(dir.X));
+                        Vector2 vector2 = new(Math.Abs(dir.Y), Math.Abs(dir.X));
                         bool flag1;
                         bool flag2;
-                        if ((double) dir.X != 0.0)
+                        if (dir.X != 0.0)
                         {
-                            flag1 = (double) this.Speed.Y <= 0.0;
-                            flag2 = (double) this.Speed.Y >= 0.0;
+                            flag1 = Speed.Y <= 0.0;
+                            flag2 = Speed.Y >= 0.0;
                         }
                         else
                         {
-                            flag1 = (double) this.Speed.X <= 0.0;
-                            flag2 = (double) this.Speed.X >= 0.0;
+                            flag1 = Speed.X <= 0.0;
+                            flag2 = Speed.X >= 0.0;
                         }
                         if (flag1)
                         {
                             for (int index = -1; index >= -4; --index)
                             {
-                                if (!this.CollideCheck<Solid, DreamBlock>(this.Position + dir + vector2 * (float) index))
+                                if (!CollideCheck<Solid, DreamBlock>(Position + dir + vector2 * index))
                                 {
-                                    this.Position = this.Position + vector2 * (float) index;
+                                    Position = Position + vector2 * index;
                                     this.dreamBlock = dreamBlock;
                                     return true;
                                 }
@@ -2475,9 +2450,9 @@ namespace Celeste
                         {
                             for (int index = 1; index <= 4; ++index)
                             {
-                                if (!this.CollideCheck<Solid, DreamBlock>(this.Position + dir + vector2 * (float) index))
+                                if (!CollideCheck<Solid, DreamBlock>(Position + dir + vector2 * index))
                                 {
-                                    this.Position = this.Position + vector2 * (float) index;
+                                    Position = Position + vector2 * index;
                                     this.dreamBlock = dreamBlock;
                                     return true;
                                 }
@@ -2494,283 +2469,283 @@ namespace Celeste
 
         public void OnBoundsH()
         {
-            this.Speed.X = 0.0f;
-            if (this.StateMachine.State != 5)
+            Speed.X = 0.0f;
+            if (StateMachine.State != 5)
                 return;
-            this.StateMachine.State = 0;
+            StateMachine.State = 0;
         }
 
         public void OnBoundsV()
         {
-            this.Speed.Y = 0.0f;
-            if (this.StateMachine.State != 5)
+            Speed.Y = 0.0f;
+            if (StateMachine.State != 5)
                 return;
-            this.StateMachine.State = 0;
+            StateMachine.State = 0;
         }
 
         protected override void OnSquish(CollisionData data)
         {
             bool flag = false;
-            if (!this.Ducking && this.StateMachine.State != 1)
+            if (!Ducking && StateMachine.State != 1)
             {
                 flag = true;
-                this.Ducking = true;
+                Ducking = true;
                 data.Pusher.Collidable = true;
-                if (!this.CollideCheck<Solid>())
+                if (!CollideCheck<Solid>())
                 {
                     data.Pusher.Collidable = false;
                     return;
                 }
-                Vector2 position = this.Position;
-                this.Position = data.TargetPosition;
-                if (!this.CollideCheck<Solid>())
+                Vector2 position = Position;
+                Position = data.TargetPosition;
+                if (!CollideCheck<Solid>())
                 {
                     data.Pusher.Collidable = false;
                     return;
                 }
-                this.Position = position;
+                Position = position;
                 data.Pusher.Collidable = false;
             }
-            if (!this.TrySquishWiggle(data, wiggleY: 5))
+            if (!TrySquishWiggle(data, wiggleY: 5))
             {
                 bool evenIfInvincible = false;
                 if (data.Pusher != null && data.Pusher.SquishEvenInAssistMode)
                     evenIfInvincible = true;
-                this.Die(Vector2.Zero, evenIfInvincible);
+                Die(Vector2.Zero, evenIfInvincible);
             }
             else
             {
-                if (!flag || !this.CanUnDuck)
+                if (!flag || !CanUnDuck)
                     return;
-                this.Ducking = false;
+                Ducking = false;
             }
         }
 
-        private void NormalBegin() => this.maxFall = 160f;
+        private void NormalBegin() => maxFall = 160f;
 
         private void NormalEnd()
         {
-            this.wallBoostTimer = 0.0f;
-            this.wallSpeedRetentionTimer = 0.0f;
-            this.hopWaitX = 0;
+            wallBoostTimer = 0.0f;
+            wallSpeedRetentionTimer = 0.0f;
+            hopWaitX = 0;
         }
 
-        public bool ClimbBoundsCheck(int dir) => (double) this.Left + (double) (dir * 2) >= (double) this.level.Bounds.Left && (double) this.Right + (double) (dir * 2) < (double) this.level.Bounds.Right;
+        public bool ClimbBoundsCheck(int dir) => (double) Left + dir * 2 >= level.Bounds.Left && (double) Right + dir * 2 < level.Bounds.Right;
 
-        public void ClimbTrigger(int dir) => this.climbTriggerDir = dir;
+        public void ClimbTrigger(int dir) => climbTriggerDir = dir;
 
-        public bool ClimbCheck(int dir, int yAdd = 0) => this.ClimbBoundsCheck(dir) && !ClimbBlocker.Check(this.Scene, (Entity) this, this.Position + Vector2.UnitY * (float) yAdd + Vector2.UnitX * 2f * (float) this.Facing) && this.CollideCheck<Solid>(this.Position + new Vector2((float) (dir * 2), (float) yAdd));
+        public bool ClimbCheck(int dir, int yAdd = 0) => ClimbBoundsCheck(dir) && !ClimbBlocker.Check(Scene, this, Position + Vector2.UnitY * yAdd + Vector2.UnitX * 2f * (float) Facing) && CollideCheck<Solid>(Position + new Vector2(dir * 2, yAdd));
 
         private int NormalUpdate()
         {
-            if ((double) this.LiftBoost.Y < 0.0 && this.wasOnGround && !this.onGround && (double) this.Speed.Y >= 0.0)
-                this.Speed.Y = this.LiftBoost.Y;
-            if (this.Holding == null)
+            if (LiftBoost.Y < 0.0 && wasOnGround && !onGround && Speed.Y >= 0.0)
+                Speed.Y = LiftBoost.Y;
+            if (Holding == null)
             {
-                if (Input.GrabCheck && !this.IsTired && !this.Ducking)
+                if (Input.GrabCheck && !IsTired && !Ducking)
                 {
-                    foreach (Holdable component in this.Scene.Tracker.GetComponents<Holdable>())
+                    foreach (Holdable component in Scene.Tracker.GetComponents<Holdable>())
                     {
-                        if (component.Check(this) && this.Pickup(component))
+                        if (component.Check(this) && Pickup(component))
                             return 8;
                     }
-                    if ((double) this.Speed.Y >= 0.0 && Math.Sign(this.Speed.X) != -(int) this.Facing)
+                    if (Speed.Y >= 0.0 && Math.Sign(Speed.X) != -(int) Facing)
                     {
-                        if (this.ClimbCheck((int) this.Facing))
+                        if (ClimbCheck((int) Facing))
                         {
-                            this.Ducking = false;
+                            Ducking = false;
                             if (!SaveData.Instance.Assists.NoGrabbing)
                                 return 1;
-                            this.ClimbTrigger((int) this.Facing);
+                            ClimbTrigger((int) Facing);
                         }
-                        if (!SaveData.Instance.Assists.NoGrabbing && (double) (float) Input.MoveY < 1.0 && (double) this.level.Wind.Y <= 0.0)
+                        if (!SaveData.Instance.Assists.NoGrabbing && (double) (float) Input.MoveY < 1.0 && level.Wind.Y <= 0.0)
                         {
                             for (int index = 1; index <= 2; ++index)
                             {
-                                if (!this.CollideCheck<Solid>(this.Position + Vector2.UnitY * (float) -index) && this.ClimbCheck((int) this.Facing, -index))
+                                if (!CollideCheck<Solid>(Position + Vector2.UnitY * -index) && ClimbCheck((int) Facing, -index))
                                 {
-                                    this.MoveVExact(-index);
-                                    this.Ducking = false;
+                                    MoveVExact(-index);
+                                    Ducking = false;
                                     return 1;
                                 }
                             }
                         }
                     }
                 }
-                if (this.CanDash)
+                if (CanDash)
                 {
-                    this.Speed += this.LiftBoost;
-                    return this.StartDash();
+                    Speed += LiftBoost;
+                    return StartDash();
                 }
-                if (this.Ducking)
+                if (Ducking)
                 {
-                    if (this.onGround && (double) (float) Input.MoveY != 1.0)
+                    if (onGround && (double) (float) Input.MoveY != 1.0)
                     {
-                        if (this.CanUnDuck)
+                        if (CanUnDuck)
                         {
-                            this.Ducking = false;
-                            this.Sprite.Scale = new Vector2(0.8f, 1.2f);
+                            Ducking = false;
+                            Sprite.Scale = new Vector2(0.8f, 1.2f);
                         }
-                        else if ((double) this.Speed.X == 0.0)
+                        else if (Speed.X == 0.0)
                         {
                             for (int index = 4; index > 0; --index)
                             {
-                                if (this.CanUnDuckAt(this.Position + Vector2.UnitX * (float) index))
+                                if (CanUnDuckAt(Position + Vector2.UnitX * index))
                                 {
-                                    this.MoveH(50f * Engine.DeltaTime);
+                                    MoveH(50f * Engine.DeltaTime);
                                     break;
                                 }
-                                if (this.CanUnDuckAt(this.Position - Vector2.UnitX * (float) index))
+                                if (CanUnDuckAt(Position - Vector2.UnitX * index))
                                 {
-                                    this.MoveH(-50f * Engine.DeltaTime);
+                                    MoveH(-50f * Engine.DeltaTime);
                                     break;
                                 }
                             }
                         }
                     }
                 }
-                else if (this.onGround && (double) (float) Input.MoveY == 1.0 && (double) this.Speed.Y >= 0.0)
+                else if (onGround && (double) (float) Input.MoveY == 1.0 && Speed.Y >= 0.0)
                 {
-                    this.Ducking = true;
-                    this.Sprite.Scale = new Vector2(1.4f, 0.6f);
+                    Ducking = true;
+                    Sprite.Scale = new Vector2(1.4f, 0.6f);
                 }
             }
             else
             {
-                if (!Input.GrabCheck && (double) this.minHoldTimer <= 0.0)
-                    this.Throw();
-                if (!this.Ducking && this.onGround && (double) (float) Input.MoveY == 1.0 && (double) this.Speed.Y >= 0.0 && !this.holdCannotDuck)
+                if (!Input.GrabCheck && minHoldTimer <= 0.0)
+                    Throw();
+                if (!Ducking && onGround && (double) (float) Input.MoveY == 1.0 && Speed.Y >= 0.0 && !holdCannotDuck)
                 {
-                    this.Drop();
-                    this.Ducking = true;
-                    this.Sprite.Scale = new Vector2(1.4f, 0.6f);
+                    Drop();
+                    Ducking = true;
+                    Sprite.Scale = new Vector2(1.4f, 0.6f);
                 }
-                else if (this.onGround && this.Ducking && (double) this.Speed.Y >= 0.0)
+                else if (onGround && Ducking && Speed.Y >= 0.0)
                 {
-                    if (this.CanUnDuck)
-                        this.Ducking = false;
+                    if (CanUnDuck)
+                        Ducking = false;
                     else
-                        this.Drop();
+                        Drop();
                 }
-                else if (this.onGround && (double) (float) Input.MoveY != 1.0 && this.holdCannotDuck)
-                    this.holdCannotDuck = false;
+                else if (onGround && (double) (float) Input.MoveY != 1.0 && holdCannotDuck)
+                    holdCannotDuck = false;
             }
-            if (this.Ducking && this.onGround)
+            if (Ducking && onGround)
             {
-                this.Speed.X = Calc.Approach(this.Speed.X, 0.0f, 500f * Engine.DeltaTime);
+                Speed.X = Calc.Approach(Speed.X, 0.0f, 500f * Engine.DeltaTime);
             }
             else
             {
-                float num1 = this.onGround ? 1f : 0.65f;
-                if (this.onGround && this.level.CoreMode == Session.CoreModes.Cold)
+                float num1 = onGround ? 1f : 0.65f;
+                if (onGround && level.CoreMode == Session.CoreModes.Cold)
                     num1 *= 0.3f;
-                if (SaveData.Instance.Assists.LowFriction && (double) this.lowFrictionStopTimer <= 0.0)
-                    num1 *= this.onGround ? 0.35f : 0.5f;
+                if (SaveData.Instance.Assists.LowFriction && lowFrictionStopTimer <= 0.0)
+                    num1 *= onGround ? 0.35f : 0.5f;
                 float num2;
-                if (this.Holding != null && this.Holding.SlowRun)
+                if (Holding != null && Holding.SlowRun)
                     num2 = 70f;
-                else if (this.Holding != null && this.Holding.SlowFall && !this.onGround)
+                else if (Holding != null && Holding.SlowFall && !onGround)
                 {
                     num2 = 108.000008f;
                     num1 *= 0.5f;
                 }
                 else
                     num2 = 90f;
-                if (this.level.InSpace)
+                if (level.InSpace)
                     num2 *= 0.6f;
-                this.Speed.X = (double) Math.Abs(this.Speed.X) <= (double) num2 || Math.Sign(this.Speed.X) != this.moveX ? Calc.Approach(this.Speed.X, num2 * (float) this.moveX, 1000f * num1 * Engine.DeltaTime) : Calc.Approach(this.Speed.X, num2 * (float) this.moveX, 400f * num1 * Engine.DeltaTime);
+                Speed.X = (double) Math.Abs(Speed.X) <= (double) num2 || Math.Sign(Speed.X) != moveX ? Calc.Approach(Speed.X, num2 * moveX, 1000f * num1 * Engine.DeltaTime) : Calc.Approach(Speed.X, num2 * moveX, 400f * num1 * Engine.DeltaTime);
             }
             float target1 = 160f;
             float target2 = 240f;
-            if (this.level.InSpace)
+            if (level.InSpace)
             {
                 target1 *= 0.6f;
                 target2 *= 0.6f;
             }
-            if (this.Holding != null && this.Holding.SlowFall && (double) this.forceMoveXTimer <= 0.0)
-                this.maxFall = Calc.Approach(this.maxFall, (double) (float) Input.GliderMoveY != 1.0 ? (!this.windMovedUp || (double) (float) Input.GliderMoveY != -1.0 ? ((double) (float) Input.GliderMoveY != -1.0 ? (!this.windMovedUp ? 40f : 0.0f) : 24f) : -32f) : 120f, 300f * Engine.DeltaTime);
-            else if ((double) (float) Input.MoveY == 1.0 && (double) this.Speed.Y >= (double) target1)
+            if (Holding != null && Holding.SlowFall && forceMoveXTimer <= 0.0)
+                maxFall = Calc.Approach(maxFall, (double) (float) Input.GliderMoveY != 1.0 ? (!windMovedUp || (double) (float) Input.GliderMoveY != -1.0 ? ((double) (float) Input.GliderMoveY != -1.0 ? (!windMovedUp ? 40f : 0.0f) : 24f) : -32f) : 120f, 300f * Engine.DeltaTime);
+            else if ((double) (float) Input.MoveY == 1.0 && Speed.Y >= (double) target1)
             {
-                this.maxFall = Calc.Approach(this.maxFall, target2, 300f * Engine.DeltaTime);
+                maxFall = Calc.Approach(maxFall, target2, 300f * Engine.DeltaTime);
                 float num = target1 + (float) (((double) target2 - (double) target1) * 0.5);
-                if ((double) this.Speed.Y >= (double) num)
+                if (Speed.Y >= (double) num)
                 {
-                    float amount = Math.Min(1f, (float) (((double) this.Speed.Y - (double) num) / ((double) target2 - (double) num)));
-                    this.Sprite.Scale.X = MathHelper.Lerp(1f, 0.5f, amount);
-                    this.Sprite.Scale.Y = MathHelper.Lerp(1f, 1.5f, amount);
+                    float amount = Math.Min(1f, (float) ((Speed.Y - (double) num) / ((double) target2 - (double) num)));
+                    Sprite.Scale.X = MathHelper.Lerp(1f, 0.5f, amount);
+                    Sprite.Scale.Y = MathHelper.Lerp(1f, 1.5f, amount);
                 }
             }
             else
-                this.maxFall = Calc.Approach(this.maxFall, target1, 300f * Engine.DeltaTime);
-            if (!this.onGround)
+                maxFall = Calc.Approach(maxFall, target1, 300f * Engine.DeltaTime);
+            if (!onGround)
             {
-                float target3 = this.maxFall;
-                if (this.Holding != null && this.Holding.SlowFall)
-                    this.holdCannotDuck = (double) (float) Input.MoveY == 1.0;
-                if (((Facings) this.moveX == this.Facing || this.moveX == 0 && Input.GrabCheck) && Input.MoveY.Value != 1)
+                float target3 = maxFall;
+                if (Holding != null && Holding.SlowFall)
+                    holdCannotDuck = (double) (float) Input.MoveY == 1.0;
+                if (((Facings) moveX == Facing || moveX == 0 && Input.GrabCheck) && Input.MoveY.Value != 1)
                 {
-                    if ((double) this.Speed.Y >= 0.0 && (double) this.wallSlideTimer > 0.0 && this.Holding == null && this.ClimbBoundsCheck((int) this.Facing) && this.CollideCheck<Solid>(this.Position + Vector2.UnitX * (float) this.Facing) && !ClimbBlocker.EdgeCheck((Scene) this.level, (Entity) this, (int) this.Facing) && this.CanUnDuck)
+                    if (Speed.Y >= 0.0 && wallSlideTimer > 0.0 && Holding == null && ClimbBoundsCheck((int) Facing) && CollideCheck<Solid>(Position + Vector2.UnitX * (float) Facing) && !ClimbBlocker.EdgeCheck(level, this, (int) Facing) && CanUnDuck)
                     {
-                        this.Ducking = false;
-                        this.wallSlideDir = (int) this.Facing;
+                        Ducking = false;
+                        wallSlideDir = (int) Facing;
                     }
-                    if (this.wallSlideDir != 0)
+                    if (wallSlideDir != 0)
                     {
                         if (Input.GrabCheck)
-                            this.ClimbTrigger(this.wallSlideDir);
-                        if ((double) this.wallSlideTimer > 0.60000002384185791 && ClimbBlocker.Check((Scene) this.level, (Entity) this, this.Position + Vector2.UnitX * (float) this.wallSlideDir))
-                            this.wallSlideTimer = 0.6f;
-                        target3 = MathHelper.Lerp(160f, 20f, this.wallSlideTimer / 1.2f);
-                        if ((double) this.wallSlideTimer / 1.2000000476837158 > 0.64999997615814209)
-                            this.CreateWallSlideParticles(this.wallSlideDir);
+                            ClimbTrigger(wallSlideDir);
+                        if (wallSlideTimer > 0.60000002384185791 && ClimbBlocker.Check(level, this, Position + Vector2.UnitX * wallSlideDir))
+                            wallSlideTimer = 0.6f;
+                        target3 = MathHelper.Lerp(160f, 20f, wallSlideTimer / 1.2f);
+                        if (wallSlideTimer / 1.2000000476837158 > 0.64999997615814209)
+                            CreateWallSlideParticles(wallSlideDir);
                     }
                 }
-                float num = (double) Math.Abs(this.Speed.Y) >= 40.0 || !Input.Jump.Check && !this.AutoJump ? 1f : 0.5f;
-                if (this.Holding != null && this.Holding.SlowFall && (double) this.forceMoveXTimer <= 0.0)
+                float num = (double) Math.Abs(Speed.Y) >= 40.0 || !Input.Jump.Check && !AutoJump ? 1f : 0.5f;
+                if (Holding != null && Holding.SlowFall && forceMoveXTimer <= 0.0)
                     num *= 0.5f;
-                if (this.level.InSpace)
+                if (level.InSpace)
                     num *= 0.6f;
-                this.Speed.Y = Calc.Approach(this.Speed.Y, target3, 900f * num * Engine.DeltaTime);
+                Speed.Y = Calc.Approach(Speed.Y, target3, 900f * num * Engine.DeltaTime);
             }
-            if ((double) this.varJumpTimer > 0.0)
+            if (varJumpTimer > 0.0)
             {
-                if (this.AutoJump || Input.Jump.Check)
-                    this.Speed.Y = Math.Min(this.Speed.Y, this.varJumpSpeed);
+                if (AutoJump || Input.Jump.Check)
+                    Speed.Y = Math.Min(Speed.Y, varJumpSpeed);
                 else
-                    this.varJumpTimer = 0.0f;
+                    varJumpTimer = 0.0f;
             }
             if (Input.Jump.Pressed && (TalkComponent.PlayerOver == null || !Input.Talk.Pressed))
             {
-                if ((double) this.jumpGraceTimer > 0.0)
-                    this.Jump();
-                else if (this.CanUnDuck)
+                if (jumpGraceTimer > 0.0)
+                    Jump();
+                else if (CanUnDuck)
                 {
-                    bool canUnDuck = this.CanUnDuck;
-                    if (canUnDuck && this.WallJumpCheck(1))
+                    bool canUnDuck = CanUnDuck;
+                    if (canUnDuck && WallJumpCheck(1))
                     {
-                        if (this.Facing == Facings.Right && Input.GrabCheck && !SaveData.Instance.Assists.NoGrabbing && (double) this.Stamina > 0.0 && this.Holding == null && !ClimbBlocker.Check(this.Scene, (Entity) this, this.Position + Vector2.UnitX * 3f))
-                            this.ClimbJump();
-                        else if (this.DashAttacking && this.SuperWallJumpAngleCheck)
-                            this.SuperWallJump(-1);
+                        if (Facing == Facings.Right && Input.GrabCheck && !SaveData.Instance.Assists.NoGrabbing && Stamina > 0.0 && Holding == null && !ClimbBlocker.Check(Scene, this, Position + Vector2.UnitX * 3f))
+                            ClimbJump();
+                        else if (DashAttacking && SuperWallJumpAngleCheck)
+                            SuperWallJump(-1);
                         else
-                            this.WallJump(-1);
+                            WallJump(-1);
                     }
-                    else if (canUnDuck && this.WallJumpCheck(-1))
+                    else if (canUnDuck && WallJumpCheck(-1))
                     {
-                        if (this.Facing == Facings.Left && Input.GrabCheck && !SaveData.Instance.Assists.NoGrabbing && (double) this.Stamina > 0.0 && this.Holding == null && !ClimbBlocker.Check(this.Scene, (Entity) this, this.Position + Vector2.UnitX * -3f))
-                            this.ClimbJump();
-                        else if (this.DashAttacking && this.SuperWallJumpAngleCheck)
-                            this.SuperWallJump(1);
+                        if (Facing == Facings.Left && Input.GrabCheck && !SaveData.Instance.Assists.NoGrabbing && Stamina > 0.0 && Holding == null && !ClimbBlocker.Check(Scene, this, Position + Vector2.UnitX * -3f))
+                            ClimbJump();
+                        else if (DashAttacking && SuperWallJumpAngleCheck)
+                            SuperWallJump(1);
                         else
-                            this.WallJump(1);
+                            WallJump(1);
                     }
                     else
                     {
                         Water water;
-                        if ((water = this.CollideFirst<Water>(this.Position + Vector2.UnitY * 2f)) != null)
+                        if ((water = CollideFirst<Water>(Position + Vector2.UnitY * 2f)) != null)
                         {
-                            this.Jump();
-                            water.TopSurface.DoRipple(this.Position, 1f);
+                            Jump();
+                            water.TopSurface.DoRipple(Position, 1f);
                         }
                     }
                 }
@@ -2780,263 +2755,263 @@ namespace Celeste
 
         public void CreateWallSlideParticles(int dir)
         {
-            if (!this.Scene.OnInterval(0.01f))
+            if (!Scene.OnInterval(0.01f))
                 return;
             int index = -1;
-            Platform platformByPriority = SurfaceIndex.GetPlatformByPriority(this.CollideAll<Platform>(this.Position + Vector2.UnitX * (float) dir * 4f, this.temp));
+            Platform platformByPriority = SurfaceIndex.GetPlatformByPriority(CollideAll<Platform>(Position + Vector2.UnitX * dir * 4f, temp));
             if (platformByPriority != null)
                 index = platformByPriority.GetWallSoundIndex(this, dir);
-            ParticleType particleType = this.DustParticleFromSurfaceIndex(index);
+            ParticleType particleType = DustParticleFromSurfaceIndex(index);
             float x = particleType == ParticleTypes.Dust ? 5f : 2f;
-            Vector2 center = this.Center;
+            Vector2 center = Center;
             Dust.Burst(dir != 1 ? center + new Vector2(-x, 4f) : center + new Vector2(x, 4f), -1.57079637f, particleType: particleType);
         }
 
-        private bool IsTired => (double) this.CheckStamina < 20.0;
+        private bool IsTired => (double) CheckStamina < 20.0;
 
-        private float CheckStamina => (double) this.wallBoostTimer > 0.0 ? this.Stamina + 27.5f : this.Stamina;
+        private float CheckStamina => wallBoostTimer > 0.0 ? Stamina + 27.5f : Stamina;
 
         private void PlaySweatEffectDangerOverride(string state)
         {
-            if ((double) this.Stamina <= 20.0)
-                this.sweatSprite.Play("danger");
+            if (Stamina <= 20.0)
+                sweatSprite.Play("danger");
             else
-                this.sweatSprite.Play(state);
+                sweatSprite.Play(state);
         }
 
         private void ClimbBegin()
         {
-            this.AutoJump = false;
-            this.Speed.X = 0.0f;
-            this.Speed.Y *= 0.2f;
-            this.wallSlideTimer = 1.2f;
-            this.climbNoMoveTimer = 0.1f;
-            this.wallBoostTimer = 0.0f;
-            this.lastClimbMove = 0;
+            AutoJump = false;
+            Speed.X = 0.0f;
+            Speed.Y *= 0.2f;
+            wallSlideTimer = 1.2f;
+            climbNoMoveTimer = 0.1f;
+            wallBoostTimer = 0.0f;
+            lastClimbMove = 0;
             Input.Rumble(RumbleStrength.Medium, RumbleLength.Short);
-            for (int index = 0; index < 2 && !this.CollideCheck<Solid>(this.Position + Vector2.UnitX * (float) this.Facing); ++index)
-                this.Position = this.Position + Vector2.UnitX * (float) this.Facing;
-            Platform platformByPriority = SurfaceIndex.GetPlatformByPriority(this.CollideAll<Solid>(this.Position + Vector2.UnitX * (float) this.Facing, this.temp));
+            for (int index = 0; index < 2 && !CollideCheck<Solid>(Position + Vector2.UnitX * (float) Facing); ++index)
+                Position = Position + Vector2.UnitX * (float) Facing;
+            Platform platformByPriority = SurfaceIndex.GetPlatformByPriority(CollideAll<Solid>(Position + Vector2.UnitX * (float) Facing, temp));
             if (platformByPriority == null)
                 return;
-            this.Play("event:/char/madeline/grab", "surface_index", (float) platformByPriority.GetWallSoundIndex(this, (int) this.Facing));
-            if (!(platformByPriority is DreamBlock))
+            Play("event:/char/madeline/grab", "surface_index", platformByPriority.GetWallSoundIndex(this, (int)Facing));
+            if (platformByPriority is not DreamBlock)
                 return;
-            (platformByPriority as DreamBlock).FootstepRipple(this.Position + new Vector2((float) ((int) this.Facing * 3), -4f));
+            (platformByPriority as DreamBlock).FootstepRipple(Position + new Vector2((int)Facing * 3, -4f));
         }
 
         private void ClimbEnd()
         {
-            if ((HandleBase) this.conveyorLoopSfx != (HandleBase) null)
+            if (conveyorLoopSfx != null)
             {
-                int num1 = (int) this.conveyorLoopSfx.setParameterValue("end", 1f);
-                int num2 = (int) this.conveyorLoopSfx.release();
-                this.conveyorLoopSfx = (EventInstance) null;
+                int num1 = (int) conveyorLoopSfx.setParameterValue("end", 1f);
+                int num2 = (int) conveyorLoopSfx.release();
+                conveyorLoopSfx = null;
             }
-            this.wallSpeedRetentionTimer = 0.0f;
-            if (this.sweatSprite == null || !(this.sweatSprite.CurrentAnimationID != "jump"))
+            wallSpeedRetentionTimer = 0.0f;
+            if (sweatSprite == null || !(sweatSprite.CurrentAnimationID != "jump"))
                 return;
-            this.sweatSprite.Play("idle");
+            sweatSprite.Play("idle");
         }
 
         private int ClimbUpdate()
         {
-            this.climbNoMoveTimer -= Engine.DeltaTime;
-            if (this.onGround)
-                this.Stamina = 110f;
-            if (Input.Jump.Pressed && (!this.Ducking || this.CanUnDuck))
+            climbNoMoveTimer -= Engine.DeltaTime;
+            if (onGround)
+                Stamina = 110f;
+            if (Input.Jump.Pressed && (!Ducking || CanUnDuck))
             {
-                if (this.moveX == -(int) this.Facing)
-                    this.WallJump(-(int) this.Facing);
+                if (moveX == -(int) Facing)
+                    WallJump(-(int) Facing);
                 else
-                    this.ClimbJump();
+                    ClimbJump();
                 return 0;
             }
-            if (this.CanDash)
+            if (CanDash)
             {
-                this.Speed += this.LiftBoost;
-                return this.StartDash();
+                Speed += LiftBoost;
+                return StartDash();
             }
             if (!Input.GrabCheck)
             {
-                this.Speed += this.LiftBoost;
-                this.Play("event:/char/madeline/grab_letgo");
+                Speed += LiftBoost;
+                Play("event:/char/madeline/grab_letgo");
                 return 0;
             }
-            if (!this.CollideCheck<Solid>(this.Position + Vector2.UnitX * (float) this.Facing))
+            if (!CollideCheck<Solid>(Position + Vector2.UnitX * (float) Facing))
             {
-                if ((double) this.Speed.Y < 0.0)
+                if (Speed.Y < 0.0)
                 {
-                    if (this.wallBoosting)
+                    if (wallBoosting)
                     {
-                        this.Speed += this.LiftBoost;
-                        this.Play("event:/char/madeline/grab_letgo");
+                        Speed += LiftBoost;
+                        Play("event:/char/madeline/grab_letgo");
                     }
                     else
-                        this.ClimbHop();
+                        ClimbHop();
                 }
                 return 0;
             }
-            WallBooster wallBooster = this.WallBoosterCheck();
-            if ((double) this.climbNoMoveTimer <= 0.0 && wallBooster != null)
+            WallBooster wallBooster = WallBoosterCheck();
+            if (climbNoMoveTimer <= 0.0 && wallBooster != null)
             {
-                this.wallBoosting = true;
-                if ((HandleBase) this.conveyorLoopSfx == (HandleBase) null)
-                    this.conveyorLoopSfx = Audio.Play("event:/game/09_core/conveyor_activate", this.Position, "end", 0.0f);
-                Audio.Position(this.conveyorLoopSfx, this.Position);
-                this.Speed.Y = Calc.Approach(this.Speed.Y, -160f, 600f * Engine.DeltaTime);
-                this.LiftSpeed = Vector2.UnitY * Math.Max(this.Speed.Y, -80f);
+                wallBoosting = true;
+                if (conveyorLoopSfx == null)
+                    conveyorLoopSfx = Audio.Play("event:/game/09_core/conveyor_activate", Position, "end", 0.0f);
+                Audio.Position(conveyorLoopSfx, Position);
+                Speed.Y = Calc.Approach(Speed.Y, -160f, 600f * Engine.DeltaTime);
+                LiftSpeed = Vector2.UnitY * Math.Max(Speed.Y, -80f);
                 Input.Rumble(RumbleStrength.Light, RumbleLength.Short);
             }
             else
             {
-                this.wallBoosting = false;
-                if ((HandleBase) this.conveyorLoopSfx != (HandleBase) null)
+                wallBoosting = false;
+                if (conveyorLoopSfx != null)
                 {
-                    int num1 = (int) this.conveyorLoopSfx.setParameterValue("end", 1f);
-                    int num2 = (int) this.conveyorLoopSfx.release();
-                    this.conveyorLoopSfx = (EventInstance) null;
+                    int num1 = (int) conveyorLoopSfx.setParameterValue("end", 1f);
+                    int num2 = (int) conveyorLoopSfx.release();
+                    conveyorLoopSfx = null;
                 }
                 float target = 0.0f;
                 bool flag = false;
-                if ((double) this.climbNoMoveTimer <= 0.0)
+                if (climbNoMoveTimer <= 0.0)
                 {
-                    if (ClimbBlocker.Check(this.Scene, (Entity) this, this.Position + Vector2.UnitX * (float) this.Facing))
+                    if (ClimbBlocker.Check(Scene, this, Position + Vector2.UnitX * (float) Facing))
                         flag = true;
                     else if (Input.MoveY.Value == -1)
                     {
                         target = -45f;
-                        if (this.CollideCheck<Solid>(this.Position - Vector2.UnitY) || this.ClimbHopBlockedCheck() && this.SlipCheck(-1f))
+                        if (CollideCheck<Solid>(Position - Vector2.UnitY) || ClimbHopBlockedCheck() && SlipCheck(-1f))
                         {
-                            if ((double) this.Speed.Y < 0.0)
-                                this.Speed.Y = 0.0f;
+                            if (Speed.Y < 0.0)
+                                Speed.Y = 0.0f;
                             target = 0.0f;
                             flag = true;
                         }
-                        else if (this.SlipCheck())
+                        else if (SlipCheck())
                         {
-                            this.ClimbHop();
+                            ClimbHop();
                             return 0;
                         }
                     }
                     else if (Input.MoveY.Value == 1)
                     {
                         target = 80f;
-                        if (this.onGround)
+                        if (onGround)
                         {
-                            if ((double) this.Speed.Y > 0.0)
-                                this.Speed.Y = 0.0f;
+                            if (Speed.Y > 0.0)
+                                Speed.Y = 0.0f;
                             target = 0.0f;
                         }
                         else
-                            this.CreateWallSlideParticles((int) this.Facing);
+                            CreateWallSlideParticles((int) Facing);
                     }
                     else
                         flag = true;
                 }
                 else
                     flag = true;
-                this.lastClimbMove = Math.Sign(target);
-                if (flag && this.SlipCheck())
+                lastClimbMove = Math.Sign(target);
+                if (flag && SlipCheck())
                     target = 30f;
-                this.Speed.Y = Calc.Approach(this.Speed.Y, target, 900f * Engine.DeltaTime);
+                Speed.Y = Calc.Approach(Speed.Y, target, 900f * Engine.DeltaTime);
             }
-            if (Input.MoveY.Value != 1 && (double) this.Speed.Y > 0.0 && !this.CollideCheck<Solid>(this.Position + new Vector2((float) this.Facing, 1f)))
-                this.Speed.Y = 0.0f;
-            if ((double) this.climbNoMoveTimer <= 0.0)
+            if (Input.MoveY.Value != 1 && Speed.Y > 0.0 && !CollideCheck<Solid>(Position + new Vector2((float) Facing, 1f)))
+                Speed.Y = 0.0f;
+            if (climbNoMoveTimer <= 0.0)
             {
-                if (this.lastClimbMove == -1)
+                if (lastClimbMove == -1)
                 {
-                    this.Stamina -= 45.4545441f * Engine.DeltaTime;
-                    if ((double) this.Stamina <= 20.0)
-                        this.sweatSprite.Play("danger");
-                    else if (this.sweatSprite.CurrentAnimationID != "climbLoop")
-                        this.sweatSprite.Play("climb");
-                    if (this.Scene.OnInterval(0.2f))
+                    Stamina -= 45.4545441f * Engine.DeltaTime;
+                    if (Stamina <= 20.0)
+                        sweatSprite.Play("danger");
+                    else if (sweatSprite.CurrentAnimationID != "climbLoop")
+                        sweatSprite.Play("climb");
+                    if (Scene.OnInterval(0.2f))
                         Input.Rumble(RumbleStrength.Climb, RumbleLength.Short);
                 }
                 else
                 {
-                    if (this.lastClimbMove == 0)
-                        this.Stamina -= 10f * Engine.DeltaTime;
-                    if (!this.onGround)
+                    if (lastClimbMove == 0)
+                        Stamina -= 10f * Engine.DeltaTime;
+                    if (!onGround)
                     {
-                        this.PlaySweatEffectDangerOverride("still");
-                        if (this.Scene.OnInterval(0.8f))
+                        PlaySweatEffectDangerOverride("still");
+                        if (Scene.OnInterval(0.8f))
                             Input.Rumble(RumbleStrength.Climb, RumbleLength.Short);
                     }
                     else
-                        this.PlaySweatEffectDangerOverride("idle");
+                        PlaySweatEffectDangerOverride("idle");
                 }
             }
             else
-                this.PlaySweatEffectDangerOverride("idle");
-            if ((double) this.Stamina > 0.0)
+                PlaySweatEffectDangerOverride("idle");
+            if (Stamina > 0.0)
                 return 1;
-            this.Speed += this.LiftBoost;
+            Speed += LiftBoost;
             return 0;
         }
 
         private WallBooster WallBoosterCheck()
         {
-            if (ClimbBlocker.Check(this.Scene, (Entity) this, this.Position + Vector2.UnitX * (float) this.Facing))
-                return (WallBooster) null;
-            foreach (WallBooster entity in this.Scene.Tracker.GetEntities<WallBooster>())
+            if (ClimbBlocker.Check(Scene, this, Position + Vector2.UnitX * (float) Facing))
+                return null;
+            foreach (WallBooster entity in Scene.Tracker.GetEntities<WallBooster>())
             {
-                if (entity.Facing == this.Facing && this.CollideCheck((Entity) entity))
+                if (entity.Facing == Facing && CollideCheck(entity))
                     return entity;
             }
-            return (WallBooster) null;
+            return null;
         }
 
         private void ClimbHop()
         {
-            this.climbHopSolid = this.CollideFirst<Solid>(this.Position + Vector2.UnitX * (float) this.Facing);
-            this.playFootstepOnLand = 0.5f;
-            if (this.climbHopSolid != null)
+            climbHopSolid = CollideFirst<Solid>(Position + Vector2.UnitX * (float) Facing);
+            playFootstepOnLand = 0.5f;
+            if (climbHopSolid != null)
             {
-                this.climbHopSolidPosition = this.climbHopSolid.Position;
-                this.hopWaitX = (int) this.Facing;
-                this.hopWaitXSpeed = (float) this.Facing * 100f;
+                climbHopSolidPosition = climbHopSolid.Position;
+                hopWaitX = (int) Facing;
+                hopWaitXSpeed = (float) Facing * 100f;
             }
             else
             {
-                this.hopWaitX = 0;
-                this.Speed.X = (float) this.Facing * 100f;
+                hopWaitX = 0;
+                Speed.X = (float) Facing * 100f;
             }
-            this.lowFrictionStopTimer = 0.15f;
-            this.Speed.Y = Math.Min(this.Speed.Y, -120f);
-            this.forceMoveX = 0;
-            this.forceMoveXTimer = 0.2f;
-            this.fastJump = false;
-            this.noWindTimer = 0.3f;
-            this.Play("event:/char/madeline/climb_ledge");
+            lowFrictionStopTimer = 0.15f;
+            Speed.Y = Math.Min(Speed.Y, -120f);
+            forceMoveX = 0;
+            forceMoveXTimer = 0.2f;
+            fastJump = false;
+            noWindTimer = 0.3f;
+            Play("event:/char/madeline/climb_ledge");
         }
 
         private bool SlipCheck(float addY = 0.0f)
         {
-            Vector2 point = this.Facing != Facings.Right ? this.TopLeft - Vector2.UnitX + Vector2.UnitY * (4f + addY) : this.TopRight + Vector2.UnitY * (4f + addY);
-            return !this.Scene.CollideCheck<Solid>(point) && !this.Scene.CollideCheck<Solid>(point + Vector2.UnitY * (addY - 4f));
+            Vector2 point = Facing != Facings.Right ? TopLeft - Vector2.UnitX + Vector2.UnitY * (4f + addY) : TopRight + Vector2.UnitY * (4f + addY);
+            return !Scene.CollideCheck<Solid>(point) && !Scene.CollideCheck<Solid>(point + Vector2.UnitY * (addY - 4f));
         }
 
         private bool ClimbHopBlockedCheck()
         {
-            foreach (Component follower in this.Leader.Followers)
+            foreach (Component follower in Leader.Followers)
             {
                 if (follower.Entity is StrawberrySeed)
                     return true;
             }
-            foreach (LedgeBlocker component in this.Scene.Tracker.GetComponents<LedgeBlocker>())
+            foreach (LedgeBlocker component in Scene.Tracker.GetComponents<LedgeBlocker>())
             {
                 if (component.HopBlockCheck(this))
                     return true;
             }
-            return this.CollideCheck<Solid>(this.Position - Vector2.UnitY * 6f);
+            return CollideCheck<Solid>(Position - Vector2.UnitY * 6f);
         }
 
         private bool JumpThruBoostBlockedCheck()
         {
-            foreach (LedgeBlocker component in this.Scene.Tracker.GetComponents<LedgeBlocker>())
+            foreach (LedgeBlocker component in Scene.Tracker.GetComponents<LedgeBlocker>())
             {
                 if (component.JumpThruBoostCheck(this))
                     return true;
@@ -3046,43 +3021,43 @@ namespace Celeste
 
         private bool DashCorrectCheck(Vector2 add)
         {
-            Vector2 position = this.Position;
-            Collider collider = this.Collider;
-            this.Position = this.Position + add;
-            this.Collider = (Collider) this.hurtbox;
-            foreach (LedgeBlocker component in this.Scene.Tracker.GetComponents<LedgeBlocker>())
+            Vector2 position = Position;
+            Collider collider = Collider;
+            Position = Position + add;
+            Collider = hurtbox;
+            foreach (LedgeBlocker component in Scene.Tracker.GetComponents<LedgeBlocker>())
             {
                 if (component.DashCorrectCheck(this))
                 {
-                    this.Position = position;
-                    this.Collider = collider;
+                    Position = position;
+                    Collider = collider;
                     return true;
                 }
             }
-            this.Position = position;
-            this.Collider = collider;
+            Position = position;
+            Collider = collider;
             return false;
         }
 
         public int StartDash()
         {
-            this.wasDashB = this.Dashes == 2;
-            this.Dashes = Math.Max(0, this.Dashes - 1);
-            this.demoDashed = Input.CrouchDashPressed;
+            wasDashB = Dashes == 2;
+            Dashes = Math.Max(0, Dashes - 1);
+            demoDashed = Input.CrouchDashPressed;
             Input.Dash.ConsumeBuffer();
             Input.CrouchDash.ConsumeBuffer();
             return 2;
         }
 
-        public bool DashAttacking => (double) this.dashAttackTimer > 0.0 || this.StateMachine.State == 5;
+        public bool DashAttacking => dashAttackTimer > 0.0 || StateMachine.State == 5;
 
         public bool CanDash
         {
             get
             {
-                if (!Input.CrouchDashPressed && !Input.DashPressed || (double) this.dashCooldownTimer > 0.0 || this.Dashes <= 0 || TalkComponent.PlayerOver != null && Input.Talk.Pressed)
+                if (!Input.CrouchDashPressed && !Input.DashPressed || dashCooldownTimer > 0.0 || Dashes <= 0 || TalkComponent.PlayerOver != null && Input.Talk.Pressed)
                     return false;
-                return this.LastBooster == null || !this.LastBooster.Ch9HubTransition || !this.LastBooster.BoostingPlayer;
+                return LastBooster == null || !LastBooster.Ch9HubTransition || !LastBooster.BoostingPlayer;
             }
         }
 
@@ -3090,199 +3065,199 @@ namespace Celeste
 
         private void CallDashEvents()
         {
-            if (this.calledDashEvents)
+            if (calledDashEvents)
                 return;
-            this.calledDashEvents = true;
-            if (this.CurrentBooster == null)
+            calledDashEvents = true;
+            if (CurrentBooster == null)
             {
                 ++SaveData.Instance.TotalDashes;
-                ++this.level.Session.Dashes;
+                ++level.Session.Dashes;
                 //Stats.Increment(Stat.DASHES);
-                bool flag = (double) this.DashDir.Y < 0.0 || (double) this.DashDir.Y == 0.0 && (double) this.DashDir.X > 0.0;
-                if (this.DashDir == Vector2.Zero)
-                    flag = this.Facing == Facings.Right;
+                bool flag = DashDir.Y < 0.0 || DashDir.Y == 0.0 && DashDir.X > 0.0;
+                if (DashDir == Vector2.Zero)
+                    flag = Facing == Facings.Right;
                 if (flag)
                 {
-                    if (this.wasDashB)
-                        this.Play("event:/char/madeline/dash_pink_right");
+                    if (wasDashB)
+                        Play("event:/char/madeline/dash_pink_right");
                     else
-                        this.Play("event:/char/madeline/dash_red_right");
+                        Play("event:/char/madeline/dash_red_right");
                 }
-                else if (this.wasDashB)
-                    this.Play("event:/char/madeline/dash_pink_left");
+                else if (wasDashB)
+                    Play("event:/char/madeline/dash_pink_left");
                 else
-                    this.Play("event:/char/madeline/dash_red_left");
-                if (this.SwimCheck())
-                    this.Play("event:/char/madeline/water_dash_gen");
-                foreach (DashListener component in this.Scene.Tracker.GetComponents<DashListener>())
+                    Play("event:/char/madeline/dash_red_left");
+                if (SwimCheck())
+                    Play("event:/char/madeline/water_dash_gen");
+                foreach (DashListener component in Scene.Tracker.GetComponents<DashListener>())
                 {
                     if (component.OnDash != null)
-                        component.OnDash(this.DashDir);
+                        component.OnDash(DashDir);
                 }
             }
             else
             {
-                this.CurrentBooster.PlayerBoosted(this, this.DashDir);
-                this.CurrentBooster = (Booster) null;
+                CurrentBooster.PlayerBoosted(this, DashDir);
+                CurrentBooster = null;
             }
         }
 
         private void DashBegin()
         {
-            this.calledDashEvents = false;
-            this.dashStartedOnGround = this.onGround;
-            this.launched = false;
-            this.canCurveDash = true;
-            if ((double) Engine.TimeRate > 0.25)
+            calledDashEvents = false;
+            dashStartedOnGround = onGround;
+            launched = false;
+            canCurveDash = true;
+            if (Engine.TimeRate > 0.25)
                 Celeste.Freeze(0.05f);
-            this.dashCooldownTimer = 0.2f;
-            this.dashRefillCooldownTimer = 0.1f;
-            this.StartedDashing = true;
-            this.wallSlideTimer = 1.2f;
-            this.dashTrailTimer = 0.0f;
-            this.dashTrailCounter = 0;
+            dashCooldownTimer = 0.2f;
+            dashRefillCooldownTimer = 0.1f;
+            StartedDashing = true;
+            wallSlideTimer = 1.2f;
+            dashTrailTimer = 0.0f;
+            dashTrailCounter = 0;
             if (!SaveData.Instance.Assists.DashAssist)
                 Input.Rumble(RumbleStrength.Strong, RumbleLength.Medium);
-            this.dashAttackTimer = 0.3f;
-            this.gliderBoostTimer = 0.55f;
+            dashAttackTimer = 0.3f;
+            gliderBoostTimer = 0.55f;
             if (SaveData.Instance.Assists.SuperDashing)
-                this.dashAttackTimer += 0.15f;
-            this.beforeDashSpeed = this.Speed;
-            this.Speed = Vector2.Zero;
-            this.DashDir = Vector2.Zero;
-            if (!this.onGround && this.Ducking && this.CanUnDuck)
-                this.Ducking = false;
-            else if (!this.Ducking && (this.demoDashed || Input.MoveY.Value == 1))
-                this.Ducking = true;
-            this.DashAssistInit();
+                dashAttackTimer += 0.15f;
+            beforeDashSpeed = Speed;
+            Speed = Vector2.Zero;
+            DashDir = Vector2.Zero;
+            if (!onGround && Ducking && CanUnDuck)
+                Ducking = false;
+            else if (!Ducking && (demoDashed || Input.MoveY.Value == 1))
+                Ducking = true;
+            DashAssistInit();
         }
 
         private void DashAssistInit()
         {
-            if (!SaveData.Instance.Assists.DashAssist || this.demoDashed)
+            if (!SaveData.Instance.Assists.DashAssist || demoDashed)
                 return;
-            Input.LastAim = Vector2.UnitX * (float) this.Facing;
+            Input.LastAim = Vector2.UnitX * (float) Facing;
             Engine.DashAssistFreeze = true;
             Engine.DashAssistFreezePress = false;
-            PlayerDashAssist playerDashAssist = this.Scene.Tracker.GetEntity<PlayerDashAssist>();
+            PlayerDashAssist playerDashAssist = Scene.Tracker.GetEntity<PlayerDashAssist>();
             if (playerDashAssist == null)
-                this.Scene.Add((Entity) (playerDashAssist = new PlayerDashAssist()));
-            playerDashAssist.Direction = Input.GetAimVector(this.Facing).Angle();
+                Scene.Add(playerDashAssist = new PlayerDashAssist());
+            playerDashAssist.Direction = Input.GetAimVector(Facing).Angle();
             playerDashAssist.Scale = 0.0f;
-            playerDashAssist.Offset = this.CurrentBooster != null || this.StateMachine.PreviousState == 5 ? new Vector2(0.0f, -4f) : Vector2.Zero;
+            playerDashAssist.Offset = CurrentBooster != null || StateMachine.PreviousState == 5 ? new Vector2(0.0f, -4f) : Vector2.Zero;
         }
 
         private void DashEnd()
         {
-            this.CallDashEvents();
-            this.demoDashed = false;
+            CallDashEvents();
+            demoDashed = false;
         }
 
         private int DashUpdate()
         {
-            this.StartedDashing = false;
-            if ((double) this.dashTrailTimer > 0.0)
+            StartedDashing = false;
+            if (dashTrailTimer > 0.0)
             {
-                this.dashTrailTimer -= Engine.DeltaTime;
-                if ((double) this.dashTrailTimer <= 0.0)
+                dashTrailTimer -= Engine.DeltaTime;
+                if (dashTrailTimer <= 0.0)
                 {
-                    this.CreateTrail();
-                    --this.dashTrailCounter;
-                    if (this.dashTrailCounter > 0)
-                        this.dashTrailTimer = 0.1f;
+                    CreateTrail();
+                    --dashTrailCounter;
+                    if (dashTrailCounter > 0)
+                        dashTrailTimer = 0.1f;
                 }
             }
-            if (SaveData.Instance.Assists.SuperDashing && this.canCurveDash && Input.Aim.Value != Vector2.Zero && this.Speed != Vector2.Zero)
+            if (SaveData.Instance.Assists.SuperDashing && canCurveDash && Input.Aim.Value != Vector2.Zero && Speed != Vector2.Zero)
             {
-                Vector2 vector = this.CorrectDashPrecision(Input.GetAimVector());
-                float num = Vector2.Dot(vector, this.Speed.SafeNormalize());
-                if ((double) num >= -0.10000000149011612 && (double) num < 0.99000000953674316)
+                Vector2 vector = CorrectDashPrecision(Input.GetAimVector());
+                float num = Vector2.Dot(vector, Speed.SafeNormalize());
+                if ((double) num is >= (-0.10000000149011612) and < 0.99000000953674316)
                 {
-                    this.Speed = this.Speed.RotateTowards(vector.Angle(), 4.18879032f * Engine.DeltaTime);
-                    this.DashDir = this.Speed.SafeNormalize();
-                    this.DashDir = this.CorrectDashPrecision(this.DashDir);
+                    Speed = Speed.RotateTowards(vector.Angle(), 4.18879032f * Engine.DeltaTime);
+                    DashDir = Speed.SafeNormalize();
+                    DashDir = CorrectDashPrecision(DashDir);
                 }
             }
-            if (SaveData.Instance.Assists.SuperDashing && this.CanDash)
+            if (SaveData.Instance.Assists.SuperDashing && CanDash)
             {
-                this.StartDash();
-                this.StateMachine.ForceState(2);
+                StartDash();
+                StateMachine.ForceState(2);
                 return 2;
             }
-            if (this.Holding == null && this.DashDir != Vector2.Zero && Input.GrabCheck && !this.IsTired && this.CanUnDuck)
+            if (Holding == null && DashDir != Vector2.Zero && Input.GrabCheck && !IsTired && CanUnDuck)
             {
-                foreach (Holdable component in this.Scene.Tracker.GetComponents<Holdable>())
+                foreach (Holdable component in Scene.Tracker.GetComponents<Holdable>())
                 {
-                    if (component.Check(this) && this.Pickup(component))
+                    if (component.Check(this) && Pickup(component))
                         return 8;
                 }
             }
-            if ((double) Math.Abs(this.DashDir.Y) < 0.10000000149011612)
+            if ((double) Math.Abs(DashDir.Y) < 0.10000000149011612)
             {
-                foreach (JumpThru entity in this.Scene.Tracker.GetEntities<JumpThru>())
+                foreach (JumpThru entity in Scene.Tracker.GetEntities<JumpThru>())
                 {
-                    if (this.CollideCheck((Entity) entity) && (double) this.Bottom - (double) entity.Top <= 6.0 && !this.DashCorrectCheck(Vector2.UnitY * (entity.Top - this.Bottom)))
-                        this.MoveVExact((int) ((double) entity.Top - (double) this.Bottom));
+                    if (CollideCheck(entity) && (double) Bottom - (double) entity.Top <= 6.0 && !DashCorrectCheck(Vector2.UnitY * (entity.Top - Bottom)))
+                        MoveVExact((int) ((double) entity.Top - (double) Bottom));
                 }
-                if (this.CanUnDuck && Input.Jump.Pressed && (double) this.jumpGraceTimer > 0.0)
+                if (CanUnDuck && Input.Jump.Pressed && jumpGraceTimer > 0.0)
                 {
-                    this.SuperJump();
+                    SuperJump();
                     return 0;
                 }
             }
-            if (this.SuperWallJumpAngleCheck)
+            if (SuperWallJumpAngleCheck)
             {
-                if (Input.Jump.Pressed && this.CanUnDuck)
+                if (Input.Jump.Pressed && CanUnDuck)
                 {
-                    if (this.WallJumpCheck(1))
+                    if (WallJumpCheck(1))
                     {
-                        this.SuperWallJump(-1);
+                        SuperWallJump(-1);
                         return 0;
                     }
-                    if (this.WallJumpCheck(-1))
+                    if (WallJumpCheck(-1))
                     {
-                        this.SuperWallJump(1);
+                        SuperWallJump(1);
                         return 0;
                     }
                 }
             }
-            else if (Input.Jump.Pressed && this.CanUnDuck)
+            else if (Input.Jump.Pressed && CanUnDuck)
             {
-                if (this.WallJumpCheck(1))
+                if (WallJumpCheck(1))
                 {
-                    if (this.Facing == Facings.Right && Input.GrabCheck && (double) this.Stamina > 0.0 && this.Holding == null && !ClimbBlocker.Check(this.Scene, (Entity) this, this.Position + Vector2.UnitX * 3f))
-                        this.ClimbJump();
+                    if (Facing == Facings.Right && Input.GrabCheck && Stamina > 0.0 && Holding == null && !ClimbBlocker.Check(Scene, this, Position + Vector2.UnitX * 3f))
+                        ClimbJump();
                     else
-                        this.WallJump(-1);
+                        WallJump(-1);
                     return 0;
                 }
-                if (this.WallJumpCheck(-1))
+                if (WallJumpCheck(-1))
                 {
-                    if (this.Facing == Facings.Left && Input.GrabCheck && (double) this.Stamina > 0.0 && this.Holding == null && !ClimbBlocker.Check(this.Scene, (Entity) this, this.Position + Vector2.UnitX * -3f))
-                        this.ClimbJump();
+                    if (Facing == Facings.Left && Input.GrabCheck && Stamina > 0.0 && Holding == null && !ClimbBlocker.Check(Scene, this, Position + Vector2.UnitX * -3f))
+                        ClimbJump();
                     else
-                        this.WallJump(1);
+                        WallJump(1);
                     return 0;
                 }
             }
-            if (this.Speed != Vector2.Zero && this.level.OnInterval(0.02f))
-                this.level.ParticlesFG.Emit(this.wasDashB ? (this.Sprite.Mode != PlayerSpriteMode.MadelineAsBadeline ? Player.P_DashB : Player.P_DashBadB) : Player.P_DashA, this.Center + Calc.Random.Range(Vector2.One * -2f, Vector2.One * 2f), this.DashDir.Angle());
+            if (Speed != Vector2.Zero && level.OnInterval(0.02f))
+                level.ParticlesFG.Emit(wasDashB ? (Sprite.Mode != PlayerSpriteMode.MadelineAsBadeline ? Player.P_DashB : Player.P_DashBadB) : Player.P_DashA, Center + Calc.Random.Range(Vector2.One * -2f, Vector2.One * 2f), DashDir.Angle());
             return 2;
         }
 
-        private bool SuperWallJumpAngleCheck => (double) Math.Abs(this.DashDir.X) <= 0.20000000298023224 && (double) this.DashDir.Y <= -0.75;
+        private bool SuperWallJumpAngleCheck => (double) Math.Abs(DashDir.X) <= 0.20000000298023224 && DashDir.Y <= -0.75;
 
         private Vector2 CorrectDashPrecision(Vector2 dir)
         {
-            if ((double) dir.X != 0.0 && (double) Math.Abs(dir.X) < 1.0 / 1000.0)
+            if (dir.X != 0.0 && (double) Math.Abs(dir.X) < 1.0 / 1000.0)
             {
                 dir.X = 0.0f;
-                dir.Y = (float) Math.Sign(dir.Y);
+                dir.Y = Math.Sign(dir.Y);
             }
-            else if ((double) dir.Y != 0.0 && (double) Math.Abs(dir.Y) < 1.0 / 1000.0)
+            else if (dir.Y != 0.0 && (double) Math.Abs(dir.Y) < 1.0 / 1000.0)
             {
                 dir.Y = 0.0f;
-                dir.X = (float) Math.Sign(dir.X);
+                dir.X = Math.Sign(dir.X);
             }
             return dir;
         }
@@ -3290,7 +3265,7 @@ namespace Celeste
         private IEnumerator DashCoroutine()
         {
             Player player = this;
-            yield return (object) null;
+            yield return null;
             if (SaveData.Instance.Assists.DashAssist)
                 Input.Rumble(RumbleStrength.Strong, RumbleLength.Medium);
             player.level.Displacement.AddBurst(player.Center, 0.4f, 8f, 64f, 0.5f, Ease.QuadOut, Ease.QuadOut);
@@ -3306,14 +3281,14 @@ namespace Celeste
                 player.Speed *= 0.75f;
             player.gliderBoostDir = player.DashDir = vector2_1;
             player.SceneAs<Level>().DirectionalShake(player.DashDir, 0.2f);
-            if ((double) player.DashDir.X != 0.0)
+            if (player.DashDir.X != 0.0)
                 player.Facing = (Facings) Math.Sign(player.DashDir.X);
             player.CallDashEvents();
             if (player.StateMachine.PreviousState == 19)
                 player.level.Particles.Emit(FlyFeather.P_Boost, 12, player.Center, Vector2.One * 4f, (-vector2_1).Angle());
-            if (player.onGround && (double) player.DashDir.X != 0.0 && (double) player.DashDir.Y > 0.0 && (double) player.Speed.Y > 0.0 && (!player.Inventory.DreamDash || !player.CollideCheck<DreamBlock>(player.Position + Vector2.UnitY)))
+            if (player.onGround && player.DashDir.X != 0.0 && player.DashDir.Y > 0.0 && player.Speed.Y > 0.0 && (!player.Inventory.DreamDash || !player.CollideCheck<DreamBlock>(player.Position + Vector2.UnitY)))
             {
-                player.DashDir.X = (float) Math.Sign(player.DashDir.X);
+                player.DashDir.X = Math.Sign(player.DashDir.X);
                 player.DashDir.Y = 0.0f;
                 player.Speed.Y = 0.0f;
                 player.Speed.X *= 1.2f;
@@ -3331,10 +3306,10 @@ namespace Celeste
                 player.dashTrailTimer = 0.08f;
                 player.dashTrailCounter = 1;
             }
-            if ((double) player.DashDir.X != 0.0 && Input.GrabCheck)
+            if (player.DashDir.X != 0.0 && Input.GrabCheck)
             {
-                SwapBlock swapBlock = player.CollideFirst<SwapBlock>(player.Position + Vector2.UnitX * (float) Math.Sign(player.DashDir.X));
-                if (swapBlock != null && (double) swapBlock.Direction.X == (double) Math.Sign(player.DashDir.X))
+                SwapBlock swapBlock = player.CollideFirst<SwapBlock>(player.Position + Vector2.UnitX * Math.Sign(player.DashDir.X));
+                if (swapBlock != null && swapBlock.Direction.X == (double) Math.Sign(player.DashDir.X))
                 {
                     player.StateMachine.State = 1;
                     player.Speed = Vector2.Zero;
@@ -3344,217 +3319,217 @@ namespace Celeste
             Vector2 swapCancel = Vector2.One;
             foreach (SwapBlock entity in player.Scene.Tracker.GetEntities<SwapBlock>())
             {
-                if (player.CollideCheck((Entity) entity, player.Position + Vector2.UnitY) && entity != null && entity.Swapping)
+                if (player.CollideCheck(entity, player.Position + Vector2.UnitY) && entity != null && entity.Swapping)
                 {
-                    if ((double) player.DashDir.X != 0.0 && (double) entity.Direction.X == (double) Math.Sign(player.DashDir.X))
+                    if (player.DashDir.X != 0.0 && entity.Direction.X == (double) Math.Sign(player.DashDir.X))
                         player.Speed.X = swapCancel.X = 0.0f;
-                    if ((double) player.DashDir.Y != 0.0 && (double) entity.Direction.Y == (double) Math.Sign(player.DashDir.Y))
+                    if (player.DashDir.Y != 0.0 && entity.Direction.Y == (double) Math.Sign(player.DashDir.Y))
                         player.Speed.Y = swapCancel.Y = 0.0f;
                 }
             }
             if (SaveData.Instance.Assists.SuperDashing)
-                yield return (object) 0.3f;
+                yield return 0.3f;
             else
-                yield return (object) 0.15f;
+                yield return 0.15f;
             player.CreateTrail();
             player.AutoJump = true;
             player.AutoJumpTimer = 0.0f;
-            if ((double) player.DashDir.Y <= 0.0)
+            if (player.DashDir.Y <= 0.0)
             {
                 player.Speed = player.DashDir * 160f;
                 player.Speed.X *= swapCancel.X;
                 player.Speed.Y *= swapCancel.Y;
             }
-            if ((double) player.Speed.Y < 0.0)
+            if (player.Speed.Y < 0.0)
                 player.Speed.Y *= 0.75f;
             player.StateMachine.State = 0;
         }
 
-        private bool SwimCheck() => this.CollideCheck<Water>(this.Position + Vector2.UnitY * -8f) && this.CollideCheck<Water>(this.Position);
+        private bool SwimCheck() => CollideCheck<Water>(Position + Vector2.UnitY * -8f) && CollideCheck<Water>(Position);
 
-        private bool SwimUnderwaterCheck() => this.CollideCheck<Water>(this.Position + Vector2.UnitY * -9f);
+        private bool SwimUnderwaterCheck() => CollideCheck<Water>(Position + Vector2.UnitY * -9f);
 
-        private bool SwimJumpCheck() => !this.CollideCheck<Water>(this.Position + Vector2.UnitY * -14f);
+        private bool SwimJumpCheck() => !CollideCheck<Water>(Position + Vector2.UnitY * -14f);
 
-        private bool SwimRiseCheck() => !this.CollideCheck<Water>(this.Position + Vector2.UnitY * -18f);
+        private bool SwimRiseCheck() => !CollideCheck<Water>(Position + Vector2.UnitY * -18f);
 
-        private bool UnderwaterMusicCheck() => this.CollideCheck<Water>(this.Position) && this.CollideCheck<Water>(this.Position + Vector2.UnitY * -12f);
+        private bool UnderwaterMusicCheck() => CollideCheck<Water>(Position) && CollideCheck<Water>(Position + Vector2.UnitY * -12f);
 
         private void SwimBegin()
         {
-            if ((double) this.Speed.Y > 0.0)
-                this.Speed.Y *= 0.5f;
-            this.Stamina = 110f;
+            if (Speed.Y > 0.0)
+                Speed.Y *= 0.5f;
+            Stamina = 110f;
         }
 
         private int SwimUpdate()
         {
-            if (!this.SwimCheck())
+            if (!SwimCheck())
                 return 0;
-            if (this.CanUnDuck)
-                this.Ducking = false;
-            if (this.CanDash)
+            if (CanUnDuck)
+                Ducking = false;
+            if (CanDash)
             {
-                this.demoDashed = Input.CrouchDashPressed;
+                demoDashed = Input.CrouchDashPressed;
                 Input.Dash.ConsumeBuffer();
                 Input.CrouchDash.ConsumeBuffer();
                 return 2;
             }
-            bool flag = this.SwimUnderwaterCheck();
-            if (!flag && (double) this.Speed.Y >= 0.0 && Input.GrabCheck && !this.IsTired && this.CanUnDuck && Math.Sign(this.Speed.X) != -(int) this.Facing && this.ClimbCheck((int) this.Facing))
+            bool flag = SwimUnderwaterCheck();
+            if (!flag && Speed.Y >= 0.0 && Input.GrabCheck && !IsTired && CanUnDuck && Math.Sign(Speed.X) != -(int) Facing && ClimbCheck((int) Facing))
             {
                 if (SaveData.Instance.Assists.NoGrabbing)
-                    this.ClimbTrigger((int) this.Facing);
-                else if (!this.MoveVExact(-1))
+                    ClimbTrigger((int) Facing);
+                else if (!MoveVExact(-1))
                 {
-                    this.Ducking = false;
+                    Ducking = false;
                     return 1;
                 }
             }
             Vector2 vector2 = Input.Feather.Value.SafeNormalize();
             float num1 = flag ? 60f : 80f;
             float num2 = 80f;
-            this.Speed.X = (double) Math.Abs(this.Speed.X) <= 80.0 || Math.Sign(this.Speed.X) != Math.Sign(vector2.X) ? Calc.Approach(this.Speed.X, num1 * vector2.X, 600f * Engine.DeltaTime) : Calc.Approach(this.Speed.X, num1 * vector2.X, 400f * Engine.DeltaTime);
-            if ((double) vector2.Y == 0.0 && this.SwimRiseCheck())
-                this.Speed.Y = Calc.Approach(this.Speed.Y, -60f, 600f * Engine.DeltaTime);
-            else if ((double) vector2.Y >= 0.0 || this.SwimUnderwaterCheck())
-                this.Speed.Y = (double) Math.Abs(this.Speed.Y) <= 80.0 || Math.Sign(this.Speed.Y) != Math.Sign(vector2.Y) ? Calc.Approach(this.Speed.Y, num2 * vector2.Y, 600f * Engine.DeltaTime) : Calc.Approach(this.Speed.Y, num2 * vector2.Y, 400f * Engine.DeltaTime);
-            if (!flag && this.moveX != 0 && this.CollideCheck<Solid>(this.Position + Vector2.UnitX * (float) this.moveX) && !this.CollideCheck<Solid>(this.Position + new Vector2((float) this.moveX, -3f)))
-                this.ClimbHop();
-            if (!Input.Jump.Pressed || !this.SwimJumpCheck())
+            Speed.X = (double) Math.Abs(Speed.X) <= 80.0 || Math.Sign(Speed.X) != Math.Sign(vector2.X) ? Calc.Approach(Speed.X, num1 * vector2.X, 600f * Engine.DeltaTime) : Calc.Approach(Speed.X, num1 * vector2.X, 400f * Engine.DeltaTime);
+            if (vector2.Y == 0.0 && SwimRiseCheck())
+                Speed.Y = Calc.Approach(Speed.Y, -60f, 600f * Engine.DeltaTime);
+            else if (vector2.Y >= 0.0 || SwimUnderwaterCheck())
+                Speed.Y = (double) Math.Abs(Speed.Y) <= 80.0 || Math.Sign(Speed.Y) != Math.Sign(vector2.Y) ? Calc.Approach(Speed.Y, num2 * vector2.Y, 600f * Engine.DeltaTime) : Calc.Approach(Speed.Y, num2 * vector2.Y, 400f * Engine.DeltaTime);
+            if (!flag && moveX != 0 && CollideCheck<Solid>(Position + Vector2.UnitX * moveX) && !CollideCheck<Solid>(Position + new Vector2(moveX, -3f)))
+                ClimbHop();
+            if (!Input.Jump.Pressed || !SwimJumpCheck())
                 return 3;
-            this.Jump();
+            Jump();
             return 0;
         }
 
         public void Boost(Booster booster)
         {
-            this.StateMachine.State = 4;
-            this.Speed = Vector2.Zero;
-            this.boostTarget = booster.Center;
-            this.boostRed = false;
-            this.LastBooster = this.CurrentBooster = booster;
+            StateMachine.State = 4;
+            Speed = Vector2.Zero;
+            boostTarget = booster.Center;
+            boostRed = false;
+            LastBooster = CurrentBooster = booster;
         }
 
         public void RedBoost(Booster booster)
         {
-            this.StateMachine.State = 4;
-            this.Speed = Vector2.Zero;
-            this.boostTarget = booster.Center;
-            this.boostRed = true;
-            this.LastBooster = this.CurrentBooster = booster;
+            StateMachine.State = 4;
+            Speed = Vector2.Zero;
+            boostTarget = booster.Center;
+            boostRed = true;
+            LastBooster = CurrentBooster = booster;
         }
 
         private void BoostBegin()
         {
-            this.RefillDash();
-            this.RefillStamina();
-            if (this.Holding == null)
+            RefillDash();
+            RefillStamina();
+            if (Holding == null)
                 return;
-            this.Drop();
+            Drop();
         }
 
         private void BoostEnd()
         {
-            Vector2 vector2 = (this.boostTarget - this.Collider.Center).Floor();
-            this.MoveToX(vector2.X);
-            this.MoveToY(vector2.Y);
+            Vector2 vector2 = (boostTarget - Collider.Center).Floor();
+            MoveToX(vector2.X);
+            MoveToY(vector2.Y);
         }
 
         private int BoostUpdate()
         {
-            Vector2 vector2 = Calc.Approach(this.ExactPosition, this.boostTarget - this.Collider.Center + Input.Aim.Value * 3f, 80f * Engine.DeltaTime);
-            this.MoveToX(vector2.X);
-            this.MoveToY(vector2.Y);
+            Vector2 vector2 = Calc.Approach(ExactPosition, boostTarget - Collider.Center + Input.Aim.Value * 3f, 80f * Engine.DeltaTime);
+            MoveToX(vector2.X);
+            MoveToY(vector2.Y);
             if (!Input.DashPressed && !Input.CrouchDashPressed)
                 return 4;
-            this.demoDashed = Input.CrouchDashPressed;
+            demoDashed = Input.CrouchDashPressed;
             Input.Dash.ConsumePress();
             Input.CrouchDash.ConsumeBuffer();
-            return this.boostRed ? 5 : 2;
+            return boostRed ? 5 : 2;
         }
 
         private IEnumerator BoostCoroutine()
         {
-            yield return (object) 0.25f;
-            this.StateMachine.State = !this.boostRed ? 2 : 5;
+            yield return 0.25f;
+            StateMachine.State = !boostRed ? 2 : 5;
         }
 
         private void RedDashBegin()
         {
-            this.calledDashEvents = false;
-            this.dashStartedOnGround = false;
+            calledDashEvents = false;
+            dashStartedOnGround = false;
             Celeste.Freeze(0.05f);
-            Dust.Burst(this.Position, (-this.DashDir).Angle(), 8);
-            this.dashCooldownTimer = 0.2f;
-            this.dashRefillCooldownTimer = 0.1f;
-            this.StartedDashing = true;
-            this.level.Displacement.AddBurst(this.Center, 0.5f, 0.0f, 80f, 0.666f, Ease.QuadOut, Ease.QuadOut);
+            Dust.Burst(Position, (-DashDir).Angle(), 8);
+            dashCooldownTimer = 0.2f;
+            dashRefillCooldownTimer = 0.1f;
+            StartedDashing = true;
+            level.Displacement.AddBurst(Center, 0.5f, 0.0f, 80f, 0.666f, Ease.QuadOut, Ease.QuadOut);
             Input.Rumble(RumbleStrength.Strong, RumbleLength.Medium);
-            this.dashAttackTimer = 0.3f;
-            this.gliderBoostTimer = 0.55f;
-            this.DashDir = this.Speed = Vector2.Zero;
-            if (!this.onGround && this.CanUnDuck)
-                this.Ducking = false;
-            this.DashAssistInit();
+            dashAttackTimer = 0.3f;
+            gliderBoostTimer = 0.55f;
+            DashDir = Speed = Vector2.Zero;
+            if (!onGround && CanUnDuck)
+                Ducking = false;
+            DashAssistInit();
         }
 
-        private void RedDashEnd() => this.CallDashEvents();
+        private void RedDashEnd() => CallDashEvents();
 
         private int RedDashUpdate()
         {
-            this.StartedDashing = false;
-            bool flag = this.LastBooster != null && this.LastBooster.Ch9HubTransition;
-            this.gliderBoostTimer = 0.05f;
-            if (this.CanDash)
-                return this.StartDash();
-            if ((double) this.DashDir.Y == 0.0)
+            StartedDashing = false;
+            bool flag = LastBooster != null && LastBooster.Ch9HubTransition;
+            gliderBoostTimer = 0.05f;
+            if (CanDash)
+                return StartDash();
+            if (DashDir.Y == 0.0)
             {
-                foreach (JumpThru entity in this.Scene.Tracker.GetEntities<JumpThru>())
+                foreach (JumpThru entity in Scene.Tracker.GetEntities<JumpThru>())
                 {
-                    if (this.CollideCheck((Entity) entity) && (double) this.Bottom - (double) entity.Top <= 6.0)
-                        this.MoveVExact((int) ((double) entity.Top - (double) this.Bottom));
+                    if (CollideCheck(entity) && (double) Bottom - (double) entity.Top <= 6.0)
+                        MoveVExact((int) ((double) entity.Top - (double) Bottom));
                 }
-                if (this.CanUnDuck && Input.Jump.Pressed && (double) this.jumpGraceTimer > 0.0 && !flag)
+                if (CanUnDuck && Input.Jump.Pressed && jumpGraceTimer > 0.0 && !flag)
                 {
-                    this.SuperJump();
+                    SuperJump();
                     return 0;
                 }
             }
             if (!flag)
             {
-                if (this.SuperWallJumpAngleCheck)
+                if (SuperWallJumpAngleCheck)
                 {
-                    if (Input.Jump.Pressed && this.CanUnDuck)
+                    if (Input.Jump.Pressed && CanUnDuck)
                     {
-                        if (this.WallJumpCheck(1))
+                        if (WallJumpCheck(1))
                         {
-                            this.SuperWallJump(-1);
+                            SuperWallJump(-1);
                             return 0;
                         }
-                        if (this.WallJumpCheck(-1))
+                        if (WallJumpCheck(-1))
                         {
-                            this.SuperWallJump(1);
+                            SuperWallJump(1);
                             return 0;
                         }
                     }
                 }
-                else if (Input.Jump.Pressed && this.CanUnDuck)
+                else if (Input.Jump.Pressed && CanUnDuck)
                 {
-                    if (this.WallJumpCheck(1))
+                    if (WallJumpCheck(1))
                     {
-                        if (this.Facing == Facings.Right && Input.GrabCheck && (double) this.Stamina > 0.0 && this.Holding == null && !ClimbBlocker.Check(this.Scene, (Entity) this, this.Position + Vector2.UnitX * 3f))
-                            this.ClimbJump();
+                        if (Facing == Facings.Right && Input.GrabCheck && Stamina > 0.0 && Holding == null && !ClimbBlocker.Check(Scene, this, Position + Vector2.UnitX * 3f))
+                            ClimbJump();
                         else
-                            this.WallJump(-1);
+                            WallJump(-1);
                         return 0;
                     }
-                    if (this.WallJumpCheck(-1))
+                    if (WallJumpCheck(-1))
                     {
-                        if (this.Facing == Facings.Left && Input.GrabCheck && (double) this.Stamina > 0.0 && this.Holding == null && !ClimbBlocker.Check(this.Scene, (Entity) this, this.Position + Vector2.UnitX * -3f))
-                            this.ClimbJump();
+                        if (Facing == Facings.Left && Input.GrabCheck && Stamina > 0.0 && Holding == null && !ClimbBlocker.Check(Scene, this, Position + Vector2.UnitX * -3f))
+                            ClimbJump();
                         else
-                            this.WallJump(1);
+                            WallJump(1);
                         return 0;
                     }
                 }
@@ -3565,50 +3540,50 @@ namespace Celeste
         private IEnumerator RedDashCoroutine()
         {
             Player player = this;
-            yield return (object) null;
+            yield return null;
             player.Speed = player.CorrectDashPrecision(player.lastAim) * 240f;
             player.gliderBoostDir = player.DashDir = player.lastAim;
             player.SceneAs<Level>().DirectionalShake(player.DashDir, 0.2f);
-            if ((double) player.DashDir.X != 0.0)
+            if (player.DashDir.X != 0.0)
                 player.Facing = (Facings) Math.Sign(player.DashDir.X);
             player.CallDashEvents();
         }
 
-        private void HitSquashBegin() => this.hitSquashNoMoveTimer = 0.1f;
+        private void HitSquashBegin() => hitSquashNoMoveTimer = 0.1f;
 
         private int HitSquashUpdate()
         {
-            this.Speed.X = Calc.Approach(this.Speed.X, 0.0f, 800f * Engine.DeltaTime);
-            this.Speed.Y = Calc.Approach(this.Speed.Y, 0.0f, 800f * Engine.DeltaTime);
+            Speed.X = Calc.Approach(Speed.X, 0.0f, 800f * Engine.DeltaTime);
+            Speed.Y = Calc.Approach(Speed.Y, 0.0f, 800f * Engine.DeltaTime);
             if (Input.Jump.Pressed)
             {
-                if (this.onGround)
-                    this.Jump();
-                else if (this.WallJumpCheck(1))
+                if (onGround)
+                    Jump();
+                else if (WallJumpCheck(1))
                 {
-                    if (this.Facing == Facings.Right && Input.GrabCheck && (double) this.Stamina > 0.0 && this.Holding == null && !ClimbBlocker.Check(this.Scene, (Entity) this, this.Position + Vector2.UnitX * 3f))
-                        this.ClimbJump();
+                    if (Facing == Facings.Right && Input.GrabCheck && Stamina > 0.0 && Holding == null && !ClimbBlocker.Check(Scene, this, Position + Vector2.UnitX * 3f))
+                        ClimbJump();
                     else
-                        this.WallJump(-1);
+                        WallJump(-1);
                 }
-                else if (this.WallJumpCheck(-1))
+                else if (WallJumpCheck(-1))
                 {
-                    if (this.Facing == Facings.Left && Input.GrabCheck && (double) this.Stamina > 0.0 && this.Holding == null && !ClimbBlocker.Check(this.Scene, (Entity) this, this.Position + Vector2.UnitX * -3f))
-                        this.ClimbJump();
+                    if (Facing == Facings.Left && Input.GrabCheck && Stamina > 0.0 && Holding == null && !ClimbBlocker.Check(Scene, this, Position + Vector2.UnitX * -3f))
+                        ClimbJump();
                     else
-                        this.WallJump(1);
+                        WallJump(1);
                 }
                 else
                     Input.Jump.ConsumeBuffer();
                 return 0;
             }
-            if (this.CanDash)
-                return this.StartDash();
-            if (Input.GrabCheck && this.ClimbCheck((int) this.Facing))
+            if (CanDash)
+                return StartDash();
+            if (Input.GrabCheck && ClimbCheck((int) Facing))
                 return 1;
-            if ((double) this.hitSquashNoMoveTimer <= 0.0)
+            if (hitSquashNoMoveTimer <= 0.0)
                 return 0;
-            this.hitSquashNoMoveTimer -= Engine.DeltaTime;
+            hitSquashNoMoveTimer -= Engine.DeltaTime;
             return 6;
         }
 
@@ -3616,131 +3591,131 @@ namespace Celeste
         {
             Input.Rumble(RumbleStrength.Strong, RumbleLength.Medium);
             Celeste.Freeze(0.1f);
-            this.launchApproachX = new float?();
-            Vector2 vector2 = (this.Center - from).SafeNormalize(-Vector2.UnitY);
+            launchApproachX = new float?();
+            Vector2 vector2 = (Center - from).SafeNormalize(-Vector2.UnitY);
             float num = Vector2.Dot(vector2, Vector2.UnitY);
             if (snapUp && (double) num <= -0.699999988079071)
             {
                 vector2.X = 0.0f;
                 vector2.Y = -1f;
             }
-            else if ((double) num <= 0.64999997615814209 && (double) num >= -0.550000011920929)
+            else if ((double) num is <= 0.64999997615814209 and >= (-0.550000011920929))
             {
                 vector2.Y = 0.0f;
-                vector2.X = (float) Math.Sign(vector2.X);
+                vector2.X = Math.Sign(vector2.X);
             }
-            if (sidesOnly && (double) vector2.X != 0.0)
+            if (sidesOnly && vector2.X != 0.0)
             {
                 vector2.Y = 0.0f;
-                vector2.X = (float) Math.Sign(vector2.X);
+                vector2.X = Math.Sign(vector2.X);
             }
-            this.Speed = 280f * vector2;
-            if ((double) this.Speed.Y <= 50.0)
+            Speed = 280f * vector2;
+            if (Speed.Y <= 50.0)
             {
-                this.Speed.Y = Math.Min(-150f, this.Speed.Y);
-                this.AutoJump = true;
+                Speed.Y = Math.Min(-150f, Speed.Y);
+                AutoJump = true;
             }
-            if ((double) this.Speed.X != 0.0)
+            if (Speed.X != 0.0)
             {
-                if (Input.MoveX.Value == Math.Sign(this.Speed.X))
+                if (Input.MoveX.Value == Math.Sign(Speed.X))
                 {
-                    this.explodeLaunchBoostTimer = 0.0f;
-                    this.Speed.X *= 1.2f;
+                    explodeLaunchBoostTimer = 0.0f;
+                    Speed.X *= 1.2f;
                 }
                 else
                 {
-                    this.explodeLaunchBoostTimer = 0.01f;
-                    this.explodeLaunchBoostSpeed = this.Speed.X * 1.2f;
+                    explodeLaunchBoostTimer = 0.01f;
+                    explodeLaunchBoostSpeed = Speed.X * 1.2f;
                 }
             }
-            SlashFx.Burst(this.Center, this.Speed.Angle());
-            if (!this.Inventory.NoRefills)
-                this.RefillDash();
-            this.RefillStamina();
-            this.dashCooldownTimer = 0.2f;
-            this.StateMachine.State = 7;
+            SlashFx.Burst(Center, Speed.Angle());
+            if (!Inventory.NoRefills)
+                RefillDash();
+            RefillStamina();
+            dashCooldownTimer = 0.2f;
+            StateMachine.State = 7;
             return vector2;
         }
 
         public void FinalBossPushLaunch(int dir)
         {
-            this.launchApproachX = new float?();
-            this.Speed.X = (float) (0.89999997615814209 * (double) dir * 280.0);
-            this.Speed.Y = -150f;
-            this.AutoJump = true;
+            launchApproachX = new float?();
+            Speed.X = (float) (0.89999997615814209 * dir * 280.0);
+            Speed.Y = -150f;
+            AutoJump = true;
             Input.Rumble(RumbleStrength.Strong, RumbleLength.Medium);
-            SlashFx.Burst(this.Center, this.Speed.Angle());
-            this.RefillDash();
-            this.RefillStamina();
-            this.dashCooldownTimer = 0.28f;
-            this.StateMachine.State = 7;
+            SlashFx.Burst(Center, Speed.Angle());
+            RefillDash();
+            RefillStamina();
+            dashCooldownTimer = 0.28f;
+            StateMachine.State = 7;
         }
 
         public void BadelineBoostLaunch(float atX)
         {
-            this.launchApproachX = new float?(atX);
-            this.Speed.X = 0.0f;
-            this.Speed.Y = -330f;
-            this.AutoJump = true;
-            if (this.Holding != null)
-                this.Drop();
-            SlashFx.Burst(this.Center, this.Speed.Angle());
-            this.RefillDash();
-            this.RefillStamina();
-            this.dashCooldownTimer = 0.2f;
-            this.StateMachine.State = 7;
+            launchApproachX = new float?(atX);
+            Speed.X = 0.0f;
+            Speed.Y = -330f;
+            AutoJump = true;
+            if (Holding != null)
+                Drop();
+            SlashFx.Burst(Center, Speed.Angle());
+            RefillDash();
+            RefillStamina();
+            dashCooldownTimer = 0.2f;
+            StateMachine.State = 7;
         }
 
-        private void LaunchBegin() => this.launched = true;
+        private void LaunchBegin() => launched = true;
 
         private int LaunchUpdate()
         {
-            if (this.launchApproachX.HasValue)
-                this.MoveTowardsX(this.launchApproachX.Value, 60f * Engine.DeltaTime);
-            if (this.CanDash)
-                return this.StartDash();
-            if (Input.GrabCheck && !this.IsTired && !this.Ducking)
+            if (launchApproachX.HasValue)
+                MoveTowardsX(launchApproachX.Value, 60f * Engine.DeltaTime);
+            if (CanDash)
+                return StartDash();
+            if (Input.GrabCheck && !IsTired && !Ducking)
             {
-                foreach (Holdable component in this.Scene.Tracker.GetComponents<Holdable>())
+                foreach (Holdable component in Scene.Tracker.GetComponents<Holdable>())
                 {
-                    if (component.Check(this) && this.Pickup(component))
+                    if (component.Check(this) && Pickup(component))
                         return 8;
                 }
             }
-            this.Speed.Y = (double) this.Speed.Y >= 0.0 ? Calc.Approach(this.Speed.Y, 160f, 225f * Engine.DeltaTime) : Calc.Approach(this.Speed.Y, 160f, 450f * Engine.DeltaTime);
-            this.Speed.X = Calc.Approach(this.Speed.X, 0.0f, 200f * Engine.DeltaTime);
-            return (double) this.Speed.Length() < 220.0 ? 0 : 7;
+            Speed.Y = Speed.Y >= 0.0 ? Calc.Approach(Speed.Y, 160f, 225f * Engine.DeltaTime) : Calc.Approach(Speed.Y, 160f, 450f * Engine.DeltaTime);
+            Speed.X = Calc.Approach(Speed.X, 0.0f, 200f * Engine.DeltaTime);
+            return (double) Speed.Length() < 220.0 ? 0 : 7;
         }
 
         public void SummitLaunch(float targetX)
         {
-            this.summitLaunchTargetX = targetX;
-            this.StateMachine.State = 10;
+            summitLaunchTargetX = targetX;
+            StateMachine.State = 10;
         }
 
         private void SummitLaunchBegin()
         {
-            this.wallBoostTimer = 0.0f;
-            this.Sprite.Play("launch");
-            this.Speed = -Vector2.UnitY * 240f;
-            this.summitLaunchParticleTimer = 0.4f;
+            wallBoostTimer = 0.0f;
+            Sprite.Play("launch");
+            Speed = -Vector2.UnitY * 240f;
+            summitLaunchParticleTimer = 0.4f;
         }
 
         private int SummitLaunchUpdate()
         {
-            this.summitLaunchParticleTimer -= Engine.DeltaTime;
-            if ((double) this.summitLaunchParticleTimer > 0.0 && this.Scene.OnInterval(0.03f))
-                this.level.ParticlesFG.Emit(BadelineBoost.P_Move, 1, this.Center, Vector2.One * 4f);
-            this.Facing = Facings.Right;
-            this.MoveTowardsX(this.summitLaunchTargetX, 20f * Engine.DeltaTime);
-            this.Speed = -Vector2.UnitY * 240f;
-            if (this.level.OnInterval(0.2f))
-                this.level.Add((Entity) Engine.Pooler.Create<SpeedRing>().Init(this.Center, 1.57079637f, Color.White));
-            CrystalStaticSpinner crystalStaticSpinner = this.Scene.CollideFirst<CrystalStaticSpinner>(new Rectangle((int) ((double) this.X - 4.0), (int) ((double) this.Y - 40.0), 8, 12));
+            summitLaunchParticleTimer -= Engine.DeltaTime;
+            if (summitLaunchParticleTimer > 0.0 && Scene.OnInterval(0.03f))
+                level.ParticlesFG.Emit(BadelineBoost.P_Move, 1, Center, Vector2.One * 4f);
+            Facing = Facings.Right;
+            MoveTowardsX(summitLaunchTargetX, 20f * Engine.DeltaTime);
+            Speed = -Vector2.UnitY * 240f;
+            if (level.OnInterval(0.2f))
+                level.Add(Engine.Pooler.Create<SpeedRing>().Init(Center, 1.57079637f, Color.White));
+            CrystalStaticSpinner crystalStaticSpinner = Scene.CollideFirst<CrystalStaticSpinner>(new Rectangle((int) ((double) X - 4.0), (int) ((double) Y - 40.0), 8, 12));
             if (crystalStaticSpinner != null)
             {
                 crystalStaticSpinner.Destroy();
-                this.level.Shake();
+                level.Shake();
                 Input.Rumble(RumbleStrength.Medium, RumbleLength.Short);
                 Celeste.Freeze(0.01f);
             }
@@ -3749,10 +3724,10 @@ namespace Celeste
 
         public void StopSummitLaunch()
         {
-            this.StateMachine.State = 0;
-            this.Speed.Y = -140f;
-            this.AutoJump = true;
-            this.varJumpSpeed = this.Speed.Y;
+            StateMachine.State = 0;
+            Speed.Y = -140f;
+            AutoJump = true;
+            varJumpSpeed = Speed.Y;
         }
 
         private IEnumerator PickupCoroutine()
@@ -3760,33 +3735,33 @@ namespace Celeste
             Player player = this;
             player.Play("event:/char/madeline/crystaltheo_lift");
             Input.Rumble(RumbleStrength.Medium, RumbleLength.Short);
-            if (player.Holding != null && player.Holding.SlowFall && ((double) player.gliderBoostTimer - 0.15999999642372131 > 0.0 && (double) player.gliderBoostDir.Y < 0.0 || (double) player.Speed.Length() > 180.0 && (double) player.Speed.Y <= 0.0))
+            if (player.Holding != null && player.Holding.SlowFall && (player.gliderBoostTimer - 0.15999999642372131 > 0.0 && player.gliderBoostDir.Y < 0.0 || (double) player.Speed.Length() > 180.0 && player.Speed.Y <= 0.0))
                 Audio.Play("event:/new_content/game/10_farewell/glider_platform_dissipate", player.Position);
             Vector2 oldSpeed = player.Speed;
             float varJump = player.varJumpTimer;
             player.Speed = Vector2.Zero;
             Vector2 begin = player.Holding.Entity.Position - player.Position;
             Vector2 carryOffsetTarget = Player.CarryOffsetTarget;
-            Vector2 control = new Vector2(begin.X + (float) (Math.Sign(begin.X) * 2), Player.CarryOffsetTarget.Y - 2f);
-            SimpleCurve curve = new SimpleCurve(begin, carryOffsetTarget, control);
+            Vector2 control = new(begin.X + Math.Sign(begin.X) * 2, Player.CarryOffsetTarget.Y - 2f);
+            SimpleCurve curve = new(begin, carryOffsetTarget, control);
             player.carryOffset = begin;
             Tween tween = Tween.Create(Tween.TweenMode.Oneshot, Ease.CubeInOut, 0.16f, true);
-            tween.OnUpdate = (Action<Tween>) (t => this.carryOffset = curve.GetPoint(t.Eased));
-            player.Add((Component) tween);
-            yield return (object) tween.Wait();
+            tween.OnUpdate = t => carryOffset = curve.GetPoint(t.Eased);
+            player.Add(tween);
+            yield return tween.Wait();
             player.Speed = oldSpeed;
             player.Speed.Y = Math.Min(player.Speed.Y, 0.0f);
             player.varJumpTimer = varJump;
             player.StateMachine.State = 0;
             if (player.Holding != null && player.Holding.SlowFall)
             {
-                if ((double) player.gliderBoostTimer > 0.0 && (double) player.gliderBoostDir.Y < 0.0)
+                if (player.gliderBoostTimer > 0.0 && player.gliderBoostDir.Y < 0.0)
                 {
                     Input.Rumble(RumbleStrength.Medium, RumbleLength.Short);
                     player.gliderBoostTimer = 0.0f;
                     player.Speed.Y = Math.Min(player.Speed.Y, -240f * Math.Abs(player.gliderBoostDir.Y));
                 }
-                else if ((double) player.Speed.Y < 0.0)
+                else if (player.Speed.Y < 0.0)
                     player.Speed.Y = Math.Min(player.Speed.Y, -105f);
                 if (player.onGround && (double) (float) Input.MoveY == 1.0)
                     player.holdCannotDuck = true;
@@ -3795,91 +3770,91 @@ namespace Celeste
 
         private void DreamDashBegin()
         {
-            if (this.dreamSfxLoop == null)
-                this.Add((Component) (this.dreamSfxLoop = new SoundSource()));
-            this.Speed = this.DashDir * 240f;
-            this.TreatNaive = true;
-            this.Depth = -12000;
-            this.dreamDashCanEndTimer = 0.1f;
-            this.Stamina = 110f;
-            this.dreamJump = false;
-            this.Play("event:/char/madeline/dreamblock_enter");
-            this.Loop(this.dreamSfxLoop, "event:/char/madeline/dreamblock_travel");
+            if (dreamSfxLoop == null)
+                Add(dreamSfxLoop = new SoundSource());
+            Speed = DashDir * 240f;
+            TreatNaive = true;
+            Depth = -12000;
+            dreamDashCanEndTimer = 0.1f;
+            Stamina = 110f;
+            dreamJump = false;
+            Play("event:/char/madeline/dreamblock_enter");
+            Loop(dreamSfxLoop, "event:/char/madeline/dreamblock_travel");
         }
 
         private void DreamDashEnd()
         {
-            this.Depth = 0;
-            if (!this.dreamJump)
+            Depth = 0;
+            if (!dreamJump)
             {
-                this.AutoJump = true;
-                this.AutoJumpTimer = 0.0f;
+                AutoJump = true;
+                AutoJumpTimer = 0.0f;
             }
-            if (!this.Inventory.NoRefills)
-                this.RefillDash();
-            this.RefillStamina();
-            this.TreatNaive = false;
-            if (this.dreamBlock != null)
+            if (!Inventory.NoRefills)
+                RefillDash();
+            RefillStamina();
+            TreatNaive = false;
+            if (dreamBlock != null)
             {
-                if ((double) this.DashDir.X != 0.0)
+                if (DashDir.X != 0.0)
                 {
-                    this.jumpGraceTimer = 0.1f;
-                    this.dreamJump = true;
+                    jumpGraceTimer = 0.1f;
+                    dreamJump = true;
                 }
                 else
-                    this.jumpGraceTimer = 0.0f;
-                this.dreamBlock.OnPlayerExit(this);
-                this.dreamBlock = (DreamBlock) null;
+                    jumpGraceTimer = 0.0f;
+                dreamBlock.OnPlayerExit(this);
+                dreamBlock = null;
             }
-            this.Stop(this.dreamSfxLoop);
-            this.Play("event:/char/madeline/dreamblock_exit");
+            Stop(dreamSfxLoop);
+            Play("event:/char/madeline/dreamblock_exit");
             Input.Rumble(RumbleStrength.Medium, RumbleLength.Short);
         }
 
         private int DreamDashUpdate()
         {
             Input.Rumble(RumbleStrength.Light, RumbleLength.Medium);
-            Vector2 position = this.Position;
-            this.NaiveMove(this.Speed * Engine.DeltaTime);
-            if ((double) this.dreamDashCanEndTimer > 0.0)
-                this.dreamDashCanEndTimer -= Engine.DeltaTime;
-            DreamBlock dreamBlock = this.CollideFirst<DreamBlock>();
+            Vector2 position = Position;
+            NaiveMove(Speed * Engine.DeltaTime);
+            if (dreamDashCanEndTimer > 0.0)
+                dreamDashCanEndTimer -= Engine.DeltaTime;
+            DreamBlock dreamBlock = CollideFirst<DreamBlock>();
             if (dreamBlock == null)
             {
-                if (this.DreamDashedIntoSolid())
+                if (DreamDashedIntoSolid())
                 {
                     if (SaveData.Instance.Assists.Invincible)
                     {
-                        this.Position = position;
-                        this.Speed *= -1f;
-                        this.Play("event:/game/general/assist_dreamblockbounce");
+                        Position = position;
+                        Speed *= -1f;
+                        Play("event:/game/general/assist_dreamblockbounce");
                     }
                     else
-                        this.Die(Vector2.Zero);
+                        Die(Vector2.Zero);
                 }
-                else if ((double) this.dreamDashCanEndTimer <= 0.0)
+                else if (dreamDashCanEndTimer <= 0.0)
                 {
                     Celeste.Freeze(0.05f);
-                    if (Input.Jump.Pressed && (double) this.DashDir.X != 0.0)
+                    if (Input.Jump.Pressed && DashDir.X != 0.0)
                     {
-                        this.dreamJump = true;
-                        this.Jump();
+                        dreamJump = true;
+                        Jump();
                     }
-                    else if ((double) this.DashDir.Y >= 0.0 || (double) this.DashDir.X != 0.0)
+                    else if (DashDir.Y >= 0.0 || DashDir.X != 0.0)
                     {
-                        if ((double) this.DashDir.X > 0.0 && this.CollideCheck<Solid>(this.Position - Vector2.UnitX * 5f))
-                            this.MoveHExact(-5);
-                        else if ((double) this.DashDir.X < 0.0 && this.CollideCheck<Solid>(this.Position + Vector2.UnitX * 5f))
-                            this.MoveHExact(5);
-                        bool flag1 = this.ClimbCheck(-1);
-                        bool flag2 = this.ClimbCheck(1);
-                        if (Input.GrabCheck && (this.moveX == 1 & flag2 || this.moveX == -1 & flag1))
+                        if (DashDir.X > 0.0 && CollideCheck<Solid>(Position - Vector2.UnitX * 5f))
+                            MoveHExact(-5);
+                        else if (DashDir.X < 0.0 && CollideCheck<Solid>(Position + Vector2.UnitX * 5f))
+                            MoveHExact(5);
+                        bool flag1 = ClimbCheck(-1);
+                        bool flag2 = ClimbCheck(1);
+                        if (Input.GrabCheck && (moveX == 1 & flag2 || moveX == -1 & flag1))
                         {
-                            this.Facing = (Facings) this.moveX;
+                            Facing = (Facings) moveX;
                             if (!SaveData.Instance.Assists.NoGrabbing)
                                 return 1;
-                            this.ClimbTrigger(this.moveX);
-                            this.Speed.X = 0.0f;
+                            ClimbTrigger(moveX);
+                            Speed.X = 0.0f;
                         }
                     }
                     return 0;
@@ -3888,11 +3863,11 @@ namespace Celeste
             else
             {
                 this.dreamBlock = dreamBlock;
-                if (this.Scene.OnInterval(0.1f))
-                    this.CreateTrail();
-                if (this.level.OnInterval(0.04f))
+                if (Scene.OnInterval(0.1f))
+                    CreateTrail();
+                if (level.OnInterval(0.04f))
                 {
-                    DisplacementRenderer.Burst burst = this.level.Displacement.AddBurst(this.Center, 0.3f, 0.0f, 40f);
+                    DisplacementRenderer.Burst burst = level.Displacement.AddBurst(Center, 0.3f, 0.0f, 40f);
                     burst.WorldClipCollider = this.dreamBlock.Collider;
                     burst.WorldClipPadding = 2;
                 }
@@ -3902,7 +3877,7 @@ namespace Celeste
 
         private bool DreamDashedIntoSolid()
         {
-            if (!this.CollideCheck<Solid>())
+            if (!CollideCheck<Solid>())
                 return false;
             for (int index1 = 1; index1 <= 5; ++index1)
             {
@@ -3912,10 +3887,10 @@ namespace Celeste
                     {
                         for (int index4 = -1; index4 <= 1; index4 += 2)
                         {
-                            Vector2 vector2 = new Vector2((float) (index1 * index2), (float) (index3 * index4));
-                            if (!this.CollideCheck<Solid>(this.Position + vector2))
+                            Vector2 vector2 = new(index1 * index2, index3 * index4);
+                            if (!CollideCheck<Solid>(Position + vector2))
                             {
-                                this.Position = this.Position + vector2;
+                                Position = Position + vector2;
                                 return false;
                             }
                         }
@@ -3927,76 +3902,76 @@ namespace Celeste
 
         public bool StartStarFly()
         {
-            this.RefillStamina();
-            if (this.StateMachine.State == 18)
+            RefillStamina();
+            if (StateMachine.State == 18)
                 return false;
-            if (this.StateMachine.State == 19)
+            if (StateMachine.State == 19)
             {
-                this.starFlyTimer = 2f;
-                this.Sprite.Color = this.starFlyColor;
+                starFlyTimer = 2f;
+                Sprite.Color = starFlyColor;
                 Input.Rumble(RumbleStrength.Medium, RumbleLength.Medium);
             }
             else
-                this.StateMachine.State = 19;
+                StateMachine.State = 19;
             return true;
         }
 
         private void StarFlyBegin()
         {
-            this.Sprite.Play("startStarFly");
-            this.starFlyTransforming = true;
-            this.starFlyTimer = 2f;
-            this.starFlySpeedLerp = 0.0f;
-            this.jumpGraceTimer = 0.0f;
-            if (this.starFlyBloom == null)
-                this.Add((Component) (this.starFlyBloom = new BloomPoint(new Vector2(0.0f, -6f), 0.0f, 16f)));
-            this.starFlyBloom.Visible = true;
-            this.starFlyBloom.Alpha = 0.0f;
-            this.Collider = (Collider) this.starFlyHitbox;
-            this.hurtbox = this.starFlyHurtbox;
-            if (this.starFlyLoopSfx == null)
+            Sprite.Play("startStarFly");
+            starFlyTransforming = true;
+            starFlyTimer = 2f;
+            starFlySpeedLerp = 0.0f;
+            jumpGraceTimer = 0.0f;
+            if (starFlyBloom == null)
+                Add(starFlyBloom = new BloomPoint(new Vector2(0.0f, -6f), 0.0f, 16f));
+            starFlyBloom.Visible = true;
+            starFlyBloom.Alpha = 0.0f;
+            Collider = starFlyHitbox;
+            hurtbox = starFlyHurtbox;
+            if (starFlyLoopSfx == null)
             {
-                this.Add((Component) (this.starFlyLoopSfx = new SoundSource()));
-                this.starFlyLoopSfx.DisposeOnTransition = false;
-                this.Add((Component) (this.starFlyWarningSfx = new SoundSource()));
-                this.starFlyWarningSfx.DisposeOnTransition = false;
+                Add(starFlyLoopSfx = new SoundSource());
+                starFlyLoopSfx.DisposeOnTransition = false;
+                Add(starFlyWarningSfx = new SoundSource());
+                starFlyWarningSfx.DisposeOnTransition = false;
             }
-            this.starFlyLoopSfx.Play("event:/game/06_reflection/feather_state_loop", "feather_speed", 1f);
-            this.starFlyWarningSfx.Stop();
+            starFlyLoopSfx.Play("event:/game/06_reflection/feather_state_loop", "feather_speed", 1f);
+            starFlyWarningSfx.Stop();
         }
 
         private void StarFlyEnd()
         {
-            this.Play("event:/game/06_reflection/feather_state_end");
-            this.starFlyWarningSfx.Stop();
-            this.starFlyLoopSfx.Stop();
-            this.Hair.DrawPlayerSpriteOutline = false;
-            this.Sprite.Color = Color.White;
-            this.level.Displacement.AddBurst(this.Center, 0.25f, 8f, 32f);
-            this.starFlyBloom.Visible = false;
-            this.Sprite.HairCount = this.startHairCount;
-            this.StarFlyReturnToNormalHitbox();
-            if (this.StateMachine.State == 2)
+            Play("event:/game/06_reflection/feather_state_end");
+            starFlyWarningSfx.Stop();
+            starFlyLoopSfx.Stop();
+            Hair.DrawPlayerSpriteOutline = false;
+            Sprite.Color = Color.White;
+            level.Displacement.AddBurst(Center, 0.25f, 8f, 32f);
+            starFlyBloom.Visible = false;
+            Sprite.HairCount = startHairCount;
+            StarFlyReturnToNormalHitbox();
+            if (StateMachine.State == 2)
                 return;
-            this.level.Particles.Emit(FlyFeather.P_Boost, 12, this.Center, Vector2.One * 4f, (-this.Speed).Angle());
+            level.Particles.Emit(FlyFeather.P_Boost, 12, Center, Vector2.One * 4f, (-Speed).Angle());
         }
 
         private void StarFlyReturnToNormalHitbox()
         {
-            this.Collider = (Collider) this.normalHitbox;
-            this.hurtbox = this.normalHurtbox;
-            if (!this.CollideCheck<Solid>())
+            Collider = normalHitbox;
+            hurtbox = normalHurtbox;
+            if (!CollideCheck<Solid>())
                 return;
-            Vector2 position = this.Position;
-            this.Y -= this.normalHitbox.Bottom - this.starFlyHitbox.Bottom;
-            if (!this.CollideCheck<Solid>())
+            Vector2 position = Position;
+            Y -= normalHitbox.Bottom - starFlyHitbox.Bottom;
+            if (!CollideCheck<Solid>())
                 return;
-            this.Position = position;
-            this.Ducking = true;
-            this.Y -= this.duckHitbox.Bottom - this.starFlyHitbox.Bottom;
-            if (this.CollideCheck<Solid>())
+            Position = position;
+            Ducking = true;
+            Y -= duckHitbox.Bottom - starFlyHitbox.Bottom;
+            if (CollideCheck<Solid>())
             {
-                this.Position = position;
+                Position = position;
                 throw new Exception("Could not get out of solids when exiting Star Fly State!");
             }
         }
@@ -4005,10 +3980,10 @@ namespace Celeste
         {
             Player player = this;
             while (player.Sprite.CurrentAnimationID == "startStarFly")
-                yield return (object) null;
+                yield return null;
             while (player.Speed != Vector2.Zero)
-                yield return (object) null;
-            yield return (object) 0.1f;
+                yield return null;
+            yield return 0.1f;
             player.Sprite.Color = player.starFlyColor;
             player.Sprite.HairCount = 7;
             player.Hair.DrawPlayerSpriteOutline = true;
@@ -4025,18 +4000,18 @@ namespace Celeste
             player.level.Particles.Emit(FlyFeather.P_Boost, 12, player.Center, Vector2.One * 4f, (-vector2).Angle());
             Input.Rumble(RumbleStrength.Strong, RumbleLength.Medium);
             player.level.DirectionalShake(player.starFlyLastDir);
-            while ((double) player.starFlyTimer > 0.5)
-                yield return (object) null;
+            while (player.starFlyTimer > 0.5)
+                yield return null;
             player.starFlyWarningSfx.Play("event:/game/06_reflection/feather_state_warning");
         }
 
         private int StarFlyUpdate()
         {
-            this.starFlyBloom.Alpha = Calc.Approach(this.starFlyBloom.Alpha, 0.7f, Engine.DeltaTime * 2f);
+            starFlyBloom.Alpha = Calc.Approach(starFlyBloom.Alpha, 0.7f, Engine.DeltaTime * 2f);
             Input.Rumble(RumbleStrength.Climb, RumbleLength.Short);
-            if (this.starFlyTransforming)
+            if (starFlyTransforming)
             {
-                this.Speed = Calc.Approach(this.Speed, Vector2.Zero, 1000f * Engine.DeltaTime);
+                Speed = Calc.Approach(Speed, Vector2.Zero, 1000f * Engine.DeltaTime);
             }
             else
             {
@@ -4047,45 +4022,45 @@ namespace Celeste
                     flag1 = true;
                     starFlyLastDir = this.starFlyLastDir;
                 }
-                Vector2 vec = this.Speed.SafeNormalize(Vector2.Zero);
+                Vector2 vec = Speed.SafeNormalize(Vector2.Zero);
                 Vector2 vector2 = !(vec == Vector2.Zero) ? vec.RotateTowards(starFlyLastDir.Angle(), 5.58505344f * Engine.DeltaTime) : starFlyLastDir;
                 this.starFlyLastDir = vector2;
                 float target;
                 if (flag1)
                 {
-                    this.starFlySpeedLerp = 0.0f;
+                    starFlySpeedLerp = 0.0f;
                     target = 91f;
                 }
                 else if (vector2 != Vector2.Zero && (double) Vector2.Dot(vector2, starFlyLastDir) >= 0.44999998807907104)
                 {
-                    this.starFlySpeedLerp = Calc.Approach(this.starFlySpeedLerp, 1f, Engine.DeltaTime / 1f);
-                    target = MathHelper.Lerp(140f, 190f, this.starFlySpeedLerp);
+                    starFlySpeedLerp = Calc.Approach(starFlySpeedLerp, 1f, Engine.DeltaTime / 1f);
+                    target = MathHelper.Lerp(140f, 190f, starFlySpeedLerp);
                 }
                 else
                 {
-                    this.starFlySpeedLerp = 0.0f;
+                    starFlySpeedLerp = 0.0f;
                     target = 140f;
                 }
-                this.starFlyLoopSfx.Param("feather_speed", flag1 ? 0.0f : 1f);
-                float num = Calc.Approach(this.Speed.Length(), target, 1000f * Engine.DeltaTime);
-                this.Speed = vector2 * num;
-                if (this.level.OnInterval(0.02f))
-                    this.level.Particles.Emit(FlyFeather.P_Flying, 1, this.Center, Vector2.One * 2f, (-this.Speed).Angle());
+                starFlyLoopSfx.Param("feather_speed", flag1 ? 0.0f : 1f);
+                float num = Calc.Approach(Speed.Length(), target, 1000f * Engine.DeltaTime);
+                Speed = vector2 * num;
+                if (level.OnInterval(0.02f))
+                    level.Particles.Emit(FlyFeather.P_Flying, 1, Center, Vector2.One * 2f, (-Speed).Angle());
                 if (Input.Jump.Pressed)
                 {
-                    if (this.OnGround(3))
+                    if (OnGround(3))
                     {
-                        this.Jump();
+                        Jump();
                         return 0;
                     }
-                    if (this.WallJumpCheck(-1))
+                    if (WallJumpCheck(-1))
                     {
-                        this.WallJump(1);
+                        WallJump(1);
                         return 0;
                     }
-                    if (this.WallJumpCheck(1))
+                    if (WallJumpCheck(1))
                     {
-                        this.WallJump(-1);
+                        WallJump(-1);
                         return 0;
                     }
                 }
@@ -4093,15 +4068,15 @@ namespace Celeste
                 {
                     bool flag2 = false;
                     int dir = 0;
-                    if (Input.MoveX.Value != -1 && this.ClimbCheck(1))
+                    if (Input.MoveX.Value != -1 && ClimbCheck(1))
                     {
-                        this.Facing = Facings.Right;
+                        Facing = Facings.Right;
                         dir = 1;
                         flag2 = true;
                     }
-                    else if (Input.MoveX.Value != 1 && this.ClimbCheck(-1))
+                    else if (Input.MoveX.Value != 1 && ClimbCheck(-1))
                     {
-                        this.Facing = Facings.Left;
+                        Facing = Facings.Left;
                         dir = -1;
                         flag2 = true;
                     }
@@ -4109,38 +4084,38 @@ namespace Celeste
                     {
                         if (!SaveData.Instance.Assists.NoGrabbing)
                             return 1;
-                        this.Speed = Vector2.Zero;
-                        this.ClimbTrigger(dir);
+                        Speed = Vector2.Zero;
+                        ClimbTrigger(dir);
                         return 0;
                     }
                 }
-                if (this.CanDash)
-                    return this.StartDash();
-                this.starFlyTimer -= Engine.DeltaTime;
-                if ((double) this.starFlyTimer <= 0.0)
+                if (CanDash)
+                    return StartDash();
+                starFlyTimer -= Engine.DeltaTime;
+                if (starFlyTimer <= 0.0)
                 {
                     if (Input.MoveY.Value == -1)
-                        this.Speed.Y = -100f;
+                        Speed.Y = -100f;
                     if (Input.MoveY.Value < 1)
                     {
-                        this.varJumpSpeed = this.Speed.Y;
-                        this.AutoJump = true;
-                        this.AutoJumpTimer = 0.0f;
-                        this.varJumpTimer = 0.2f;
+                        varJumpSpeed = Speed.Y;
+                        AutoJump = true;
+                        AutoJumpTimer = 0.0f;
+                        varJumpTimer = 0.2f;
                     }
-                    if ((double) this.Speed.Y > 0.0)
-                        this.Speed.Y = 0.0f;
-                    if ((double) Math.Abs(this.Speed.X) > 140.0)
-                        this.Speed.X = 140f * (float) Math.Sign(this.Speed.X);
+                    if (Speed.Y > 0.0)
+                        Speed.Y = 0.0f;
+                    if ((double) Math.Abs(Speed.X) > 140.0)
+                        Speed.X = 140f * Math.Sign(Speed.X);
                     Input.Rumble(RumbleStrength.Medium, RumbleLength.Medium);
                     return 0;
                 }
-                if ((double) this.starFlyTimer < 0.5 && this.Scene.OnInterval(0.05f))
+                if (starFlyTimer < 0.5 && Scene.OnInterval(0.05f))
                 {
-                    if (this.Sprite.Color == this.starFlyColor)
-                        this.Sprite.Color = Player.NormalHairColor;
+                    if (Sprite.Color == starFlyColor)
+                        Sprite.Color = Player.NormalHairColor;
                     else
-                        this.Sprite.Color = this.starFlyColor;
+                        Sprite.Color = starFlyColor;
                 }
             }
             return 19;
@@ -4148,31 +4123,31 @@ namespace Celeste
 
         public bool DoFlingBird(FlingBird bird)
         {
-            if (this.Dead || this.StateMachine.State == 24)
+            if (Dead || StateMachine.State == 24)
                 return false;
-            this.flingBird = bird;
-            this.StateMachine.State = 24;
-            if (this.Holding != null)
-                this.Drop();
+            flingBird = bird;
+            StateMachine.State = 24;
+            if (Holding != null)
+                Drop();
             return true;
         }
 
         public void FinishFlingBird()
         {
-            this.StateMachine.State = 0;
-            this.AutoJump = true;
-            this.forceMoveX = 1;
-            this.forceMoveXTimer = 0.2f;
-            this.Speed = FlingBird.FlingSpeed;
-            this.varJumpTimer = 0.2f;
-            this.varJumpSpeed = this.Speed.Y;
-            this.launched = true;
+            StateMachine.State = 0;
+            AutoJump = true;
+            forceMoveX = 1;
+            forceMoveXTimer = 0.2f;
+            Speed = FlingBird.FlingSpeed;
+            varJumpTimer = 0.2f;
+            varJumpSpeed = Speed.Y;
+            launched = true;
         }
 
         private void FlingBirdBegin()
         {
-            this.RefillDash();
-            this.RefillStamina();
+            RefillDash();
+            RefillStamina();
         }
 
         private void FlingBirdEnd()
@@ -4181,8 +4156,8 @@ namespace Celeste
 
         private int FlingBirdUpdate()
         {
-            this.MoveTowardsX(this.flingBird.X, 250f * Engine.DeltaTime);
-            this.MoveTowardsY(this.flingBird.Y + 8f + this.Collider.Height, 250f * Engine.DeltaTime);
+            MoveTowardsX(flingBird.X, 250f * Engine.DeltaTime);
+            MoveTowardsY(flingBird.Y + 8f + Collider.Height, 250f * Engine.DeltaTime);
             return 24;
         }
 
@@ -4193,19 +4168,19 @@ namespace Celeste
 
         public void StartCassetteFly(Vector2 targetPosition, Vector2 control)
         {
-            this.StateMachine.State = 21;
-            this.cassetteFlyCurve = new SimpleCurve(this.Position, targetPosition, control);
-            this.cassetteFlyLerp = 0.0f;
-            this.Speed = Vector2.Zero;
-            if (this.Holding == null)
+            StateMachine.State = 21;
+            cassetteFlyCurve = new SimpleCurve(Position, targetPosition, control);
+            cassetteFlyLerp = 0.0f;
+            Speed = Vector2.Zero;
+            if (Holding == null)
                 return;
-            this.Drop();
+            Drop();
         }
 
         private void CassetteFlyBegin()
         {
-            this.Sprite.Play("bubble");
-            this.Sprite.Y += 5f;
+            Sprite.Play("bubble");
+            Sprite.Y += 5f;
         }
 
         private void CassetteFlyEnd()
@@ -4222,21 +4197,21 @@ namespace Celeste
             player.level.FormationBackdrop.Alpha = 0.5f;
             player.Sprite.Scale = Vector2.One * 1.25f;
             player.Depth = -2000000;
-            yield return (object) 0.4f;
-            while ((double) player.cassetteFlyLerp < 1.0)
+            yield return 0.4f;
+            while (player.cassetteFlyLerp < 1.0)
             {
                 if (player.level.OnInterval(0.03f))
                     player.level.Particles.Emit(Player.P_CassetteFly, 2, player.Center, Vector2.One * 4f);
                 player.cassetteFlyLerp = Calc.Approach(player.cassetteFlyLerp, 1f, 1.6f * Engine.DeltaTime);
                 player.Position = player.cassetteFlyCurve.GetPoint(Ease.SineInOut(player.cassetteFlyLerp));
                 player.level.Camera.Position = player.CameraTarget;
-                yield return (object) null;
+                yield return null;
             }
             player.Position = player.cassetteFlyCurve.End;
             player.Sprite.Scale = Vector2.One * 1.25f;
             player.Sprite.Y -= 5f;
             player.Sprite.Play("fallFast");
-            yield return (object) 0.2f;
+            yield return 0.2f;
             player.level.CanRetry = true;
             player.level.FormationBackdrop.Display = false;
             player.level.FormationBackdrop.Alpha = 0.5f;
@@ -4247,10 +4222,10 @@ namespace Celeste
         public void StartAttract(Vector2 attractTo)
         {
             this.attractTo = attractTo.Round();
-            this.StateMachine.State = 22;
+            StateMachine.State = 22;
         }
 
-        private void AttractBegin() => this.Speed = Vector2.Zero;
+        private void AttractBegin() => Speed = Vector2.Zero;
 
         private void AttractEnd()
         {
@@ -4258,68 +4233,68 @@ namespace Celeste
 
         private int AttractUpdate()
         {
-            if ((double) Vector2.Distance(this.attractTo, this.ExactPosition) <= 1.5)
+            if ((double) Vector2.Distance(attractTo, ExactPosition) <= 1.5)
             {
-                this.Position = this.attractTo;
-                this.ZeroRemainderX();
-                this.ZeroRemainderY();
+                Position = attractTo;
+                ZeroRemainderX();
+                ZeroRemainderY();
             }
             else
             {
-                Vector2 vector2 = Calc.Approach(this.ExactPosition, this.attractTo, 200f * Engine.DeltaTime);
-                this.MoveToX(vector2.X);
-                this.MoveToY(vector2.Y);
+                Vector2 vector2 = Calc.Approach(ExactPosition, attractTo, 200f * Engine.DeltaTime);
+                MoveToX(vector2.X);
+                MoveToY(vector2.Y);
             }
             return 22;
         }
 
-        public bool AtAttractTarget => this.StateMachine.State == 22 && this.ExactPosition == this.attractTo;
+        public bool AtAttractTarget => StateMachine.State == 22 && ExactPosition == attractTo;
 
         private void DummyBegin()
         {
-            this.DummyMoving = false;
-            this.DummyGravity = true;
-            this.DummyAutoAnimate = true;
+            DummyMoving = false;
+            DummyGravity = true;
+            DummyAutoAnimate = true;
         }
 
         private int DummyUpdate()
         {
-            if (this.CanUnDuck)
-                this.Ducking = false;
-            if (!this.onGround && this.DummyGravity)
+            if (CanUnDuck)
+                Ducking = false;
+            if (!onGround && DummyGravity)
             {
-                float num = (double) Math.Abs(this.Speed.Y) >= 40.0 || !Input.Jump.Check && !this.AutoJump ? 1f : 0.5f;
-                if (this.level.InSpace)
+                float num = (double) Math.Abs(Speed.Y) >= 40.0 || !Input.Jump.Check && !AutoJump ? 1f : 0.5f;
+                if (level.InSpace)
                     num *= 0.6f;
-                this.Speed.Y = Calc.Approach(this.Speed.Y, 160f, 900f * num * Engine.DeltaTime);
+                Speed.Y = Calc.Approach(Speed.Y, 160f, 900f * num * Engine.DeltaTime);
             }
-            if ((double) this.varJumpTimer > 0.0)
+            if (varJumpTimer > 0.0)
             {
-                if (this.AutoJump || Input.Jump.Check)
-                    this.Speed.Y = Math.Min(this.Speed.Y, this.varJumpSpeed);
+                if (AutoJump || Input.Jump.Check)
+                    Speed.Y = Math.Min(Speed.Y, varJumpSpeed);
                 else
-                    this.varJumpTimer = 0.0f;
+                    varJumpTimer = 0.0f;
             }
-            if (!this.DummyMoving)
+            if (!DummyMoving)
             {
-                if ((double) Math.Abs(this.Speed.X) > 90.0 && this.DummyMaxspeed)
-                    this.Speed.X = Calc.Approach(this.Speed.X, 90f * (float) Math.Sign(this.Speed.X), 2500f * Engine.DeltaTime);
-                if (this.DummyFriction)
-                    this.Speed.X = Calc.Approach(this.Speed.X, 0.0f, 1000f * Engine.DeltaTime);
+                if ((double) Math.Abs(Speed.X) > 90.0 && DummyMaxspeed)
+                    Speed.X = Calc.Approach(Speed.X, 90f * Math.Sign(Speed.X), 2500f * Engine.DeltaTime);
+                if (DummyFriction)
+                    Speed.X = Calc.Approach(Speed.X, 0.0f, 1000f * Engine.DeltaTime);
             }
-            if (this.DummyAutoAnimate)
+            if (DummyAutoAnimate)
             {
-                if (this.onGround)
+                if (onGround)
                 {
-                    if ((double) this.Speed.X == 0.0)
-                        this.Sprite.Play("idle");
+                    if (Speed.X == 0.0)
+                        Sprite.Play("idle");
                     else
-                        this.Sprite.Play("walk");
+                        Sprite.Play("walk");
                 }
-                else if ((double) this.Speed.Y < 0.0)
-                    this.Sprite.Play("jumpSlow");
+                else if (Speed.Y < 0.0)
+                    Sprite.Play("jumpSlow");
                 else
-                    this.Sprite.Play("fallSlow");
+                    Sprite.Play("fallSlow");
             }
             return 11;
         }
@@ -4342,10 +4317,10 @@ namespace Celeste
                 }
                 else
                     player.Facing = (Facings) Math.Sign(x - player.X);
-                while ((double) Math.Abs(x - player.X) > 4.0 && player.Scene != null && (keepWalkingIntoWalls || !player.CollideCheck<Solid>(player.Position + Vector2.UnitX * (float) Math.Sign(x - player.X))))
+                while ((double) Math.Abs(x - player.X) > 4.0 && player.Scene != null && (keepWalkingIntoWalls || !player.CollideCheck<Solid>(player.Position + Vector2.UnitX * Math.Sign(x - player.X))))
                 {
-                    player.Speed.X = Calc.Approach(player.Speed.X, (float) Math.Sign(x - player.X) * 64f * speedMultiplier, 1000f * Engine.DeltaTime);
-                    yield return (object) null;
+                    player.Speed.X = Calc.Approach(player.Speed.X, Math.Sign(x - player.X) * 64f * speedMultiplier, 1000f * Engine.DeltaTime);
+                    yield return null;
                 }
                 player.Sprite.Rate = 1f;
                 player.Sprite.Play("idle");
@@ -4361,28 +4336,28 @@ namespace Celeste
         {
             Player player = this;
             player.StateMachine.State = 11;
-            if ((double) player.X != (double) x)
+            if ((double) player.X != x)
             {
                 player.DummyMoving = true;
                 if (walkBackwards)
                 {
                     player.Sprite.Rate = -1f;
-                    player.Facing = (Facings) Math.Sign(player.X - (float) x);
+                    player.Facing = (Facings) Math.Sign(player.X - x);
                 }
                 else
-                    player.Facing = (Facings) Math.Sign((float) x - player.X);
-                int last = Math.Sign(player.X - (float) x);
-                while (!player.Dead && (double) player.X != (double) x && !player.CollideCheck<Solid>(player.Position + new Vector2((float) player.Facing, 0.0f)) && (!cancelOnFall || player.OnGround()))
+                    player.Facing = (Facings) Math.Sign(x - player.X);
+                int last = Math.Sign(player.X - x);
+                while (!player.Dead && (double) player.X != x && !player.CollideCheck<Solid>(player.Position + new Vector2((float) player.Facing, 0.0f)) && (!cancelOnFall || player.OnGround()))
                 {
-                    player.Speed.X = Calc.Approach(player.Speed.X, (float) Math.Sign((float) x - player.X) * 64f * speedMultiplier, 1000f * Engine.DeltaTime);
-                    int num = Math.Sign(player.X - (float) x);
+                    player.Speed.X = Calc.Approach(player.Speed.X, Math.Sign(x - player.X) * 64f * speedMultiplier, 1000f * Engine.DeltaTime);
+                    int num = Math.Sign(player.X - x);
                     if (num != last)
                     {
-                        player.X = (float) x;
+                        player.X = x;
                         break;
                     }
                     last = num;
-                    yield return (object) null;
+                    yield return null;
                 }
                 player.Speed.X = 0.0f;
                 player.Sprite.Rate = 1f;
@@ -4405,8 +4380,8 @@ namespace Celeste
                 player.Facing = (Facings) Math.Sign(x - player.X);
                 while ((double) Math.Abs(player.X - x) > 4.0)
                 {
-                    player.Speed.X = Calc.Approach(player.Speed.X, (float) Math.Sign(x - player.X) * 90f, 1000f * Engine.DeltaTime);
-                    yield return (object) null;
+                    player.Speed.X = Calc.Approach(player.Speed.X, Math.Sign(x - player.X) * 90f, 1000f * Engine.DeltaTime);
+                    yield return null;
                 }
                 player.Sprite.Play("idle");
                 player.DummyMoving = false;
@@ -4417,14 +4392,14 @@ namespace Celeste
 
         private int TempleFallUpdate()
         {
-            this.Facing = Facings.Right;
-            if (!this.onGround)
+            Facing = Facings.Right;
+            if (!onGround)
             {
-                int num = this.level.Bounds.Left + 160;
-                this.Speed.X = Calc.Approach(this.Speed.X, 54.0000038f * ((double) Math.Abs((float) num - this.X) <= 4.0 ? 0.0f : (float) Math.Sign((float) num - this.X)), 325f * Engine.DeltaTime);
+                int num = level.Bounds.Left + 160;
+                Speed.X = Calc.Approach(Speed.X, 54.0000038f * ((double) Math.Abs(num - X) <= 4.0 ? 0.0f : Math.Sign(num - X)), 325f * Engine.DeltaTime);
             }
-            if (!this.onGround && this.DummyGravity)
-                this.Speed.Y = Calc.Approach(this.Speed.Y, 320f, 225f * Engine.DeltaTime);
+            if (!onGround && DummyGravity)
+                Speed.Y = Calc.Approach(Speed.Y, 320f, 225f * Engine.DeltaTime);
             return 20;
         }
 
@@ -4433,7 +4408,7 @@ namespace Celeste
             Player player = this;
             player.Sprite.Play("fallFast");
             while (!player.onGround)
-                yield return (object) null;
+                yield return null;
             player.Play("event:/char/madeline/mirrortemple_big_landing");
             if (player.Dashes <= 1)
                 player.Sprite.Play("fallPose");
@@ -4447,34 +4422,34 @@ namespace Celeste
             player.level.Particles.Emit(Player.P_SummitLandB, 8, player.BottomCenter - Vector2.UnitX * 2f, Vector2.UnitX * 2f, 3.403392f);
             player.level.Particles.Emit(Player.P_SummitLandB, 8, player.BottomCenter + Vector2.UnitX * 2f, Vector2.UnitX * 2f, -0.2617994f);
             for (float p = 0.0f; (double) p < 1.0; p += Engine.DeltaTime)
-                yield return (object) null;
+                yield return null;
             player.StateMachine.State = 0;
         }
 
-        private void ReflectionFallBegin() => this.IgnoreJumpThrus = true;
+        private void ReflectionFallBegin() => IgnoreJumpThrus = true;
 
         private void ReflectionFallEnd()
         {
             FallEffects.Show(false);
-            this.IgnoreJumpThrus = false;
+            IgnoreJumpThrus = false;
         }
 
         private int ReflectionFallUpdate()
         {
-            this.Facing = Facings.Right;
-            if (this.Scene.OnInterval(0.05f))
+            Facing = Facings.Right;
+            if (Scene.OnInterval(0.05f))
             {
-                this.wasDashB = true;
-                this.CreateTrail();
+                wasDashB = true;
+                CreateTrail();
             }
-            this.Speed.Y = !this.CollideCheck<Water>() ? Calc.Approach(this.Speed.Y, 320f, 225f * Engine.DeltaTime) : Calc.Approach(this.Speed.Y, -20f, 400f * Engine.DeltaTime);
-            foreach (Entity entity in this.Scene.Tracker.GetEntities<FlyFeather>())
+            Speed.Y = !CollideCheck<Water>() ? Calc.Approach(Speed.Y, 320f, 225f * Engine.DeltaTime) : Calc.Approach(Speed.Y, -20f, 400f * Engine.DeltaTime);
+            foreach (Entity entity in Scene.Tracker.GetEntities<FlyFeather>())
                 entity.RemoveSelf();
-            CrystalStaticSpinner crystalStaticSpinner = this.Scene.CollideFirst<CrystalStaticSpinner>(new Rectangle((int) ((double) this.X - 6.0), (int) ((double) this.Y - 6.0), 12, 12));
+            CrystalStaticSpinner crystalStaticSpinner = Scene.CollideFirst<CrystalStaticSpinner>(new Rectangle((int) ((double) X - 6.0), (int) ((double) Y - 6.0), 12, 12));
             if (crystalStaticSpinner != null)
             {
                 crystalStaticSpinner.Destroy();
-                this.level.Shake();
+                level.Shake();
                 Input.Rumble(RumbleStrength.Medium, RumbleLength.Medium);
                 Celeste.Freeze(0.01f);
             }
@@ -4489,41 +4464,41 @@ namespace Celeste
             for (float t = 0.0f; (double) t < 2.0; t += Engine.DeltaTime)
             {
                 player.Speed.Y = 0.0f;
-                yield return (object) null;
+                yield return null;
             }
             FallEffects.Show(true);
             player.Speed.Y = 320f;
             while (!player.CollideCheck<Water>())
-                yield return (object) null;
+                yield return null;
             Input.Rumble(RumbleStrength.Strong, RumbleLength.Medium);
             FallEffects.Show(false);
             player.Sprite.Play("bigFallRecover");
             player.level.Session.Audio.Music.Event = "event:/music/lvl6/main";
             player.level.Session.Audio.Apply();
             player.level.EndCutscene();
-            yield return (object) 1.2f;
+            yield return 1.2f;
             player.StateMachine.State = 0;
         }
 
-        private void OnReflectionFallSkip(Level level) => level.OnEndOfFrame += (Action) (() =>
+        private void OnReflectionFallSkip(Level level) => level.OnEndOfFrame += () =>
         {
-            level.Remove((Entity) this);
+            level.Remove(this);
             level.UnloadLevel();
             level.Session.Level = "00";
             Session session = level.Session;
             Level level1 = level;
             Rectangle bounds = level.Bounds;
-            double left = (double) bounds.Left;
+            double left = bounds.Left;
             bounds = level.Bounds;
-            double bottom = (double) bounds.Bottom;
-            Vector2 from = new Vector2((float) left, (float) bottom);
+            double bottom = bounds.Bottom;
+            Vector2 from = new((float)left, (float)bottom);
             Vector2? nullable = new Vector2?(level1.GetSpawnPoint(from));
             session.RespawnPoint = nullable;
-            level.LoadLevel(Player.IntroTypes.None);
+            level.LoadLevel(IntroTypes.None);
             FallEffects.Show(false);
             level.Session.Audio.Music.Event = "event:/music/lvl6/main";
             level.Session.Audio.Apply();
-        });
+        };
 
         public IEnumerator IntroWalkCoroutine()
         {
@@ -4531,24 +4506,24 @@ namespace Celeste
             Vector2 start = player.Position;
             if (player.IntroWalkDirection == Facings.Right)
             {
-                player.X = (float) (player.level.Bounds.Left - 16);
+                player.X = player.level.Bounds.Left - 16;
                 player.Facing = Facings.Right;
             }
             else
             {
-                player.X = (float) (player.level.Bounds.Right + 16);
+                player.X = player.level.Bounds.Right + 16;
                 player.Facing = Facings.Left;
             }
-            yield return (object) 0.3f;
+            yield return 0.3f;
             player.Sprite.Play("runSlow");
             while ((double) Math.Abs(player.X - start.X) > 2.0 && !player.CollideCheck<Solid>(player.Position + new Vector2((float) player.Facing, 0.0f)))
             {
                 player.MoveTowardsX(start.X, 64f * Engine.DeltaTime);
-                yield return (object) null;
+                yield return null;
             }
             player.Position = start;
             player.Sprite.Play("idle");
-            yield return (object) 0.2f;
+            yield return 0.2f;
             player.StateMachine.State = 0;
         }
 
@@ -4561,44 +4536,44 @@ namespace Celeste
             player.Facing = Facings.Right;
             if (!wasSummitJump)
             {
-                player.Y = (float) (player.level.Bounds.Bottom + 16);
-                yield return (object) 0.5f;
+                player.Y = player.level.Bounds.Bottom + 16;
+                yield return 0.5f;
             }
             else
             {
-                start.Y = (float) (player.level.Bounds.Bottom - 24);
-                player.MoveToX((float) ((int) Math.Round((double) player.X / 8.0) * 8));
+                start.Y = player.level.Bounds.Bottom - 24;
+                player.MoveToX((int)Math.Round((double)player.X / 8.0) * 8);
             }
             if (!wasSummitJump)
                 player.Sprite.Play("jumpSlow");
-            while ((double) player.Y > (double) start.Y - 8.0)
+            while ((double) player.Y > start.Y - 8.0)
             {
                 player.Y += -120f * Engine.DeltaTime;
-                yield return (object) null;
+                yield return null;
             }
             player.Y = (float) Math.Round((double) player.Y);
             player.Speed.Y = -100f;
-            while ((double) player.Speed.Y < 0.0)
+            while (player.Speed.Y < 0.0)
             {
                 player.Speed.Y += Engine.DeltaTime * 800f;
-                yield return (object) null;
+                yield return null;
             }
             player.Speed.Y = 0.0f;
             if (wasSummitJump)
             {
-                yield return (object) 0.2f;
+                yield return 0.2f;
                 player.Play("event:/char/madeline/summit_areastart");
                 player.Sprite.Play("launchRecover");
-                yield return (object) 0.1f;
+                yield return 0.1f;
             }
             else
-                yield return (object) 0.1f;
+                yield return 0.1f;
             if (!wasSummitJump)
                 player.Sprite.Play("fallSlow");
             while (!player.onGround)
             {
                 player.Speed.Y += Engine.DeltaTime * 800f;
-                yield return (object) null;
+                yield return null;
             }
             if (player.StateMachine.PreviousState != 10)
                 player.Position = start;
@@ -4611,9 +4586,9 @@ namespace Celeste
                 player.level.Particles.Emit(Player.P_SummitLandB, 8, player.BottomCenter - Vector2.UnitX * 2f, Vector2.UnitX * 2f, 3.403392f);
                 player.level.Particles.Emit(Player.P_SummitLandB, 8, player.BottomCenter + Vector2.UnitX * 2f, Vector2.UnitX * 2f, -0.2617994f);
                 player.level.ParticlesBG.Emit(Player.P_SummitLandC, 30, player.BottomCenter, Vector2.UnitX * 5f);
-                yield return (object) 0.35f;
+                yield return 0.35f;
                 for (int index = 0; index < player.Hair.Nodes.Count; ++index)
-                    player.Hair.Nodes[index] = new Vector2(0.0f, (float) (2 + index));
+                    player.Hair.Nodes[index] = new Vector2(0.0f, 2 + index);
             }
             player.StateMachine.State = 0;
         }
@@ -4625,9 +4600,9 @@ namespace Celeste
             player.Facing = Facings.Right;
             player.Speed = Vector2.Zero;
             player.Visible = false;
-            player.Y = (float) (player.level.Bounds.Bottom + 16);
-            yield return (object) 0.5f;
-            yield return (object) player.MoonLanding(start);
+            player.Y = player.level.Bounds.Bottom + 16;
+            yield return 0.5f;
+            yield return player.MoonLanding(start);
             player.StateMachine.State = 0;
         }
 
@@ -4638,113 +4613,113 @@ namespace Celeste
             player.Speed = Vector2.Zero;
             player.Visible = true;
             player.Sprite.Play("jumpSlow");
-            while ((double) player.Y > (double) groundPosition.Y - 8.0)
+            while ((double) player.Y > groundPosition.Y - 8.0)
             {
                 player.MoveV(-200f * Engine.DeltaTime);
-                yield return (object) null;
+                yield return null;
             }
             player.Speed.Y = -200f;
-            while ((double) player.Speed.Y < 0.0)
+            while (player.Speed.Y < 0.0)
             {
                 player.Speed.Y += Engine.DeltaTime * 400f;
-                yield return (object) null;
+                yield return null;
             }
             player.Speed.Y = 0.0f;
-            yield return (object) 0.2f;
+            yield return 0.2f;
             player.Sprite.Play("fallSlow");
             float s = 100f;
             while (!player.OnGround())
             {
                 player.Speed.Y += Engine.DeltaTime * s;
                 s = Calc.Approach(s, 2f, Engine.DeltaTime * 50f);
-                yield return (object) null;
+                yield return null;
             }
             player.Depth = 0;
         }
 
         private IEnumerator IntroWakeUpCoroutine()
         {
-            this.Sprite.Play("asleep");
-            yield return (object) 0.5f;
-            yield return (object) this.Sprite.PlayRoutine("wakeUp");
-            yield return (object) 0.2f;
-            this.StateMachine.State = 0;
+            Sprite.Play("asleep");
+            yield return 0.5f;
+            yield return Sprite.PlayRoutine("wakeUp");
+            yield return 0.2f;
+            StateMachine.State = 0;
         }
 
         private void IntroRespawnBegin()
         {
-            this.Play("event:/char/madeline/revive");
-            this.Depth = -1000000;
-            this.introEase = 1f;
-            Vector2 from = this.Position;
+            Play("event:/char/madeline/revive");
+            Depth = -1000000;
+            introEase = 1f;
+            Vector2 from = Position;
             ref Vector2 local1 = ref from;
-            double x = (double) from.X;
-            Rectangle bounds1 = this.level.Bounds;
-            double min1 = (double) bounds1.Left + 40.0;
-            bounds1 = this.level.Bounds;
-            double max1 = (double) bounds1.Right - 40.0;
+            double x = from.X;
+            Rectangle bounds1 = level.Bounds;
+            double min1 = bounds1.Left + 40.0;
+            bounds1 = level.Bounds;
+            double max1 = bounds1.Right - 40.0;
             double num1 = (double) MathHelper.Clamp((float) x, (float) min1, (float) max1);
             local1.X = (float) num1;
             ref Vector2 local2 = ref from;
-            double y = (double) from.Y;
-            Rectangle bounds2 = this.level.Bounds;
-            double min2 = (double) bounds2.Top + 40.0;
-            bounds2 = this.level.Bounds;
-            double max2 = (double) bounds2.Bottom - 40.0;
+            double y = from.Y;
+            Rectangle bounds2 = level.Bounds;
+            double min2 = bounds2.Top + 40.0;
+            bounds2 = level.Bounds;
+            double max2 = bounds2.Bottom - 40.0;
             double num2 = (double) MathHelper.Clamp((float) y, (float) min2, (float) max2);
             local2.Y = (float) num2;
-            this.deadOffset = from;
-            from -= this.Position;
-            this.respawnTween = Tween.Create(Tween.TweenMode.Oneshot, duration: 0.6f, start: true);
-            this.respawnTween.OnUpdate = (Action<Tween>) (t =>
+            deadOffset = from;
+            from -= Position;
+            respawnTween = Tween.Create(Tween.TweenMode.Oneshot, duration: 0.6f, start: true);
+            respawnTween.OnUpdate = t =>
             {
-                this.deadOffset = Vector2.Lerp(from, Vector2.Zero, t.Eased);
-                this.introEase = 1f - t.Eased;
-            });
-            this.respawnTween.OnComplete = (Action<Tween>) (t =>
+                deadOffset = Vector2.Lerp(from, Vector2.Zero, t.Eased);
+                introEase = 1f - t.Eased;
+            };
+            respawnTween.OnComplete = t =>
             {
-                if (this.StateMachine.State != 14)
+                if (StateMachine.State != 14)
                     return;
-                this.StateMachine.State = 0;
-                this.Sprite.Scale = new Vector2(1.5f, 0.5f);
-            });
-            this.Add((Component) this.respawnTween);
+                StateMachine.State = 0;
+                Sprite.Scale = new Vector2(1.5f, 0.5f);
+            };
+            Add(respawnTween);
         }
 
         private void IntroRespawnEnd()
         {
-            this.Depth = 0;
-            this.deadOffset = Vector2.Zero;
-            this.Remove((Component) this.respawnTween);
-            this.respawnTween = (Tween) null;
+            Depth = 0;
+            deadOffset = Vector2.Zero;
+            Remove(respawnTween);
+            respawnTween = null;
         }
 
         public IEnumerator IntroThinkForABitCoroutine()
         {
             Player player = this;
             (player.Scene as Level).Camera.X += 8f;
-            yield return (object) 0.1f;
+            yield return 0.1f;
             player.Sprite.Play("walk");
             float target = player.X + 8f;
             while ((double) player.X < (double) target)
             {
                 player.MoveH(32f * Engine.DeltaTime);
-                yield return (object) null;
+                yield return null;
             }
             player.Sprite.Play("idle");
-            yield return (object) 0.3f;
+            yield return 0.3f;
             player.Facing = Facings.Left;
-            yield return (object) 0.8f;
+            yield return 0.8f;
             player.Facing = Facings.Right;
-            yield return (object) 0.1f;
+            yield return 0.1f;
             player.StateMachine.State = 0;
         }
 
         private void BirdDashTutorialBegin()
         {
-            this.DashBegin();
-            this.Play("event:/char/madeline/dash_red_right");
-            this.Sprite.Play("dash");
+            DashBegin();
+            Play("event:/char/madeline/dash_red_right");
+            Sprite.Play("dash");
         }
 
         private int BirdDashTutorialUpdate() => 16;
@@ -4752,10 +4727,10 @@ namespace Celeste
         private IEnumerator BirdDashTutorialCoroutine()
         {
             Player player = this;
-            yield return (object) null;
+            yield return null;
             player.CreateTrail();
-            player.Add((Component) Alarm.Create(Alarm.AlarmMode.Oneshot, new Action(player.CreateTrail), 0.08f, true));
-            player.Add((Component) Alarm.Create(Alarm.AlarmMode.Oneshot, new Action(player.CreateTrail), 0.15f, true));
+            player.Add(Alarm.Create(Alarm.AlarmMode.Oneshot, new Action(player.CreateTrail), 0.08f, true));
+            player.Add(Alarm.Create(Alarm.AlarmMode.Oneshot, new Action(player.CreateTrail), 0.15f, true));
             Vector2 vector2 = new Vector2(1f, -1f).SafeNormalize();
             player.Facing = Facings.Right;
             player.Speed = vector2 * 240f;
@@ -4767,13 +4742,13 @@ namespace Celeste
             {
                 if (player.Speed != Vector2.Zero && player.level.OnInterval(0.02f))
                     player.level.ParticlesFG.Emit(Player.P_DashA, player.Center + Calc.Random.Range(Vector2.One * -2f, Vector2.One * 2f), player.DashDir.Angle());
-                yield return (object) null;
+                yield return null;
             }
             player.AutoJump = true;
             player.AutoJumpTimer = 0.0f;
-            if ((double) player.DashDir.Y <= 0.0)
+            if (player.DashDir.Y <= 0.0)
                 player.Speed = player.DashDir * 160f;
-            if ((double) player.Speed.Y < 0.0)
+            if (player.Speed.Y < 0.0)
                 player.Speed.Y *= 0.75f;
             player.Sprite.Play("fallFast");
             bool climbing = false;
@@ -4782,24 +4757,24 @@ namespace Celeste
                 player.Speed.Y = Calc.Approach(player.Speed.Y, 160f, 900f * Engine.DeltaTime);
                 if (player.CollideCheck<Solid>(player.Position + new Vector2(1f, 0.0f)))
                     climbing = true;
-                if ((double) player.Top > (double) player.level.Bounds.Bottom)
+                if ((double) player.Top > player.level.Bounds.Bottom)
                 {
                     player.level.CancelCutscene();
                     player.Die(Vector2.Zero);
                 }
-                yield return (object) null;
+                yield return null;
             }
             if (climbing)
             {
                 player.Sprite.Play("wallslide");
                 Dust.Burst(player.Position + new Vector2(4f, -6f), new Vector2(-4f, 0.0f).Angle());
                 player.Speed.Y = 0.0f;
-                yield return (object) 0.2f;
+                yield return 0.2f;
                 player.Sprite.Play("climbUp");
                 while (player.CollideCheck<Solid>(player.Position + new Vector2(1f, 0.0f)))
                 {
                     player.Y += -45f * Engine.DeltaTime;
-                    yield return (object) null;
+                    yield return null;
                 }
                 player.Y = (float) Math.Round((double) player.Y);
                 player.Play("event:/char/madeline/climb_ledge");
@@ -4809,7 +4784,7 @@ namespace Celeste
                 {
                     player.Speed.Y = Calc.Approach(player.Speed.Y, 160f, 900f * Engine.DeltaTime);
                     player.Speed.X = 20f;
-                    yield return (object) null;
+                    yield return null;
                 }
                 player.Speed.X = 0.0f;
                 player.Speed.Y = 0.0f;
@@ -4817,7 +4792,7 @@ namespace Celeste
                 for (time = 0.0f; (double) time < 0.5; time += Engine.DeltaTime)
                 {
                     player.X += 32f * Engine.DeltaTime;
-                    yield return (object) null;
+                    yield return null;
                 }
                 player.Sprite.Play("tired");
             }
@@ -4825,12 +4800,12 @@ namespace Celeste
             {
                 player.Sprite.Play("tired");
                 player.Speed.Y = 0.0f;
-                while ((double) player.Speed.X != 0.0)
+                while (player.Speed.X != 0.0)
                 {
                     player.Speed.X = Calc.Approach(player.Speed.X, 0.0f, 240f * Engine.DeltaTime);
                     if (player.Scene.OnInterval(0.04f))
                         Dust.Burst(player.BottomCenter + new Vector2(0.0f, -2f), -2.3561945f);
-                    yield return (object) null;
+                    yield return null;
                 }
             }
         }
@@ -4838,15 +4813,15 @@ namespace Celeste
         public EventInstance Play(string sound, string param = null, float value = 0.0f)
         {
             float num = 0.0f;
-            if (this.Scene is Level scene && scene.Raining)
+            if (Scene is Level scene && scene.Raining)
                 num = 1f;
-            this.AddChaserStateSound(sound, param, value);
-            return Audio.Play(sound, this.Center, param, value, "raining", num);
+            AddChaserStateSound(sound, param, value);
+            return Audio.Play(sound, Center, param, value, "raining", num);
         }
 
         public void Loop(SoundSource sfx, string sound)
         {
-            this.AddChaserStateSound(sound, (string) null, 0.0f, Player.ChaserStateSound.Actions.Loop);
+            AddChaserStateSound(sound, null, 0.0f, ChaserStateSound.Actions.Loop);
             sfx.Play(sound);
         }
 
@@ -4854,23 +4829,22 @@ namespace Celeste
         {
             if (!sfx.Playing)
                 return;
-            this.AddChaserStateSound(sfx.EventName, (string) null, 0.0f, Player.ChaserStateSound.Actions.Stop);
+            AddChaserStateSound(sfx.EventName, null, 0.0f, ChaserStateSound.Actions.Stop);
             sfx.Stop();
         }
 
-        private void AddChaserStateSound(string sound, Player.ChaserStateSound.Actions action) => this.AddChaserStateSound(sound, (string) null, 0.0f, action);
+        private void AddChaserStateSound(string sound, ChaserStateSound.Actions action) => AddChaserStateSound(sound, null, 0.0f, action);
 
         private void AddChaserStateSound(
             string sound,
             string param = null,
             float value = 0.0f,
-            Player.ChaserStateSound.Actions action = Player.ChaserStateSound.Actions.Oneshot)
+            ChaserStateSound.Actions action = ChaserStateSound.Actions.Oneshot)
         {
-            string str = (string) null;
-            SFX.MadelineToBadelineSound.TryGetValue(sound, out str);
+            SFX.MadelineToBadelineSound.TryGetValue(sound, out string str);
             if (str == null)
                 return;
-            this.activeSounds.Add(new Player.ChaserStateSound()
+            activeSounds.Add(new ChaserStateSound()
             {
                 Event = str,
                 Parameter = param,
@@ -4900,7 +4874,7 @@ namespace Celeste
             public string Event;
             public string Parameter;
             public float ParameterValue;
-            public Player.ChaserStateSound.Actions Action;
+            public ChaserStateSound.Actions Action;
 
             public enum Actions
             {
@@ -4921,52 +4895,46 @@ namespace Celeste
             public int Depth;
             public Vector2 Scale;
             public Vector2 DashDirection;
-            private Player.ChaserStateSound sound0;
-            private Player.ChaserStateSound sound1;
-            private Player.ChaserStateSound sound2;
-            private Player.ChaserStateSound sound3;
-            private Player.ChaserStateSound sound4;
+            private ChaserStateSound sound0;
+            private ChaserStateSound sound1;
+            private ChaserStateSound sound2;
+            private ChaserStateSound sound3;
+            private ChaserStateSound sound4;
             public int Sounds;
 
             public ChaserState(Player player)
             {
-                this.Position = player.Position;
-                this.TimeStamp = player.Scene.TimeActive;
-                this.Animation = player.Sprite.CurrentAnimationID;
-                this.Facing = player.Facing;
-                this.OnGround = player.onGround;
-                this.HairColor = player.Hair.Color;
-                this.Depth = player.Depth;
-                this.Scale = new Vector2(Math.Abs(player.Sprite.Scale.X) * (float) player.Facing, player.Sprite.Scale.Y);
-                this.DashDirection = player.DashDir;
-                List<Player.ChaserStateSound> activeSounds = player.activeSounds;
-                this.Sounds = Math.Min(5, activeSounds.Count);
-                this.sound0 = this.Sounds > 0 ? activeSounds[0] : new Player.ChaserStateSound();
-                this.sound1 = this.Sounds > 1 ? activeSounds[1] : new Player.ChaserStateSound();
-                this.sound2 = this.Sounds > 2 ? activeSounds[2] : new Player.ChaserStateSound();
-                this.sound3 = this.Sounds > 3 ? activeSounds[3] : new Player.ChaserStateSound();
-                this.sound4 = this.Sounds > 4 ? activeSounds[4] : new Player.ChaserStateSound();
+                Position = player.Position;
+                TimeStamp = player.Scene.TimeActive;
+                Animation = player.Sprite.CurrentAnimationID;
+                Facing = player.Facing;
+                OnGround = player.onGround;
+                HairColor = player.Hair.Color;
+                Depth = player.Depth;
+                Scale = new Vector2(Math.Abs(player.Sprite.Scale.X) * (float) player.Facing, player.Sprite.Scale.Y);
+                DashDirection = player.DashDir;
+                List<ChaserStateSound> activeSounds = player.activeSounds;
+                Sounds = Math.Min(5, activeSounds.Count);
+                sound0 = Sounds > 0 ? activeSounds[0] : new ChaserStateSound();
+                sound1 = Sounds > 1 ? activeSounds[1] : new ChaserStateSound();
+                sound2 = Sounds > 2 ? activeSounds[2] : new ChaserStateSound();
+                sound3 = Sounds > 3 ? activeSounds[3] : new ChaserStateSound();
+                sound4 = Sounds > 4 ? activeSounds[4] : new ChaserStateSound();
             }
 
-            public Player.ChaserStateSound this[int index]
+            public ChaserStateSound this[int index]
             {
                 get
                 {
-                    switch (index)
+                    return index switch
                     {
-                        case 0:
-                            return this.sound0;
-                        case 1:
-                            return this.sound1;
-                        case 2:
-                            return this.sound2;
-                        case 3:
-                            return this.sound3;
-                        case 4:
-                            return this.sound4;
-                        default:
-                            return new Player.ChaserStateSound();
-                    }
+                        0 => sound0,
+                        1 => sound1,
+                        2 => sound2,
+                        3 => sound3,
+                        4 => sound4,
+                        _ => new ChaserStateSound(),
+                    };
                 }
             }
         }

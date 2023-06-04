@@ -11,6 +11,9 @@ using System.Xml.Serialization;
 
 namespace Celeste
 {
+    /// <summary>
+    /// Class containing commands to be used in the in-game console. These functions are called using reflection so don't worry about VS 'warnings'.
+    /// </summary>
     public static class Commands
     {
         [Command("global_stats", "logs global steam stats")]
@@ -37,18 +40,18 @@ namespace Celeste
         [Command("give_golden", "gives you a golden strawb")]
         private static void CmdGiveGolden()
         {
-            if (!(Engine.Scene is Level scene))
+            if (Engine.Scene is not Level scene)
                 return;
             Player entity = scene.Tracker.GetEntity<Player>();
             if (entity == null)
                 return;
-            EntityData data = new EntityData();
+            EntityData data = new();
             data.Position = entity.Position + new Vector2(0.0f, -16f);
             data.ID = Calc.Random.Next();
             data.Name = "goldenBerry";
-            EntityID gid = new EntityID(scene.Session.Level, data.ID);
-            Strawberry strawberry = new Strawberry(data, Vector2.Zero, gid);
-            scene.Add((Entity) strawberry);
+            EntityID gid = new(scene.Session.Level, data.ID);
+            Strawberry strawberry = new(data, Vector2.Zero, gid);
+            scene.Add(strawberry);
         }
 
         [Command("unlock_doors", "unlock all lockblocks")]
@@ -74,12 +77,10 @@ namespace Celeste
             int num = 0;
             foreach (KeyValuePair<string, EventDescription> eventDescription in Audio.cachedEventDescriptions)
             {
-                int count;
-                int instanceCount = (int) eventDescription.Value.getInstanceCount(out count);
+                int instanceCount = (int)eventDescription.Value.getInstanceCount(out int count);
                 if (count > 0)
                 {
-                    string path1;
-                    int path2 = (int) eventDescription.Value.getPath(out path1);
+                    int path2 = (int)eventDescription.Value.getPath(out string path1);
                     Engine.Commands.Log((path1 + ": " + count));
                     Console.WriteLine(path1 + ": " + count);
                 }
@@ -174,22 +175,22 @@ namespace Celeste
         private static void CmdLogSession()
         {
             Session session = (Engine.Scene as Level).Session;
-            XmlSerializer xmlSerializer = new XmlSerializer(typeof (Session));
-            StringWriter stringWriter1 = new StringWriter();
+            XmlSerializer xmlSerializer = new(typeof (Session));
+            StringWriter stringWriter1 = new();
             StringWriter stringWriter2 = stringWriter1;
             Session o = session;
-            xmlSerializer.Serialize((TextWriter) stringWriter2, o);
+            xmlSerializer.Serialize(stringWriter2, o);
             Console.WriteLine(stringWriter1.ToString());
         }
 
         [Command("postcard", "views a postcard")]
-        private static void CmdPostcard(string id, int area = 1) => Engine.Scene = (Scene) new PreviewPostcard(new Postcard(Dialog.Get("POSTCARD_" + id), area));
+        private static void CmdPostcard(string id, int area = 1) => Engine.Scene = new PreviewPostcard(new Postcard(Dialog.Get("POSTCARD_" + id), area));
 
         [Command("postcard_cside", "views a postcard")]
-        private static void CmdPostcardCside() => Engine.Scene = (Scene) new PreviewPostcard(new Postcard(Dialog.Get("POSTCARD_CSIDES"), "event:/ui/main/postcard_csides_in", "event:/ui/main/postcard_csides_out"));
+        private static void CmdPostcardCside() => Engine.Scene = new PreviewPostcard(new Postcard(Dialog.Get("POSTCARD_CSIDES"), "event:/ui/main/postcard_csides_in", "event:/ui/main/postcard_csides_out"));
 
         [Command("postcard_variants", "views a postcard")]
-        private static void CmdPostcardVariants() => Engine.Scene = (Scene) new PreviewPostcard(new Postcard(Dialog.Get("POSTCARD_VARIANTS"), "event:/new_content/ui/postcard_variants_in", "event:/new_content/ui/postcard_variants_out"));
+        private static void CmdPostcardVariants() => Engine.Scene = new PreviewPostcard(new Postcard(Dialog.Get("POSTCARD_VARIANTS"), "event:/new_content/ui/postcard_variants_in", "event:/new_content/ui/postcard_variants_out"));
 
         [Command("check_all_languages", "compares all langauges to english")]
         private static void CmdCheckLangauges(bool compareContent = false)
@@ -231,7 +232,7 @@ namespace Celeste
                 {
                     if (area.Mode[index1] != null)
                     {
-                        HashSet<string> stringSet = new HashSet<string>();
+                        HashSet<string> stringSet = new();
                         EntityData[,] entityDataArray = new EntityData[10, 25];
                         foreach (EntityData strawberry in area.Mode[index1].MapData.Strawberries)
                         {
@@ -258,7 +259,7 @@ namespace Celeste
         }
 
         [Command("ow_reflection_fall", "tests reflection overworld fall cutscene")]
-        private static void CmdOWReflectionFall() => Engine.Scene = (Scene) new OverworldReflectionsFall((Level) null, (Action) (() => Engine.Scene = (Scene) new OverworldLoader(Overworld.StartMode.Titlescreen)));
+        private static void CmdOWReflectionFall() => Engine.Scene = new OverworldReflectionsFall(null, () => Engine.Scene = new OverworldLoader(Overworld.StartMode.Titlescreen));
 
         [Command("core", "set the core mode of the level")]
         private static void CmdCore(int mode = 0, bool session = false)
@@ -301,9 +302,9 @@ namespace Celeste
         [Command("screenpadding", "sets level screenpadding")]
         private static void CmdScreenPadding(int value)
         {
-            if (!(Engine.Scene is Level scene))
+            if (Engine.Scene is not Level scene)
                 return;
-            scene.ScreenPadding = (float) value;
+            scene.ScreenPadding = value;
         }
 
         [Command("textures", "counts textures in memory")]
@@ -320,8 +321,8 @@ namespace Celeste
             if (entity == null)
                 return;
             Level scene = Engine.Scene as Level;
-            Key key = new Key(entity, new EntityID("unknown", 1073741823 + Calc.Random.Next(10000)));
-            scene.Add((Entity) key);
+            Key key = new(entity, new EntityID("unknown", 1073741823 + Calc.Random.Next(10000)));
+            scene.Add(key);
             scene.Session.Keys.Add(key.ID);
         }
 
@@ -329,12 +330,12 @@ namespace Celeste
         private static void CmdRefFall()
         {
             SaveData.InitializeDebugMode();
-            Session session = new Session(new AreaKey(6));
+            Session session = new(new AreaKey(6));
             session.Level = "04";
-            LevelLoader levelLoader = new LevelLoader(session, new Vector2?(session.GetSpawnPoint(new Vector2((float) session.LevelData.Bounds.Center.X, (float) session.LevelData.Bounds.Top))));
+            LevelLoader levelLoader = new(session, new Vector2?(session.GetSpawnPoint(new Vector2(session.LevelData.Bounds.Center.X, session.LevelData.Bounds.Top))));
             levelLoader.PlayerIntroTypeOverride = new Player.IntroTypes?(Player.IntroTypes.Fall);
-            levelLoader.Level.Add((Entity) new BackgroundFadeIn(Color.Black, 2f, 30f));
-            Engine.Scene = (Scene) levelLoader;
+            levelLoader.Level.Add(new BackgroundFadeIn(Color.Black, 2f, 30f));
+            Engine.Scene = levelLoader;
         }
 
         [Command("lines", "Counts Dialog Lines")]
@@ -349,25 +350,25 @@ namespace Celeste
         }
 
         [Command("leaf", "play the leaf minigame")]
-        private static void CmdLeaf() => Engine.Scene = (Scene) new TestBreathingGame();
+        private static void CmdLeaf() => Engine.Scene = new TestBreathingGame();
 
         [Command("wipes", "plays screen wipes for kert")]
-        private static void CmdWipes() => Engine.Scene = (Scene) new TestWipes();
+        private static void CmdWipes() => Engine.Scene = new TestWipes();
 
         [Command("pico", "plays pico-8 game, optional room skip (x/y)")]
-        private static void CmdPico(int roomX = 0, int roomY = 0) => Engine.Scene = (Scene) new Emulator((Scene) null, roomX, roomY);
+        private static void CmdPico(int roomX = 0, int roomY = 0) => Engine.Scene = new Emulator(null, roomX, roomY);
 
         [Command("colorgrading", "sets color grading enabled (true/false)")]
         private static void CmdColorGrading(bool enabled) => ColorGrade.Enabled = enabled;
 
         [Command("portraits", "portrait debugger")]
-        private static void CmdPortraits() => Engine.Scene = (Scene) new PreviewPortrait();
+        private static void CmdPortraits() => Engine.Scene = new PreviewPortrait();
 
         [Command("dialog", "dialog debugger")]
-        private static void CmdDialog() => Engine.Scene = (Scene) new PreviewDialog();
+        private static void CmdDialog() => Engine.Scene = new PreviewDialog();
 
         [Command("titlescreen", "go to the titlescreen")]
-        private static void CmdTitlescreen() => Engine.Scene = (Scene) new OverworldLoader(Overworld.StartMode.Titlescreen);
+        private static void CmdTitlescreen() => Engine.Scene = new OverworldLoader(Overworld.StartMode.Titlescreen);
 
         [Command("time", "set the time speed")]
         private static void CmdTime(float rate = 1f) => Engine.TimeRate = rate;
@@ -377,13 +378,13 @@ namespace Celeste
         {
             SaveData.InitializeDebugMode();
             SaveData.Instance.LastArea = new AreaKey(id);
-            Session session = new Session(new AreaKey(id));
+            Session session = new(new AreaKey(id));
             if (level != null && session.MapData.Get(level) != null)
             {
                 session.Level = level;
                 session.FirstLevel = false;
             }
-            Engine.Scene = (Scene) new LevelLoader(session);
+            Engine.Scene = new LevelLoader(session);
         }
 
         [Command("hard", "test a hard level")]
@@ -391,30 +392,30 @@ namespace Celeste
         {
             SaveData.InitializeDebugMode();
             SaveData.Instance.LastArea = new AreaKey(id, AreaMode.BSide);
-            Session session = new Session(new AreaKey(id, AreaMode.BSide));
+            Session session = new(new AreaKey(id, AreaMode.BSide));
             if (level != null)
             {
                 session.Level = level;
                 session.FirstLevel = false;
             }
-            Engine.Scene = (Scene) new LevelLoader(session);
+            Engine.Scene = new LevelLoader(session);
         }
 
         [Command("music_progress", "set music progress value")]
-        private static void CmdMusProgress(int progress) => Audio.SetMusicParam(nameof (progress), (float) progress);
+        private static void CmdMusProgress(int progress) => Audio.SetMusicParam(nameof (progress), progress);
 
         [Command("rmx2", "test a RMX2 level")]
         private static void CmdRMX2(int id = 0, string level = null)
         {
             SaveData.InitializeDebugMode();
             SaveData.Instance.LastArea = new AreaKey(id, AreaMode.CSide);
-            Session session = new Session(new AreaKey(id, AreaMode.CSide));
+            Session session = new(new AreaKey(id, AreaMode.CSide));
             if (level != null)
             {
                 session.Level = level;
                 session.FirstLevel = false;
             }
-            Engine.Scene = (Scene) new LevelLoader(session);
+            Engine.Scene = new LevelLoader(session);
         }
 
         [Command("complete", "test the complete screen for an area")]
@@ -425,9 +426,9 @@ namespace Celeste
                 SaveData.InitializeDebugMode();
                 SaveData.Instance.CurrentSession = new Session(AreaKey.Default);
             }
-            AreaKey area = new AreaKey(index, (AreaMode) mode);
+            AreaKey area = new(index, (AreaMode) mode);
             int entityID = 0;
-            Session session = new Session(area);
+            Session session = new(area);
             while (session.Strawberries.Count < strawberries)
             {
                 ++entityID;
@@ -435,8 +436,8 @@ namespace Celeste
             }
             session.Deaths = deaths;
             session.Cassette = gem;
-            session.Time = 100000L + (long) Calc.Random.Next();
-            Engine.Scene = (Scene) new LevelExit(LevelExit.Mode.Completed, session);
+            session.Time = 100000L + Calc.Random.Next();
+            Engine.Scene = new LevelExit(LevelExit.Mode.Completed, session);
         }
 
         [Command("ow_complete", "test the completion sequence on the overworld after a level")]
@@ -455,8 +456,8 @@ namespace Celeste
                 SaveData.InitializeDebugMode();
                 SaveData.Instance.CurrentSession = new Session(AreaKey.Default);
             }
-            AreaKey area1 = new AreaKey(index, (AreaMode) mode);
-            Session session = new Session(area1);
+            AreaKey area1 = new(index, (AreaMode) mode);
+            Session session = new(area1);
             AreaStats area2 = SaveData.Instance.Areas[index];
             AreaModeStats mode1 = area2.Modes[mode];
             TimeSpan timeSpan = TimeSpan.FromTicks(mode1.BestTime);
@@ -507,13 +508,13 @@ namespace Celeste
                     areaModeStats.BestFullClearTime = ticks;
                 }
             }
-            Engine.Scene = (Scene) new OverworldLoader(Overworld.StartMode.AreaComplete);
+            Engine.Scene = new OverworldLoader(Overworld.StartMode.AreaComplete);
         }
 
         [Command("mapedit", "edit a map")]
         private static void CmdMapEdit(int index = -1, int mode = 0)
         {
-            Engine.Scene = (Scene) new MapEditor(index != -1 ? new AreaKey(index, (AreaMode) mode) : (!(Engine.Scene is Level) ? AreaKey.Default : (Engine.Scene as Level).Session.Area));
+            Engine.Scene = new MapEditor(index != -1 ? new AreaKey(index, (AreaMode)mode) : (Engine.Scene is not Level ? AreaKey.Default : (Engine.Scene as Level).Session.Area));
             Engine.Commands.Open = false;
         }
 
@@ -556,7 +557,7 @@ namespace Celeste
                 SaveData.InitializeDebugMode();
                 SaveData.Instance.CurrentSession = new Session(AreaKey.Default);
             }
-            Engine.Scene = (Scene) new OverworldLoader(Overworld.StartMode.Titlescreen);
+            Engine.Scene = new OverworldLoader(Overworld.StartMode.Titlescreen);
         }
 
         [Command("music", "play a music track")]
@@ -616,8 +617,7 @@ namespace Celeste
                 numArray[0] = area.Mode[0].StartStrawberries;
                 for (int index = 1; index < numArray.Length; ++index)
                     numArray[index] = area.Mode[0].Checkpoints[index - 1].Strawberries;
-                int total;
-                int[] strawberries = new MapData(new AreaKey(chapterID)).GetStrawberries(out total);
+                int[] strawberries = new MapData(new AreaKey(chapterID)).GetStrawberries(out int total);
                 Engine.Commands.Log(("Chapter " + chapterID + " Strawberries"));
                 Engine.Commands.Log(("Total: " + total), totalStrawberries == total ? lime : red);
                 for (int index = 0; index < numArray.Length; ++index)
@@ -629,7 +629,7 @@ namespace Celeste
         }
 
         [Command("say", "initiate a dialog message")]
-        private static void CmdSay(string id) => Engine.Scene.Add((Entity) new Textbox(id, new Func<IEnumerator>[0]));
+        private static void CmdSay(string id) => Engine.Scene.Add(new Textbox(id, new Func<IEnumerator>[0]));
 
         [Command("level_count", "print out total level count!")]
         private static void CmdTotalLevels(int areaID = -1, int mode = 0)
@@ -690,7 +690,7 @@ namespace Celeste
         {
             filename += ".bin";
             if (File.Exists(filename))
-                Engine.Scene = (Scene) new PreviewRecording(filename);
+                Engine.Scene = new PreviewRecording(filename);
             else
                 Engine.Commands.Log("FILE NOT FOUND");
         }
@@ -701,7 +701,7 @@ namespace Celeste
         [Command("rename", "renames a level")]
         private static void CmdRename(string current, string newName)
         {
-            if (!(Engine.Scene is MapEditor scene))
+            if (Engine.Scene is not MapEditor scene)
                 Engine.Commands.Log("Must be in the Map Editor");
             else
                 scene.Rename(current, newName);
@@ -711,7 +711,7 @@ namespace Celeste
         private static void CmdBlackHoleStrength(int strength)
         {
             strength = Calc.Clamp(strength, 0, 3);
-            if (!(Engine.Scene is Level scene))
+            if (Engine.Scene is not Level scene)
                 return;
             scene.Background.Get<BlackholeBG>()?.NextStrength(scene, (BlackholeBG.Strengths) strength);
         }

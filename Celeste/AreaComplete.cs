@@ -42,7 +42,7 @@ namespace Celeste
             this.Add((Monocle.Renderer) (this.snow = snow));
             this.RendererList.UpdateLists();
             AreaKey area = session.Area;
-            /*if (area.Mode != AreaMode.Normal)
+            if (area.Mode != AreaMode.Normal)
                 return;
             if (area.ID == 1)
                 Achievements.Register(Achievement.CH1);
@@ -63,7 +63,7 @@ namespace Celeste
                 if (area.ID != 7)
                     return;
                 Achievements.Register(Achievement.CH7);
-            }*/
+            }
         }
 
         public override void End()

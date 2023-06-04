@@ -6,28 +6,28 @@ namespace Monocle
 {
     public static class SaveLoad
     {
-        public static void SerializeToFile<T>(T obj, string filepath, SaveLoad.SerializeModes mode)
+        public static void SerializeToFile<T>(T obj, string filepath, SerializeModes mode)
         {
-            using (FileStream serializationStream = new FileStream(filepath, FileMode.Create))
+            using (FileStream serializationStream = new(filepath, FileMode.Create))
             {
-                if (mode == SaveLoad.SerializeModes.Binary)
+                if (mode == SerializeModes.Binary)
                 {
-                    new BinaryFormatter().Serialize((Stream) serializationStream, (object) obj);
+                    new BinaryFormatter().Serialize(serializationStream, obj);
                 }
                 else
                 {
-                    if (mode != SaveLoad.SerializeModes.XML)
+                    if (mode != SerializeModes.XML)
                         return;
-                    new XmlSerializer(typeof (T)).Serialize((Stream) serializationStream, (object) obj);
+                    new XmlSerializer(typeof (T)).Serialize(serializationStream, obj);
                 }
             }
         }
 
-        public static bool SafeSerializeToFile<T>(T obj, string filepath, SaveLoad.SerializeModes mode)
+        public static bool SafeSerializeToFile<T>(T obj, string filepath, SerializeModes mode)
         {
             try
             {
-                SaveLoad.SerializeToFile<T>(obj, filepath, mode);
+                SerializeToFile<T>(obj, filepath, mode);
                 return true;
             }
             catch
@@ -36,24 +36,24 @@ namespace Monocle
             }
         }
 
-        public static T DeserializeFromFile<T>(string filepath, SaveLoad.SerializeModes mode)
+        public static T DeserializeFromFile<T>(string filepath, SerializeModes mode)
         {
             using (FileStream serializationStream = File.OpenRead(filepath))
-                return mode == SaveLoad.SerializeModes.Binary ? (T) new BinaryFormatter().Deserialize((Stream) serializationStream) : (T) new XmlSerializer(typeof (T)).Deserialize((Stream) serializationStream);
+                return mode == SerializeModes.Binary ? (T) new BinaryFormatter().Deserialize(serializationStream) : (T) new XmlSerializer(typeof (T)).Deserialize(serializationStream);
         }
 
         public static T SafeDeserializeFromFile<T>(
             string filepath,
-            SaveLoad.SerializeModes mode,
+            SerializeModes mode,
             bool debugUnsafe = false)
         {
             if (!File.Exists(filepath))
                 return default (T);
             if (debugUnsafe)
-                return SaveLoad.DeserializeFromFile<T>(filepath, mode);
+                return DeserializeFromFile<T>(filepath, mode);
             try
             {
-                return SaveLoad.DeserializeFromFile<T>(filepath, mode);
+                return DeserializeFromFile<T>(filepath, mode);
             }
             catch
             {
@@ -63,7 +63,7 @@ namespace Monocle
 
         public static T SafeDeserializeFromFile<T>(
             string filepath,
-            SaveLoad.SerializeModes mode,
+            SerializeModes mode,
             out bool loadError,
             bool debugUnsafe = false)
         {
@@ -72,12 +72,12 @@ namespace Monocle
                 if (debugUnsafe)
                 {
                     loadError = false;
-                    return SaveLoad.DeserializeFromFile<T>(filepath, mode);
+                    return DeserializeFromFile<T>(filepath, mode);
                 }
                 try
                 {
                     loadError = false;
-                    return SaveLoad.DeserializeFromFile<T>(filepath, mode);
+                    return DeserializeFromFile<T>(filepath, mode);
                 }
                 catch
                 {

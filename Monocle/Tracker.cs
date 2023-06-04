@@ -17,10 +17,10 @@ namespace Monocle
 
         public static void Initialize()
         {
-            Tracker.TrackedEntityTypes = new Dictionary<Type, List<Type>>();
-            Tracker.TrackedComponentTypes = new Dictionary<Type, List<Type>>();
-            Tracker.StoredEntityTypes = new HashSet<Type>();
-            Tracker.StoredComponentTypes = new HashSet<Type>();
+            TrackedEntityTypes = new Dictionary<Type, List<Type>>();
+            TrackedComponentTypes = new Dictionary<Type, List<Type>>();
+            StoredEntityTypes = new HashSet<Type>();
+            StoredComponentTypes = new HashSet<Type>();
             foreach (Type type in Assembly.GetEntryAssembly().GetTypes())
             {
                 object[] customAttributes = type.GetCustomAttributes(typeof (Tracked), false);
@@ -31,20 +31,20 @@ namespace Monocle
                     {
                         if (!type.IsAbstract)
                         {
-                            if (!Tracker.TrackedEntityTypes.ContainsKey(type))
-                                Tracker.TrackedEntityTypes.Add(type, new List<Type>());
-                            Tracker.TrackedEntityTypes[type].Add(type);
+                            if (!TrackedEntityTypes.ContainsKey(type))
+                                TrackedEntityTypes.Add(type, new List<Type>());
+                            TrackedEntityTypes[type].Add(type);
                         }
-                        Tracker.StoredEntityTypes.Add(type);
+                        StoredEntityTypes.Add(type);
                         if (inherited)
                         {
-                            foreach (Type subclass in Tracker.GetSubclasses(type))
+                            foreach (Type subclass in GetSubclasses(type))
                             {
                                 if (!subclass.IsAbstract)
                                 {
-                                    if (!Tracker.TrackedEntityTypes.ContainsKey(subclass))
-                                        Tracker.TrackedEntityTypes.Add(subclass, new List<Type>());
-                                    Tracker.TrackedEntityTypes[subclass].Add(type);
+                                    if (!TrackedEntityTypes.ContainsKey(subclass))
+                                        TrackedEntityTypes.Add(subclass, new List<Type>());
+                                    TrackedEntityTypes[subclass].Add(type);
                                 }
                             }
                         }
@@ -55,20 +55,20 @@ namespace Monocle
                             throw new Exception("Type '" + type.Name + "' cannot be Tracked because it does not derive from Entity or Component");
                         if (!type.IsAbstract)
                         {
-                            if (!Tracker.TrackedComponentTypes.ContainsKey(type))
-                                Tracker.TrackedComponentTypes.Add(type, new List<Type>());
-                            Tracker.TrackedComponentTypes[type].Add(type);
+                            if (!TrackedComponentTypes.ContainsKey(type))
+                                TrackedComponentTypes.Add(type, new List<Type>());
+                            TrackedComponentTypes[type].Add(type);
                         }
-                        Tracker.StoredComponentTypes.Add(type);
+                        StoredComponentTypes.Add(type);
                         if (inherited)
                         {
-                            foreach (Type subclass in Tracker.GetSubclasses(type))
+                            foreach (Type subclass in GetSubclasses(type))
                             {
                                 if (!subclass.IsAbstract)
                                 {
-                                    if (!Tracker.TrackedComponentTypes.ContainsKey(subclass))
-                                        Tracker.TrackedComponentTypes.Add(subclass, new List<Type>());
-                                    Tracker.TrackedComponentTypes[subclass].Add(type);
+                                    if (!TrackedComponentTypes.ContainsKey(subclass))
+                                        TrackedComponentTypes.Add(subclass, new List<Type>());
+                                    TrackedComponentTypes[subclass].Add(type);
                                 }
                             }
                         }
@@ -79,7 +79,7 @@ namespace Monocle
 
         private static List<Type> GetSubclasses(Type type)
         {
-            List<Type> subclasses = new List<Type>();
+            List<Type> subclasses = new();
             foreach (Type type1 in Assembly.GetEntryAssembly().GetTypes())
             {
                 if (type != type1 && type.IsAssignableFrom(type1))
@@ -94,33 +94,33 @@ namespace Monocle
 
         public Tracker()
         {
-            this.Entities = new Dictionary<Type, List<Entity>>(Tracker.TrackedEntityTypes.Count);
-            foreach (Type storedEntityType in Tracker.StoredEntityTypes)
-                this.Entities.Add(storedEntityType, new List<Entity>());
-            this.Components = new Dictionary<Type, List<Component>>(Tracker.TrackedComponentTypes.Count);
-            foreach (Type storedComponentType in Tracker.StoredComponentTypes)
-                this.Components.Add(storedComponentType, new List<Component>());
+            Entities = new Dictionary<Type, List<Entity>>(TrackedEntityTypes.Count);
+            foreach (Type storedEntityType in StoredEntityTypes)
+                Entities.Add(storedEntityType, new List<Entity>());
+            Components = new Dictionary<Type, List<Component>>(TrackedComponentTypes.Count);
+            foreach (Type storedComponentType in StoredComponentTypes)
+                Components.Add(storedComponentType, new List<Component>());
         }
 
-        public bool IsEntityTracked<T>() where T : Entity => this.Entities.ContainsKey(typeof (T));
+        public bool IsEntityTracked<T>() where T : Entity => Entities.ContainsKey(typeof (T));
 
-        public bool IsComponentTracked<T>() where T : Component => this.Components.ContainsKey(typeof (T));
+        public bool IsComponentTracked<T>() where T : Component => Components.ContainsKey(typeof (T));
 
         public T GetEntity<T>() where T : Entity
         {
-            List<Entity> entity = this.Entities[typeof (T)];
-            return entity.Count == 0 ? default (T) : entity[0] as T;
+            List<Entity> entity = Entities[typeof (T)];
+            return entity.Count == 0 ? default : entity[0] as T;
         }
 
         public T GetNearestEntity<T>(Vector2 nearestTo) where T : Entity
         {
-            List<Entity> entities = this.GetEntities<T>();
+            List<Entity> entities = GetEntities<T>();
             T nearestEntity = default (T);
             float num1 = 0.0f;
             foreach (T obj in entities)
             {
                 float num2 = Vector2.DistanceSquared(nearestTo, obj.Position);
-                if ((object) nearestEntity == null || (double) num2 < (double) num1)
+                if (nearestEntity == null || (double) num2 < (double) num1)
                 {
                     nearestEntity = obj;
                     num1 = num2;
@@ -129,33 +129,33 @@ namespace Monocle
             return nearestEntity;
         }
 
-        public List<Entity> GetEntities<T>() where T : Entity => this.Entities[typeof (T)];
+        public List<Entity> GetEntities<T>() where T : Entity => Entities[typeof (T)];
 
-        public List<Entity> GetEntitiesCopy<T>() where T : Entity => new List<Entity>((IEnumerable<Entity>) this.GetEntities<T>());
+        public List<Entity> GetEntitiesCopy<T>() where T : Entity => new(GetEntities<T>());
 
         public IEnumerator<T> EnumerateEntities<T>() where T : Entity
         {
-            foreach (Entity entity in this.Entities[typeof (T)])
+            foreach (Entity entity in Entities[typeof (T)])
                 yield return entity as T;
         }
 
-        public int CountEntities<T>() where T : Entity => this.Entities[typeof (T)].Count;
+        public int CountEntities<T>() where T : Entity => Entities[typeof (T)].Count;
 
         public T GetComponent<T>() where T : Component
         {
-            List<Component> component = this.Components[typeof (T)];
+            List<Component> component = Components[typeof (T)];
             return component.Count == 0 ? default (T) : component[0] as T;
         }
 
         public T GetNearestComponent<T>(Vector2 nearestTo) where T : Component
         {
-            List<Component> components = this.GetComponents<T>();
+            List<Component> components = GetComponents<T>();
             T nearestComponent = default (T);
             float num1 = 0.0f;
             foreach (T obj in components)
             {
                 float num2 = Vector2.DistanceSquared(nearestTo, obj.Entity.Position);
-                if ((object) nearestComponent == null || (double) num2 < (double) num1)
+                if (nearestComponent == null || (double) num2 < (double) num1)
                 {
                     nearestComponent = obj;
                     num1 = num2;
@@ -164,64 +164,60 @@ namespace Monocle
             return nearestComponent;
         }
 
-        public List<Component> GetComponents<T>() where T : Component => this.Components[typeof (T)];
+        public List<Component> GetComponents<T>() where T : Component => Components[typeof (T)];
 
-        public List<Component> GetComponentsCopy<T>() where T : Component => new List<Component>((IEnumerable<Component>) this.GetComponents<T>());
+        public List<Component> GetComponentsCopy<T>() where T : Component => new(GetComponents<T>());
 
         public IEnumerator<T> EnumerateComponents<T>() where T : Component
         {
-            foreach (Component component in this.Components[typeof (T)])
+            foreach (Component component in Components[typeof (T)])
                 yield return component as T;
         }
 
-        public int CountComponents<T>() where T : Component => this.Components[typeof (T)].Count;
+        public int CountComponents<T>() where T : Component => Components[typeof (T)].Count;
 
         internal void EntityAdded(Entity entity)
         {
-            List<Type> typeList;
-            if (!Tracker.TrackedEntityTypes.TryGetValue(entity.GetType(), out typeList))
+            if (!TrackedEntityTypes.TryGetValue(entity.GetType(), out List<Type> typeList))
                 return;
             foreach (Type key in typeList)
-                this.Entities[key].Add(entity);
+                Entities[key].Add(entity);
         }
 
         internal void EntityRemoved(Entity entity)
         {
-            List<Type> typeList;
-            if (!Tracker.TrackedEntityTypes.TryGetValue(entity.GetType(), out typeList))
+            if (!TrackedEntityTypes.TryGetValue(entity.GetType(), out List<Type> typeList))
                 return;
             foreach (Type key in typeList)
-                this.Entities[key].Remove(entity);
+                Entities[key].Remove(entity);
         }
 
         internal void ComponentAdded(Component component)
         {
-            List<Type> typeList;
-            if (!Tracker.TrackedComponentTypes.TryGetValue(component.GetType(), out typeList))
+            if (!TrackedComponentTypes.TryGetValue(component.GetType(), out List<Type> typeList))
                 return;
             foreach (Type key in typeList)
-                this.Components[key].Add(component);
+                Components[key].Add(component);
         }
 
         internal void ComponentRemoved(Component component)
         {
-            List<Type> typeList;
-            if (!Tracker.TrackedComponentTypes.TryGetValue(component.GetType(), out typeList))
+            if (!TrackedComponentTypes.TryGetValue(component.GetType(), out List<Type> typeList))
                 return;
             foreach (Type key in typeList)
-                this.Components[key].Remove(component);
+                Components[key].Remove(component);
         }
 
         public void LogEntities()
         {
-            foreach (KeyValuePair<Type, List<Entity>> entity in this.Entities)
-                Engine.Commands.Log((object) (entity.Key.Name + " : " + (object) entity.Value.Count));
+            foreach (KeyValuePair<Type, List<Entity>> entity in Entities)
+                Engine.Commands.Log(entity.Key.Name + " : " + entity.Value.Count);
         }
 
         public void LogComponents()
         {
-            foreach (KeyValuePair<Type, List<Component>> component in this.Components)
-                Engine.Commands.Log((object) (component.Key.Name + " : " + (object) component.Value.Count));
+            foreach (KeyValuePair<Type, List<Component>> component in Components)
+                Engine.Commands.Log(component.Key.Name + " : " + component.Value.Count);
         }
     }
 }

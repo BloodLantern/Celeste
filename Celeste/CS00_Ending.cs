@@ -28,7 +28,7 @@ namespace Celeste
             CS00_Ending cs00Ending = this;
             for (; (double) Engine.TimeRate > 0.0; Engine.TimeRate -= Engine.RawDeltaTime * 2f)
             {
-                yield return (object) null;
+                yield return null;
                 if ((double) Engine.TimeRate < 0.5 && cs00Ending.bridge != null)
                     cs00Ending.bridge.StopCollapseLoop();
                 level.StopShake();
@@ -37,7 +37,7 @@ namespace Celeste
             Engine.TimeRate = 0.0f;
             cs00Ending.player.StateMachine.State = 11;
             cs00Ending.player.Facing = Facings.Right;
-            yield return (object) cs00Ending.WaitFor(1f);
+            yield return cs00Ending.WaitFor(1f);
             EventInstance instance = Audio.Play("event:/game/general/bird_in", cs00Ending.bird.Position);
             cs00Ending.bird.Facing = Facings.Left;
             cs00Ending.bird.Sprite.Play("fall");
@@ -51,29 +51,29 @@ namespace Celeste
                 if ((double) percent > 0.5)
                     cs00Ending.bird.Sprite.Play("fly");
                 percent += Engine.RawDeltaTime * 0.5f;
-                yield return (object) null;
+                yield return null;
             }
             cs00Ending.bird.Position = to;
-            instance = (EventInstance) null;
+            instance = null;
             from = new Vector2();
             to = new Vector2();
             Audio.Play("event:/game/general/bird_land_dirt", cs00Ending.bird.Position);
-            Dust.Burst(cs00Ending.bird.Position, -1.57079637f, 12);
+            Dust.Burst(cs00Ending.bird.Position, -MathHelper.Pi / 2, 12);
             cs00Ending.bird.Sprite.Play("idle");
-            yield return (object) cs00Ending.WaitFor(0.5f);
+            yield return cs00Ending.WaitFor(0.5f);
             cs00Ending.bird.Sprite.Play("peck");
-            yield return (object) cs00Ending.WaitFor(1.1f);
-            yield return (object) cs00Ending.bird.ShowTutorial(new BirdTutorialGui((Entity) cs00Ending.bird, new Vector2(0.0f, -16f), (object) Dialog.Clean("tutorial_dash"), new object[3]
+            yield return cs00Ending.WaitFor(1.1f);
+            yield return cs00Ending.bird.ShowTutorial(new BirdTutorialGui(cs00Ending.bird, new Vector2(0.0f, -16f), Dialog.Clean("tutorial_dash"), new object[3]
             {
-                (object) new Vector2(1f, -1f),
-                (object) "+",
-                (object) BirdTutorialGui.ButtonPrompt.Dash
+                new Vector2(1f, -1f),
+                "+",
+                BirdTutorialGui.ButtonPrompt.Dash
             }), true);
             while (true)
             {
                 Vector2 aimVector = Input.GetAimVector();
-                if ((double) aimVector.X <= 0.0 || (double) aimVector.Y >= 0.0 || !Input.Dash.Pressed)
-                    yield return (object) null;
+                if (aimVector.X <= 0.0 || aimVector.Y >= 0.0 || !Input.Dash.Pressed)
+                    yield return null;
                 else
                     break;
             }
@@ -83,22 +83,22 @@ namespace Celeste
             Engine.TimeRate = 1f;
             cs00Ending.keyOffed = true;
             int num1 = (int) Audio.CurrentMusicEventInstance.triggerCue();
-            cs00Ending.bird.Add((Component) new Coroutine(cs00Ending.bird.HideTutorial()));
-            yield return (object) 0.25f;
-            cs00Ending.bird.Add((Component) new Coroutine(cs00Ending.bird.StartleAndFlyAway()));
+            cs00Ending.bird.Add(new Coroutine(cs00Ending.bird.HideTutorial()));
+            yield return 0.25f;
+            cs00Ending.bird.Add(new Coroutine(cs00Ending.bird.StartleAndFlyAway()));
             while (!cs00Ending.player.Dead && !cs00Ending.player.OnGround())
-                yield return (object) null;
-            yield return (object) 2f;
+                yield return null;
+            yield return 2f;
             Audio.SetMusic("event:/music/lvl0/title_ping");
-            yield return (object) 2f;
+            yield return 2f;
             cs00Ending.endingText = new PrologueEndingText(false);
-            cs00Ending.Scene.Add((Entity) cs00Ending.endingText);
+            cs00Ending.Scene.Add(cs00Ending.endingText);
             Snow bgSnow = level.Background.Get<Snow>();
             Snow fgSnow = level.Foreground.Get<Snow>();
-            level.Add((Monocle.Renderer) (level.HiresSnow = new HiresSnow()));
-            level.HiresSnow.Alpha = 0.0f;
-            float ease = 0.0f;
-            while ((double) ease < 1.0)
+            level.Add(level.HiresSnow = new HiresSnow());
+            level.HiresSnow.Alpha = 0f;
+            float ease = 0f;
+            while (ease < 1)
             {
                 ease += Engine.DeltaTime * 0.25f;
                 float num2 = Ease.CubeInOut(ease);
@@ -108,8 +108,8 @@ namespace Celeste
                     bgSnow.Alpha -= Engine.DeltaTime * 0.5f;
                 level.HiresSnow.Alpha = Calc.Approach(level.HiresSnow.Alpha, 1f, Engine.DeltaTime * 0.5f);
                 cs00Ending.endingText.Position = new Vector2(960f, (float) (540.0 - 1080.0 * (1.0 - (double) num2)));
-                level.Camera.Y = (float) level.Bounds.Top - 3900f * num2;
-                yield return (object) null;
+                level.Camera.Y = level.Bounds.Top - 3900f * num2;
+                yield return null;
             }
             cs00Ending.EndCutscene(level);
         }
@@ -117,7 +117,7 @@ namespace Celeste
         private IEnumerator WaitFor(float time)
         {
             for (float t = 0.0f; (double) t < (double) time; t += Engine.RawDeltaTime)
-                yield return (object) null;
+                yield return null;
         }
 
         public override void OnEnd(Level level)
