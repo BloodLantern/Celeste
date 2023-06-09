@@ -22,12 +22,12 @@ namespace Celeste
         public float ParticleSpeed = 1f;
         public float Shake;
         private float timer;
-        private string text;
+        private readonly string text;
         private bool disposed;
-        private VirtualRenderTarget poem;
-        private VirtualRenderTarget smoke;
-        private VirtualRenderTarget temp;
-        private Poem.Particle[] particles = new Poem.Particle[80];
+        private readonly VirtualRenderTarget poem;
+        private readonly VirtualRenderTarget smoke;
+        private readonly VirtualRenderTarget temp;
+        private readonly Particle[] particles = new Particle[80];
 
         public Color Color { get; private set; }
 
@@ -35,113 +35,113 @@ namespace Celeste
         {
             if (text != null)
                 this.text = ActiveFont.FontSize.AutoNewline(text, 1024);
-            this.Color = Poem.colors[heartIndex];
-            this.Heart = GFX.GuiSpriteBank.Create("heartgem" + (object) heartIndex);
-            this.Heart.Play("spin");
-            this.Heart.Position = new Vector2(1920f, 1080f) * 0.5f;
-            this.Heart.Color = Color.White * heartAlpha;
+            Color = colors[heartIndex];
+            Heart = GFX.GuiSpriteBank.Create("heartgem" + heartIndex);
+            Heart.Play("spin");
+            Heart.Position = new Vector2(1920f, 1080f) * 0.5f;
+            Heart.Color = Color.White * heartAlpha;
             int width = Math.Min(1920, Engine.ViewWidth);
             int height = Math.Min(1080, Engine.ViewHeight);
-            this.poem = VirtualContent.CreateRenderTarget("poem-a", width, height);
-            this.smoke = VirtualContent.CreateRenderTarget("poem-b", width / 2, height / 2);
-            this.temp = VirtualContent.CreateRenderTarget("poem-c", width / 2, height / 2);
-            this.Tag = (int) Tags.HUD | (int) Tags.FrozenUpdate;
-            this.Add((Component) new BeforeRenderHook(new Action(this.BeforeRender)));
-            for (int index = 0; index < this.particles.Length; ++index)
-                this.particles[index].Reset(Calc.Random.NextFloat());
+            poem = VirtualContent.CreateRenderTarget("poem-a", width, height);
+            smoke = VirtualContent.CreateRenderTarget("poem-b", width / 2, height / 2);
+            temp = VirtualContent.CreateRenderTarget("poem-c", width / 2, height / 2);
+            Tag = (int) Tags.HUD | (int) Tags.FrozenUpdate;
+            Add(new BeforeRenderHook(new Action(BeforeRender)));
+            for (int index = 0; index < particles.Length; ++index)
+                particles[index].Reset(Calc.Random.NextFloat());
         }
 
         public void Dispose()
         {
-            if (this.disposed)
+            if (disposed)
                 return;
-            this.poem.Dispose();
-            this.smoke.Dispose();
-            this.temp.Dispose();
-            this.RemoveSelf();
-            this.disposed = true;
+            poem.Dispose();
+            smoke.Dispose();
+            temp.Dispose();
+            RemoveSelf();
+            disposed = true;
         }
 
         private void DrawPoem(Vector2 offset, Color color)
         {
             MTexture mtexture = GFX.Gui["poemside"];
-            float num = ActiveFont.Measure(this.text).X * 1.5f;
+            float num = ActiveFont.Measure(text).X * 1.5f;
             Vector2 position = new Vector2(960f, 540f) + offset;
-            mtexture.DrawCentered(position - Vector2.UnitX * (float) ((double) num / 2.0 + 64.0), color);
-            ActiveFont.Draw(this.text, position, new Vector2(0.5f, 0.5f), Vector2.One * 1.5f, color);
-            mtexture.DrawCentered(position + Vector2.UnitX * (float) ((double) num / 2.0 + 64.0), color);
+            mtexture.DrawCentered(position - Vector2.UnitX * (num / 2 + 64), color);
+            ActiveFont.Draw(text, position, new Vector2(0.5f, 0.5f), Vector2.One * 1.5f, color);
+            mtexture.DrawCentered(position + Vector2.UnitX * (num / 2 + 64), color);
         }
 
         public override void Update()
         {
-            this.timer += Engine.DeltaTime;
-            for (int index = 0; index < this.particles.Length; ++index)
+            timer += Engine.DeltaTime;
+            for (int index = 0; index < particles.Length; ++index)
             {
-                this.particles[index].Percent += Engine.DeltaTime / this.particles[index].Duration * this.ParticleSpeed;
-                if ((double) this.particles[index].Percent > 1.0)
-                    this.particles[index].Reset(0.0f);
+                particles[index].Percent += Engine.DeltaTime / particles[index].Duration * ParticleSpeed;
+                if (particles[index].Percent > 1)
+                    particles[index].Reset(0f);
             }
-            this.Heart.Update();
+            Heart.Update();
         }
 
         public void BeforeRender()
         {
-            if (this.disposed)
+            if (disposed)
                 return;
-            Engine.Graphics.GraphicsDevice.SetRenderTarget((RenderTarget2D) this.poem);
+            Engine.Graphics.GraphicsDevice.SetRenderTarget((RenderTarget2D) poem);
             Engine.Graphics.GraphicsDevice.Clear(Color.Transparent);
-            Matrix scale = Matrix.CreateScale((float) this.poem.Width / 1920f);
-            Draw.SpriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, SamplerState.LinearClamp, (DepthStencilState) null, (RasterizerState) null, (Effect) null, scale);
-            this.Heart.Position = this.Offset + new Vector2(1920f, 1080f) * 0.5f;
-            this.Heart.Scale = Vector2.One * (float) (1.0 + (double) this.Shake * 0.10000000149011612);
+            Matrix scale = Matrix.CreateScale(poem.Width / 1920f);
+            Draw.SpriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, SamplerState.LinearClamp, null, null, null, scale);
+            Heart.Position = Offset + new Vector2(1920f, 1080f) * 0.5f;
+            Heart.Scale = Vector2.One * (float) (1.0 + Shake * 0.10000000149011612);
             MTexture atla = OVR.Atlas["snow"];
-            for (int index = 0; index < this.particles.Length; ++index)
+            for (int index = 0; index < particles.Length; ++index)
             {
-                Poem.Particle particle = this.particles[index];
+                Poem.Particle particle = particles[index];
                 float num1 = Ease.SineIn(particle.Percent);
-                Vector2 position = this.Heart.Position + particle.Direction * (1f - num1) * 1920f;
+                Vector2 position = Heart.Position + particle.Direction * (1f - num1) * 1920f;
                 float x = (float) (1.0 + (double) num1 * 2.0);
                 float y = (float) (0.25 * (0.25 + (1.0 - (double) num1) * 0.75));
                 float num2 = 1f - num1;
-                atla.DrawCentered(position, this.Color * num2, new Vector2(x, y), (-particle.Direction).Angle());
+                atla.DrawCentered(position, Color * num2, new Vector2(x, y), (-particle.Direction).Angle());
             }
-            Sprite heart = this.Heart;
-            heart.Position = heart.Position + new Vector2(Calc.Random.Range(-1f, 1f), Calc.Random.Range(-1f, 1f)) * 16f * this.Shake;
-            this.Heart.Render();
-            if (!string.IsNullOrEmpty(this.text))
+            Sprite heart = Heart;
+            heart.Position = heart.Position + new Vector2(Calc.Random.Range(-1f, 1f), Calc.Random.Range(-1f, 1f)) * 16f * Shake;
+            Heart.Render();
+            if (!string.IsNullOrEmpty(text))
             {
-                this.DrawPoem(this.Offset + new Vector2(-2f, 0.0f), Color.Black * this.TextAlpha);
-                this.DrawPoem(this.Offset + new Vector2(2f, 0.0f), Color.Black * this.TextAlpha);
-                this.DrawPoem(this.Offset + new Vector2(0.0f, -2f), Color.Black * this.TextAlpha);
-                this.DrawPoem(this.Offset + new Vector2(0.0f, 2f), Color.Black * this.TextAlpha);
-                this.DrawPoem(this.Offset + Vector2.Zero, this.Color * this.TextAlpha);
+                DrawPoem(Offset + new Vector2(-2f, 0.0f), Color.Black * TextAlpha);
+                DrawPoem(Offset + new Vector2(2f, 0.0f), Color.Black * TextAlpha);
+                DrawPoem(Offset + new Vector2(0.0f, -2f), Color.Black * TextAlpha);
+                DrawPoem(Offset + new Vector2(0.0f, 2f), Color.Black * TextAlpha);
+                DrawPoem(Offset + Vector2.Zero, Color * TextAlpha);
             }
             Draw.SpriteBatch.End();
-            Engine.Graphics.GraphicsDevice.SetRenderTarget((RenderTarget2D) this.smoke);
+            Engine.Graphics.GraphicsDevice.SetRenderTarget((RenderTarget2D) smoke);
             Engine.Graphics.GraphicsDevice.Clear(Color.Transparent);
-            MagicGlow.Render((Texture2D) (RenderTarget2D) this.poem, this.timer, -1f, Matrix.CreateScale(0.5f));
-            GaussianBlur.Blur((Texture2D) (RenderTarget2D) this.smoke, this.temp, this.smoke);
+            MagicGlow.Render((RenderTarget2D)poem, timer, -1f, Matrix.CreateScale(0.5f));
+            GaussianBlur.Blur((RenderTarget2D)smoke, temp, smoke);
         }
 
         public override void Render()
         {
-            if (this.disposed || this.Scene.Paused)
+            if (disposed || Scene.Paused)
                 return;
-            float scale = 1920f / (float) this.poem.Width;
-            Draw.SpriteBatch.Draw((Texture2D) (RenderTarget2D) this.smoke, Vector2.Zero, new Rectangle?(this.smoke.Bounds), Color.White * 0.3f * this.Alpha, 0.0f, Vector2.Zero, scale * 2f, SpriteEffects.None, 0.0f);
-            Draw.SpriteBatch.Draw((Texture2D) (RenderTarget2D) this.poem, Vector2.Zero, new Rectangle?(this.poem.Bounds), Color.White * this.Alpha, 0.0f, Vector2.Zero, scale, SpriteEffects.None, 0.0f);
+            float scale = 1920f / poem.Width;
+            Draw.SpriteBatch.Draw((RenderTarget2D)smoke, Vector2.Zero, new Rectangle?(smoke.Bounds), Color.White * 0.3f * Alpha, 0.0f, Vector2.Zero, scale * 2f, SpriteEffects.None, 0.0f);
+            Draw.SpriteBatch.Draw((RenderTarget2D)poem, Vector2.Zero, new Rectangle?(poem.Bounds), Color.White * Alpha, 0.0f, Vector2.Zero, scale, SpriteEffects.None, 0.0f);
         }
 
         public override void Removed(Scene scene)
         {
             base.Removed(scene);
-            this.Dispose();
+            Dispose();
         }
 
         public override void SceneEnd(Scene scene)
         {
             base.SceneEnd(scene);
-            this.Dispose();
+            Dispose();
         }
 
         private struct Particle
@@ -152,9 +152,9 @@ namespace Celeste
 
             public void Reset(float percent)
             {
-                this.Direction = Calc.AngleToVector(Calc.Random.NextFloat(6.28318548f), 1f);
-                this.Percent = percent;
-                this.Duration = (float) (0.5 + (double) Calc.Random.NextFloat() * 0.5);
+                Direction = Calc.AngleToVector(Calc.Random.NextFloat(6.28318548f), 1f);
+                Percent = percent;
+                Duration = (float) (0.5 + (double) Calc.Random.NextFloat() * 0.5);
             }
         }
     }

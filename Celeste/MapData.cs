@@ -18,10 +18,10 @@ namespace Celeste
         public int DetectedStrawberries;
         public bool DetectedRemixNotes;
         public bool DetectedHeartGem;
-        public List<LevelData> Levels = new List<LevelData>();
-        public List<Rectangle> Filler = new List<Rectangle>();
-        public List<EntityData> Strawberries = new List<EntityData>();
-        public List<EntityData> Goldenberries = new List<EntityData>();
+        public List<LevelData> Levels = new();
+        public List<Rectangle> Filler = new();
+        public List<EntityData> Strawberries = new();
+        public List<EntityData> Goldenberries = new();
         public Color BackgroundColor = Color.Black;
         public BinaryPacker.Element Foreground;
         public BinaryPacker.Element Background;
@@ -31,7 +31,7 @@ namespace Celeste
 
         public string Filepath => Path.Combine(Engine.ContentDirectory, "Maps", Filename + ".bin");
 
-        public Rectangle TileBounds => new Rectangle(Bounds.X / 8, Bounds.Y / 8, (int) Math.Ceiling((double) Bounds.Width / 8.0), (int) Math.Ceiling((double) Bounds.Height / 8.0));
+        public Rectangle TileBounds => new(Bounds.X / 8, Bounds.Y / 8, (int) Math.Ceiling(Bounds.Width / 8f), (int) Math.Ceiling(Bounds.Height / 8f));
 
         public MapData(AreaKey area)
         {
@@ -55,7 +55,7 @@ namespace Celeste
             {
                 int loadSeed = 0;
                 foreach (char ch in Data.Name)
-                    loadSeed += (int) ch;
+                    loadSeed += ch;
                 return loadSeed;
             }
         }
@@ -215,7 +215,7 @@ namespace Celeste
                 if (level.Check(at))
                     return level;
             }
-            return (LevelData) null;
+            return null;
         }
 
         public LevelData Get(string levelName)
@@ -225,12 +225,12 @@ namespace Celeste
                 if (level.Name.Equals(levelName))
                     return level;
             }
-            return (LevelData) null;
+            return null;
         }
 
         public List<Backdrop> CreateBackdrops(BinaryPacker.Element data)
         {
-            List<Backdrop> backdrops = new List<Backdrop>();
+            List<Backdrop> backdrops = new();
             if (data != null && data.Children != null)
             {
                 foreach (BinaryPacker.Element child1 in data.Children)
@@ -244,7 +244,7 @@ namespace Celeste
                         }
                     }
                     else
-                        backdrops.Add(ParseBackdrop(child1, (BinaryPacker.Element) null));
+                        backdrops.Add(ParseBackdrop(child1, null));
                 }
             }
             return backdrops;
@@ -257,8 +257,8 @@ namespace Celeste
             {
                 string id = child.Attr("texture");
                 string str1 = child.Attr("atlas", "game");
-                Parallax parallax = new Parallax(!(str1 == "game") || !GFX.Game.Has(id) ? (!(str1 == "gui") || !GFX.Gui.Has(id) ? GFX.Misc[id] : GFX.Gui[id]) : GFX.Game[id]);
-                backdrop = (Backdrop) parallax;
+                Parallax parallax = new(!(str1 == "game") || !GFX.Game.Has(id) ? (!(str1 == "gui") || !GFX.Gui.Has(id) ? GFX.Misc[id] : GFX.Gui[id]) : GFX.Game[id]);
+                backdrop = parallax;
                 string str2 = "";
                 if (child.HasAttr("blendmode"))
                     str2 = child.Attr("blendmode", "alphablend").ToLower();
@@ -269,48 +269,48 @@ namespace Celeste
                 parallax.DoFadeIn = bool.Parse(child.Attr("fadeIn", "false"));
             }
             else if (child.Name.Equals("snowfg", StringComparison.OrdinalIgnoreCase))
-                backdrop = (Backdrop) new Snow(true);
+                backdrop = new Snow(true);
             else if (child.Name.Equals("snowbg", StringComparison.OrdinalIgnoreCase))
-                backdrop = (Backdrop) new Snow(false);
+                backdrop = new Snow(false);
             else if (child.Name.Equals("windsnow", StringComparison.OrdinalIgnoreCase))
-                backdrop = (Backdrop) new WindSnowFG();
+                backdrop = new WindSnowFG();
             else if (child.Name.Equals("dreamstars", StringComparison.OrdinalIgnoreCase))
-                backdrop = (Backdrop) new DreamStars();
+                backdrop = new DreamStars();
             else if (child.Name.Equals("stars", StringComparison.OrdinalIgnoreCase))
-                backdrop = (Backdrop) new StarsBG();
+                backdrop = new StarsBG();
             else if (child.Name.Equals("mirrorfg", StringComparison.OrdinalIgnoreCase))
-                backdrop = (Backdrop) new MirrorFG();
+                backdrop = new MirrorFG();
             else if (child.Name.Equals("reflectionfg", StringComparison.OrdinalIgnoreCase))
-                backdrop = (Backdrop) new ReflectionFG();
+                backdrop = new ReflectionFG();
             else if (child.Name.Equals("godrays", StringComparison.OrdinalIgnoreCase))
-                backdrop = (Backdrop) new Godrays();
+                backdrop = new Godrays();
             else if (child.Name.Equals("tentacles", StringComparison.OrdinalIgnoreCase))
-                backdrop = (Backdrop) new Tentacles((Tentacles.Side) Enum.Parse(typeof (Tentacles.Side), child.Attr("side", "Right")), Calc.HexToColor(child.Attr("color")), child.AttrFloat("offset"));
+                backdrop = new Tentacles((Tentacles.Side)Enum.Parse(typeof(Tentacles.Side), child.Attr("side", "Right")), Calc.HexToColor(child.Attr("color")), child.AttrFloat("offset"));
             else if (child.Name.Equals("northernlights", StringComparison.OrdinalIgnoreCase))
-                backdrop = (Backdrop) new NorthernLights();
+                backdrop = new NorthernLights();
             else if (child.Name.Equals("bossStarField", StringComparison.OrdinalIgnoreCase))
-                backdrop = (Backdrop) new FinalBossStarfield();
+                backdrop = new FinalBossStarfield();
             else if (child.Name.Equals("petals", StringComparison.OrdinalIgnoreCase))
-                backdrop = (Backdrop) new Petals();
+                backdrop = new Petals();
             else if (child.Name.Equals("heatwave", StringComparison.OrdinalIgnoreCase))
-                backdrop = (Backdrop) new HeatWave();
+                backdrop = new HeatWave();
             else if (child.Name.Equals("corestarsfg", StringComparison.OrdinalIgnoreCase))
-                backdrop = (Backdrop) new CoreStarsFG();
+                backdrop = new CoreStarsFG();
             else if (child.Name.Equals("starfield", StringComparison.OrdinalIgnoreCase))
-                backdrop = (Backdrop) new Starfield(Calc.HexToColor(child.Attr("color")), child.AttrFloat("speed", 1f));
+                backdrop = new Starfield(Calc.HexToColor(child.Attr("color")), child.AttrFloat("speed", 1f));
             else if (child.Name.Equals("planets", StringComparison.OrdinalIgnoreCase))
-                backdrop = (Backdrop) new Planets((int) child.AttrFloat("count", 32f), child.Attr("size", "small"));
+                backdrop = new Planets((int)child.AttrFloat("count", 32f), child.Attr("size", "small"));
             else if (child.Name.Equals("rain", StringComparison.OrdinalIgnoreCase))
-                backdrop = (Backdrop) new RainFG();
+                backdrop = new RainFG();
             else if (child.Name.Equals("stardust", StringComparison.OrdinalIgnoreCase))
             {
-                backdrop = (Backdrop) new StardustFG();
+                backdrop = new StardustFG();
             }
             else
             {
                 if (!child.Name.Equals("blackhole", StringComparison.OrdinalIgnoreCase))
                     throw new Exception("Background type " + child.Name + " does not exist");
-                backdrop = (Backdrop) new BlackholeBG();
+                backdrop = new BlackholeBG();
             }
             if (child.HasAttr("tag"))
                 backdrop.Tags.Add(child.Attr("tag"));
@@ -369,35 +369,35 @@ namespace Celeste
                 backdrop.WindMultiplier = child.AttrFloat("wind");
             else if (above != null && above.HasAttr("wind"))
                 backdrop.WindMultiplier = above.AttrFloat("wind");
-            string list1 = (string) null;
+            string list1 = null;
             if (child.HasAttr("exclude"))
                 list1 = child.Attr("exclude");
             else if (above != null && above.HasAttr("exclude"))
                 list1 = above.Attr("exclude");
             if (list1 != null)
                 backdrop.ExcludeFrom = ParseLevelsList(list1);
-            string list2 = (string) null;
+            string list2 = null;
             if (child.HasAttr("only"))
                 list2 = child.Attr("only");
             else if (above != null && above.HasAttr("only"))
                 list2 = above.Attr("only");
             if (list2 != null)
                 backdrop.OnlyIn = ParseLevelsList(list2);
-            string str3 = (string) null;
+            string str3 = null;
             if (child.HasAttr("flag"))
                 str3 = child.Attr("flag");
             else if (above != null && above.HasAttr("flag"))
                 str3 = above.Attr("flag");
             if (str3 != null)
                 backdrop.OnlyIfFlag = str3;
-            string str4 = (string) null;
+            string str4 = null;
             if (child.HasAttr("notflag"))
                 str4 = child.Attr("notflag");
             else if (above != null && above.HasAttr("notflag"))
                 str4 = above.Attr("notflag");
             if (str4 != null)
                 backdrop.OnlyIfNotFlag = str4;
-            string str5 = (string) null;
+            string str5 = null;
             if (child.HasAttr("always"))
                 str5 = child.Attr("always");
             else if (above != null && above.HasAttr("always"))
@@ -419,7 +419,7 @@ namespace Celeste
                 backdrop.InstantOut = child.AttrBool("instantOut");
             else if (above != null && above.HasAttr("instantOut"))
                 backdrop.InstantOut = above.AttrBool("instantOut");
-            string str6 = (string) null;
+            string str6 = null;
             if (child.HasAttr("fadex"))
                 str6 = child.Attr("fadex");
             else if (above != null && above.HasAttr("fadex"))
@@ -437,8 +437,8 @@ namespace Celeste
                     {
                         string[] strArray2 = strArray1[0].Split('-');
                         string[] strArray3 = strArray1[1].Split('-');
-                        float fadeFrom = float.Parse(strArray3[0], (IFormatProvider) CultureInfo.InvariantCulture);
-                        float fadeTo = float.Parse(strArray3[1], (IFormatProvider) CultureInfo.InvariantCulture);
+                        float fadeFrom = float.Parse(strArray3[0], CultureInfo.InvariantCulture);
+                        float fadeTo = float.Parse(strArray3[1], CultureInfo.InvariantCulture);
                         int num1 = 1;
                         int num2 = 1;
                         if (strArray2[0][0] == 'n')
@@ -451,11 +451,11 @@ namespace Celeste
                             num2 = -1;
                             strArray2[1] = strArray2[1].Substring(1);
                         }
-                        backdrop.FadeX.Add((float) (num1 * int.Parse(strArray2[0])), (float) (num2 * int.Parse(strArray2[1])), fadeFrom, fadeTo);
+                        backdrop.FadeX.Add(num1 * int.Parse(strArray2[0]), num2 * int.Parse(strArray2[1]), fadeFrom, fadeTo);
                     }
                 }
             }
-            string str9 = (string) null;
+            string str9 = null;
             if (child.HasAttr("fadey"))
                 str9 = child.Attr("fadey");
             else if (above != null && above.HasAttr("fadey"))
@@ -473,8 +473,8 @@ namespace Celeste
                     {
                         string[] strArray5 = strArray4[0].Split('-');
                         string[] strArray6 = strArray4[1].Split('-');
-                        float fadeFrom = float.Parse(strArray6[0], (IFormatProvider) CultureInfo.InvariantCulture);
-                        float fadeTo = float.Parse(strArray6[1], (IFormatProvider) CultureInfo.InvariantCulture);
+                        float fadeFrom = float.Parse(strArray6[0], CultureInfo.InvariantCulture);
+                        float fadeTo = float.Parse(strArray6[1], CultureInfo.InvariantCulture);
                         int num3 = 1;
                         int num4 = 1;
                         if (strArray5[0][0] == 'n')
@@ -487,7 +487,7 @@ namespace Celeste
                             num4 = -1;
                             strArray5[1] = strArray5[1].Substring(1);
                         }
-                        backdrop.FadeY.Add((float) (num3 * int.Parse(strArray5[0])), (float) (num4 * int.Parse(strArray5[1])), fadeFrom, fadeTo);
+                        backdrop.FadeY.Add(num3 * int.Parse(strArray5[0]), num4 * int.Parse(strArray5[1]), fadeFrom, fadeTo);
                     }
                 }
             }
@@ -496,7 +496,7 @@ namespace Celeste
 
         private HashSet<string> ParseLevelsList(string list)
         {
-            HashSet<string> levelsList = new HashSet<string>();
+            HashSet<string> levelsList = new();
             string str1 = list;
             char[] chArray = new char[1]{ ',' };
             foreach (string str2 in str1.Split(chArray))

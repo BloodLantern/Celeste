@@ -33,9 +33,9 @@ namespace Celeste
             }
         }
 
-        public static bool operator ==(AreaKey a, AreaKey b) => a.ID == b.ID && a.Mode == b.Mode;
+        public static bool operator==(AreaKey a, AreaKey b) => a.ID == b.ID && a.Mode == b.Mode;
 
-        public static bool operator !=(AreaKey a, AreaKey b) => a.ID != b.ID || a.Mode != b.Mode;
+        public static bool operator!=(AreaKey a, AreaKey b) => a.ID != b.ID || a.Mode != b.Mode;
 
         public override bool Equals(object obj) => false;
 

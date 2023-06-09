@@ -34,7 +34,7 @@ namespace Celeste
         public string Spike = "default";
         public string CrumbleBlock = "default";
         public string WoodPlatform = "default";
-        public Color CassseteNoteColor = Color.White;
+        public Color CassseteNoteColor = Color.White; // Yes, this is Casssete and not Cassette
         public Color[] CobwebColor = new Color[1]
         {
             Calc.HexToColor("696a6a")
@@ -81,7 +81,7 @@ namespace Celeste
                     IntroType = Player.IntroTypes.WalkInRight,
                     Dreaming = false,
                     ColorGrade = null,
-                    Wipe = ((scene, wipeIn, onComplete) => new CurtainWipe(scene, wipeIn, onComplete)),
+                    Wipe = (scene, wipeIn, onComplete) => new CurtainWipe(scene, wipeIn, onComplete),
                     DarknessAlpha = 0.05f,
                     BloomBase = 0.0f,
                     BloomStrength = 1f,
@@ -137,7 +137,7 @@ namespace Celeste
                     IntroType = Player.IntroTypes.Jump,
                     Dreaming = false,
                     ColorGrade = null,
-                    Wipe = ((scene, wipeIn, onComplete) => new AngledWipe(scene, wipeIn, onComplete)),
+                    Wipe = (scene, wipeIn, onComplete) => new AngledWipe(scene, wipeIn, onComplete),
                     DarknessAlpha = 0.05f,
                     BloomBase = 0.0f,
                     BloomStrength = 1f,
@@ -195,7 +195,7 @@ namespace Celeste
                     IntroType = Player.IntroTypes.WakeUp,
                     Dreaming = true,
                     ColorGrade = "oldsite",
-                    Wipe = ((scene, wipeIn, onComplete) => new DreamWipe(scene, wipeIn, onComplete)),
+                    Wipe = (scene, wipeIn, onComplete) => new DreamWipe(scene, wipeIn, onComplete),
                     DarknessAlpha = 0.15f,
                     BloomBase = 0.5f,
                     BloomStrength = 1f,
@@ -266,7 +266,7 @@ namespace Celeste
                     IntroType = Player.IntroTypes.WalkInRight,
                     Dreaming = false,
                     ColorGrade = null,
-                    Wipe = ((scene, wipeIn, onComplete) => new KeyDoorWipe(scene, wipeIn, onComplete)),
+                    Wipe = (scene, wipeIn, onComplete) => new KeyDoorWipe(scene, wipeIn, onComplete),
                     DarknessAlpha = 0.15f,
                     BloomBase = 0.0f,
                     BloomStrength = 1f,
@@ -326,7 +326,7 @@ namespace Celeste
                     IntroType = Player.IntroTypes.WalkInRight,
                     Dreaming = false,
                     ColorGrade = null,
-                    Wipe = ((scene, wipeIn, onComplete) => new WindWipe(scene, wipeIn, onComplete)),
+                    Wipe = (scene, wipeIn, onComplete) => new WindWipe(scene, wipeIn, onComplete),
                     DarknessAlpha = 0.1f,
                     BloomBase = 0.25f,
                     BloomStrength = 1f,
@@ -390,7 +390,7 @@ namespace Celeste
                     IntroType = Player.IntroTypes.WakeUp,
                     Dreaming = false,
                     ColorGrade = null,
-                    Wipe = ((scene, wipeIn, onComplete) => new DropWipe(scene, wipeIn, onComplete)),
+                    Wipe = (scene, wipeIn, onComplete) => new DropWipe(scene, wipeIn, onComplete),
                     DarknessAlpha = 0.15f,
                     BloomBase = 0.0f,
                     BloomStrength = 1f,
@@ -469,7 +469,7 @@ namespace Celeste
                     IntroType = Player.IntroTypes.None,
                     Dreaming = false,
                     ColorGrade = "reflection",
-                    Wipe = ((scene, wipeIn, onComplete) => new FallWipe(scene, wipeIn, onComplete)),
+                    Wipe = (scene, wipeIn, onComplete) => new FallWipe(scene, wipeIn, onComplete),
                     DarknessAlpha = 0.2f,
                     BloomBase = 0.2f,
                     BloomStrength = 1f,
@@ -725,21 +725,21 @@ namespace Celeste
         {
             foreach (XmlElement xml in (XmlNode) Calc.LoadXML(Path.Combine(Engine.ContentDirectory, "Overworld", "AreaViews.xml"))["Views"])
             {
-                int index = xml.AttrInt("id");
-                if (index >= 0 && index < Areas.Count)
+                int i = xml.AttrInt("id");
+                if (i >= 0 && i < Areas.Count)
                 {
-                    Vector3 pos1 = xml["Idle"].AttrVector3("position");
-                    Vector3 target1 = xml["Idle"].AttrVector3("target");
-                    Areas[index].MountainIdle = new MountainCamera(pos1, target1);
-                    Vector3 pos2 = xml["Select"].AttrVector3("position");
-                    Vector3 target2 = xml["Select"].AttrVector3("target");
-                    Areas[index].MountainSelect = new MountainCamera(pos2, target2);
-                    Vector3 pos3 = xml["Zoom"].AttrVector3("position");
-                    Vector3 target3 = xml["Zoom"].AttrVector3("target");
-                    Areas[index].MountainZoom = new MountainCamera(pos3, target3);
+                    Vector3 idlePosition = xml["Idle"].AttrVector3("position");
+                    Vector3 idleTarget = xml["Idle"].AttrVector3("target");
+                    Areas[i].MountainIdle = new MountainCamera(idlePosition, idleTarget);
+                    Vector3 selectPosition = xml["Select"].AttrVector3("position");
+                    Vector3 selectTarget = xml["Select"].AttrVector3("target");
+                    Areas[i].MountainSelect = new MountainCamera(selectPosition, selectTarget);
+                    Vector3 zoomPosition = xml["Zoom"].AttrVector3("position");
+                    Vector3 zoomTarget = xml["Zoom"].AttrVector3("target");
+                    Areas[i].MountainZoom = new MountainCamera(zoomPosition, zoomTarget);
                     if (xml["Cursor"] != null)
-                        Areas[index].MountainCursor = xml["Cursor"].AttrVector3("position");
-                    Areas[index].MountainState = xml.AttrInt("state", 0);
+                        Areas[i].MountainCursor = xml["Cursor"].AttrVector3("position");
+                    Areas[i].MountainState = xml.AttrInt("state", 0);
                 }
             }
         }
@@ -827,9 +827,7 @@ namespace Celeste
         public void DoScreenWipe(Scene scene, bool wipeIn, Action onComplete = null)
         {
             if (Wipe == null)
-            {
-                WindWipe windWipe = new(scene, wipeIn, onComplete);
-            }
+                (Wipe = new Action<Scene, bool, Action>((s, w, oc) => new CurtainWipe(s, w, oc)))(scene, wipeIn, onComplete);
             else
                 Wipe(scene, wipeIn, onComplete);
         }

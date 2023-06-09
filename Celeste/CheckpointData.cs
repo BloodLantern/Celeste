@@ -21,13 +21,13 @@ namespace Celeste
             bool dreaming = false,
             AudioState audioState = null)
         {
-            this.Level = level;
-            this.Name = name;
-            this.Inventory = inventory;
-            this.Dreaming = dreaming;
-            this.AudioState = audioState;
-            this.CoreMode = new Session.CoreModes?();
-            this.ColorGrade = (string) null;
+            Level = level;
+            Name = name;
+            Inventory = inventory;
+            Dreaming = dreaming;
+            AudioState = audioState;
+            CoreMode = new Session.CoreModes?();
+            ColorGrade = null;
         }
     }
 }
