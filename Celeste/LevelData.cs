@@ -66,10 +66,10 @@ namespace Celeste
                         EditorColorIndex = (int)attribute.Value;
                         continue;
                     case "cameraOffsetX":
-                        CameraOffset.X = Convert.ToSingle(attribute.Value, (IFormatProvider)CultureInfo.InvariantCulture);
+                        CameraOffset.X = Convert.ToSingle(attribute.Value, CultureInfo.InvariantCulture);
                         continue;
                     case "cameraOffsetY":
-                        CameraOffset.Y = Convert.ToSingle(attribute.Value, (IFormatProvider)CultureInfo.InvariantCulture);
+                        CameraOffset.Y = Convert.ToSingle(attribute.Value, CultureInfo.InvariantCulture);
                         continue;
                     case "dark":
                         Dark = (bool)attribute.Value;
@@ -147,139 +147,134 @@ namespace Celeste
             Triggers = new List<EntityData>();
             BgDecals = new List<DecalData>();
             FgDecals = new List<DecalData>();
-            foreach (BinaryPacker.Element child1 in data.Children)
+            foreach (BinaryPacker.Element child in data.Children)
             {
-                if (child1.Name == "entities")
+                if (child.Name == "entities")
                 {
-                    if (child1.Children != null)
-                    {
-                        foreach (BinaryPacker.Element child2 in child1.Children)
+                    if (child.Children != null)
+                        foreach (BinaryPacker.Element entity in child.Children)
                         {
-                            if (child2.Name == "player")
-                                Spawns.Add(new Vector2((float)Bounds.X + Convert.ToSingle(child2.Attributes["x"], (IFormatProvider)CultureInfo.InvariantCulture), (float)Bounds.Y + Convert.ToSingle(child2.Attributes["y"], (IFormatProvider)CultureInfo.InvariantCulture)));
-                            else if (child2.Name == "strawberry" || child2.Name == "snowberry")
-                                ++Strawberries;
-                            else if (child2.Name == "shard")
+                            if (entity.Name == "player")
+                                Spawns.Add(new Vector2(Bounds.X + Convert.ToSingle(entity.Attributes["x"], CultureInfo.InvariantCulture), Bounds.Y + Convert.ToSingle(entity.Attributes["y"], CultureInfo.InvariantCulture)));
+                            else if (entity.Name is "strawberry" or "snowberry")
+                                Strawberries++;
+                            else if (entity.Name == "shard")
                                 HasGem = true;
-                            else if (child2.Name == "blackGem")
+                            else if (entity.Name == "blackGem")
                                 HasHeartGem = true;
-                            else if (child2.Name == "checkpoint")
+                            else if (entity.Name == "checkpoint")
                                 HasCheckpoint = true;
-                            if (!child2.Name.Equals("player"))
-                                Entities.Add(CreateEntityData(child2));
+
+                            if (entity.Name != "player")
+                                Entities.Add(CreateEntityData(entity));
                         }
-                    }
                 }
-                else if (child1.Name == "triggers")
+                else if (child.Name == "triggers")
                 {
-                    if (child1.Children != null)
-                    {
-                        foreach (BinaryPacker.Element child3 in child1.Children)
-                            Triggers.Add(CreateEntityData(child3));
-                    }
+                    if (child.Children != null)
+                        foreach (BinaryPacker.Element trigger in child.Children)
+                            Triggers.Add(CreateEntityData(trigger));
                 }
-                else if (child1.Name == "bgdecals")
+                else if (child.Name == "bgdecals")
                 {
-                    if (child1.Children != null)
-                    {
-                        foreach (BinaryPacker.Element child4 in child1.Children)
-                            BgDecals.Add(new DecalData()
-                            {
-                                Position = new Vector2(Convert.ToSingle(child4.Attributes["x"], (IFormatProvider)CultureInfo.InvariantCulture), Convert.ToSingle(child4.Attributes["y"], (IFormatProvider)CultureInfo.InvariantCulture)),
-                                Scale = new Vector2(Convert.ToSingle(child4.Attributes["scaleX"], (IFormatProvider)CultureInfo.InvariantCulture), Convert.ToSingle(child4.Attributes["scaleY"], (IFormatProvider)CultureInfo.InvariantCulture)),
-                                Texture = (string)child4.Attributes["texture"]
-                            });
-                    }
+                    if (child.Children != null)
+                        foreach (BinaryPacker.Element decal in child.Children)
+                            BgDecals.Add(
+                                new DecalData()
+                                {
+                                    Position = new Vector2(Convert.ToSingle(decal.Attributes["x"], CultureInfo.InvariantCulture), Convert.ToSingle(decal.Attributes["y"], CultureInfo.InvariantCulture)),
+                                    Scale = new Vector2(Convert.ToSingle(decal.Attributes["scaleX"], CultureInfo.InvariantCulture), Convert.ToSingle(decal.Attributes["scaleY"], CultureInfo.InvariantCulture)),
+                                    Texture = (string) decal.Attributes["texture"]
+                                }
+                            );
                 }
-                else if (child1.Name == "fgdecals")
+                else if (child.Name == "fgdecals")
                 {
-                    if (child1.Children != null)
-                    {
-                        foreach (BinaryPacker.Element child5 in child1.Children)
-                            FgDecals.Add(new DecalData()
-                            {
-                                Position = new Vector2(Convert.ToSingle(child5.Attributes["x"], (IFormatProvider)CultureInfo.InvariantCulture), Convert.ToSingle(child5.Attributes["y"], (IFormatProvider)CultureInfo.InvariantCulture)),
-                                Scale = new Vector2(Convert.ToSingle(child5.Attributes["scaleX"], (IFormatProvider)CultureInfo.InvariantCulture), Convert.ToSingle(child5.Attributes["scaleY"], (IFormatProvider)CultureInfo.InvariantCulture)),
-                                Texture = (string)child5.Attributes["texture"]
-                            });
-                    }
+                    if (child.Children != null)
+                        foreach (BinaryPacker.Element decal in child.Children)
+                            FgDecals.Add(
+                                new DecalData()
+                                {
+                                    Position = new Vector2(Convert.ToSingle(decal.Attributes["x"], CultureInfo.InvariantCulture), Convert.ToSingle(decal.Attributes["y"], CultureInfo.InvariantCulture)),
+                                    Scale = new Vector2(Convert.ToSingle(decal.Attributes["scaleX"], CultureInfo.InvariantCulture), Convert.ToSingle(decal.Attributes["scaleY"], CultureInfo.InvariantCulture)),
+                                    Texture = (string) decal.Attributes["texture"]
+                                }
+                            );
                 }
-                else if (child1.Name == "solids")
-                    Solids = child1.Attr("innerText");
-                else if (child1.Name == "bg")
-                    Bg = child1.Attr("innerText");
-                else if (child1.Name == "fgtiles")
-                    FgTiles = child1.Attr("innerText");
-                else if (child1.Name == "bgtiles")
-                    BgTiles = child1.Attr("innerText");
-                else if (child1.Name == "objtiles")
-                    ObjTiles = child1.Attr("innerText");
+                else if (child.Name == "solids")
+                    Solids = child.Attr("innerText");
+                else if (child.Name == "bg")
+                    Bg = child.Attr("innerText");
+                else if (child.Name == "fgtiles")
+                    FgTiles = child.Attr("innerText");
+                else if (child.Name == "bgtiles")
+                    BgTiles = child.Attr("innerText");
+                else if (child.Name == "objtiles")
+                    ObjTiles = child.Attr("innerText");
             }
-            Dummy = Spawns.Count <= 0;
+            Dummy = Spawns.Count == 0;
         }
 
         private EntityData CreateEntityData(BinaryPacker.Element entity)
         {
-            EntityData entityData = new EntityData();
-            entityData.Name = entity.Name;
-            entityData.Level = this;
-            if (entity.Attributes != null)
+            EntityData result = new()
             {
+                Name = entity.Name,
+                Level = this,
+                Nodes = new Vector2[entity.Children == null ? 0 : entity.Children.Count]
+            };
+
+            if (entity.Attributes != null)
                 foreach (KeyValuePair<string, object> attribute in entity.Attributes)
                 {
                     if (attribute.Key == "id")
-                        entityData.ID = (int)attribute.Value;
+                        result.ID = (int) attribute.Value;
                     else if (attribute.Key == "x")
-                        entityData.Position.X = Convert.ToSingle(attribute.Value, (IFormatProvider)CultureInfo.InvariantCulture);
+                        result.Position.X = Convert.ToSingle(attribute.Value, CultureInfo.InvariantCulture);
                     else if (attribute.Key == "y")
-                        entityData.Position.Y = Convert.ToSingle(attribute.Value, (IFormatProvider)CultureInfo.InvariantCulture);
+                        result.Position.Y = Convert.ToSingle(attribute.Value, CultureInfo.InvariantCulture);
                     else if (attribute.Key == "width")
-                        entityData.Width = (int)attribute.Value;
+                        result.Width = (int) attribute.Value;
                     else if (attribute.Key == "height")
-                        entityData.Height = (int)attribute.Value;
+                        result.Height = (int) attribute.Value;
                     else if (attribute.Key == "originX")
-                        entityData.Origin.X = Convert.ToSingle(attribute.Value, (IFormatProvider)CultureInfo.InvariantCulture);
+                        result.Origin.X = Convert.ToSingle(attribute.Value, CultureInfo.InvariantCulture);
                     else if (attribute.Key == "originY")
-                    {
-                        entityData.Origin.Y = Convert.ToSingle(attribute.Value, (IFormatProvider)CultureInfo.InvariantCulture);
-                    }
+                        result.Origin.Y = Convert.ToSingle(attribute.Value, CultureInfo.InvariantCulture);
                     else
                     {
-                        if (entityData.Values == null)
-                            entityData.Values = new Dictionary<string, object>();
-                        entityData.Values.Add(attribute.Key, attribute.Value);
+                        result.Values ??= new Dictionary<string, object>();
+                        result.Values.Add(attribute.Key, attribute.Value);
                     }
                 }
-            }
-            entityData.Nodes = new Vector2[entity.Children == null ? 0 : entity.Children.Count];
-            for (int index = 0; index < entityData.Nodes.Length; ++index)
-            {
-                foreach (KeyValuePair<string, object> attribute in entity.Children[index].Attributes)
+
+            for (int i = 0; i < result.Nodes.Length; i++)
+                foreach (KeyValuePair<string, object> attribute in entity.Children[i].Attributes)
                 {
                     if (attribute.Key == "x")
-                        entityData.Nodes[index].X = Convert.ToSingle(attribute.Value, (IFormatProvider)CultureInfo.InvariantCulture);
+                        result.Nodes[i].X = Convert.ToSingle(attribute.Value, CultureInfo.InvariantCulture);
                     else if (attribute.Key == "y")
-                        entityData.Nodes[index].Y = Convert.ToSingle(attribute.Value, (IFormatProvider)CultureInfo.InvariantCulture);
+                        result.Nodes[i].Y = Convert.ToSingle(attribute.Value, CultureInfo.InvariantCulture);
                 }
-            }
-            return entityData;
+
+            return result;
         }
 
-        public bool Check(Vector2 at) => (double)at.X >= (double)this.Bounds.Left && (double)at.Y >= (double)this.Bounds.Top && (double)at.X < (double)this.Bounds.Right && (double)at.Y < (double)this.Bounds.Bottom;
+        public bool Check(Vector2 at) => at.X >= Bounds.Left && at.Y >= Bounds.Top && at.X < Bounds.Right && at.Y < Bounds.Bottom;
 
-        public Rectangle TileBounds => new Rectangle(this.Bounds.X / 8, this.Bounds.Y / 8, (int)Math.Ceiling((double)this.Bounds.Width / 8.0), (int)Math.Ceiling((double)this.Bounds.Height / 8.0));
+        public Rectangle TileBounds => new(Bounds.X / 8, Bounds.Y / 8, (int)Math.Ceiling(Bounds.Width / 8.0), (int)Math.Ceiling(Bounds.Height / 8.0));
 
         public Vector2 Position
         {
-            get => new Vector2((float)this.Bounds.X, (float)this.Bounds.Y);
+            get => new(Bounds.X, Bounds.Y);
             set
             {
-                for (int index = 0; index < this.Spawns.Count; ++index)
-                    this.Spawns[index] -= this.Position;
-                this.Bounds.X = (int)value.X;
-                this.Bounds.Y = (int)value.Y;
-                for (int index = 0; index < this.Spawns.Count; ++index)
-                    this.Spawns[index] += this.Position;
+                for (int index = 0; index < Spawns.Count; ++index)
+                    Spawns[index] -= Position;
+                Bounds.X = (int)value.X;
+                Bounds.Y = (int)value.Y;
+                for (int index = 0; index < Spawns.Count; ++index)
+                    Spawns[index] += Position;
             }
         }
 
@@ -288,8 +283,8 @@ namespace Celeste
             get
             {
                 int loadSeed = 0;
-                foreach (char ch in this.Name)
-                    loadSeed += (int)ch;
+                foreach (char ch in Name)
+                    loadSeed += ch;
                 return loadSeed;
             }
         }

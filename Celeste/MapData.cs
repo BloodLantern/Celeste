@@ -80,10 +80,13 @@ namespace Celeste
         {
             if (!File.Exists(Filepath))
                 return;
+
             Strawberries = new List<EntityData>();
             BinaryPacker.Element element = BinaryPacker.FromBinary(Filepath);
+
             if (!element.Package.Equals(ModeData.Path))
                 throw new Exception("Corrupted Level Data");
+
             foreach (BinaryPacker.Element data in element.Children)
             {
                 if (data.Name == "levels")
@@ -92,11 +95,13 @@ namespace Celeste
                     foreach (BinaryPacker.Element level in data.Children)
                     {
                         LevelData levelData = new(level);
+
                         DetectedStrawberries += levelData.Strawberries;
                         if (levelData.HasGem)
                             DetectedRemixNotes = true;
                         if (levelData.HasHeartGem)
                             DetectedHeartGem = true;
+
                         Levels.Add(levelData);
                     }
                 }
@@ -104,15 +109,14 @@ namespace Celeste
                 {
                     Filler = new List<Rectangle>();
                     if (data.Children != null)
-                    {
                         foreach (BinaryPacker.Element filler in data.Children)
                             Filler.Add(new Rectangle((int) filler.Attributes["x"], (int) filler.Attributes["y"], (int) filler.Attributes["w"], (int) filler.Attributes["h"]));
-                    }
                 }
                 else if (data.Name == "Style")
                 {
                     if (data.HasAttr("color"))
                         BackgroundColor = Calc.HexToColor(data.Attr("color"));
+
                     if (data.Children != null)
                     {
                         foreach (BinaryPacker.Element styleground in data.Children)
@@ -125,6 +129,7 @@ namespace Celeste
                     }
                 }
             }
+
             foreach (LevelData level in Levels)
             {
                 foreach (EntityData entity in level.Entities)
@@ -135,6 +140,7 @@ namespace Celeste
                         Goldenberries.Add(entity);
                 }
             }
+
             int left = int.MaxValue;
             int top = int.MaxValue;
             int right = int.MinValue;
@@ -150,6 +156,7 @@ namespace Celeste
                 if (level.Bounds.Bottom > bottom)
                     bottom = level.Bounds.Bottom;
             }
+
             foreach (Rectangle rectangle in Filler)
             {
                 if (rectangle.Left < left)
@@ -161,31 +168,40 @@ namespace Celeste
                 if (rectangle.Bottom > bottom)
                     bottom = rectangle.Bottom;
             }
-            int num5 = 64;
-            Bounds = new Rectangle(left - num5, top - num5, right - left + num5 * 2, bottom - top + num5 * 2);
+
+            int offset = 64;
+            Bounds = new Rectangle(
+                left - offset,
+                top - offset,
+                right - left + offset * 2,
+                bottom - top + offset * 2
+            );
+
             ModeData.TotalStrawberries = 0;
             ModeData.StartStrawberries = 0;
             ModeData.StrawberriesByCheckpoint = new EntityData[10, 25];
-            for (int index = 0; ModeData.Checkpoints != null && index < ModeData.Checkpoints.Length; ++index)
-            {
-                if (ModeData.Checkpoints[index] != null)
-                    ModeData.Checkpoints[index].Strawberries = 0;
-            }
+
+            if (ModeData.Checkpoints != null)
+                for (int i = 0; i < ModeData.Checkpoints.Length; i++)
+                    if (ModeData.Checkpoints[i] != null)
+                        ModeData.Checkpoints[i].Strawberries = 0;
+
             foreach (EntityData strawberry in Strawberries)
-            {
                 if (!strawberry.Bool("moon"))
                 {
-                    int index1 = strawberry.Int("checkpointID");
-                    int index2 = strawberry.Int("order");
-                    if (ModeData.StrawberriesByCheckpoint[index1, index2] == null)
-                        ModeData.StrawberriesByCheckpoint[index1, index2] = strawberry;
-                    if (index1 == 0)
-                        ++ModeData.StartStrawberries;
+                    int checkpointId = strawberry.Int("checkpointID");
+                    int strawberryId = strawberry.Int("order");
+
+                    if (ModeData.StrawberriesByCheckpoint[checkpointId, strawberryId] == null)
+                        ModeData.StrawberriesByCheckpoint[checkpointId, strawberryId] = strawberry;
+
+                    if (checkpointId == 0)
+                        ModeData.StartStrawberries++;
                     else if (ModeData.Checkpoints != null)
-                        ++ModeData.Checkpoints[index1 - 1].Strawberries;
-                    ++ModeData.TotalStrawberries;
+                        ModeData.Checkpoints[checkpointId - 1].Strawberries++;
+
+                    ModeData.TotalStrawberries++;
                 }
-            }
         }
 
         public int[] GetStrawberries(out int total)
