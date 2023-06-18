@@ -16,56 +16,56 @@ namespace Monocle
 
         public string Path { get; private set; }
 
-        public bool IsDisposed => this.Texture == null || this.Texture.IsDisposed || this.Texture.GraphicsDevice.IsDisposed;
+        public bool IsDisposed => Texture == null || Texture.IsDisposed || Texture.GraphicsDevice.IsDisposed;
 
         internal VirtualTexture(string path)
         {
-            this.Name = this.Path = path;
-            this.Reload();
+            Name = Path = path;
+            Reload();
         }
 
         internal VirtualTexture(string name, int width, int height, Color color)
         {
-            this.Name = name;
-            this.Width = width;
-            this.Height = height;
+            Name = name;
+            Width = width;
+            Height = height;
             this.color = color;
-            this.Reload();
+            Reload();
         }
 
         internal override void Unload()
         {
-            if (this.Texture != null && !this.Texture.IsDisposed)
-                this.Texture.Dispose();
-            this.Texture = (Texture2D) null;
+            if (Texture != null && !Texture.IsDisposed)
+                Texture.Dispose();
+            Texture = null;
         }
 
         internal override unsafe void Reload()
         {
-            this.Unload();
-            if (string.IsNullOrEmpty(this.Path))
+            Unload();
+            if (string.IsNullOrEmpty(Path))
             {
-                this.Texture = new Texture2D(Engine.Instance.GraphicsDevice, this.Width, this.Height);
-                Color[] data = new Color[this.Width * this.Height];
+                Texture = new Texture2D(Engine.Instance.GraphicsDevice, Width, Height);
+                Color[] data = new Color[Width * Height];
                 fixed (Color* colorPtr = data)
                 {
                     for (int index = 0; index < data.Length; ++index)
-                        colorPtr[index] = this.color;
+                        colorPtr[index] = color;
                 }
-                this.Texture.SetData<Color>(data);
+                Texture.SetData<Color>(data);
             }
             else
             {
-                string extension = System.IO.Path.GetExtension(this.Path);
+                string extension = System.IO.Path.GetExtension(Path);
                 if (extension == ".data")
                 {
-                    using (FileStream fileStream = File.OpenRead(System.IO.Path.Combine(Engine.ContentDirectory, this.Path)))
+                    using (FileStream fileStream = File.OpenRead(System.IO.Path.Combine(Engine.ContentDirectory, Path)))
                     {
                         fileStream.Read(VirtualTexture.bytes, 0, 524288);
                         int startIndex = 0;
                         int int32_1 = BitConverter.ToInt32(VirtualTexture.bytes, startIndex);
                         int int32_2 = BitConverter.ToInt32(VirtualTexture.bytes, startIndex + 4);
-                        bool flag = VirtualTexture.bytes[startIndex + 8] == (byte) 1;
+                        bool flag = VirtualTexture.bytes[startIndex + 8] == 1;
                         int index1 = startIndex + 9;
                         int elementCount = int32_1 * int32_2 * 4;
                         int index2 = 0;
@@ -74,11 +74,11 @@ namespace Monocle
                             {
                                 while (index2 < elementCount)
                                 {
-                                    int num1 = (int) numPtr1[index1] * 4;
+                                    int num1 = numPtr1[index1] * 4;
                                     if (flag)
                                     {
                                         byte num2 = numPtr1[index1 + 1];
-                                        if (num2 > (byte) 0)
+                                        if (num2 > 0)
                                         {
                                             numPtr2[index2] = numPtr1[index1 + 4];
                                             numPtr2[index2 + 1] = numPtr1[index1 + 3];
@@ -88,10 +88,10 @@ namespace Monocle
                                         }
                                         else
                                         {
-                                            numPtr2[index2] = (byte) 0;
-                                            numPtr2[index2 + 1] = (byte) 0;
-                                            numPtr2[index2 + 2] = (byte) 0;
-                                            numPtr2[index2 + 3] = (byte) 0;
+                                            numPtr2[index2] = 0;
+                                            numPtr2[index2 + 1] = 0;
+                                            numPtr2[index2 + 2] = 0;
+                                            numPtr2[index2 + 3] = 0;
                                             index1 += 2;
                                         }
                                     }
@@ -125,47 +125,47 @@ namespace Monocle
                                     }
                                 }
                             }
-                        this.Texture = new Texture2D(Engine.Graphics.GraphicsDevice, int32_1, int32_2);
-                        this.Texture.SetData<byte>(VirtualTexture.buffer, 0, elementCount);
+                        Texture = new Texture2D(Engine.Graphics.GraphicsDevice, int32_1, int32_2);
+                        Texture.SetData<byte>(VirtualTexture.buffer, 0, elementCount);
                     }
                 }
                 else if (extension == ".png")
                 {
-                    using (FileStream fileStream = File.OpenRead(System.IO.Path.Combine(Engine.ContentDirectory, this.Path)))
-                        this.Texture = Texture2D.FromStream(Engine.Graphics.GraphicsDevice, (Stream) fileStream);
-                    int elementCount = this.Texture.Width * this.Texture.Height;
+                    using (FileStream fileStream = File.OpenRead(System.IO.Path.Combine(Engine.ContentDirectory, Path)))
+                        Texture = Texture2D.FromStream(Engine.Graphics.GraphicsDevice, fileStream);
+                    int elementCount = Texture.Width * Texture.Height;
                     Color[] data = new Color[elementCount];
-                    this.Texture.GetData<Color>(data, 0, elementCount);
+                    Texture.GetData(data, 0, elementCount);
                     fixed (Color* colorPtr = data)
                     {
                         for (int index = 0; index < elementCount; ++index)
                         {
-                            colorPtr[index].R = (byte) ((double) colorPtr[index].R * ((double) colorPtr[index].A / (double) byte.MaxValue));
-                            colorPtr[index].G = (byte) ((double) colorPtr[index].G * ((double) colorPtr[index].A / (double) byte.MaxValue));
-                            colorPtr[index].B = (byte) ((double) colorPtr[index].B * ((double) colorPtr[index].A / (double) byte.MaxValue));
+                            colorPtr[index].R = (byte) (colorPtr[index].R * (colorPtr[index].A / (double) byte.MaxValue));
+                            colorPtr[index].G = (byte) (colorPtr[index].G * (colorPtr[index].A / (double) byte.MaxValue));
+                            colorPtr[index].B = (byte) (colorPtr[index].B * (colorPtr[index].A / (double) byte.MaxValue));
                         }
                     }
-                    this.Texture.SetData<Color>(data, 0, elementCount);
+                    Texture.SetData(data, 0, elementCount);
                 }
                 else if (extension == ".xnb")
                 {
-                    this.Texture = Engine.Instance.Content.Load<Texture2D>(this.Path.Replace(".xnb", ""));
+                    Texture = Engine.Instance.Content.Load<Texture2D>(Path.Replace(".xnb", ""));
                 }
                 else
                 {
-                    using (FileStream fileStream = File.OpenRead(System.IO.Path.Combine(Engine.ContentDirectory, this.Path)))
-                        this.Texture = Texture2D.FromStream(Engine.Graphics.GraphicsDevice, (Stream) fileStream);
+                    using (FileStream fileStream = File.OpenRead(System.IO.Path.Combine(Engine.ContentDirectory, Path)))
+                        Texture = Texture2D.FromStream(Engine.Graphics.GraphicsDevice, fileStream);
                 }
-                this.Width = this.Texture.Width;
-                this.Height = this.Texture.Height;
+                Width = Texture.Width;
+                Height = Texture.Height;
             }
         }
 
         public override void Dispose()
         {
-            this.Unload();
-            this.Texture = (Texture2D) null;
-            VirtualContent.Remove((VirtualAsset) this);
+            Unload();
+            Texture = null;
+            VirtualContent.Remove(this);
         }
     }
 }

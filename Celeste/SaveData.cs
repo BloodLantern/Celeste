@@ -66,9 +66,11 @@ namespace Celeste
                 data = UserIO.Load<SaveData>(GetFilename(4));
                 UserIO.Close();
             }
+
             data ??= new SaveData();
             data.DebugMode = true;
             data.CurrentSession = null;
+
             Start(data, 4);
         }
 
@@ -105,7 +107,7 @@ namespace Celeste
             AssistModeChecks();
             foreach (AreaStats area in Areas)
                 area.CleanCheckpoints();
-            if (Version == null || !(new System.Version(Version) < new System.Version(1, 2, 1, 1)))
+            if (Version == null || !(new Version(Version) < new Version(1, 2, 1, 1)))
                 return;
             for (int index1 = 0; index1 < Areas.Count; ++index1)
             {

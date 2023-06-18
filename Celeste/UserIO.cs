@@ -18,19 +18,25 @@ namespace Celeste
         private static byte[] savingFileData;
         private static byte[] savingSettingsData;
 
-        private static string GetHandle(string name) => Path.Combine("Saves", name + ".celeste");
+        private static string GetHandle(string name) => Path.Combine(SavePath, name + Extension);
 
-        private static string GetBackupHandle(string name) => Path.Combine("Backups", name + ".celeste");
+        private static string GetBackupHandle(string name) => Path.Combine(BackupPath, name + Extension);
 
-        public static bool Open(UserIO.Mode mode) => true;
+        /// <summary>
+        /// Opens the IO stream... I suppose. For some reason this function always
+        /// returns <see langword="true"/> and <see cref="Close"/> is empty.
+        /// </summary>
+        /// <param name="mode">The mode to open the stream in.</param>
+        /// <returns>Whether the stream could be opened... I suppose. This always returns <see langword="true"/>.</returns>
+        public static bool Open(Mode mode) => true;
 
         public static bool Save<T>(string path, byte[] data) where T : class
         {
-            string handle = UserIO.GetHandle(path);
+            string handle = GetHandle(path);
             bool flag = false;
             try
             {
-                string backupHandle = UserIO.GetBackupHandle(path);
+                string backupHandle = GetBackupHandle(path);
                 DirectoryInfo directory1 = new FileInfo(handle).Directory;
                 if (!directory1.Exists)
                     directory1.Create();
@@ -39,7 +45,7 @@ namespace Celeste
                     directory2.Create();
                 using (FileStream fileStream = File.Open(backupHandle, FileMode.Create, FileAccess.Write))
                     fileStream.Write(data, 0, data.Length);
-                if ((object) UserIO.Load<T>(path, true) != null)
+                if (Load<T>(path, true) is not null)
                 {
                     File.Copy(backupHandle, handle, true);
                     flag = true;
@@ -55,16 +61,23 @@ namespace Celeste
             return flag;
         }
 
+        /// <summary>
+        /// Loads a file and deserializes it as a T.
+        /// </summary>
+        /// <typeparam name="T">The type of file to deserialize.</typeparam>
+        /// <param name="path">The file name without extension.</param>
+        /// <param name="backup">Whether the file is a normal save file or a backup one.</param>
+        /// <returns>The deserialized file.</returns>
         public static T Load<T>(string path, bool backup = false) where T : class
         {
-            string path1 = !backup ? UserIO.GetHandle(path) : UserIO.GetBackupHandle(path);
-            T obj = default (T);
+            string filepath = !backup ? GetHandle(path) : GetBackupHandle(path);
+            T obj = default;
             try
             {
-                if (File.Exists(path1))
+                if (File.Exists(filepath))
                 {
-                    using (FileStream fileStream = File.OpenRead(path1))
-                        obj = UserIO.Deserialize<T>((Stream) fileStream);
+                    using FileStream fileStream = File.OpenRead(filepath);
+                    obj = Deserialize<T>(fileStream);
                 }
             }
             catch (Exception ex)
@@ -75,28 +88,38 @@ namespace Celeste
             return obj;
         }
 
+        /// <summary>
+        /// Deserializes a file as a T.
+        /// </summary>
+        /// <typeparam name="T">The type of file to deserialize.</typeparam>
+        /// <param name="stream">The file stream.</param>
+        /// <returns>The deserialized file.</returns>
         private static T Deserialize<T>(Stream stream) where T : class => (T) new XmlSerializer(typeof (T)).Deserialize(stream);
 
-        public static bool Exists(string path) => File.Exists(UserIO.GetHandle(path));
+        public static bool Exists(string path) => File.Exists(GetHandle(path));
 
         public static bool Delete(string path)
         {
-            string handle = UserIO.GetHandle(path);
+            string handle = GetHandle(path);
             if (!File.Exists(handle))
                 return false;
             File.Delete(handle);
             return true;
         }
 
+        /// <summary>
+        /// Closes the IO stream... I suppose. For some readon this function is empty
+        /// and <see cref="Open(Mode)"/> always returns <see langword="true"/>.
+        /// </summary>
         public static void Close()
         {
         }
 
         public static byte[] Serialize<T>(T instance)
         {
-            using (MemoryStream memoryStream = new MemoryStream())
+            using (MemoryStream memoryStream = new())
             {
-                new XmlSerializer(typeof (T)).Serialize((Stream) memoryStream, (object) instance);
+                new XmlSerializer(typeof (T)).Serialize(memoryStream, instance);
                 return memoryStream.ToArray();
             }
         }
@@ -107,68 +130,77 @@ namespace Celeste
 
         public static void SaveHandler(bool file, bool settings)
         {
-            if (UserIO.Saving)
+            if (Saving)
                 return;
-            UserIO.Saving = true;
-            Celeste.SaveRoutine = new Coroutine(UserIO.SaveRoutine(file, settings));
+            Saving = true;
+            Celeste.SaveRoutine = new Coroutine(SaveRoutine(file, settings));
         }
 
         private static IEnumerator SaveRoutine(bool file, bool settings)
         {
-            UserIO.savingFile = file;
-            UserIO.savingSettings = settings;
+            savingFile = file;
+            savingSettings = settings;
             FileErrorOverlay menu;
             do
             {
-                if (UserIO.savingFile)
+                if (savingFile)
                 {
                     SaveData.Instance.BeforeSave();
-                    UserIO.savingFileData = UserIO.Serialize<SaveData>(SaveData.Instance);
+                    savingFileData = Serialize<SaveData>(SaveData.Instance);
                 }
-                if (UserIO.savingSettings)
-                    UserIO.savingSettingsData = UserIO.Serialize<Settings>(Settings.Instance);
-                UserIO.savingInternal = true;
-                UserIO.SavingResult = false;
-                RunThread.Start(new Action(UserIO.SaveThread), "USER_IO");
+                if (savingSettings)
+                    savingSettingsData = Serialize<Settings>(Settings.Instance);
+                savingInternal = true;
+                SavingResult = false;
+                RunThread.Start(new Action(SaveThread), "USER_IO");
                 SaveLoadIcon.Show(Engine.Scene);
-                while (UserIO.savingInternal)
-                    yield return (object) null;
+                while (savingInternal)
+                    yield return null;
                 SaveLoadIcon.Hide();
-                if (!UserIO.SavingResult)
+                if (!SavingResult)
                 {
                     menu = new FileErrorOverlay(FileErrorOverlay.Error.Save);
                     while (menu.Open)
-                        yield return (object) null;
+                        yield return null;
                 }
                 else
                     goto label_14;
             }
             while (menu.TryAgain);
-            menu = (FileErrorOverlay) null;
+            menu = null;
 label_14:
-            UserIO.Saving = false;
-            Celeste.SaveRoutine = (Coroutine) null;
+            Saving = false;
+            Celeste.SaveRoutine = null;
         }
 
         private static void SaveThread()
         {
-            UserIO.SavingResult = false;
-            if (UserIO.Open(UserIO.Mode.Write))
+            SavingResult = false;
+            if (Open(Mode.Write))
             {
-                UserIO.SavingResult = true;
-                if (UserIO.savingFile)
-                    UserIO.SavingResult &= UserIO.Save<SaveData>(SaveData.GetFilename(), UserIO.savingFileData);
-                if (UserIO.savingSettings)
-                    UserIO.SavingResult &= UserIO.Save<Settings>("settings", UserIO.savingSettingsData);
-                UserIO.Close();
+                SavingResult = true;
+                if (savingFile)
+                    SavingResult &= Save<SaveData>(SaveData.GetFilename(), savingFileData);
+                if (savingSettings)
+                    SavingResult &= Save<Settings>("settings", savingSettingsData);
+                Close();
             }
-            UserIO.savingInternal = false;
+            savingInternal = false;
         }
 
+        /// <summary>
+        /// Stream modes. Either Read or Write.
+        /// </summary>
         public enum Mode
         {
+            /// <summary>
+            /// Readonly stream.
+            /// </summary>
             Read,
-            Write,
+            /// <summary>
+            /// Write-readable stream.
+            /// </summary>
+            Write
         }
     }
 }

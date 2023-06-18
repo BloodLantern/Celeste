@@ -16,9 +16,9 @@ namespace Monocle
 {
     public static class Calc
     {
-        public static Random Random = new Random();
-        private static Stack<Random> randomStack = new Stack<Random>();
-        private static int[] shakeVectorOffsets = new int[5]
+        public static Random Random = new();
+        private static readonly Stack<Random> randomStack = new();
+        private static readonly int[] shakeVectorOffsets = new int[5]
         {
             -1,
             -1,
@@ -47,7 +47,7 @@ namespace Monocle
 
         public static int EnumLength(Type e) => Enum.GetNames(e).Length;
 
-        public static T StringToEnum<T>(string str) where T : struct => Enum.IsDefined(typeof (T), (object) str) ? (T) Enum.Parse(typeof (T), str) : throw new Exception("The string cannot be converted to the enum type.");
+        public static T StringToEnum<T>(string str) where T : struct => Enum.IsDefined(typeof (T), str) ? (T) Enum.Parse(typeof (T), str) : throw new Exception("The string cannot be converted to the enum type.");
 
         public static T[] StringsToEnums<T>(string[] strs) where T : struct
         {
@@ -57,7 +57,7 @@ namespace Monocle
             return enums;
         }
 
-        public static bool EnumHasString<T>(string str) where T : struct => Enum.IsDefined(typeof (T), (object) str);
+        public static bool EnumHasString<T>(string str) where T : struct => Enum.IsDefined(typeof (T), str);
 
         public static bool StartsWith(this string str, string match) => str.IndexOf(match) == 0;
 
@@ -89,7 +89,7 @@ namespace Monocle
             int maxLineWidth,
             char newLine = '\n')
         {
-            List<string> stringList = new List<string>();
+            List<string> stringList = new();
             string str1 = text;
             char[] chArray1 = new char[1]{ newLine };
             foreach (string str2 in str1.Split(chArray1))
@@ -98,7 +98,7 @@ namespace Monocle
                 char[] chArray2 = new char[1]{ ' ' };
                 foreach (string str4 in str2.Split(chArray2))
                 {
-                    if ((double) font.MeasureString(str3 + " " + str4).X > (double) maxLineWidth)
+                    if (font.MeasureString(str3 + " " + str4).X > (double) maxLineWidth)
                     {
                         stringList.Add(str3);
                         str3 = str4;
@@ -118,9 +118,9 @@ namespace Monocle
         public static int Count<T>(T target, T a, T b)
         {
             int num = 0;
-            if (a.Equals((object) target))
+            if (a.Equals(target))
                 ++num;
-            if (b.Equals((object) target))
+            if (b.Equals(target))
                 ++num;
             return num;
         }
@@ -128,11 +128,11 @@ namespace Monocle
         public static int Count<T>(T target, T a, T b, T c)
         {
             int num = 0;
-            if (a.Equals((object) target))
+            if (a.Equals(target))
                 ++num;
-            if (b.Equals((object) target))
+            if (b.Equals(target))
                 ++num;
-            if (c.Equals((object) target))
+            if (c.Equals(target))
                 ++num;
             return num;
         }
@@ -140,13 +140,13 @@ namespace Monocle
         public static int Count<T>(T target, T a, T b, T c, T d)
         {
             int num = 0;
-            if (a.Equals((object) target))
+            if (a.Equals(target))
                 ++num;
-            if (b.Equals((object) target))
+            if (b.Equals(target))
                 ++num;
-            if (c.Equals((object) target))
+            if (c.Equals(target))
                 ++num;
-            if (d.Equals((object) target))
+            if (d.Equals(target))
                 ++num;
             return num;
         }
@@ -154,15 +154,15 @@ namespace Monocle
         public static int Count<T>(T target, T a, T b, T c, T d, T e)
         {
             int num = 0;
-            if (a.Equals((object) target))
+            if (a.Equals(target))
                 ++num;
-            if (b.Equals((object) target))
+            if (b.Equals(target))
                 ++num;
-            if (c.Equals((object) target))
+            if (c.Equals(target))
                 ++num;
-            if (d.Equals((object) target))
+            if (d.Equals(target))
                 ++num;
-            if (e.Equals((object) target))
+            if (e.Equals(target))
                 ++num;
             return num;
         }
@@ -170,17 +170,17 @@ namespace Monocle
         public static int Count<T>(T target, T a, T b, T c, T d, T e, T f)
         {
             int num = 0;
-            if (a.Equals((object) target))
+            if (a.Equals(target))
                 ++num;
-            if (b.Equals((object) target))
+            if (b.Equals(target))
                 ++num;
-            if (c.Equals((object) target))
+            if (c.Equals(target))
                 ++num;
-            if (d.Equals((object) target))
+            if (d.Equals(target))
                 ++num;
-            if (e.Equals((object) target))
+            if (e.Equals(target))
                 ++num;
-            if (f.Equals((object) target))
+            if (f.Equals(target))
                 ++num;
             return num;
         }
@@ -196,74 +196,52 @@ namespace Monocle
 
         public static T GiveMe<T>(int index, T a, T b, T c)
         {
-            switch (index)
+            return index switch
             {
-                case 0:
-                    return a;
-                case 1:
-                    return b;
-                case 2:
-                    return c;
-                default:
-                    throw new Exception("Index was out of range!");
-            }
+                0 => a,
+                1 => b,
+                2 => c,
+                _ => throw new Exception("Index was out of range!"),
+            };
         }
 
         public static T GiveMe<T>(int index, T a, T b, T c, T d)
         {
-            switch (index)
+            return index switch
             {
-                case 0:
-                    return a;
-                case 1:
-                    return b;
-                case 2:
-                    return c;
-                case 3:
-                    return d;
-                default:
-                    throw new Exception("Index was out of range!");
-            }
+                0 => a,
+                1 => b,
+                2 => c,
+                3 => d,
+                _ => throw new Exception("Index was out of range!"),
+            };
         }
 
         public static T GiveMe<T>(int index, T a, T b, T c, T d, T e)
         {
-            switch (index)
+            return index switch
             {
-                case 0:
-                    return a;
-                case 1:
-                    return b;
-                case 2:
-                    return c;
-                case 3:
-                    return d;
-                case 4:
-                    return e;
-                default:
-                    throw new Exception("Index was out of range!");
-            }
+                0 => a,
+                1 => b,
+                2 => c,
+                3 => d,
+                4 => e,
+                _ => throw new Exception("Index was out of range!"),
+            };
         }
 
         public static T GiveMe<T>(int index, T a, T b, T c, T d, T e, T f)
         {
-            switch (index)
+            return index switch
             {
-                case 0:
-                    return a;
-                case 1:
-                    return b;
-                case 2:
-                    return c;
-                case 3:
-                    return d;
-                case 4:
-                    return e;
-                case 5:
-                    return f;
-                default:
-                    throw new Exception("Index was out of range!");
-            }
+                0 => a,
+                1 => b,
+                2 => c,
+                3 => d,
+                4 => e,
+                5 => f,
+                _ => throw new Exception("Index was out of range!"),
+            };
         }
 
         public static void PushRandom(int newSeed)
@@ -316,7 +294,7 @@ namespace Monocle
 
         public static float NextAngle(this Random random) => random.NextFloat() * 6.28318548f;
 
-        public static Vector2 ShakeVector(this Random random) => new Vector2((float) random.Choose<int>(Calc.shakeVectorOffsets), (float) random.Choose<int>(Calc.shakeVectorOffsets));
+        public static Vector2 ShakeVector(this Random random) => new(random.Choose<int>(Calc.shakeVectorOffsets), random.Choose<int>(Calc.shakeVectorOffsets));
 
         public static Vector2 ClosestTo(this List<Vector2> list, Vector2 to)
         {
@@ -412,7 +390,7 @@ namespace Monocle
 
         public static void ShuffleNotFirst<T>(this List<T> list, T notFirst) => list.ShuffleNotFirst<T>(Calc.Random, notFirst);
 
-        public static Color Invert(this Color color) => new Color((int) byte.MaxValue - (int) color.R, (int) byte.MaxValue - (int) color.G, (int) byte.MaxValue - (int) color.B, (int) color.A);
+        public static Color Invert(this Color color) => new(byte.MaxValue - color.R, byte.MaxValue - color.G, byte.MaxValue - color.B, color.A);
 
         public static Color HexToColor(string hex)
         {
@@ -421,18 +399,17 @@ namespace Monocle
                 num1 = 1;
             if (hex.Length - num1 >= 6)
             {
-                double r = (double) ((int) Calc.HexToByte(hex[num1]) * 16 + (int) Calc.HexToByte(hex[num1 + 1])) / (double) byte.MaxValue;
-                float num2 = (float) ((int) Calc.HexToByte(hex[num1 + 2]) * 16 + (int) Calc.HexToByte(hex[num1 + 3])) / (float) byte.MaxValue;
-                float num3 = (float) ((int) Calc.HexToByte(hex[num1 + 4]) * 16 + (int) Calc.HexToByte(hex[num1 + 5])) / (float) byte.MaxValue;
+                double r =  (Calc.HexToByte(hex[num1]) * 16 + Calc.HexToByte(hex[num1 + 1])) / (double) byte.MaxValue;
+                float num2 =  (Calc.HexToByte(hex[num1 + 2]) * 16 + Calc.HexToByte(hex[num1 + 3])) / (float) byte.MaxValue;
+                float num3 =  (Calc.HexToByte(hex[num1 + 4]) * 16 + Calc.HexToByte(hex[num1 + 5])) / (float) byte.MaxValue;
                 double g = (double) num2;
                 double b = (double) num3;
                 return new Color((float) r, (float) g, (float) b);
             }
-            int result;
-            return int.TryParse(hex.Substring(num1), out result) ? Calc.HexToColor(result) : Color.White;
+            return int.TryParse(hex.Substring(num1), out int result) ? Calc.HexToColor(result) : Color.White;
         }
 
-        public static Color HexToColor(int hex) => new Color()
+        public static Color HexToColor(int hex) => new()
         {
             A = byte.MaxValue,
             R = (byte) (hex >> 16),
@@ -444,7 +421,7 @@ namespace Monocle
         {
             int num1 = (int) ((double) hue * 360.0);
             float num2 = s * v;
-            float num3 = num2 * (1f - Math.Abs((float) ((double) num1 / 60.0 % 2.0 - 1.0)));
+            float num3 = num2 * (1f - Math.Abs((float) (num1 / 60.0 % 2.0 - 1.0)));
             float num4 = v - num2;
             if (num1 < 60)
                 return new Color(num4 + num2, num4 + num3, num4);
@@ -461,7 +438,7 @@ namespace Monocle
 
         public static string LongGameplayFormat(this TimeSpan time)
         {
-            StringBuilder stringBuilder = new StringBuilder();
+            StringBuilder stringBuilder = new();
             if (time.TotalDays >= 2.0)
             {
                 stringBuilder.Append((int) time.TotalDays);
@@ -469,7 +446,7 @@ namespace Monocle
             }
             else if (time.TotalDays >= 1.0)
                 stringBuilder.Append("1 day, ");
-            stringBuilder.Append((time.TotalHours - (double) ((int) time.TotalDays * 24)).ToString("0.0"));
+            stringBuilder.Append((time.TotalHours - (int)time.TotalDays * 24).ToString("0.0"));
             stringBuilder.Append(" hours");
             return stringBuilder.ToString();
         }
@@ -486,7 +463,7 @@ namespace Monocle
 
         public static float Percent(float num, float zeroAt, float oneAt) => MathHelper.Clamp((float) (((double) num - (double) zeroAt) / ((double) oneAt - (double) zeroAt)), 0.0f, 1f);
 
-        public static float SignThreshold(float value, float threshold) => (double) Math.Abs(value) >= (double) threshold ? (float) Math.Sign(value) : 0.0f;
+        public static float SignThreshold(float value, float threshold) => (double) Math.Abs(value) >= (double) threshold ? Math.Sign(value) : 0.0f;
 
         public static float Min(params float[] values)
         {
@@ -542,7 +519,7 @@ namespace Monocle
             return (double) (vector2 - value2).LengthSquared() < (double) snapThresholdSq ? value2 : vector2;
         }
 
-        public static Vector2 Sign(this Vector2 vec) => new Vector2((float) Math.Sign(vec.X), (float) Math.Sign(vec.Y));
+        public static Vector2 Sign(this Vector2 vec) => new(Math.Sign(vec.X), Math.Sign(vec.Y));
 
         public static Vector2 SafeNormalize(this Vector2 vec) => vec.SafeNormalize(Vector2.Zero);
 
@@ -564,7 +541,7 @@ namespace Monocle
             return vec * length;
         }
 
-        public static Vector2 TurnRight(this Vector2 vec) => new Vector2(-vec.Y, vec.X);
+        public static Vector2 TurnRight(this Vector2 vec) => new(-vec.Y, vec.X);
 
         public static float ReflectAngle(float angle, float axis = 0.0f) => (float) -((double) angle + (double) axis) - axis;
 
@@ -580,17 +557,17 @@ namespace Monocle
             return lineA + vector2 * num;
         }
 
-        public static Vector2 Round(this Vector2 vec) => new Vector2((float) Math.Round((double) vec.X), (float) Math.Round((double) vec.Y));
+        public static Vector2 Round(this Vector2 vec) => new((float) Math.Round(vec.X), (float) Math.Round(vec.Y));
 
         public static float Snap(float value, float increment) => (float) Math.Round((double) value / (double) increment) * increment;
 
         public static float Snap(float value, float increment, float offset) => (float) Math.Round(((double) value - (double) offset) / (double) increment) * increment + offset;
 
-        public static float WrapAngleDeg(float angleDegrees) => (float) (((double) angleDegrees * (double) Math.Sign(angleDegrees) + 180.0) % 360.0 - 180.0) * (float) Math.Sign(angleDegrees);
+        public static float WrapAngleDeg(float angleDegrees) => (float) (((double) angleDegrees * Math.Sign(angleDegrees) + 180.0) % 360.0 - 180.0) * Math.Sign(angleDegrees);
 
-        public static float WrapAngle(float angleRadians) => (float) (((double) angleRadians * (double) Math.Sign(angleRadians) + 3.1415927410125732) % 6.2831854820251465 - 3.1415927410125732) * (float) Math.Sign(angleRadians);
+        public static float WrapAngle(float angleRadians) => (float) (((double) angleRadians * Math.Sign(angleRadians) + 3.1415927410125732) % 6.2831854820251465 - 3.1415927410125732) * Math.Sign(angleRadians);
 
-        public static Vector2 AngleToVector(float angleRadians, float length) => new Vector2((float) Math.Cos((double) angleRadians) * length, (float) Math.Sin((double) angleRadians) * length);
+        public static Vector2 AngleToVector(float angleRadians, float length) => new((float) Math.Cos((double) angleRadians) * length, (float) Math.Sin((double) angleRadians) * length);
 
         public static float AngleApproach(float val, float target, float maxMove)
         {
@@ -616,7 +593,7 @@ namespace Monocle
 
         public static int SignAngleDiff(float radiansA, float radiansB) => Math.Sign(Calc.AngleDiff(radiansA, radiansB));
 
-        public static float Angle(Vector2 from, Vector2 to) => (float) Math.Atan2((double) to.Y - (double) from.Y, (double) to.X - (double) from.X);
+        public static float Angle(Vector2 from, Vector2 to) => (float) Math.Atan2(to.Y - (double) from.Y, to.X - (double) from.X);
 
         public static Color ToggleColors(Color current, Color a, Color b) => current == a ? b : a;
 
@@ -651,23 +628,23 @@ namespace Monocle
 
         public static T[][] VerifyLength<T>(this T[][] array, int length0, int length1)
         {
-            array = array.VerifyLength<T[]>(length0);
+            array = array.VerifyLength(length0);
             for (int index = 0; index < array.Length; ++index)
                 array[index] = array[index].VerifyLength<T>(length1);
             return array;
         }
 
-        public static bool BetweenInterval(float val, float interval) => (double) val % ((double) interval * 2.0) > (double) interval;
+        public static bool BetweenInterval(float val, float interval) => val % (interval * 2) > interval;
 
-        public static bool OnInterval(float val, float prevVal, float interval) => (int) ((double) prevVal / (double) interval) != (int) ((double) val / (double) interval);
+        public static bool OnInterval(float val, float prevVal, float interval) => prevVal / interval != val / interval;
 
         public static Vector2 Toward(Vector2 from, Vector2 to, float length) => from == to ? Vector2.Zero : (to - from).SafeNormalize(length);
 
-        public static Vector2 Toward(Entity from, Entity to, float length) => Calc.Toward(from.Position, to.Position, length);
+        public static Vector2 Toward(Entity from, Entity to, float length) => Toward(from.Position, to.Position, length);
 
-        public static Vector2 Perpendicular(this Vector2 vector) => new Vector2(-vector.Y, vector.X);
+        public static Vector2 Perpendicular(this Vector2 vector) => new(-vector.Y, vector.X);
 
-        public static float Angle(this Vector2 vector) => (float) Math.Atan2((double) vector.Y, (double) vector.X);
+        public static float Angle(this Vector2 vector) => (float) Math.Atan2(vector.Y, vector.X);
 
         public static Vector2 Clamp(
             this Vector2 val,
@@ -679,11 +656,11 @@ namespace Monocle
             return new Vector2(MathHelper.Clamp(val.X, minX, maxX), MathHelper.Clamp(val.Y, minY, maxY));
         }
 
-        public static Vector2 Floor(this Vector2 val) => new Vector2((float) (int) Math.Floor((double) val.X), (float) (int) Math.Floor((double) val.Y));
+        public static Vector2 Floor(this Vector2 val) => new((int)Math.Floor(val.X), (int)Math.Floor(val.Y));
 
-        public static Vector2 Ceiling(this Vector2 val) => new Vector2((float) (int) Math.Ceiling((double) val.X), (float) (int) Math.Ceiling((double) val.Y));
+        public static Vector2 Ceiling(this Vector2 val) => new((int)Math.Ceiling(val.X), (int)Math.Ceiling(val.Y));
 
-        public static Vector2 Abs(this Vector2 val) => new Vector2(Math.Abs(val.X), Math.Abs(val.Y));
+        public static Vector2 Abs(this Vector2 val) => new(Math.Abs(val.X), Math.Abs(val.Y));
 
         public static Vector2 Approach(Vector2 val, Vector2 target, float maxMove)
         {
@@ -701,8 +678,8 @@ namespace Monocle
             if (vec == Vector2.Zero)
                 return Vector2.Zero;
             vec = Calc.AngleToVector((float) Math.Floor(((double) vec.Angle() + 0.78539818525314331) / 1.5707963705062866) * 1.57079637f, 1f);
-            vec.X = (double) Math.Abs(vec.X) >= 0.5 ? (float) Math.Sign(vec.X) : 0.0f;
-            vec.Y = (double) Math.Abs(vec.Y) >= 0.5 ? (float) Math.Sign(vec.Y) : 0.0f;
+            vec.X = (double) Math.Abs(vec.X) >= 0.5 ? Math.Sign(vec.X) : 0.0f;
+            vec.Y = (double) Math.Abs(vec.Y) >= 0.5 ? Math.Sign(vec.Y) : 0.0f;
             return vec;
         }
 
@@ -741,7 +718,7 @@ namespace Monocle
             for (int index = 0; index < strArray1.Length; ++index)
             {
                 string[] strArray2 = strArray1[index].Split(',');
-                vector2List[index] = new Vector2((float) Convert.ToInt32(strArray2[0]), (float) Convert.ToInt32(strArray2[1]));
+                vector2List[index] = new Vector2(Convert.ToInt32(strArray2[0]), Convert.ToInt32(strArray2[1]));
             }
             return vector2List;
         }
@@ -765,7 +742,7 @@ namespace Monocle
             double num1 = (double) from.Length();
             float num2 = target.Length();
             float w = (float) Math.Sqrt(num1 * num1 * ((double) num2 * (double) num2)) + Vector3.Dot(from, target);
-            Quaternion quaternion = new Quaternion(vector3.X, vector3.Y, vector3.Z, w);
+            Quaternion quaternion = new(vector3.X, vector3.Y, vector3.Z, w);
             if ((double) quaternion.Length() <= (double) maxRotationRadians)
                 return target;
             quaternion.Normalize();
@@ -773,7 +750,7 @@ namespace Monocle
             return Vector3.Transform(from, rotation);
         }
 
-        public static Vector2 XZ(this Vector3 vector) => new Vector2(vector.X, vector.Z);
+        public static Vector2 XZ(this Vector3 vector) => new(vector.X, vector.Z);
 
         public static Vector3 Approach(this Vector3 v, Vector3 target, float amount) => (double) amount > (double) (target - v).Length() ? target : v + (target - v).SafeNormalize() * amount;
 
@@ -820,7 +797,7 @@ namespace Monocle
             if (csv == "")
                 return new int[0];
             string[] strArray1 = csv.Split(',');
-            List<int> intList = new List<int>();
+            List<int> intList = new();
             foreach (string str in strArray1)
             {
                 if (str.IndexOf('-') != -1)
@@ -858,8 +835,8 @@ namespace Monocle
 
         public static string IntGridToCSV(int[,] data)
         {
-            StringBuilder stringBuilder = new StringBuilder();
-            List<int> values = new List<int>();
+            StringBuilder stringBuilder = new();
+            List<int> values = new();
             int num1 = 0;
             for (int index1 = 0; index1 < data.GetLength(1); ++index1)
             {
@@ -882,7 +859,7 @@ namespace Monocle
                 }
                 if (values.Count > 0)
                 {
-                    stringBuilder.Append(string.Join<int>(",", (IEnumerable<int>) values));
+                    stringBuilder.Append(string.Join<int>(",", values));
                     values.Clear();
                 }
                 ++num1;
@@ -895,12 +872,12 @@ namespace Monocle
             int length1 = 0;
             for (int index = 0; index < data.Length; ++index)
             {
-                if (data[index] == '1' || data[index] == '0')
+                if (data[index] is '1' or '0')
                     ++length1;
-                else if ((int) data[index] == (int) rowSep)
+                else if (data[index] == rowSep)
                     break;
             }
-            int length2 = data.Count<char>((Func<char, bool>) (c => c == '\n')) + 1;
+            int length2 = data.Count<char>(c => c == '\n') + 1;
             bool[,] bitData = new bool[length1, length2];
             int index1 = 0;
             int index2 = 0;
@@ -972,7 +949,7 @@ namespace Monocle
         {
             float[] floatArray = new float[strings.Length];
             for (int index = 0; index < strings.Length; ++index)
-                floatArray[index] = Convert.ToSingle(strings[index], (IFormatProvider) CultureInfo.InvariantCulture);
+                floatArray[index] = Convert.ToSingle(strings[index], CultureInfo.InvariantCulture);
             return floatArray;
         }
 
@@ -980,10 +957,10 @@ namespace Monocle
 
         public static bool SaveFile<T>(T obj, string filename) where T : new()
         {
-            Stream stream = (Stream) new FileStream(filename, FileMode.Create, FileAccess.Write, FileShare.None);
+            Stream stream = new FileStream(filename, FileMode.Create, FileAccess.Write, FileShare.None);
             try
             {
-                new XmlSerializer(typeof (T)).Serialize(stream, (object) obj);
+                new XmlSerializer(typeof (T)).Serialize(stream, obj);
                 stream.Close();
                 return true;
             }
@@ -996,7 +973,7 @@ namespace Monocle
 
         public static bool LoadFile<T>(string filename, ref T data) where T : new()
         {
-            Stream stream = (Stream) new FileStream(filename, FileMode.Open, FileAccess.Read, FileShare.Read);
+            Stream stream = new FileStream(filename, FileMode.Open, FileAccess.Read, FileShare.Read);
             try
             {
                 T obj = (T) new XmlSerializer(typeof (T)).Deserialize(stream);
@@ -1013,7 +990,7 @@ namespace Monocle
 
         public static XmlDocument LoadContentXML(string filename)
         {
-            XmlDocument xmlDocument = new XmlDocument();
+            XmlDocument xmlDocument = new();
             using (Stream inStream = TitleContainer.OpenStream(Path.Combine(Engine.Instance.Content.RootDirectory, filename)))
                 xmlDocument.Load(inStream);
             return xmlDocument;
@@ -1021,9 +998,9 @@ namespace Monocle
 
         public static XmlDocument LoadXML(string filename)
         {
-            XmlDocument xmlDocument = new XmlDocument();
+            XmlDocument xmlDocument = new();
             using (FileStream inStream = File.OpenRead(filename))
-                xmlDocument.Load((Stream) inStream);
+                xmlDocument.Load(inStream);
             return xmlDocument;
         }
 
@@ -1041,14 +1018,14 @@ namespace Monocle
 
         public static int AttrInt(this XmlElement xml, string attributeName, int defaultValue) => !xml.HasAttr(attributeName) ? defaultValue : Convert.ToInt32(xml.Attributes[attributeName].InnerText);
 
-        public static float AttrFloat(this XmlElement xml, string attributeName) => Convert.ToSingle(xml.Attributes[attributeName].InnerText, (IFormatProvider) CultureInfo.InvariantCulture);
+        public static float AttrFloat(this XmlElement xml, string attributeName) => Convert.ToSingle(xml.Attributes[attributeName].InnerText, CultureInfo.InvariantCulture);
 
-        public static float AttrFloat(this XmlElement xml, string attributeName, float defaultValue) => !xml.HasAttr(attributeName) ? defaultValue : Convert.ToSingle(xml.Attributes[attributeName].InnerText, (IFormatProvider) CultureInfo.InvariantCulture);
+        public static float AttrFloat(this XmlElement xml, string attributeName, float defaultValue) => !xml.HasAttr(attributeName) ? defaultValue : Convert.ToSingle(xml.Attributes[attributeName].InnerText, CultureInfo.InvariantCulture);
 
         public static Vector3 AttrVector3(this XmlElement xml, string attributeName)
         {
             string[] strArray = xml.Attr(attributeName).Split(',');
-            return new Vector3(float.Parse(strArray[0].Trim(), (IFormatProvider) CultureInfo.InvariantCulture), float.Parse(strArray[1].Trim(), (IFormatProvider) CultureInfo.InvariantCulture), float.Parse(strArray[2].Trim(), (IFormatProvider) CultureInfo.InvariantCulture));
+            return new Vector3(float.Parse(strArray[0].Trim(), CultureInfo.InvariantCulture), float.Parse(strArray[1].Trim(), CultureInfo.InvariantCulture), float.Parse(strArray[2].Trim(), CultureInfo.InvariantCulture));
         }
 
         public static Vector2 AttrVector2(
@@ -1078,7 +1055,7 @@ namespace Monocle
 
         public static T AttrEnum<T>(this XmlElement xml, string attributeName) where T : struct
         {
-            if (Enum.IsDefined(typeof (T), (object) xml.Attributes[attributeName].InnerText))
+            if (Enum.IsDefined(typeof (T), xml.Attributes[attributeName].InnerText))
                 return (T) Enum.Parse(typeof (T), xml.Attributes[attributeName].InnerText);
             throw new Exception("The attribute value cannot be converted to the enum type.");
         }
@@ -1103,9 +1080,9 @@ namespace Monocle
             return !xml.HasAttr(attributeName) ? Calc.HexToColor(defaultValue) : xml.AttrHexColor(attributeName);
         }
 
-        public static Vector2 Position(this XmlElement xml) => new Vector2(xml.AttrFloat("x"), xml.AttrFloat("y"));
+        public static Vector2 Position(this XmlElement xml) => new(xml.AttrFloat("x"), xml.AttrFloat("y"));
 
-        public static Vector2 Position(this XmlElement xml, Vector2 defaultPosition) => new Vector2(xml.AttrFloat("x", defaultPosition.X), xml.AttrFloat("y", defaultPosition.Y));
+        public static Vector2 Position(this XmlElement xml, Vector2 defaultPosition) => new(xml.AttrFloat("x", defaultPosition.X), xml.AttrFloat("y", defaultPosition.Y));
 
         public static int X(this XmlElement xml) => xml.AttrInt("x");
 
@@ -1123,17 +1100,17 @@ namespace Monocle
 
         public static int Height(this XmlElement xml, int defaultHeight) => xml.AttrInt("height", defaultHeight);
 
-        public static Rectangle Rect(this XmlElement xml) => new Rectangle(xml.X(), xml.Y(), xml.Width(), xml.Height());
+        public static Rectangle Rect(this XmlElement xml) => new(xml.X(), xml.Y(), xml.Width(), xml.Height());
 
         public static int ID(this XmlElement xml) => xml.AttrInt("id");
 
         public static int InnerInt(this XmlElement xml) => Convert.ToInt32(xml.InnerText);
 
-        public static float InnerFloat(this XmlElement xml) => Convert.ToSingle(xml.InnerText, (IFormatProvider) CultureInfo.InvariantCulture);
+        public static float InnerFloat(this XmlElement xml) => Convert.ToSingle(xml.InnerText, CultureInfo.InvariantCulture);
 
         public static bool InnerBool(this XmlElement xml) => Convert.ToBoolean(xml.InnerText);
 
-        public static T InnerEnum<T>(this XmlElement xml) where T : struct => Enum.IsDefined(typeof (T), (object) xml.InnerText) ? (T) Enum.Parse(typeof (T), xml.InnerText) : throw new Exception("The attribute value cannot be converted to the enum type.");
+        public static T InnerEnum<T>(this XmlElement xml) where T : struct => Enum.IsDefined(typeof (T), xml.InnerText) ? (T) Enum.Parse(typeof (T), xml.InnerText) : throw new Exception("The attribute value cannot be converted to the enum type.");
 
         public static Color InnerHexColor(this XmlElement xml) => Calc.HexToColor(xml.InnerText);
 
@@ -1157,7 +1134,7 @@ namespace Monocle
 
         public static T ChildEnum<T>(this XmlElement xml, string childName) where T : struct
         {
-            if (Enum.IsDefined(typeof (T), (object) xml[childName].InnerText))
+            if (Enum.IsDefined(typeof (T), xml[childName].InnerText))
                 return (T) Enum.Parse(typeof (T), xml[childName].InnerText);
             throw new Exception("The attribute value cannot be converted to the enum type.");
         }
@@ -1166,7 +1143,7 @@ namespace Monocle
         {
             if (!xml.HasChild(childName))
                 return defaultValue;
-            if (Enum.IsDefined(typeof (T), (object) xml[childName].InnerText))
+            if (Enum.IsDefined(typeof (T), xml[childName].InnerText))
                 return (T) Enum.Parse(typeof (T), xml[childName].InnerText);
             throw new Exception("The attribute value cannot be converted to the enum type.");
         }
@@ -1199,11 +1176,11 @@ namespace Monocle
             return xml.HasChild(childName) ? xml[childName].Position(defaultValue) : defaultValue;
         }
 
-        public static Vector2 FirstNode(this XmlElement xml) => xml["node"] == null ? Vector2.Zero : new Vector2((float) (int) xml["node"].AttrFloat("x"), (float) (int) xml["node"].AttrFloat("y"));
+        public static Vector2 FirstNode(this XmlElement xml) => xml["node"] == null ? Vector2.Zero : new Vector2((int)xml["node"].AttrFloat("x"), (int)xml["node"].AttrFloat("y"));
 
-        public static Vector2? FirstNodeNullable(this XmlElement xml) => xml["node"] == null ? new Vector2?() : new Vector2?(new Vector2((float) (int) xml["node"].AttrFloat("x"), (float) (int) xml["node"].AttrFloat("y")));
+        public static Vector2? FirstNodeNullable(this XmlElement xml) => xml["node"] == null ? new Vector2?() : new Vector2?(new Vector2((int)xml["node"].AttrFloat("x"), (int)xml["node"].AttrFloat("y")));
 
-        public static Vector2? FirstNodeNullable(this XmlElement xml, Vector2 offset) => xml["node"] == null ? new Vector2?() : new Vector2?(new Vector2((float) (int) xml["node"].AttrFloat("x"), (float) (int) xml["node"].AttrFloat("y")) + offset);
+        public static Vector2? FirstNodeNullable(this XmlElement xml, Vector2 offset) => xml["node"] == null ? new Vector2?() : new Vector2?(new Vector2((int)xml["node"].AttrFloat("x"), (int)xml["node"].AttrFloat("y")) + offset);
 
         public static Vector2[] Nodes(this XmlElement xml, bool includePosition = false)
         {
@@ -1220,13 +1197,13 @@ namespace Monocle
                 vector2Array = new Vector2[elementsByTagName.Count + 1];
                 vector2Array[0] = xml.Position();
                 for (int i = 0; i < elementsByTagName.Count; ++i)
-                    vector2Array[i + 1] = new Vector2((float) Convert.ToInt32(elementsByTagName[i].Attributes["x"].InnerText), (float) Convert.ToInt32(elementsByTagName[i].Attributes["y"].InnerText));
+                    vector2Array[i + 1] = new Vector2(Convert.ToInt32(elementsByTagName[i].Attributes["x"].InnerText), Convert.ToInt32(elementsByTagName[i].Attributes["y"].InnerText));
             }
             else
             {
                 vector2Array = new Vector2[elementsByTagName.Count];
                 for (int i = 0; i < elementsByTagName.Count; ++i)
-                    vector2Array[i] = new Vector2((float) Convert.ToInt32(elementsByTagName[i].Attributes["x"].InnerText), (float) Convert.ToInt32(elementsByTagName[i].Attributes["y"].InnerText));
+                    vector2Array[i] = new Vector2(Convert.ToInt32(elementsByTagName[i].Attributes["x"].InnerText), Convert.ToInt32(elementsByTagName[i].Attributes["y"].InnerText));
             }
             return vector2Array;
         }
@@ -1267,23 +1244,23 @@ namespace Monocle
             }
             else
             {
-                element = xml.OwnerDocument.CreateElement((string) null, childName, xml.NamespaceURI);
-                xml.AppendChild((XmlNode) element);
+                element = xml.OwnerDocument.CreateElement(null, childName, xml.NamespaceURI);
+                xml.AppendChild(element);
             }
             element.InnerText = setTo.ToString();
         }
 
         public static XmlElement CreateChild(this XmlDocument doc, string childName)
         {
-            XmlElement element = doc.CreateElement((string) null, childName, doc.NamespaceURI);
-            doc.AppendChild((XmlNode) element);
+            XmlElement element = doc.CreateElement(null, childName, doc.NamespaceURI);
+            doc.AppendChild(element);
             return element;
         }
 
         public static XmlElement CreateChild(this XmlElement xml, string childName)
         {
-            XmlElement element = xml.OwnerDocument.CreateElement((string) null, childName, xml.NamespaceURI);
-            xml.AppendChild((XmlNode) element);
+            XmlElement element = xml.OwnerDocument.CreateElement(null, childName, xml.NamespaceURI);
+            xml.AppendChild(element);
             return element;
         }
 
@@ -1340,11 +1317,11 @@ namespace Monocle
             if (Calc.stopwatch == null)
                 return;
             Calc.stopwatch.Stop();
-            Console.Write("Timer: " + (object) Calc.stopwatch.ElapsedTicks + " ticks, or " + TimeSpan.FromTicks(Calc.stopwatch.ElapsedTicks).TotalSeconds.ToString("00.0000000") + " seconds");
-            Calc.stopwatch = (Stopwatch) null;
+            Console.Write("Timer: " + stopwatch.ElapsedTicks + " ticks, or " + TimeSpan.FromTicks(Calc.stopwatch.ElapsedTicks).TotalSeconds.ToString("00.0000000") + " seconds");
+            Calc.stopwatch = null;
         }
 
-        public static Delegate GetMethod<T>(object obj, string method) where T : class => obj.GetType().GetMethod(method, BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic) == (MethodInfo) null ? (Delegate) null : Delegate.CreateDelegate(typeof (T), obj, method);
+        public static Delegate GetMethod<T>(object obj, string method) where T : class => obj.GetType().GetMethod(method, BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic) == null ? null : Delegate.CreateDelegate(typeof (T), obj, method);
 
         public static T At<T>(this T[,] arr, Pnt at) => arr[at.X, at.Y];
 
@@ -1365,11 +1342,11 @@ namespace Monocle
             {
                 if (numerators.Length == 1)
                 {
-                    yield return (object) numerators[0];
+                    yield return numerators[0];
                 }
                 else
                 {
-                    List<Coroutine> routines = new List<Coroutine>();
+                    List<Coroutine> routines = new();
                     foreach (IEnumerator numerator in numerators)
                         routines.Add(new Coroutine(numerator));
                     while (true)
@@ -1382,11 +1359,11 @@ namespace Monocle
                                 flag = true;
                         }
                         if (flag)
-                            yield return (object) null;
+                            yield return null;
                         else
                             break;
                     }
-                    routines = (List<Coroutine>) null;
+                    routines = null;
                 }
             }
         }

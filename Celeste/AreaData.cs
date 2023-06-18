@@ -705,19 +705,21 @@ namespace Celeste
                 }
             };
 
-            int length = Enum.GetNames(typeof(AreaMode)).Length;
+            int sides = Enum.GetNames(typeof(AreaMode)).Length;
             for (int i = 0; i < Areas.Count; ++i)
             {
-                Areas[i].ID = i;
-                Areas[i].Mode[0].MapData = new MapData(new AreaKey(i));
-                if (!Areas[i].Interlude)
-                    for (int mode = 1; mode < length; ++mode)
+                AreaData area = Areas[i];
+                area.ID = i;
+                area.Mode[0].MapData = new MapData(new AreaKey(i));
+                if (!area.Interlude)
+                    for (int j = 1; j < sides; ++j)
                     {
-                        AreaMode areaMode = (AreaMode) mode;
-                        if (Areas[i].HasMode(areaMode))
-                            Areas[i].Mode[mode].MapData = new MapData(new AreaKey(i, areaMode));
+                        AreaMode side = (AreaMode) j;
+                        if (area.HasMode(side))
+                            area.Mode[j].MapData = new MapData(new AreaKey(i, side));
                     }
             }
+
             ReloadMountainViews();
         }
 
@@ -747,10 +749,8 @@ namespace Celeste
         public static bool IsPoemRemix(string id)
         {
             foreach (AreaData area in Areas)
-            {
                 if (area.Mode.Length > 1 && area.Mode[1] != null && !string.IsNullOrEmpty(area.Mode[1].PoemID) && area.Mode[1].PoemID.Equals(id, StringComparison.OrdinalIgnoreCase))
                     return true;
-            }
             return false;
         }
 
@@ -758,13 +758,9 @@ namespace Celeste
         {
             CheckpointData[] checkpoints = Areas[area.ID].Mode[(int) area.Mode].Checkpoints;
             if (checkpoints != null)
-            {
                 for (int checkpointId = 0; checkpointId < checkpoints.Length; ++checkpointId)
-                {
                     if (checkpoints[checkpointId].Level.Equals(level))
                         return checkpointId;
-                }
-            }
             return -1;
         }
 
@@ -772,13 +768,9 @@ namespace Celeste
         {
             CheckpointData[] checkpoints = Areas[area.ID].Mode[(int) area.Mode].Checkpoints;
             if (level != null && checkpoints != null)
-            {
                 foreach (CheckpointData checkpoint in checkpoints)
-                {
                     if (checkpoint.Level.Equals(level))
                         return checkpoint;
-                }
-            }
             return null;
         }
 

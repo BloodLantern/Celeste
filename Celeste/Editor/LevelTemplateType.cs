@@ -3,6 +3,6 @@
     public enum LevelTemplateType
     {
         Level,
-        Filler,
+        Filler
     }
 }
