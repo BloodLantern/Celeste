@@ -7,25 +7,25 @@ namespace Celeste
     {
         public static byte[] Encode(string str)
         {
-            List<byte> byteList = new();
-            for (int index = 0; index < str.Length; ++index)
+            List<byte> result = new();
+            for (int i = 0; i < str.Length; i++)
             {
-                byte num = 1;
-                char ch;
-                for (ch = str[index]; index + 1 < str.Length && str[index + 1] == ch && num < byte.MaxValue; ++index)
-                    ++num;
-                byteList.Add(num);
-                byteList.Add((byte) ch);
+                byte valueCount = 1;
+                char value;
+                for (value = str[i]; i + 1 < str.Length && str[i + 1] == value && valueCount < byte.MaxValue; ++i)
+                    ++valueCount;
+                result.Add(valueCount);
+                result.Add((byte)value);
             }
-            return byteList.ToArray();
+            return result.ToArray();
         }
 
         public static string Decode(byte[] bytes)
         {
-            StringBuilder stringBuilder = new();
-            for (int index = 0; index < bytes.Length; index += 2)
-                stringBuilder.Append((char) bytes[index + 1], bytes[index]);
-            return stringBuilder.ToString();
+            StringBuilder result = new();
+            for (int i = 0; i < bytes.Length; i += 2)
+                result.Append((char)bytes[i + 1], bytes[i]);
+            return result.ToString();
         }
     }
 }

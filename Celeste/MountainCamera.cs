@@ -11,15 +11,15 @@ namespace Celeste
 
         public MountainCamera(Vector3 pos, Vector3 target)
         {
-            this.Position = pos;
-            this.Target = target;
-            this.Rotation = new Quaternion().LookAt(this.Position, this.Target, Vector3.Up);
+            Position = pos;
+            Target = target;
+            Rotation = new Quaternion().LookAt(Position, Target, Vector3.Up);
         }
 
         public void LookAt(Vector3 pos)
         {
-            this.Target = pos;
-            this.Rotation = new Quaternion().LookAt(this.Position, this.Target, Vector3.Up);
+            Target = pos;
+            Rotation = new Quaternion().LookAt(Position, Target, Vector3.Up);
         }
     }
 }

@@ -7,10 +7,10 @@ namespace Monocle
 {
     public class VirtualTexture : VirtualAsset
     {
-        private const int ByteArraySize = 524288;
-        private const int ByteArrayCheckSize = 524256;
-        internal static readonly byte[] buffer = new byte[67108864];
-        internal static readonly byte[] bytes = new byte[524288];
+        private const int ByteArraySize = 0x8_0000;
+        private const int ByteArrayCheckSize = ByteArraySize - 0x20;
+        internal static readonly byte[] buffer = new byte[0x400_0000];
+        internal static readonly byte[] bytes = new byte[ByteArraySize];
         public Texture2D Texture;
         private Color color;
 
@@ -40,94 +40,88 @@ namespace Monocle
             Texture = null;
         }
 
-        internal override unsafe void Reload()
+        internal override void Reload()
         {
             Unload();
+
             if (string.IsNullOrEmpty(Path))
             {
+                // Set the texture to be filled with 'color'
                 Texture = new Texture2D(Engine.Instance.GraphicsDevice, Width, Height);
                 Color[] data = new Color[Width * Height];
-                fixed (Color* colorPtr = data)
-                {
-                    for (int index = 0; index < data.Length; ++index)
-                        colorPtr[index] = color;
-                }
-                Texture.SetData<Color>(data);
+                for (int i = 0; i < data.Length; i++)
+                    data[i] = color;
+                Texture.SetData(data);
             }
             else
             {
                 string extension = System.IO.Path.GetExtension(Path);
                 if (extension == ".data")
                 {
-                    using (FileStream fileStream = File.OpenRead(System.IO.Path.Combine(Engine.ContentDirectory, Path)))
+                    using FileStream fileStream = File.OpenRead(System.IO.Path.Combine(Engine.ContentDirectory, Path));
+                    fileStream.Read(bytes, 0, ByteArraySize);
+
+                    int width = BitConverter.ToInt32(bytes, 0);
+                    int height = BitConverter.ToInt32(bytes, 4);
+                    bool flag = bytes[8] == 1;
+
+                    int bytesIndex = 9;
+                    int totalSize = width * height * 4;
+                    int bufferIndex = 0;
+                    while (bufferIndex < totalSize)
                     {
-                        fileStream.Read(VirtualTexture.bytes, 0, 524288);
-                        int startIndex = 0;
-                        int int32_1 = BitConverter.ToInt32(VirtualTexture.bytes, startIndex);
-                        int int32_2 = BitConverter.ToInt32(VirtualTexture.bytes, startIndex + 4);
-                        bool flag = VirtualTexture.bytes[startIndex + 8] == 1;
-                        int index1 = startIndex + 9;
-                        int elementCount = int32_1 * int32_2 * 4;
-                        int index2 = 0;
-                        fixed (byte* numPtr1 = VirtualTexture.bytes)
-                            fixed (byte* numPtr2 = VirtualTexture.buffer)
+                        int blockSize = bytes[bytesIndex] * 4;
+                        if (flag)
+                        {
+                            byte num2 = bytes[bytesIndex + 1];
+                            if (num2 > 0)
                             {
-                                while (index2 < elementCount)
-                                {
-                                    int num1 = numPtr1[index1] * 4;
-                                    if (flag)
-                                    {
-                                        byte num2 = numPtr1[index1 + 1];
-                                        if (num2 > 0)
-                                        {
-                                            numPtr2[index2] = numPtr1[index1 + 4];
-                                            numPtr2[index2 + 1] = numPtr1[index1 + 3];
-                                            numPtr2[index2 + 2] = numPtr1[index1 + 2];
-                                            numPtr2[index2 + 3] = num2;
-                                            index1 += 5;
-                                        }
-                                        else
-                                        {
-                                            numPtr2[index2] = 0;
-                                            numPtr2[index2 + 1] = 0;
-                                            numPtr2[index2 + 2] = 0;
-                                            numPtr2[index2 + 3] = 0;
-                                            index1 += 2;
-                                        }
-                                    }
-                                    else
-                                    {
-                                        numPtr2[index2] = numPtr1[index1 + 3];
-                                        numPtr2[index2 + 1] = numPtr1[index1 + 2];
-                                        numPtr2[index2 + 2] = numPtr1[index1 + 1];
-                                        numPtr2[index2 + 3] = byte.MaxValue;
-                                        index1 += 4;
-                                    }
-                                    if (num1 > 4)
-                                    {
-                                        int index3 = index2 + 4;
-                                        for (int index4 = index2 + num1; index3 < index4; index3 += 4)
-                                        {
-                                            numPtr2[index3] = numPtr2[index2];
-                                            numPtr2[index3 + 1] = numPtr2[index2 + 1];
-                                            numPtr2[index3 + 2] = numPtr2[index2 + 2];
-                                            numPtr2[index3 + 3] = numPtr2[index2 + 3];
-                                        }
-                                    }
-                                    index2 += num1;
-                                    if (index1 > 524256)
-                                    {
-                                        int offset = 524288 - index1;
-                                        for (int index5 = 0; index5 < offset; ++index5)
-                                            numPtr1[index5] = numPtr1[index1 + index5];
-                                        fileStream.Read(VirtualTexture.bytes, offset, 524288 - offset);
-                                        index1 = 0;
-                                    }
-                                }
+                                buffer[bufferIndex] = bytes[bytesIndex + 4];
+                                buffer[bufferIndex + 1] = bytes[bytesIndex + 3];
+                                buffer[bufferIndex + 2] = bytes[bytesIndex + 2];
+                                buffer[bufferIndex + 3] = num2;
+                                bytesIndex += 5;
                             }
-                        Texture = new Texture2D(Engine.Graphics.GraphicsDevice, int32_1, int32_2);
-                        Texture.SetData<byte>(VirtualTexture.buffer, 0, elementCount);
+                            else
+                            {
+                                buffer[bufferIndex] = 0;
+                                buffer[bufferIndex + 1] = 0;
+                                buffer[bufferIndex + 2] = 0;
+                                buffer[bufferIndex + 3] = 0;
+                                bytesIndex += 2;
+                            }
+                        }
+                        else
+                        {
+                            buffer[bufferIndex] = bytes[bytesIndex + 3];
+                            buffer[bufferIndex + 1] = bytes[bytesIndex + 2];
+                            buffer[bufferIndex + 2] = bytes[bytesIndex + 1];
+                            buffer[bufferIndex + 3] = byte.MaxValue;
+                            bytesIndex += 4;
+                        }
+                        if (blockSize > 4)
+                        {
+                            int index3 = bufferIndex + 4;
+                            for (int index4 = bufferIndex + blockSize; index3 < index4; index3 += 4)
+                            {
+                                buffer[index3] = buffer[bufferIndex];
+                                buffer[index3 + 1] = buffer[bufferIndex + 1];
+                                buffer[index3 + 2] = buffer[bufferIndex + 2];
+                                buffer[index3 + 3] = buffer[bufferIndex + 3];
+                            }
+                        }
+                        bufferIndex += blockSize;
+                        if (bytesIndex > ByteArrayCheckSize)
+                        {
+                            int offset = ByteArraySize - bytesIndex;
+                            for (int index5 = 0; index5 < offset; ++index5)
+                                bytes[index5] = bytes[bytesIndex + index5];
+                            fileStream.Read(bytes, offset, ByteArraySize - offset);
+                            bytesIndex = 0;
+                        }
                     }
+                    Texture = new Texture2D(Engine.Graphics.GraphicsDevice, width, height);
+                    Texture.SetData(buffer, 0, totalSize);
                 }
                 else if (extension == ".png")
                 {
@@ -136,14 +130,11 @@ namespace Monocle
                     int elementCount = Texture.Width * Texture.Height;
                     Color[] data = new Color[elementCount];
                     Texture.GetData(data, 0, elementCount);
-                    fixed (Color* colorPtr = data)
+                    for (int index = 0; index < elementCount; ++index)
                     {
-                        for (int index = 0; index < elementCount; ++index)
-                        {
-                            colorPtr[index].R = (byte) (colorPtr[index].R * (colorPtr[index].A / (double) byte.MaxValue));
-                            colorPtr[index].G = (byte) (colorPtr[index].G * (colorPtr[index].A / (double) byte.MaxValue));
-                            colorPtr[index].B = (byte) (colorPtr[index].B * (colorPtr[index].A / (double) byte.MaxValue));
-                        }
+                        data[index].R = (byte) (data[index].R * (data[index].A / (double) byte.MaxValue));
+                        data[index].G = (byte) (data[index].G * (data[index].A / (double) byte.MaxValue));
+                        data[index].B = (byte) (data[index].B * (data[index].A / (double) byte.MaxValue));
                     }
                     Texture.SetData(data, 0, elementCount);
                 }
@@ -153,8 +144,8 @@ namespace Monocle
                 }
                 else
                 {
-                    using (FileStream fileStream = File.OpenRead(System.IO.Path.Combine(Engine.ContentDirectory, Path)))
-                        Texture = Texture2D.FromStream(Engine.Graphics.GraphicsDevice, fileStream);
+                    using FileStream fileStream = File.OpenRead(System.IO.Path.Combine(Engine.ContentDirectory, Path));
+                    Texture = Texture2D.FromStream(Engine.Graphics.GraphicsDevice, fileStream);
                 }
                 Width = Texture.Width;
                 Height = Texture.Height;

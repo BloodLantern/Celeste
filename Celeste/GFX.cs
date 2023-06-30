@@ -40,7 +40,7 @@ namespace Celeste
         public static Autotiler BGAutotiler;
         public static Autotiler FGAutotiler;
         public const float PortraitSize = 240f;
-        public static readonly BlendState Subtract = new BlendState()
+        public static readonly BlendState Subtract = new()
         {
             ColorSourceBlend = Blend.One,
             ColorDestinationBlend = Blend.One,
@@ -49,7 +49,7 @@ namespace Celeste
             AlphaDestinationBlend = Blend.One,
             AlphaBlendFunction = BlendFunction.Add
         };
-        public static readonly BlendState DestinationTransparencySubtract = new BlendState()
+        public static readonly BlendState DestinationTransparencySubtract = new()
         {
             ColorSourceBlend = Blend.One,
             ColorDestinationBlend = Blend.One,
@@ -65,109 +65,114 @@ namespace Celeste
 
         public static void Load()
         {
-            if (!GFX.Loaded)
+            if (!Loaded)
             {
                 Stopwatch stopwatch = Stopwatch.StartNew();
-                GFX.Game = Atlas.FromAtlas(Path.Combine("Graphics", "Atlases", "Gameplay"), Atlas.AtlasDataFormat.Packer);
-                GFX.Opening = Atlas.FromAtlas(Path.Combine("Graphics", "Atlases", "Opening"), Atlas.AtlasDataFormat.PackerNoAtlas);
-                GFX.Gui = Atlas.FromAtlas(Path.Combine("Graphics", "Atlases", "Gui"), Atlas.AtlasDataFormat.Packer);
-                GFX.GuiSpriteBank = new SpriteBank(GFX.Gui, Path.Combine("Graphics", "SpritesGui.xml"));
-                GFX.Misc = Atlas.FromAtlas(Path.Combine("Graphics", "Atlases", "Misc"), Atlas.AtlasDataFormat.PackerNoAtlas);
-                GFX.Portraits = Atlas.FromAtlas(Path.Combine("Graphics", "Atlases", "Portraits"), Atlas.AtlasDataFormat.PackerNoAtlas);
-                Draw.Particle = GFX.Game["util/particle"];
-                Draw.Pixel = new MTexture(GFX.Game["util/pixel"], 1, 1, 1, 1);
+
+                Game = Atlas.FromAtlas(Path.Combine("Graphics", "Atlases", "Gameplay"), Atlas.AtlasDataFormat.Packer);
+                Opening = Atlas.FromAtlas(Path.Combine("Graphics", "Atlases", "Opening"), Atlas.AtlasDataFormat.PackerNoAtlas);
+                Gui = Atlas.FromAtlas(Path.Combine("Graphics", "Atlases", "Gui"), Atlas.AtlasDataFormat.Packer);
+                GuiSpriteBank = new SpriteBank(Gui, Path.Combine("Graphics", "SpritesGui.xml"));
+                Misc = Atlas.FromAtlas(Path.Combine("Graphics", "Atlases", "Misc"), Atlas.AtlasDataFormat.PackerNoAtlas);
+                Portraits = Atlas.FromAtlas(Path.Combine("Graphics", "Atlases", "Portraits"), Atlas.AtlasDataFormat.PackerNoAtlas);
+
+                Draw.Particle = Game["util/particle"];
+                Draw.Pixel = new MTexture(Game["util/pixel"], 1, 1, 1, 1);
                 ParticleTypes.Load();
-                GFX.ColorGrades = Atlas.FromDirectory(Path.Combine("Graphics", "ColorGrading"));
-                GFX.MagicGlowNoise = VirtualContent.CreateTexture("glow-noise", 128, 128, Color.White);
-                Color[] data = new Color[GFX.MagicGlowNoise.Width * GFX.MagicGlowNoise.Height];
+
+                ColorGrades = Atlas.FromDirectory(Path.Combine("Graphics", "ColorGrading"));
+
+                MagicGlowNoise = VirtualContent.CreateTexture("glow-noise", 128, 128, Color.White);
+                Color[] data = new Color[MagicGlowNoise.Width * MagicGlowNoise.Height];
                 for (int index = 0; index < data.Length; ++index)
                     data[index] = new Color(Calc.Random.NextFloat(), Calc.Random.NextFloat(), Calc.Random.NextFloat(), 0.0f);
-                GFX.MagicGlowNoise.Texture.SetData<Color>(data);
-                Console.WriteLine(" - GFX LOAD: " + (object) stopwatch.ElapsedMilliseconds + "ms");
+                MagicGlowNoise.Texture.SetData(data);
+
+                Console.WriteLine(" - GFX LOAD: " + stopwatch.ElapsedMilliseconds + "ms");
             }
-            GFX.Loaded = true;
+            Loaded = true;
         }
 
         public static void LoadData()
         {
-            if (!GFX.DataLoaded)
+            if (!DataLoaded)
             {
                 Stopwatch stopwatch = Stopwatch.StartNew();
-                GFX.PortraitsSpriteBank = new SpriteBank(GFX.Portraits, Path.Combine("Graphics", "Portraits.xml"));
-                GFX.SpriteBank = new SpriteBank(GFX.Game, Path.Combine("Graphics", "Sprites.xml"));
-                GFX.BGAutotiler = new Autotiler(Path.Combine("Graphics", "BackgroundTiles.xml"));
-                GFX.FGAutotiler = new Autotiler(Path.Combine("Graphics", "ForegroundTiles.xml"));
-                GFX.SceneryTiles = new Tileset(GFX.Game["tilesets/scenery"], 8, 8);
+                PortraitsSpriteBank = new SpriteBank(Portraits, Path.Combine("Graphics", "Portraits.xml"));
+                SpriteBank = new SpriteBank(Game, Path.Combine("Graphics", "Sprites.xml"));
+                BGAutotiler = new Autotiler(Path.Combine("Graphics", "BackgroundTiles.xml"));
+                FGAutotiler = new Autotiler(Path.Combine("Graphics", "ForegroundTiles.xml"));
+                SceneryTiles = new Tileset(Game["tilesets/scenery"], 8, 8);
                 PlayerSprite.ClearFramesMetadata();
                 PlayerSprite.CreateFramesMetadata("player");
                 PlayerSprite.CreateFramesMetadata("player_no_backpack");
                 PlayerSprite.CreateFramesMetadata("badeline");
                 PlayerSprite.CreateFramesMetadata("player_badeline");
                 PlayerSprite.CreateFramesMetadata("player_playback");
-                GFX.CompleteScreensXml = Calc.LoadContentXML(Path.Combine("Graphics", "CompleteScreens.xml"));
-                GFX.AnimatedTilesBank = new AnimatedTilesBank();
+                CompleteScreensXml = Calc.LoadContentXML(Path.Combine("Graphics", "CompleteScreens.xml"));
+                AnimatedTilesBank = new AnimatedTilesBank();
                 foreach (XmlElement xml in (XmlNode) Calc.LoadContentXML(Path.Combine("Graphics", "AnimatedTiles.xml"))["Data"])
                 {
                     if (xml != null)
-                        GFX.AnimatedTilesBank.Add(xml.Attr("name"), xml.AttrFloat("delay", 0.0f), xml.AttrVector2("posX", "posY", Vector2.Zero), xml.AttrVector2("origX", "origY", Vector2.Zero), GFX.Game.GetAtlasSubtextures(xml.Attr("path")));
+                        AnimatedTilesBank.Add(xml.Attr("name"), xml.AttrFloat("delay", 0.0f), xml.AttrVector2("posX", "posY", Vector2.Zero), xml.AttrVector2("origX", "origY", Vector2.Zero), Game.GetAtlasSubtextures(xml.Attr("path")));
                 }
-                Console.WriteLine(" - GFX DATA LOAD: " + (object) stopwatch.ElapsedMilliseconds + "ms");
+                Console.WriteLine(" - GFX DATA LOAD: " + stopwatch.ElapsedMilliseconds + "ms");
             }
-            GFX.DataLoaded = true;
+            DataLoaded = true;
         }
 
         public static void Unload()
         {
-            if (GFX.Loaded)
+            if (Loaded)
             {
-                GFX.Game.Dispose();
-                GFX.Game = (Atlas) null;
-                GFX.Gui.Dispose();
-                GFX.Gui = (Atlas) null;
-                GFX.Opening.Dispose();
-                GFX.Opening = (Atlas) null;
-                GFX.Misc.Dispose();
-                GFX.Misc = (Atlas) null;
-                GFX.ColorGrades.Dispose();
-                GFX.ColorGrades = (Atlas) null;
-                GFX.MagicGlowNoise.Dispose();
-                GFX.MagicGlowNoise = (VirtualTexture) null;
-                GFX.Portraits.Dispose();
-                GFX.Portraits = (Atlas) null;
+                Game.Dispose();
+                Game = null;
+                Gui.Dispose();
+                Gui = null;
+                Opening.Dispose();
+                Opening = null;
+                Misc.Dispose();
+                Misc = null;
+                ColorGrades.Dispose();
+                ColorGrades = null;
+                MagicGlowNoise.Dispose();
+                MagicGlowNoise = null;
+                Portraits.Dispose();
+                Portraits = null;
             }
-            GFX.Loaded = false;
+            Loaded = false;
         }
 
         public static void UnloadData()
         {
-            if (GFX.DataLoaded)
+            if (DataLoaded)
             {
-                GFX.GuiSpriteBank = (SpriteBank) null;
-                GFX.PortraitsSpriteBank = (SpriteBank) null;
-                GFX.SpriteBank = (SpriteBank) null;
-                GFX.CompleteScreensXml = (XmlDocument) null;
-                GFX.SceneryTiles = (Tileset) null;
-                GFX.BGAutotiler = (Autotiler) null;
-                GFX.FGAutotiler = (Autotiler) null;
+                GuiSpriteBank = null;
+                PortraitsSpriteBank = null;
+                SpriteBank = null;
+                CompleteScreensXml = null;
+                SceneryTiles = null;
+                BGAutotiler = null;
+                FGAutotiler = null;
             }
-            GFX.DataLoaded = false;
+            DataLoaded = false;
         }
 
         public static void LoadEffects()
         {
-            GFX.FxMountain = GFX.LoadFx("MountainRender");
-            GFX.FxGaussianBlur = GFX.LoadFx("GaussianBlur");
-            GFX.FxDistort = GFX.LoadFx("Distort");
-            GFX.FxDust = GFX.LoadFx("Dust");
-            GFX.FxPrimitive = GFX.LoadFx("Primitive");
-            GFX.FxDither = GFX.LoadFx("Dither");
-            GFX.FxMagicGlow = GFX.LoadFx("MagicGlow");
-            GFX.FxMirrors = GFX.LoadFx("Mirrors");
-            GFX.FxColorGrading = GFX.LoadFx("ColorGrade");
-            GFX.FxGlitch = GFX.LoadFx("Glitch");
-            GFX.FxTexture = GFX.LoadFx("Texture");
-            GFX.FxLighting = GFX.LoadFx("Lighting");
-            GFX.FxDebug = new BasicEffect(Engine.Graphics.GraphicsDevice);
+            FxMountain = LoadFx("MountainRender");
+            FxGaussianBlur = LoadFx("GaussianBlur");
+            FxDistort = LoadFx("Distort");
+            FxDust = LoadFx("Dust");
+            FxPrimitive = LoadFx("Primitive");
+            FxDither = LoadFx("Dither");
+            FxMagicGlow = LoadFx("MagicGlow");
+            FxMirrors = LoadFx("Mirrors");
+            FxColorGrading = LoadFx("ColorGrade");
+            FxGlitch = LoadFx("Glitch");
+            FxTexture = LoadFx("Texture");
+            FxLighting = LoadFx("Lighting");
+            FxDebug = new BasicEffect(Engine.Graphics.GraphicsDevice);
         }
 
         public static Effect LoadFx(string name) => Engine.Instance.Content.Load<Effect>(Path.Combine("Effects", name));
@@ -180,14 +185,14 @@ namespace Celeste
             BlendState blendState = null)
             where T : struct, IVertexType
         {
-            Effect effect1 = effect != null ? effect : GFX.FxPrimitive;
+            Effect effect1 = effect != null ? effect : FxPrimitive;
             BlendState blendState1 = blendState != null ? blendState : BlendState.AlphaBlend;
             Viewport viewport = Engine.Graphics.GraphicsDevice.Viewport;
-            double width = (double) viewport.Width;
+            double width = viewport.Width;
             viewport = Engine.Graphics.GraphicsDevice.Viewport;
-            double height = (double) viewport.Height;
-            Vector2 local = new Vector2((float) width, (float) height);
-            matrix *= Matrix.CreateScale((float) (1.0 / (double) local.X * 2.0), (float) (-(1.0 / (double) local.Y) * 2.0), 1f);
+            double height = viewport.Height;
+            Vector2 local = new((float) width, (float) height);
+            matrix *= Matrix.CreateScale((float) (1.0 / local.X * 2.0), (float) (-(1.0 / local.Y) * 2.0), 1f);
             matrix *= Matrix.CreateTranslation(-1f, 1f, 0.0f);
             Engine.Instance.GraphicsDevice.RasterizerState = RasterizerState.CullNone;
             Engine.Instance.GraphicsDevice.BlendState = blendState1;
@@ -209,14 +214,14 @@ namespace Celeste
             BlendState blendState = null)
             where T : struct, IVertexType
         {
-            Effect effect1 = effect != null ? effect : GFX.FxPrimitive;
+            Effect effect1 = effect != null ? effect : FxPrimitive;
             BlendState blendState1 = blendState != null ? blendState : BlendState.AlphaBlend;
             Viewport viewport = Engine.Graphics.GraphicsDevice.Viewport;
-            double width = (double) viewport.Width;
+            double width = viewport.Width;
             viewport = Engine.Graphics.GraphicsDevice.Viewport;
-            double height = (double) viewport.Height;
-            Vector2 local = new Vector2((float) width, (float) height);
-            matrix *= Matrix.CreateScale((float) (1.0 / (double) local.X * 2.0), (float) (-(1.0 / (double) local.Y) * 2.0), 1f);
+            double height = viewport.Height;
+            Vector2 local = new((float) width, (float) height);
+            matrix *= Matrix.CreateScale((float) (1.0 / local.X * 2.0), (float) (-(1.0 / local.Y) * 2.0), 1f);
             matrix *= Matrix.CreateTranslation(-1f, 1f, 0.0f);
             Engine.Instance.GraphicsDevice.RasterizerState = RasterizerState.CullNone;
             Engine.Instance.GraphicsDevice.BlendState = blendState1;

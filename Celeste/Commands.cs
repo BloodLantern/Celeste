@@ -589,41 +589,42 @@ namespace Celeste
         [Command("berries", "check how many strawberries are in the given chapter, or the entire game")]
         private static void CmdStrawberries(int chapterID = -1)
         {
-            Color lime = Color.Lime;
-            Color red = Color.Red;
-            Color yellow = Color.Yellow;
-            Color gray = Color.Gray;
             if (chapterID == -1)
             {
-                int num = 0;
-                int[] numArray = new int[AreaData.Areas.Count];
+                int total = 0;
+                int[] areaTotals = new int[AreaData.Areas.Count];
                 for (int id = 0; id < AreaData.Areas.Count; ++id)
                 {
-                    new MapData(new AreaKey(id)).GetStrawberries(out numArray[id]);
-                    num += numArray[id];
+                    new MapData(new AreaKey(id)).GetStrawberries(out areaTotals[id]);
+                    total += areaTotals[id];
                 }
-                Engine.Commands.Log(("Grand Total Strawberries: " + num), yellow);
-                for (int index = 0; index < numArray.Length; ++index)
+                Engine.Commands.Log("Grand Total Strawberries: " + total, Color.Yellow);
+
+                for (int i = 0; i < areaTotals.Length; ++i)
                 {
-                    Color color = numArray[index] == AreaData.Areas[index].Mode[0].TotalStrawberries ? (numArray[index] != 0 ? lime : gray) : red;
-                    Engine.Commands.Log(("Chapter " + index + ": " + numArray[index]), color);
+                    // Shows the text in lime if the strawberry count is the same as the total it should have
+                    // Shows it in gray if it has 0 berries
+                    // Shows in red if its strawberry count is different from the total it should have
+                    Color color = areaTotals[i] == AreaData.Areas[i].Mode[0].TotalStrawberries ? (areaTotals[i] != 0 ? Color.Lime : Color.Gray) : Color.Red;
+                    Engine.Commands.Log("Chapter " + i + ": " + areaTotals[i], color);
                 }
             }
             else
             {
                 AreaData area = AreaData.Areas[chapterID];
                 int totalStrawberries = area.Mode[0].TotalStrawberries;
-                int[] numArray = new int[area.Mode[0].Checkpoints.Length + 1];
-                numArray[0] = area.Mode[0].StartStrawberries;
-                for (int index = 1; index < numArray.Length; ++index)
-                    numArray[index] = area.Mode[0].Checkpoints[index - 1].Strawberries;
+                int[] checkpointStrawberries = new int[area.Mode[0].Checkpoints.Length + 1];
+                checkpointStrawberries[0] = area.Mode[0].StartStrawberries;
+                for (int index = 1; index < checkpointStrawberries.Length; ++index)
+                    checkpointStrawberries[index] = area.Mode[0].Checkpoints[index - 1].Strawberries;
+
                 int[] strawberries = new MapData(new AreaKey(chapterID)).GetStrawberries(out int total);
-                Engine.Commands.Log(("Chapter " + chapterID + " Strawberries"));
-                Engine.Commands.Log(("Total: " + total), totalStrawberries == total ? lime : red);
-                for (int index = 0; index < numArray.Length; ++index)
+                Engine.Commands.Log("Chapter " + chapterID + " Strawberries");
+                Engine.Commands.Log("Total: " + total, totalStrawberries == total ? Color.Lime : Color.Red);
+                for (int index = 0; index < checkpointStrawberries.Length; ++index)
                 {
-                    Color color = strawberries[index] == numArray[index] ? (strawberries[index] != 0 ? lime : gray) : red;
-                    Engine.Commands.Log(("CP" + index + ": " + strawberries[index]), color);
+                    Color color = strawberries[index] == checkpointStrawberries[index] ? (strawberries[index] != 0 ? Color.Lime : Color.Gray) : Color.Red;
+                    Engine.Commands.Log("CP" + index + ": " + strawberries[index], color);
                 }
             }
         }

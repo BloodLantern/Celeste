@@ -26,22 +26,22 @@ namespace Monocle
             1,
             1
         };
-        public const float Right = 0.0f;
-        public const float Up = -1.57079637f;
-        public const float Left = 3.14159274f;
-        public const float Down = 1.57079637f;
-        public const float UpRight = -0.7853982f;
-        public const float UpLeft = -2.3561945f;
-        public const float DownRight = 0.7853982f;
-        public const float DownLeft = 2.3561945f;
-        public const float DegToRad = 0.0174532924f;
+        public const float Right = 0f;
+        public const float Up = -MathHelper.Pi / 2;
+        public const float Left = MathHelper.Pi;
+        public const float Down = MathHelper.Pi / 2;
+        public const float UpRight = -MathHelper.Pi / 4;
+        public const float UpLeft = -3 * MathHelper.Pi / 4;
+        public const float DownRight = MathHelper.Pi / 4;
+        public const float DownLeft = 3 * MathHelper.Pi / 4;
+        public const float DegToRad = 1 / (2 * MathHelper.Pi);
         public const float RadToDeg = 57.2957764f;
-        public const float DtR = 0.0174532924f;
-        public const float RtD = 57.2957764f;
-        public const float Circle = 6.28318548f;
-        public const float HalfCircle = 3.14159274f;
-        public const float QuarterCircle = 1.57079637f;
-        public const float EighthCircle = 0.7853982f;
+        public const float DtR = DegToRad;
+        public const float RtD = RadToDeg;
+        public const float Circle = MathHelper.Pi * 2;
+        public const float HalfCircle = MathHelper.Pi;
+        public const float QuarterCircle = MathHelper.Pi / 2;
+        public const float EighthCircle = MathHelper.Pi / 4;
         private const string Hex = "0123456789ABCDEF";
         private static Stopwatch stopwatch;
 
@@ -53,7 +53,7 @@ namespace Monocle
         {
             T[] enums = new T[strs.Length];
             for (int index = 0; index < strs.Length; ++index)
-                enums[index] = Calc.StringToEnum<T>(strs[index]);
+                enums[index] = StringToEnum<T>(strs[index]);
             return enums;
         }
 
@@ -246,33 +246,33 @@ namespace Monocle
 
         public static void PushRandom(int newSeed)
         {
-            Calc.randomStack.Push(Calc.Random);
-            Calc.Random = new Random(newSeed);
+            randomStack.Push(Random);
+            Random = new Random(newSeed);
         }
 
         public static void PushRandom(Random random)
         {
-            Calc.randomStack.Push(Calc.Random);
-            Calc.Random = random;
+            randomStack.Push(Random);
+            Random = random;
         }
 
         public static void PushRandom()
         {
-            Calc.randomStack.Push(Calc.Random);
-            Calc.Random = new Random();
+            randomStack.Push(Random);
+            Random = new Random();
         }
 
-        public static void PopRandom() => Calc.Random = Calc.randomStack.Pop();
+        public static void PopRandom() => Random = randomStack.Pop();
 
-        public static T Choose<T>(this Random random, T a, T b) => Calc.GiveMe<T>(random.Next(2), a, b);
+        public static T Choose<T>(this Random random, T a, T b) => GiveMe<T>(random.Next(2), a, b);
 
-        public static T Choose<T>(this Random random, T a, T b, T c) => Calc.GiveMe<T>(random.Next(3), a, b, c);
+        public static T Choose<T>(this Random random, T a, T b, T c) => GiveMe<T>(random.Next(3), a, b, c);
 
-        public static T Choose<T>(this Random random, T a, T b, T c, T d) => Calc.GiveMe<T>(random.Next(4), a, b, c, d);
+        public static T Choose<T>(this Random random, T a, T b, T c, T d) => GiveMe<T>(random.Next(4), a, b, c, d);
 
-        public static T Choose<T>(this Random random, T a, T b, T c, T d, T e) => Calc.GiveMe<T>(random.Next(5), a, b, c, d, e);
+        public static T Choose<T>(this Random random, T a, T b, T c, T d, T e) => GiveMe<T>(random.Next(5), a, b, c, d, e);
 
-        public static T Choose<T>(this Random random, T a, T b, T c, T d, T e, T f) => Calc.GiveMe<T>(random.Next(6), a, b, c, d, e, f);
+        public static T Choose<T>(this Random random, T a, T b, T c, T d, T e, T f) => GiveMe<T>(random.Next(6), a, b, c, d, e, f);
 
         public static T Choose<T>(this Random random, params T[] choices) => choices[random.Next(choices.Length)];
 
@@ -294,7 +294,7 @@ namespace Monocle
 
         public static float NextAngle(this Random random) => random.NextFloat() * 6.28318548f;
 
-        public static Vector2 ShakeVector(this Random random) => new(random.Choose<int>(Calc.shakeVectorOffsets), random.Choose<int>(Calc.shakeVectorOffsets));
+        public static Vector2 ShakeVector(this Random random) => new(random.Choose<int>(shakeVectorOffsets), random.Choose<int>(shakeVectorOffsets));
 
         public static Vector2 ClosestTo(this List<Vector2> list, Vector2 to)
         {
@@ -358,7 +358,7 @@ namespace Monocle
             }
         }
 
-        public static void Shuffle<T>(this List<T> list) => list.Shuffle<T>(Calc.Random);
+        public static void Shuffle<T>(this List<T> list) => list.Shuffle<T>(Random);
 
         public static void ShuffleSetFirst<T>(this List<T> list, Random random, T first)
         {
@@ -373,7 +373,7 @@ namespace Monocle
                 list.Insert(0, first);
         }
 
-        public static void ShuffleSetFirst<T>(this List<T> list, T first) => list.ShuffleSetFirst<T>(Calc.Random, first);
+        public static void ShuffleSetFirst<T>(this List<T> list, T first) => list.ShuffleSetFirst<T>(Random, first);
 
         public static void ShuffleNotFirst<T>(this List<T> list, Random random, T notFirst)
         {
@@ -388,7 +388,7 @@ namespace Monocle
                 list.Insert(random.Next(list.Count - 1) + 1, notFirst);
         }
 
-        public static void ShuffleNotFirst<T>(this List<T> list, T notFirst) => list.ShuffleNotFirst<T>(Calc.Random, notFirst);
+        public static void ShuffleNotFirst<T>(this List<T> list, T notFirst) => list.ShuffleNotFirst<T>(Random, notFirst);
 
         public static Color Invert(this Color color) => new(byte.MaxValue - color.R, byte.MaxValue - color.G, byte.MaxValue - color.B, color.A);
 
@@ -399,14 +399,14 @@ namespace Monocle
                 num1 = 1;
             if (hex.Length - num1 >= 6)
             {
-                double r =  (Calc.HexToByte(hex[num1]) * 16 + Calc.HexToByte(hex[num1 + 1])) / (double) byte.MaxValue;
-                float num2 =  (Calc.HexToByte(hex[num1 + 2]) * 16 + Calc.HexToByte(hex[num1 + 3])) / (float) byte.MaxValue;
-                float num3 =  (Calc.HexToByte(hex[num1 + 4]) * 16 + Calc.HexToByte(hex[num1 + 5])) / (float) byte.MaxValue;
+                double r =  (HexToByte(hex[num1]) * 16 + HexToByte(hex[num1 + 1])) / (double) byte.MaxValue;
+                float num2 =  (HexToByte(hex[num1 + 2]) * 16 + HexToByte(hex[num1 + 3])) / (float) byte.MaxValue;
+                float num3 =  (HexToByte(hex[num1 + 4]) * 16 + HexToByte(hex[num1 + 5])) / (float) byte.MaxValue;
                 double g = (double) num2;
                 double b = (double) num3;
                 return new Color((float) r, (float) g, (float) b);
             }
-            return int.TryParse(hex.Substring(num1), out int result) ? Calc.HexToColor(result) : Color.White;
+            return int.TryParse(hex.Substring(num1), out int result) ? HexToColor(result) : Color.White;
         }
 
         public static Color HexToColor(int hex) => new()
@@ -459,7 +459,7 @@ namespace Monocle
             return num1;
         }
 
-        public static byte HexToByte(char c) => (byte) "0123456789ABCDEF".IndexOf(char.ToUpper(c));
+        public static byte HexToByte(char c) => (byte) Hex.IndexOf(char.ToUpper(c));
 
         public static float Percent(float num, float zeroAt, float oneAt) => MathHelper.Clamp((float) (((double) num - (double) zeroAt) / ((double) oneAt - (double) zeroAt)), 0.0f, 1f);
 
@@ -497,7 +497,7 @@ namespace Monocle
 
         public static float Map(float val, float min, float max, float newMin = 0.0f, float newMax = 1f) => (float) (((double) val - (double) min) / ((double) max - (double) min) * ((double) newMax - (double) newMin)) + newMin;
 
-        public static float SineMap(float counter, float newMin, float newMax) => Calc.Map((float) Math.Sin((double) counter), -1f, 1f, newMin, newMax);
+        public static float SineMap(float counter, float newMin, float newMax) => Map((float) Math.Sin((double) counter), -1f, 1f, newMin, newMax);
 
         public static float ClampedMap(float val, float min, float max, float newMin = 0.0f, float newMax = 1f) => MathHelper.Clamp((float) (((double) val - (double) min) / ((double) max - (double) min)), 0.0f, 1f) * (newMax - newMin) + newMin;
 
@@ -545,7 +545,7 @@ namespace Monocle
 
         public static float ReflectAngle(float angle, float axis = 0.0f) => (float) -((double) angle + (double) axis) - axis;
 
-        public static float ReflectAngle(float angleRadians, Vector2 axis) => Calc.ReflectAngle(angleRadians, axis.Angle());
+        public static float ReflectAngle(float angleRadians, Vector2 axis) => ReflectAngle(angleRadians, axis.Angle());
 
         public static Vector2 ClosestPointOnLine(
             Vector2 lineA,
@@ -571,11 +571,11 @@ namespace Monocle
 
         public static float AngleApproach(float val, float target, float maxMove)
         {
-            float num = Calc.AngleDiff(val, target);
+            float num = AngleDiff(val, target);
             return (double) Math.Abs(num) < (double) maxMove ? target : val + MathHelper.Clamp(num, -maxMove, maxMove);
         }
 
-        public static float AngleLerp(float startAngle, float endAngle, float percent) => startAngle + Calc.AngleDiff(startAngle, endAngle) * percent;
+        public static float AngleLerp(float startAngle, float endAngle, float percent) => startAngle + AngleDiff(startAngle, endAngle) * percent;
 
         public static float Approach(float val, float target, float maxMove) => (double) val <= (double) target ? Math.Min(val + maxMove, target) : Math.Max(val - maxMove, target);
 
@@ -589,15 +589,15 @@ namespace Monocle
             return num;
         }
 
-        public static float AbsAngleDiff(float radiansA, float radiansB) => Math.Abs(Calc.AngleDiff(radiansA, radiansB));
+        public static float AbsAngleDiff(float radiansA, float radiansB) => Math.Abs(AngleDiff(radiansA, radiansB));
 
-        public static int SignAngleDiff(float radiansA, float radiansB) => Math.Sign(Calc.AngleDiff(radiansA, radiansB));
+        public static int SignAngleDiff(float radiansA, float radiansB) => Math.Sign(AngleDiff(radiansA, radiansB));
 
         public static float Angle(Vector2 from, Vector2 to) => (float) Math.Atan2(to.Y - (double) from.Y, to.X - (double) from.X);
 
         public static Color ToggleColors(Color current, Color a, Color b) => current == a ? b : a;
 
-        public static float ShorterAngleDifference(float currentAngle, float angleA, float angleB) => (double) Math.Abs(Calc.AngleDiff(currentAngle, angleA)) < (double) Math.Abs(Calc.AngleDiff(currentAngle, angleB)) ? angleA : angleB;
+        public static float ShorterAngleDifference(float currentAngle, float angleA, float angleB) => (double) Math.Abs(AngleDiff(currentAngle, angleA)) < (double) Math.Abs(AngleDiff(currentAngle, angleB)) ? angleA : angleB;
 
         public static float ShorterAngleDifference(
             float currentAngle,
@@ -605,7 +605,7 @@ namespace Monocle
             float angleB,
             float angleC)
         {
-            return (double) Math.Abs(Calc.AngleDiff(currentAngle, angleA)) < (double) Math.Abs(Calc.AngleDiff(currentAngle, angleB)) ? Calc.ShorterAngleDifference(currentAngle, angleA, angleC) : Calc.ShorterAngleDifference(currentAngle, angleB, angleC);
+            return (double) Math.Abs(AngleDiff(currentAngle, angleA)) < (double) Math.Abs(AngleDiff(currentAngle, angleB)) ? ShorterAngleDifference(currentAngle, angleA, angleC) : ShorterAngleDifference(currentAngle, angleB, angleC);
         }
 
         public static bool IsInRange<T>(this T[] array, int index) => index >= 0 && index < array.Length;
@@ -677,7 +677,7 @@ namespace Monocle
         {
             if (vec == Vector2.Zero)
                 return Vector2.Zero;
-            vec = Calc.AngleToVector((float) Math.Floor(((double) vec.Angle() + 0.78539818525314331) / 1.5707963705062866) * 1.57079637f, 1f);
+            vec = AngleToVector((float) Math.Floor(((double) vec.Angle() + 0.78539818525314331) / 1.5707963705062866) * 1.57079637f, 1f);
             vec.X = (double) Math.Abs(vec.X) >= 0.5 ? Math.Sign(vec.X) : 0.0f;
             vec.Y = (double) Math.Abs(vec.Y) >= 0.5 ? Math.Sign(vec.Y) : 0.0f;
             return vec;
@@ -687,7 +687,7 @@ namespace Monocle
         {
             if (vec == Vector2.Zero)
                 return Vector2.Zero;
-            vec = Calc.AngleToVector((float) Math.Floor(((double) vec.Angle() + 0.39269909262657166) / 0.78539818525314331) * 0.7853982f, 1f);
+            vec = AngleToVector((float) Math.Floor(((double) vec.Angle() + 0.39269909262657166) / 0.78539818525314331) * 0.7853982f, 1f);
             if ((double) Math.Abs(vec.X) < 0.5)
                 vec.X = 0.0f;
             else if ((double) Math.Abs(vec.Y) < 0.5)
@@ -698,13 +698,13 @@ namespace Monocle
         public static Vector2 SnappedNormal(this Vector2 vec, float slices)
         {
             float num = 6.28318548f / slices;
-            return Calc.AngleToVector((float) Math.Floor(((double) vec.Angle() + (double) num / 2.0) / (double) num) * num, 1f);
+            return AngleToVector((float) Math.Floor(((double) vec.Angle() + (double) num / 2.0) / (double) num) * num, 1f);
         }
 
         public static Vector2 Snapped(this Vector2 vec, float slices)
         {
             float num = 6.28318548f / slices;
-            return Calc.AngleToVector((float) Math.Floor(((double) vec.Angle() + (double) num / 2.0) / (double) num) * num, vec.Length());
+            return AngleToVector((float) Math.Floor(((double) vec.Angle() + (double) num / 2.0) / (double) num) * num, vec.Length());
         }
 
         public static Vector2 XComp(this Vector2 vec) => Vector2.UnitX * vec.X;
@@ -723,14 +723,14 @@ namespace Monocle
             return vector2List;
         }
 
-        public static Vector2 Rotate(this Vector2 vec, float angleRadians) => Calc.AngleToVector(vec.Angle() + angleRadians, vec.Length());
+        public static Vector2 Rotate(this Vector2 vec, float angleRadians) => AngleToVector(vec.Angle() + angleRadians, vec.Length());
 
         public static Vector2 RotateTowards(
             this Vector2 vec,
             float targetAngleRadians,
             float maxMoveRadians)
         {
-            return Calc.AngleToVector(Calc.AngleApproach(vec.Angle(), targetAngleRadians, maxMoveRadians), vec.Length());
+            return AngleToVector(AngleApproach(vec.Angle(), targetAngleRadians, maxMoveRadians), vec.Length());
         }
 
         public static Vector3 RotateTowards(
@@ -1062,7 +1062,7 @@ namespace Monocle
 
         public static T AttrEnum<T>(this XmlElement xml, string attributeName, T defaultValue) where T : struct => !xml.HasAttr(attributeName) ? defaultValue : xml.AttrEnum<T>(attributeName);
 
-        public static Color AttrHexColor(this XmlElement xml, string attributeName) => Calc.HexToColor(xml.Attr(attributeName));
+        public static Color AttrHexColor(this XmlElement xml, string attributeName) => HexToColor(xml.Attr(attributeName));
 
         public static Color AttrHexColor(
             this XmlElement xml,
@@ -1077,7 +1077,7 @@ namespace Monocle
             string attributeName,
             string defaultValue)
         {
-            return !xml.HasAttr(attributeName) ? Calc.HexToColor(defaultValue) : xml.AttrHexColor(attributeName);
+            return !xml.HasAttr(attributeName) ? HexToColor(defaultValue) : xml.AttrHexColor(attributeName);
         }
 
         public static Vector2 Position(this XmlElement xml) => new(xml.AttrFloat("x"), xml.AttrFloat("y"));
@@ -1112,7 +1112,7 @@ namespace Monocle
 
         public static T InnerEnum<T>(this XmlElement xml) where T : struct => Enum.IsDefined(typeof (T), xml.InnerText) ? (T) Enum.Parse(typeof (T), xml.InnerText) : throw new Exception("The attribute value cannot be converted to the enum type.");
 
-        public static Color InnerHexColor(this XmlElement xml) => Calc.HexToColor(xml.InnerText);
+        public static Color InnerHexColor(this XmlElement xml) => HexToColor(xml.InnerText);
 
         public static bool HasChild(this XmlElement xml, string childName) => xml[childName] != null;
 
@@ -1148,14 +1148,14 @@ namespace Monocle
             throw new Exception("The attribute value cannot be converted to the enum type.");
         }
 
-        public static Color ChildHexColor(this XmlElement xml, string childName) => Calc.HexToColor(xml[childName].InnerText);
+        public static Color ChildHexColor(this XmlElement xml, string childName) => HexToColor(xml[childName].InnerText);
 
         public static Color ChildHexColor(
             this XmlElement xml,
             string childName,
             Color defaultValue)
         {
-            return xml.HasChild(childName) ? Calc.HexToColor(xml[childName].InnerText) : defaultValue;
+            return xml.HasChild(childName) ? HexToColor(xml[childName].InnerText) : defaultValue;
         }
 
         public static Color ChildHexColor(
@@ -1163,7 +1163,7 @@ namespace Monocle
             string childName,
             string defaultValue)
         {
-            return xml.HasChild(childName) ? Calc.HexToColor(xml[childName].InnerText) : Calc.HexToColor(defaultValue);
+            return xml.HasChild(childName) ? HexToColor(xml[childName].InnerText) : HexToColor(defaultValue);
         }
 
         public static Vector2 ChildPosition(this XmlElement xml, string childName) => xml[childName].Position();
@@ -1308,17 +1308,17 @@ namespace Monocle
 
         public static void StartTimer()
         {
-            Calc.stopwatch = new Stopwatch();
-            Calc.stopwatch.Start();
+            stopwatch = new Stopwatch();
+            stopwatch.Start();
         }
 
         public static void EndTimer()
         {
-            if (Calc.stopwatch == null)
+            if (stopwatch == null)
                 return;
-            Calc.stopwatch.Stop();
-            Console.Write("Timer: " + stopwatch.ElapsedTicks + " ticks, or " + TimeSpan.FromTicks(Calc.stopwatch.ElapsedTicks).TotalSeconds.ToString("00.0000000") + " seconds");
-            Calc.stopwatch = null;
+            stopwatch.Stop();
+            Console.Write("Timer: " + stopwatch.ElapsedTicks + " ticks, or " + TimeSpan.FromTicks(stopwatch.ElapsedTicks).TotalSeconds.ToString("00.0000000") + " seconds");
+            stopwatch = null;
         }
 
         public static Delegate GetMethod<T>(object obj, string method) where T : class => obj.GetType().GetMethod(method, BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic) == null ? null : Delegate.CreateDelegate(typeof (T), obj, method);

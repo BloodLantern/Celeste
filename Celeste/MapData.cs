@@ -204,6 +204,11 @@ namespace Celeste
                 }
         }
 
+        /// <summary>
+        /// Gets the number of strawberries. Outputs the total strawberry count through the parameter.
+        /// </summary>
+        /// <param name="total">The total strawberry count.</param>
+        /// <returns>An array containing the strawberry count for each checkpoint.</returns>
         public int[] GetStrawberries(out int total)
         {
             total = 0;

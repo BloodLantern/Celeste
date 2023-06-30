@@ -6,15 +6,15 @@ namespace Monocle
 {
     public static class VirtualContent
     {
-        private static List<VirtualAsset> assets = new List<VirtualAsset>();
+        private static readonly List<VirtualAsset> assets = new();
         private static bool reloading;
 
-        public static int Count => VirtualContent.assets.Count;
+        public static int Count => assets.Count;
 
         public static VirtualTexture CreateTexture(string path)
         {
-            VirtualTexture texture = new VirtualTexture(path);
-            VirtualContent.assets.Add((VirtualAsset) texture);
+            VirtualTexture texture = new(path);
+            assets.Add(texture);
             return texture;
         }
 
@@ -24,8 +24,8 @@ namespace Monocle
             int height,
             Color color)
         {
-            VirtualTexture texture = new VirtualTexture(name, width, height, color);
-            VirtualContent.assets.Add((VirtualAsset) texture);
+            VirtualTexture texture = new(name, width, height, color);
+            assets.Add(texture);
             return texture;
         }
 
@@ -37,15 +37,15 @@ namespace Monocle
             bool preserve = true,
             int multiSampleCount = 0)
         {
-            VirtualRenderTarget renderTarget = new VirtualRenderTarget(name, width, height, multiSampleCount, depth, preserve);
-            VirtualContent.assets.Add((VirtualAsset) renderTarget);
+            VirtualRenderTarget renderTarget = new(name, width, height, multiSampleCount, depth, preserve);
+            assets.Add(renderTarget);
             return renderTarget;
         }
 
         public static void BySize()
         {
-            Dictionary<int, Dictionary<int, int>> dictionary = new Dictionary<int, Dictionary<int, int>>();
-            foreach (VirtualAsset asset in VirtualContent.assets)
+            Dictionary<int, Dictionary<int, int>> dictionary = new();
+            foreach (VirtualAsset asset in assets)
             {
                 if (!dictionary.ContainsKey(asset.Width))
                     dictionary.Add(asset.Width, new Dictionary<int, int>());
@@ -56,33 +56,33 @@ namespace Monocle
             foreach (KeyValuePair<int, Dictionary<int, int>> keyValuePair1 in dictionary)
             {
                 foreach (KeyValuePair<int, int> keyValuePair2 in keyValuePair1.Value)
-                    Console.WriteLine(keyValuePair1.Key.ToString() + "x" + (object) keyValuePair2.Key + ": " + (object) keyValuePair2.Value);
+                    Console.WriteLine(keyValuePair1.Key.ToString() + "x" + keyValuePair2.Key + ": " + keyValuePair2.Value);
             }
         }
 
         public static void ByName()
         {
-            foreach (VirtualAsset asset in VirtualContent.assets)
-                Console.WriteLine(asset.Name + "[" + (object) asset.Width + "x" + (object) asset.Height + "]");
+            foreach (VirtualAsset asset in assets)
+                Console.WriteLine(asset.Name + "[" + asset.Width + "x" + asset.Height + "]");
         }
 
-        internal static void Remove(VirtualAsset asset) => VirtualContent.assets.Remove(asset);
+        internal static void Remove(VirtualAsset asset) => assets.Remove(asset);
 
         internal static void Reload()
         {
-            if (VirtualContent.reloading)
+            if (reloading)
             {
-                foreach (VirtualAsset asset in VirtualContent.assets)
+                foreach (VirtualAsset asset in assets)
                     asset.Reload();
             }
-            VirtualContent.reloading = false;
+            reloading = false;
         }
 
         internal static void Unload()
         {
-            foreach (VirtualAsset asset in VirtualContent.assets)
+            foreach (VirtualAsset asset in assets)
                 asset.Unload();
-            VirtualContent.reloading = true;
+            reloading = true;
         }
     }
 }

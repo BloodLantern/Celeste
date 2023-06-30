@@ -13,6 +13,14 @@ namespace Celeste
 {
     public class Celeste : Engine
     {
+        public enum PlayModes
+        {
+            Normal,
+            Debug,
+            Event,
+            Demo,
+        }
+
         public const int GameWidth = 320;
         public const int GameHeight = 180;
         public const int TargetWidth = 1920;
@@ -76,8 +84,8 @@ namespace Celeste
             if (firstLoad)
             {
                 firstLoad = false;
-                HudTarget = VirtualContent.CreateRenderTarget("hud-target", 1922, 1082);
-                WipeTarget = VirtualContent.CreateRenderTarget("wipe-target", 1922, 1082);
+                HudTarget = VirtualContent.CreateRenderTarget("hud-target", TargetWidth + 2, TargetHeight + 2);
+                WipeTarget = VirtualContent.CreateRenderTarget("wipe-target", TargetWidth + 2, TargetHeight + 2);
                 OVR.Load();
                 GFX.Load();
                 MTN.Load();
@@ -266,14 +274,6 @@ namespace Celeste
                     break;
             }
             return false;
-        }
-
-        public enum PlayModes
-        {
-            Normal,
-            Debug,
-            Event,
-            Demo,
         }
     }
 }

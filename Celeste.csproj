@@ -6,7 +6,7 @@
     <ProjectGuid>{AD4A712C-C235-41E5-B0A1-D1F0A1C24124}</ProjectGuid>
     <OutputType>WinExe</OutputType>
     <AssemblyName>Celeste</AssemblyName>
-    <TargetFrameworkVersion>v4.8.1</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.5.2</TargetFrameworkVersion>
     <LangVersion>preview</LangVersion>
     <FileAlignment>512</FileAlignment>
     <PublishUrl>publish\</PublishUrl>
