@@ -257,7 +257,7 @@ namespace Celeste.Editor
                     Draw.Rect(X + back.X, Y + back.Y, back.Width, back.Height, Dummy ? dummyBgTilesColor : bgTilesColor);
                 foreach (Rectangle solid in solids)
                     Draw.Rect(X + solid.X, Y + solid.Y, solid.Width, solid.Height, Dummy ? dummyFgTilesColor : fgTilesColor[EditorColorIndex]);
-                
+
                 // Draw entities
                 foreach (Vector2 spawn in Spawns)
                     Draw.Rect(X + spawn.X, Y + spawn.Y - 1f, 1f, 1f, Color.Red);
@@ -366,18 +366,17 @@ namespace Celeste.Editor
                     // If this level is inside the other level on the Y axis
                     if (Bottom >= otherLevel.Top && Top <= otherLevel.Bottom)
                     {
-                        // Maybe change int to bool ?
-                        int snapRight = Math.Abs(Left - otherLevel.Right) < 3 ? 1 : 0;
+                        bool snapRight = Math.Abs(Left - otherLevel.Right) < 3;
                         bool snapLeft = Math.Abs(Right - otherLevel.Left) < 3;
 
                         // Try to snap on the X axis
-                        if (snapRight != 0)
+                        if (snapRight)
                             Left = otherLevel.Right;
                         else if (snapLeft)
                             Right = otherLevel.Left;
 
                         // If snapped
-                        if ((snapRight | (snapLeft ? 1 : 0)) != 0)
+                        if (snapRight || snapLeft)
                         {
                             // Then try to snap on the Y axis
                             if (Math.Abs(Top - otherLevel.Top) < 3)
@@ -390,18 +389,17 @@ namespace Celeste.Editor
                     // If this level is inside the other level on the X axis
                     if (Right >= otherLevel.Left && Left <= otherLevel.Right)
                     {
-                        // Maybe change int to bool ?
-                        int snapDown = Math.Abs(Top - otherLevel.Bottom) < 5 ? 1 : 0;
+                        bool snapDown = Math.Abs(Top - otherLevel.Bottom) < 5;
                         bool snapUp = Math.Abs(Bottom - otherLevel.Top) < 5;
 
                         // Try to snap on the Y axis
-                        if (snapDown != 0)
+                        if (snapDown)
                             Top = otherLevel.Bottom;
                         else if (snapUp)
                             Bottom = otherLevel.Top;
 
                         // If snapped
-                        if ((snapDown | (snapUp ? 1 : 0)) != 0)
+                        if (snapDown || snapUp)
                         {
                             // Then try to snap on the X axis
                             if (Math.Abs(Left - otherLevel.Left) < 3)

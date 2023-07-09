@@ -183,12 +183,14 @@ namespace Celeste.Editor
         }
 
         /// <summary>
-        /// Saves the current map state... I suppose. This function is empty.
+        /// Saves the current map state... I suppose. This function is empty. The content
+        /// must have been within preprocessor directives.
         /// </summary>
         private void Save() { }
 
         /// <summary>
         /// Saves and reloads the current map state... I suppose. This function is empty.
+        /// The content must have been within preprocessor directives.
         /// </summary>
         private void SaveAndReload() { }
 
@@ -256,17 +258,13 @@ namespace Celeste.Editor
                         bool resizing = false;
                         if (selection.Count == 1)
                         {
-                            // If we know the selection is already of size 1, why not just use selection.ElementAt(0) instead of a foreach loop ?
-                            foreach (LevelTemplate selectedLevel in selection)
-                            {
-                                if (selectedLevel.ResizePosition(mousePosition) && selectedLevel.Type == LevelTemplateType.Filler)
-                                    resizing = true;
-                            }
+                            LevelTemplate selectedLevel = selection.ElementAt(0);
+                            if (selectedLevel.ResizePosition(mousePosition) && selectedLevel.Type == LevelTemplateType.Filler)
+                                resizing = true;
                         }
 
                         if (resizing)
                         {
-                            // Same here, we know the selection has only 1 level so why a foreach loop ?
                             foreach (LevelTemplate levelTemplate in selection)
                                 levelTemplate.StartResizing();
                             mouseMode = MouseModes.Resize;
@@ -418,11 +416,11 @@ namespace Celeste.Editor
 
             Draw.SpriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, SamplerState.PointClamp,
                 DepthStencilState.None, RasterizerState.CullNone, null, Camera.Matrix * Engine.ScreenMatrix);
-            
+
             float width = Celeste.TargetWidth / Camera.Zoom;
             float height = Celeste.TargetHeight / Camera.Zoom;
 
-            int gridSquareSize = 5; // Why isn't it const ?
+            const int gridSquareSize = 5;
             float x = (float) Math.Floor((double) (Camera.Left / gridSquareSize - 1f)) * gridSquareSize;
             float y = (float) Math.Floor((double) (Camera.Top / gridSquareSize - 1f)) * gridSquareSize;
 
@@ -457,7 +455,7 @@ namespace Celeste.Editor
 
             if (saveFlash > 0)
                 Draw.Rect(Camera.Left, Camera.Top, width, height, Color.White * Ease.CubeInOut(saveFlash));
-            
+
             if (fade > 0)
                 Draw.Rect(0f, 0f, Celeste.GameWidth, Celeste.GameHeight, Color.Black * fade);
 
@@ -466,7 +464,7 @@ namespace Celeste.Editor
             // Top UI
             Draw.SpriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, SamplerState.LinearClamp,
                 DepthStencilState.None, RasterizerState.CullNone, null, Engine.ScreenMatrix);
-            
+
             Draw.Rect(0f, 0f, Celeste.TargetWidth, Celeste.TargetHeight / 15, Color.Black);
 
             Vector2 topUILeft = new(16f, 4f);
@@ -477,28 +475,24 @@ namespace Celeste.Editor
                 // Draw global dark overlay
                 Draw.Rect(-10f, -10f, Celeste.TargetWidth + 20f, Celeste.TargetHeight + 20f, Color.Black * 0.25f);
 
-                using (List<LevelTemplate>.Enumerator enumerator = levels.GetEnumerator())
+                using List<LevelTemplate>.Enumerator enumerator = levels.GetEnumerator();
+                while (enumerator.MoveNext())
                 {
-Celeste_Editor_MapEditor_Render_NextStrawberryLevel:
-                    while (enumerator.MoveNext())
+                    LevelTemplate current = enumerator.Current;
+                    int strawberryIndex = 0;
+                    while (true)
                     {
-                        LevelTemplate current = enumerator.Current;
-                        int strawberryIndex = 0;
-                        while (true)
+                        if (current.Strawberries != null && strawberryIndex < current.Strawberries.Count)
                         {
-                            if (current.Strawberries != null && strawberryIndex < current.Strawberries.Count)
-                            {
-                                Vector2 strawberryPosition = current.Strawberries[strawberryIndex];
-                                ActiveFont.DrawOutline(current.StrawberryMetadata[strawberryIndex],
-                                    (new Vector2(current.X + strawberryPosition.X, current.Y + strawberryPosition.Y) - Camera.Position) * Camera.Zoom
-                                        + new Vector2(Celeste.TargetWidth / 2, (Celeste.TargetHeight - 16f) / 2),
-                                    new Vector2(0.5f, 1f), Vector2.One * 1f, Color.Red, 2f, Color.Black);
-                                strawberryIndex++;
-                            }
-                            else
-                                // Why not just a 'break' ?
-                                goto Celeste_Editor_MapEditor_Render_NextStrawberryLevel;
+                            Vector2 strawberryPosition = current.Strawberries[strawberryIndex];
+                            ActiveFont.DrawOutline(current.StrawberryMetadata[strawberryIndex],
+                                (new Vector2(current.X + strawberryPosition.X, current.Y + strawberryPosition.Y) - Camera.Position) * Camera.Zoom
+                                    + new Vector2(Celeste.TargetWidth / 2, (Celeste.TargetHeight - 16f) / 2),
+                                new Vector2(0.5f, 1f), Vector2.One * 1f, Color.Red, 2f, Color.Black);
+                            strawberryIndex++;
                         }
+                        else
+                            break;
                     }
                 }
             }
@@ -517,13 +511,7 @@ Celeste_Editor_MapEditor_Render_NextStrawberryLevel:
             }
             else if (hovered.Count == 1)
             {
-                LevelTemplate levelTemplate = null;
-                // Again, why not just get the last object of the set ?
-                using (HashSet<LevelTemplate>.Enumerator enumerator = hovered.GetEnumerator())
-                {
-                    if (enumerator.MoveNext())
-                        levelTemplate = enumerator.Current;
-                }
+                LevelTemplate levelTemplate = hovered.ElementAt(0);
 
                 string text = levelTemplate.ActualWidth.ToString() + "x" + levelTemplate.ActualHeight.ToString() + "   "
                     + levelTemplate.X + "," + levelTemplate.Y + "   " + (levelTemplate.X * 8) + "," + (levelTemplate.Y * 8);
@@ -586,8 +574,7 @@ Celeste_Editor_MapEditor_Render_NextStrawberryLevel:
                 levelPositions[index] = new Vector2(levels[index].X, levels[index].Y);
             redoStack.Add(levelPositions);
 
-            // Why not just undoStack.Last() ?
-            Vector2[] undo = undoStack[undoStack.Count - 1];
+            Vector2[] undo = undoStack.Last();
             undoStack.RemoveAt(undoStack.Count - 1);
             for (int i = 0; i < undo.Length; ++i)
             {
@@ -609,13 +596,12 @@ Celeste_Editor_MapEditor_Render_NextStrawberryLevel:
                 vector2Array[index] = new Vector2(levels[index].X, levels[index].Y);
             undoStack.Add(vector2Array);
 
-            // Why not just redoStack.Last() ?
-            Vector2[] redo = redoStack[undoStack.Count - 1];
+            Vector2[] redo = redoStack.Last();
             redoStack.RemoveAt(undoStack.Count - 1);
             for (int index = 0; index < redo.Length; ++index)
             {
-                levels[index].X = (int)redo[index].X;
-                levels[index].Y = (int)redo[index].Y;
+                levels[index].X = (int) redo[index].X;
+                levels[index].Y = (int) redo[index].Y;
             }
         }
 
