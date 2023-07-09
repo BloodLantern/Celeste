@@ -218,18 +218,16 @@ namespace Celeste
             Raining = false;
             bool flag1 = false;
             bool flag2 = false;
-            if (HiccupRandom == null)
-                HiccupRandom = new Random(Session.Area.ID * 77 + (int) Session.Area.Mode * 999);
+            HiccupRandom ??= new Random(Session.Area.ID * 77 + (int) Session.Area.Mode * 999);
             Entities.FindFirst<LightningRenderer>()?.Reset();
             Calc.PushRandom(Session.LevelData.LoadSeed);
             MapData mapData = Session.MapData;
             LevelData levelData = Session.LevelData;
-            Vector2 vector2_1 = new(levelData.Bounds.Left, levelData.Bounds.Top);
+            Vector2 entityOffset = new(levelData.Bounds.Left, levelData.Bounds.Top);
             bool flag3 = playerIntro != Player.IntroTypes.Fall || levelData.Name == "0";
             DarkRoom = levelData.Dark && !Session.GetFlag("ignore_darkness_" + levelData.Name);
             Zoom = 1f;
-            if (Session.Audio == null)
-                Session.Audio = AreaData.Get(Session).Mode[(int) Session.Area.Mode].AudioState.Clone();
+            Session.Audio ??= AreaData.Get(Session).Mode[(int) Session.Area.Mode].AudioState.Clone();
             if (!levelData.DelayAltMusic)
                 Audio.SetAltMusic(SFX.EventnameByHandle(levelData.AltMusic));
             if (levelData.Music.Length > 0)
@@ -263,7 +261,7 @@ namespace Celeste
             if (playerIntro != Player.IntroTypes.Transition)
                 windController.SetStartPattern();
             if (levelData.Underwater)
-                Add(new Water(vector2_1, false, false, levelData.Bounds.Width, levelData.Bounds.Height));
+                Add(new Water(entityOffset, false, false, levelData.Bounds.Width, levelData.Bounds.Height));
             InSpace = levelData.Space;
             if (InSpace)
                 Add(new SpaceController());
@@ -277,75 +275,75 @@ namespace Celeste
                 foreach (Follower follower in entity1.Leader.Followers)
                     entityIdList.Add(follower.ParentEntityID);
             }
-            foreach (EntityData entity2 in levelData.Entities)
+            foreach (EntityData entity in levelData.Entities)
             {
-                int id = entity2.ID;
+                int id = entity.ID;
                 EntityID entityId = new(levelData.Name, id);
                 if (!Session.DoNotLoad.Contains(entityId) && !entityIdList.Contains(entityId))
                 {
-                    switch (entity2.Name)
+                    switch (entity.Name)
                     {
                         case "SoundTest3d":
-                            Add(new _3dSoundTest(entity2, vector2_1));
+                            Add(new _3dSoundTest(entity, entityOffset));
                             continue;
                         case "SummitBackgroundManager":
-                            Add(new AscendManager(entity2, vector2_1));
+                            Add(new AscendManager(entity, entityOffset));
                             continue;
                         case "badelineBoost":
-                            Add(new BadelineBoost(entity2, vector2_1));
+                            Add(new BadelineBoost(entity, entityOffset));
                             continue;
                         case "bigSpinner":
-                            Add(new Bumper(entity2, vector2_1));
+                            Add(new Bumper(entity, entityOffset));
                             continue;
                         case "bigWaterfall":
-                            Add(new BigWaterfall(entity2, vector2_1));
+                            Add(new BigWaterfall(entity, entityOffset));
                             continue;
                         case "bird":
-                            Add(new BirdNPC(entity2, vector2_1));
+                            Add(new BirdNPC(entity, entityOffset));
                             continue;
                         case "birdForsakenCityGem":
-                            Add(new ForsakenCitySatellite(entity2, vector2_1));
+                            Add(new ForsakenCitySatellite(entity, entityOffset));
                             continue;
                         case "birdPath":
-                            Add(new BirdPath(entityId, entity2, vector2_1));
+                            Add(new BirdPath(entityId, entity, entityOffset));
                             continue;
                         case "blackGem":
                             if (!Session.HeartGem || Session.Area.Mode != AreaMode.Normal)
                             {
-                                Add(new HeartGem(entity2, vector2_1));
+                                Add(new HeartGem(entity, entityOffset));
                                 continue;
                             }
                             continue;
                         case "blockField":
-                            Add(new BlockField(entity2, vector2_1));
+                            Add(new BlockField(entity, entityOffset));
                             continue;
                         case "bonfire":
-                            Add(new Bonfire(entity2, vector2_1));
+                            Add(new Bonfire(entity, entityOffset));
                             continue;
                         case "booster":
-                            Add(new Booster(entity2, vector2_1));
+                            Add(new Booster(entity, entityOffset));
                             continue;
                         case "bounceBlock":
-                            Add(new BounceBlock(entity2, vector2_1));
+                            Add(new BounceBlock(entity, entityOffset));
                             continue;
                         case "bridge":
-                            Add(new Bridge(entity2, vector2_1));
+                            Add(new Bridge(entity, entityOffset));
                             continue;
                         case "bridgeFixed":
-                            Add(new BridgeFixed(entity2, vector2_1));
+                            Add(new BridgeFixed(entity, entityOffset));
                             continue;
                         case "cassette":
                             if (!Session.Cassette)
                             {
-                                Add(new Cassette(entity2, vector2_1));
+                                Add(new Cassette(entity, entityOffset));
                                 continue;
                             }
                             continue;
                         case "cassetteBlock":
-                            CassetteBlock cassetteBlock = new(entity2, vector2_1, entityId);
+                            CassetteBlock cassetteBlock = new(entity, entityOffset, entityId);
                             Add(cassetteBlock);
                             HasCassetteBlocks = true;
-                            if (CassetteBlockTempo == 1.0)
+                            if (CassetteBlockTempo == 1f)
                                 CassetteBlockTempo = cassetteBlock.Tempo;
                             CassetteBlockBeats = Math.Max(cassetteBlock.Index + 1, CassetteBlockBeats);
                             if (!flag1)
@@ -360,167 +358,167 @@ namespace Celeste
                             }
                             continue;
                         case "chaserBarrier":
-                            Add(new ChaserBarrier(entity2, vector2_1));
+                            Add(new ChaserBarrier(entity, entityOffset));
                             continue;
                         case "checkpoint":
                             if (flag3)
                             {
-                                Checkpoint checkpoint = new(entity2, vector2_1);
+                                Checkpoint checkpoint = new(entity, entityOffset);
                                 Add(checkpoint);
-                                nullable = new Vector2?(entity2.Position + vector2_1 + checkpoint.SpawnOffset);
+                                nullable = new Vector2?(entity.Position + entityOffset + checkpoint.SpawnOffset);
                                 continue;
                             }
                             continue;
                         case "cliffflag":
-                            Add(new CliffFlags(entity2, vector2_1));
+                            Add(new CliffFlags(entity, entityOffset));
                             continue;
                         case "cliffside_flag":
-                            Add(new CliffsideWindFlag(entity2, vector2_1));
+                            Add(new CliffsideWindFlag(entity, entityOffset));
                             continue;
                         case "clothesline":
-                            Add(new Clothesline(entity2, vector2_1));
+                            Add(new Clothesline(entity, entityOffset));
                             continue;
                         case "cloud":
-                            Add(new Cloud(entity2, vector2_1));
+                            Add(new Cloud(entity, entityOffset));
                             continue;
                         case "clutterCabinet":
-                            Add(new ClutterCabinet(entity2, vector2_1));
+                            Add(new ClutterCabinet(entity, entityOffset));
                             continue;
                         case "clutterDoor":
-                            Add(new ClutterDoor(entity2, vector2_1, Session));
+                            Add(new ClutterDoor(entity, entityOffset, Session));
                             continue;
                         case "cobweb":
-                            Add(new Cobweb(entity2, vector2_1));
+                            Add(new Cobweb(entity, entityOffset));
                             continue;
                         case "colorSwitch":
-                            Add(new ClutterSwitch(entity2, vector2_1));
+                            Add(new ClutterSwitch(entity, entityOffset));
                             continue;
                         case "conditionBlock":
-                            Level.ConditionBlockModes conditionBlockModes = entity2.Enum<Level.ConditionBlockModes>("condition");
+                            ConditionBlockModes conditionBlockModes = entity.Enum<ConditionBlockModes>("condition");
                             EntityID none = EntityID.None;
-                            string[] strArray = entity2.Attr("conditionID").Split(':');
+                            string[] strArray = entity.Attr("conditionID").Split(':');
                             none.Level = strArray[0];
                             none.ID = Convert.ToInt32(strArray[1]);
-                            var flag4 = conditionBlockModes switch
+                            bool hasExitBlock = conditionBlockModes switch
                             {
-                                Level.ConditionBlockModes.Key => Session.DoNotLoad.Contains(none),
-                                Level.ConditionBlockModes.Button => Session.GetFlag(DashSwitch.GetFlagName(none)),
-                                Level.ConditionBlockModes.Strawberry => Session.Strawberries.Contains(none),
+                                ConditionBlockModes.Key => Session.DoNotLoad.Contains(none),
+                                ConditionBlockModes.Button => Session.GetFlag(DashSwitch.GetFlagName(none)),
+                                ConditionBlockModes.Strawberry => Session.Strawberries.Contains(none),
                                 _ => throw new Exception("Condition type not supported!"),
                             };
-                            if (flag4)
+                            if (hasExitBlock)
                             {
-                                Add(new ExitBlock(entity2, vector2_1));
+                                Add(new ExitBlock(entity, entityOffset));
                                 continue;
                             }
                             continue;
                         case "coreMessage":
-                            Add(new CoreMessage(entity2, vector2_1));
+                            Add(new CoreMessage(entity, entityOffset));
                             continue;
                         case "coreModeToggle":
-                            Add(new CoreModeToggle(entity2, vector2_1));
+                            Add(new CoreModeToggle(entity, entityOffset));
                             continue;
                         case "coverupWall":
-                            Add(new CoverupWall(entity2, vector2_1));
+                            Add(new CoverupWall(entity, entityOffset));
                             continue;
                         case "crumbleBlock":
-                            Add(new CrumblePlatform(entity2, vector2_1));
+                            Add(new CrumblePlatform(entity, entityOffset));
                             continue;
                         case "crumbleWallOnRumble":
-                            Add(new CrumbleWallOnRumble(entity2, vector2_1, entityId));
+                            Add(new CrumbleWallOnRumble(entity, entityOffset, entityId));
                             continue;
                         case "crushBlock":
-                            Add(new CrushBlock(entity2, vector2_1));
+                            Add(new CrushBlock(entity, entityOffset));
                             continue;
                         case "cutsceneNode":
-                            Add(new CutsceneNode(entity2, vector2_1));
+                            Add(new CutsceneNode(entity, entityOffset));
                             continue;
                         case "darkChaser":
-                            Add(new BadelineOldsite(entity2, vector2_1, index1));
+                            Add(new BadelineOldsite(entity, entityOffset, index1));
                             ++index1;
                             continue;
                         case "dashBlock":
-                            Add(new DashBlock(entity2, vector2_1, entityId));
+                            Add(new DashBlock(entity, entityOffset, entityId));
                             continue;
                         case "dashSwitchH":
                         case "dashSwitchV":
-                            Add(DashSwitch.Create(entity2, vector2_1, entityId));
+                            Add(DashSwitch.Create(entity, entityOffset, entityId));
                             continue;
                         case "door":
-                            Add(new Door(entity2, vector2_1));
+                            Add(new Door(entity, entityOffset));
                             continue;
                         case "dreamBlock":
-                            Add(new DreamBlock(entity2, vector2_1));
+                            Add(new DreamBlock(entity, entityOffset));
                             continue;
                         case "dreamHeartGem":
                             if (!Session.HeartGem)
                             {
-                                Add(new DreamHeartGem(entity2, vector2_1));
+                                Add(new DreamHeartGem(entity, entityOffset));
                                 continue;
                             }
                             continue;
                         case "dreammirror":
-                            Add(new DreamMirror(vector2_1 + entity2.Position));
+                            Add(new DreamMirror(entityOffset + entity.Position));
                             continue;
                         case "exitBlock":
-                            Add(new ExitBlock(entity2, vector2_1));
+                            Add(new ExitBlock(entity, entityOffset));
                             continue;
                         case "eyebomb":
-                            Add(new Puffer(entity2, vector2_1));
+                            Add(new Puffer(entity, entityOffset));
                             continue;
                         case "fakeBlock":
-                            Add(new FakeWall(entityId, entity2, vector2_1, FakeWall.Modes.Block));
+                            Add(new FakeWall(entityId, entity, entityOffset, FakeWall.Modes.Block));
                             continue;
                         case "fakeHeart":
-                            Add(new FakeHeart(entity2, vector2_1));
+                            Add(new FakeHeart(entity, entityOffset));
                             continue;
                         case "fakeWall":
-                            Add(new FakeWall(entityId, entity2, vector2_1, FakeWall.Modes.Wall));
+                            Add(new FakeWall(entityId, entity, entityOffset, FakeWall.Modes.Wall));
                             continue;
                         case "fallingBlock":
-                            Add(new FallingBlock(entity2, vector2_1));
+                            Add(new FallingBlock(entity, entityOffset));
                             continue;
                         case "finalBoss":
-                            Add(new FinalBoss(entity2, vector2_1));
+                            Add(new FinalBoss(entity, entityOffset));
                             continue;
                         case "finalBossFallingBlock":
-                            Add(FallingBlock.CreateFinalBossBlock(entity2, vector2_1));
+                            Add(FallingBlock.CreateFinalBossBlock(entity, entityOffset));
                             continue;
                         case "finalBossMovingBlock":
-                            Add(new FinalBossMovingBlock(entity2, vector2_1));
+                            Add(new FinalBossMovingBlock(entity, entityOffset));
                             continue;
                         case "fireBall":
-                            Add(new FireBall(entity2, vector2_1));
+                            Add(new FireBall(entity, entityOffset));
                             continue;
                         case "fireBarrier":
-                            Add(new FireBarrier(entity2, vector2_1));
+                            Add(new FireBarrier(entity, entityOffset));
                             continue;
                         case "flingBird":
-                            Add(new FlingBird(entity2, vector2_1));
+                            Add(new FlingBird(entity, entityOffset));
                             continue;
                         case "flingBirdIntro":
-                            Add(new FlingBirdIntro(entity2, vector2_1));
+                            Add(new FlingBirdIntro(entity, entityOffset));
                             continue;
                         case "floatingDebris":
-                            Add(new FloatingDebris(entity2, vector2_1));
+                            Add(new FloatingDebris(entity, entityOffset));
                             continue;
                         case "floatySpaceBlock":
-                            Add(new FloatySpaceBlock(entity2, vector2_1));
+                            Add(new FloatySpaceBlock(entity, entityOffset));
                             continue;
                         case "flutterbird":
-                            Add(new FlutterBird(entity2, vector2_1));
+                            Add(new FlutterBird(entity, entityOffset));
                             continue;
                         case "foregroundDebris":
-                            Add(new ForegroundDebris(entity2, vector2_1));
+                            Add(new ForegroundDebris(entity, entityOffset));
                             continue;
                         case "friendlyGhost":
-                            Add(new AngryOshiro(entity2, vector2_1));
+                            Add(new AngryOshiro(entity, entityOffset));
                             continue;
                         case "glassBlock":
-                            Add(new GlassBlock(entity2, vector2_1));
+                            Add(new GlassBlock(entity, entityOffset));
                             continue;
                         case "glider":
-                            Add(new Glider(entity2, vector2_1));
+                            Add(new Glider(entity, entityOffset));
                             continue;
                         case "goldenBerry":
                             int num1 = SaveData.Instance.CheatMode ? 1 : 0;
@@ -529,120 +527,120 @@ namespace Celeste
                             bool completed = SaveData.Instance.Areas[Session.Area.ID].Modes[(int) Session.Area.Mode].Completed;
                             if (((num1 != 0 ? 1 : (flag6 & completed ? 1 : 0)) & (flag5 ? 1 : 0)) != 0)
                             {
-                                Add(new Strawberry(entity2, vector2_1, entityId));
+                                Add(new Strawberry(entity, entityOffset, entityId));
                                 continue;
                             }
                             continue;
                         case "goldenBlock":
-                            Add(new GoldenBlock(entity2, vector2_1));
+                            Add(new GoldenBlock(entity, entityOffset));
                             continue;
                         case "gondola":
-                            Add(new Gondola(entity2, vector2_1));
+                            Add(new Gondola(entity, entityOffset));
                             continue;
                         case "greenBlocks":
                             ClutterBlockGenerator.Init(this);
-                            ClutterBlockGenerator.Add((int) (entity2.Position.X / 8.0), (int) (entity2.Position.Y / 8.0), entity2.Width / 8, entity2.Height / 8, ClutterBlock.Colors.Green);
+                            ClutterBlockGenerator.Add((int) (entity.Position.X / 8.0), (int) (entity.Position.Y / 8.0), entity.Width / 8, entity.Height / 8, ClutterBlock.Colors.Green);
                             continue;
                         case "hahaha":
-                            Add(new Hahaha(entity2, vector2_1));
+                            Add(new Hahaha(entity, entityOffset));
                             continue;
                         case "hanginglamp":
-                            Add(new HangingLamp(entity2, vector2_1 + entity2.Position));
+                            Add(new HangingLamp(entity, entityOffset + entity.Position));
                             continue;
                         case "heartGemDoor":
-                            Add(new HeartGemDoor(entity2, vector2_1));
+                            Add(new HeartGemDoor(entity, entityOffset));
                             continue;
                         case "iceBlock":
-                            Add(new IceBlock(entity2, vector2_1));
+                            Add(new IceBlock(entity, entityOffset));
                             continue;
                         case "infiniteStar":
-                            Add(new FlyFeather(entity2, vector2_1));
+                            Add(new FlyFeather(entity, entityOffset));
                             continue;
                         case "introCar":
-                            Add(new IntroCar(entity2, vector2_1));
+                            Add(new IntroCar(entity, entityOffset));
                             continue;
                         case "introCrusher":
-                            Add(new IntroCrusher(entity2, vector2_1));
+                            Add(new IntroCrusher(entity, entityOffset));
                             continue;
                         case "invisibleBarrier":
-                            Add(new InvisibleBarrier(entity2, vector2_1));
+                            Add(new InvisibleBarrier(entity, entityOffset));
                             continue;
                         case "jumpThru":
-                            Add(new JumpthruPlatform(entity2, vector2_1));
+                            Add(new JumpthruPlatform(entity, entityOffset));
                             continue;
                         case "kevins_pc":
-                            Add(new KevinsPC(entity2, vector2_1));
+                            Add(new KevinsPC(entity, entityOffset));
                             continue;
                         case "key":
-                            Add(new Key(entity2, vector2_1, entityId));
+                            Add(new Key(entity, entityOffset, entityId));
                             continue;
                         case "killbox":
-                            Add(new Killbox(entity2, vector2_1));
+                            Add(new Killbox(entity, entityOffset));
                             continue;
                         case "lamp":
-                            Add(new Lamp(vector2_1 + entity2.Position, entity2.Bool("broken")));
+                            Add(new Lamp(entityOffset + entity.Position, entity.Bool("broken")));
                             continue;
                         case "light":
-                            Add(new PropLight(entity2, vector2_1));
+                            Add(new PropLight(entity, entityOffset));
                             continue;
                         case "lightbeam":
-                            Add(new LightBeam(entity2, vector2_1));
+                            Add(new LightBeam(entity, entityOffset));
                             continue;
                         case "lightning":
-                            if (entity2.Bool("perLevel") || !Session.GetFlag("disable_lightning"))
+                            if (entity.Bool("perLevel") || !Session.GetFlag("disable_lightning"))
                             {
-                                Add(new Lightning(entity2, vector2_1));
+                                Add(new Lightning(entity, entityOffset));
                                 flag2 = true;
                                 continue;
                             }
                             continue;
                         case "lightningBlock":
-                            Add(new LightningBreakerBox(entity2, vector2_1));
+                            Add(new LightningBreakerBox(entity, entityOffset));
                             continue;
                         case "lockBlock":
-                            Add(new LockBlock(entity2, vector2_1, entityId));
+                            Add(new LockBlock(entity, entityOffset, entityId));
                             continue;
                         case "memorial":
-                            Add(new Memorial(entity2, vector2_1));
+                            Add(new Memorial(entity, entityOffset));
                             continue;
                         case "memorialTextController":
                             if (Session.Dashes == 0 && Session.StartedFromBeginning)
                             {
-                                Add(new Strawberry(entity2, vector2_1, entityId));
+                                Add(new Strawberry(entity, entityOffset, entityId));
                                 continue;
                             }
                             continue;
                         case "moonCreature":
-                            Add(new MoonCreature(entity2, vector2_1));
+                            Add(new MoonCreature(entity, entityOffset));
                             continue;
                         case "moveBlock":
-                            Add(new MoveBlock(entity2, vector2_1));
+                            Add(new MoveBlock(entity, entityOffset));
                             continue;
                         case "movingPlatform":
-                            Add(new MovingPlatform(entity2, vector2_1));
+                            Add(new MovingPlatform(entity, entityOffset));
                             continue;
                         case "negaBlock":
-                            Add(new NegaBlock(entity2, vector2_1));
+                            Add(new NegaBlock(entity, entityOffset));
                             continue;
                         case "npc":
-                            string lower = entity2.Attr("npc").ToLower();
-                            Vector2 position = entity2.Position + vector2_1;
-                            if (lower == "granny_00_house")
+                            string npcName = entity.Attr("npc").ToLower();
+                            Vector2 position = entity.Position + entityOffset;
+                            if (npcName == "granny_00_house")
                             {
                                 Add(new NPC00_Granny(position));
                                 continue;
                             }
-                            if (lower == "theo_01_campfire")
+                            if (npcName == "theo_01_campfire")
                             {
                                 Add(new NPC01_Theo(position));
                                 continue;
                             }
-                            if (lower == "theo_02_campfire")
+                            if (npcName == "theo_02_campfire")
                             {
                                 Add(new NPC02_Theo(position));
                                 continue;
                             }
-                            if (lower == "theo_03_escaping")
+                            if (npcName == "theo_03_escaping")
                             {
                                 if (!Session.GetFlag("resort_theo"))
                                 {
@@ -651,204 +649,204 @@ namespace Celeste
                                 }
                                 continue;
                             }
-                            if (lower == "theo_03_vents")
+                            if (npcName == "theo_03_vents")
                             {
                                 Add(new NPC03_Theo_Vents(position));
                                 continue;
                             }
-                            if (lower == "oshiro_03_lobby")
+                            if (npcName == "oshiro_03_lobby")
                             {
                                 Add(new NPC03_Oshiro_Lobby(position));
                                 continue;
                             }
-                            if (lower == "oshiro_03_hallway")
+                            if (npcName == "oshiro_03_hallway")
                             {
                                 Add(new NPC03_Oshiro_Hallway1(position));
                                 continue;
                             }
-                            if (lower == "oshiro_03_hallway2")
+                            if (npcName == "oshiro_03_hallway2")
                             {
                                 Add(new NPC03_Oshiro_Hallway2(position));
                                 continue;
                             }
-                            if (lower == "oshiro_03_bigroom")
+                            if (npcName == "oshiro_03_bigroom")
                             {
-                                Add(new NPC03_Oshiro_Cluttter(entity2, vector2_1));
+                                Add(new NPC03_Oshiro_Cluttter(entity, entityOffset));
                                 continue;
                             }
-                            if (lower == "oshiro_03_breakdown")
+                            if (npcName == "oshiro_03_breakdown")
                             {
                                 Add(new NPC03_Oshiro_Breakdown(position));
                                 continue;
                             }
-                            if (lower == "oshiro_03_suite")
+                            if (npcName == "oshiro_03_suite")
                             {
                                 Add(new NPC03_Oshiro_Suite(position));
                                 continue;
                             }
-                            if (lower == "oshiro_03_rooftop")
+                            if (npcName == "oshiro_03_rooftop")
                             {
                                 Add(new NPC03_Oshiro_Rooftop(position));
                                 continue;
                             }
-                            if (lower == "granny_04_cliffside")
+                            if (npcName == "granny_04_cliffside")
                             {
                                 Add(new NPC04_Granny(position));
                                 continue;
                             }
-                            if (lower == "theo_04_cliffside")
+                            if (npcName == "theo_04_cliffside")
                             {
                                 Add(new NPC04_Theo(position));
                                 continue;
                             }
-                            if (lower == "theo_05_entrance")
+                            if (npcName == "theo_05_entrance")
                             {
                                 Add(new NPC05_Theo_Entrance(position));
                                 continue;
                             }
-                            if (lower == "theo_05_inmirror")
+                            if (npcName == "theo_05_inmirror")
                             {
                                 Add(new NPC05_Theo_Mirror(position));
                                 continue;
                             }
-                            if (lower == "evil_05")
+                            if (npcName == "evil_05")
                             {
-                                Add(new NPC05_Badeline(entity2, vector2_1));
+                                Add(new NPC05_Badeline(entity, entityOffset));
                                 continue;
                             }
-                            if (lower == "theo_06_plateau")
+                            if (npcName == "theo_06_plateau")
                             {
-                                Add(new NPC06_Theo_Plateau(entity2, vector2_1));
+                                Add(new NPC06_Theo_Plateau(entity, entityOffset));
                                 continue;
                             }
-                            if (lower == "granny_06_intro")
+                            if (npcName == "granny_06_intro")
                             {
-                                Add(new NPC06_Granny(entity2, vector2_1));
+                                Add(new NPC06_Granny(entity, entityOffset));
                                 continue;
                             }
-                            if (lower == "badeline_06_crying")
+                            if (npcName == "badeline_06_crying")
                             {
-                                Add(new NPC06_Badeline_Crying(entity2, vector2_1));
+                                Add(new NPC06_Badeline_Crying(entity, entityOffset));
                                 continue;
                             }
-                            if (lower == "granny_06_ending")
+                            if (npcName == "granny_06_ending")
                             {
-                                Add(new NPC06_Granny_Ending(entity2, vector2_1));
+                                Add(new NPC06_Granny_Ending(entity, entityOffset));
                                 continue;
                             }
-                            if (lower == "theo_06_ending")
+                            if (npcName == "theo_06_ending")
                             {
-                                Add(new NPC06_Theo_Ending(entity2, vector2_1));
+                                Add(new NPC06_Theo_Ending(entity, entityOffset));
                                 continue;
                             }
-                            if (lower == "granny_07x")
+                            if (npcName == "granny_07x")
                             {
-                                Add(new NPC07X_Granny_Ending(entity2, vector2_1));
+                                Add(new NPC07X_Granny_Ending(entity, entityOffset));
                                 continue;
                             }
-                            if (lower == "theo_08_inside")
+                            if (npcName == "theo_08_inside")
                             {
-                                Add(new NPC08_Theo(entity2, vector2_1));
+                                Add(new NPC08_Theo(entity, entityOffset));
                                 continue;
                             }
-                            if (lower == "granny_08_inside")
+                            if (npcName == "granny_08_inside")
                             {
-                                Add(new NPC08_Granny(entity2, vector2_1));
+                                Add(new NPC08_Granny(entity, entityOffset));
                                 continue;
                             }
-                            if (lower == "granny_09_outside")
+                            if (npcName == "granny_09_outside")
                             {
-                                Add(new NPC09_Granny_Outside(entity2, vector2_1));
+                                Add(new NPC09_Granny_Outside(entity, entityOffset));
                                 continue;
                             }
-                            if (lower == "granny_09_inside")
+                            if (npcName == "granny_09_inside")
                             {
-                                Add(new NPC09_Granny_Inside(entity2, vector2_1));
+                                Add(new NPC09_Granny_Inside(entity, entityOffset));
                                 continue;
                             }
-                            if (lower == "gravestone_10")
+                            if (npcName == "gravestone_10")
                             {
-                                Add(new NPC10_Gravestone(entity2, vector2_1));
+                                Add(new NPC10_Gravestone(entity, entityOffset));
                                 continue;
                             }
-                            if (lower == "granny_10_never")
+                            if (npcName == "granny_10_never")
                             {
-                                Add(new NPC07X_Granny_Ending(entity2, vector2_1, true));
+                                Add(new NPC07X_Granny_Ending(entity, entityOffset, true));
                                 continue;
                             }
                             continue;
                         case "oshirodoor":
-                            Add(new MrOshiroDoor(entity2, vector2_1));
+                            Add(new MrOshiroDoor(entity, entityOffset));
                             continue;
                         case "payphone":
-                            Add(new Payphone(vector2_1 + entity2.Position));
+                            Add(new Payphone(entityOffset + entity.Position));
                             continue;
                         case "picoconsole":
-                            Add(new PicoConsole(entity2, vector2_1));
+                            Add(new PicoConsole(entity, entityOffset));
                             continue;
                         case "plateau":
-                            Add(new Plateau(entity2, vector2_1));
+                            Add(new Plateau(entity, entityOffset));
                             continue;
                         case "playbackBillboard":
-                            Add(new PlaybackBillboard(entity2, vector2_1));
+                            Add(new PlaybackBillboard(entity, entityOffset));
                             continue;
                         case "playbackTutorial":
-                            Add(new PlayerPlayback(entity2, vector2_1));
+                            Add(new PlayerPlayback(entity, entityOffset));
                             continue;
                         case "playerSeeker":
-                            Add(new PlayerSeeker(entity2, vector2_1));
+                            Add(new PlayerSeeker(entity, entityOffset));
                             continue;
                         case "powerSourceNumber":
-                            Add(new PowerSourceNumber(entity2.Position + vector2_1, entity2.Int("number", 1), GotCollectables(entity2)));
+                            Add(new PowerSourceNumber(entity.Position + entityOffset, entity.Int("number", 1), GotCollectables(entity)));
                             continue;
                         case "redBlocks":
                             ClutterBlockGenerator.Init(this);
-                            ClutterBlockGenerator.Add((int) (entity2.Position.X / 8.0), (int) (entity2.Position.Y / 8.0), entity2.Width / 8, entity2.Height / 8, ClutterBlock.Colors.Red);
+                            ClutterBlockGenerator.Add((int) (entity.Position.X / 8.0), (int) (entity.Position.Y / 8.0), entity.Width / 8, entity.Height / 8, ClutterBlock.Colors.Red);
                             continue;
                         case "refill":
-                            Add(new Refill(entity2, vector2_1));
+                            Add(new Refill(entity, entityOffset));
                             continue;
                         case "reflectionHeartStatue":
-                            Add(new ReflectionHeartStatue(entity2, vector2_1));
+                            Add(new ReflectionHeartStatue(entity, entityOffset));
                             continue;
                         case "resortLantern":
-                            Add(new ResortLantern(entity2, vector2_1));
+                            Add(new ResortLantern(entity, entityOffset));
                             continue;
                         case "resortRoofEnding":
-                            Add(new ResortRoofEnding(entity2, vector2_1));
+                            Add(new ResortRoofEnding(entity, entityOffset));
                             continue;
                         case "resortmirror":
-                            Add(new ResortMirror(entity2, vector2_1));
+                            Add(new ResortMirror(entity, entityOffset));
                             continue;
                         case "ridgeGate":
-                            if (GotCollectables(entity2))
+                            if (GotCollectables(entity))
                             {
-                                Add(new RidgeGate(entity2, vector2_1));
+                                Add(new RidgeGate(entity, entityOffset));
                                 continue;
                             }
                             continue;
                         case "risingLava":
-                            Add(new RisingLava(entity2, vector2_1));
+                            Add(new RisingLava(entity, entityOffset));
                             continue;
                         case "rotateSpinner":
                             if (Session.Area.ID == 10)
                             {
-                                Add(new StarRotateSpinner(entity2, vector2_1));
+                                Add(new StarRotateSpinner(entity, entityOffset));
                                 continue;
                             }
                             if (Session.Area.ID == 3 || Session.Area.ID == 7 && Session.Level.StartsWith("d-"))
                             {
-                                Add(new DustRotateSpinner(entity2, vector2_1));
+                                Add(new DustRotateSpinner(entity, entityOffset));
                                 continue;
                             }
-                            Add(new BladeRotateSpinner(entity2, vector2_1));
+                            Add(new BladeRotateSpinner(entity, entityOffset));
                             continue;
                         case "rotatingPlatforms":
-                            Vector2 vector2_2 = entity2.Position + vector2_1;
-                            Vector2 center = entity2.Nodes[0] + vector2_1;
-                            int width = entity2.Width;
-                            int num2 = entity2.Int("platforms");
-                            bool clockwise = entity2.Bool("clockwise");
+                            Vector2 vector2_2 = entity.Position + entityOffset;
+                            Vector2 center = entity.Nodes[0] + entityOffset;
+                            int width = entity.Width;
+                            int num2 = entity.Int("platforms");
+                            bool clockwise = entity.Bool("clockwise");
                             float length = (vector2_2 - center).Length();
                             float num3 = (vector2_2 - center).Angle();
                             float num4 = 6.28318548f / num2;
@@ -859,42 +857,42 @@ namespace Celeste
                             }
                             continue;
                         case "sandwichLava":
-                            Add(new SandwichLava(entity2, vector2_1));
+                            Add(new SandwichLava(entity, entityOffset));
                             continue;
                         case "seeker":
-                            Add(new Seeker(entity2, vector2_1));
+                            Add(new Seeker(entity, entityOffset));
                             continue;
                         case "seekerBarrier":
-                            Add(new SeekerBarrier(entity2, vector2_1));
+                            Add(new SeekerBarrier(entity, entityOffset));
                             continue;
                         case "seekerStatue":
-                            Add(new SeekerStatue(entity2, vector2_1));
+                            Add(new SeekerStatue(entity, entityOffset));
                             continue;
                         case "sinkingPlatform":
-                            Add(new SinkingPlatform(entity2, vector2_1));
+                            Add(new SinkingPlatform(entity, entityOffset));
                             continue;
                         case "slider":
-                            Add(new Slider(entity2, vector2_1));
+                            Add(new Slider(entity, entityOffset));
                             continue;
                         case "soundSource":
-                            Add(new SoundSourceEntity(entity2, vector2_1));
+                            Add(new SoundSourceEntity(entity, entityOffset));
                             continue;
                         case "spikesDown":
-                            Add(new Spikes(entity2, vector2_1, Spikes.Directions.Down));
+                            Add(new Spikes(entity, entityOffset, Spikes.Directions.Down));
                             continue;
                         case "spikesLeft":
-                            Add(new Spikes(entity2, vector2_1, Spikes.Directions.Left));
+                            Add(new Spikes(entity, entityOffset, Spikes.Directions.Left));
                             continue;
                         case "spikesRight":
-                            Add(new Spikes(entity2, vector2_1, Spikes.Directions.Right));
+                            Add(new Spikes(entity, entityOffset, Spikes.Directions.Right));
                             continue;
                         case "spikesUp":
-                            Add(new Spikes(entity2, vector2_1, Spikes.Directions.Up));
+                            Add(new Spikes(entity, entityOffset, Spikes.Directions.Up));
                             continue;
                         case "spinner":
                             if (Session.Area.ID == 3 || Session.Area.ID == 7 && Session.Level.StartsWith("d-"))
                             {
-                                Add(new DustStaticSpinner(entity2, vector2_1));
+                                Add(new DustStaticSpinner(entity, entityOffset));
                                 continue;
                             }
                             CrystalColor color = CrystalColor.Blue;
@@ -904,133 +902,133 @@ namespace Celeste
                                 color = CrystalColor.Purple;
                             else if (Session.Area.ID == 10)
                                 color = CrystalColor.Rainbow;
-                            Add(new CrystalStaticSpinner(entity2, vector2_1, color));
+                            Add(new CrystalStaticSpinner(entity, entityOffset, color));
                             continue;
                         case "spring":
-                            Add(new Spring(entity2, vector2_1, Spring.Orientations.Floor));
+                            Add(new Spring(entity, entityOffset, Spring.Orientations.Floor));
                             continue;
                         case "starClimbController":
                             Add(new StarJumpController());
                             continue;
                         case "starJumpBlock":
-                            Add(new StarJumpBlock(entity2, vector2_1));
+                            Add(new StarJumpBlock(entity, entityOffset));
                             continue;
                         case "strawberry":
-                            Add(new Strawberry(entity2, vector2_1, entityId));
+                            Add(new Strawberry(entity, entityOffset, entityId));
                             continue;
                         case "summitGemManager":
-                            Add(new SummitGemManager(entity2, vector2_1));
+                            Add(new SummitGemManager(entity, entityOffset));
                             continue;
                         case "summitcheckpoint":
-                            Add(new SummitCheckpoint(entity2, vector2_1));
+                            Add(new SummitCheckpoint(entity, entityOffset));
                             continue;
                         case "summitcloud":
-                            Add(new SummitCloud(entity2, vector2_1));
+                            Add(new SummitCloud(entity, entityOffset));
                             continue;
                         case "summitgem":
-                            Add(new SummitGem(entity2, vector2_1, entityId));
+                            Add(new SummitGem(entity, entityOffset, entityId));
                             continue;
                         case "swapBlock":
                         case "switchBlock":
-                            Add(new SwapBlock(entity2, vector2_1));
+                            Add(new SwapBlock(entity, entityOffset));
                             continue;
                         case "switchGate":
-                            Add(new SwitchGate(entity2, vector2_1));
+                            Add(new SwitchGate(entity, entityOffset));
                             continue;
                         case "templeBigEyeball":
-                            Add(new TempleBigEyeball(entity2, vector2_1));
+                            Add(new TempleBigEyeball(entity, entityOffset));
                             continue;
                         case "templeCrackedBlock":
-                            Add(new TempleCrackedBlock(entityId, entity2, vector2_1));
+                            Add(new TempleCrackedBlock(entityId, entity, entityOffset));
                             continue;
                         case "templeEye":
-                            Add(new TempleEye(entity2, vector2_1));
+                            Add(new TempleEye(entity, entityOffset));
                             continue;
                         case "templeGate":
-                            Add(new TempleGate(entity2, vector2_1, levelData.Name));
+                            Add(new TempleGate(entity, entityOffset, levelData.Name));
                             continue;
                         case "templeMirror":
-                            Add(new TempleMirror(entity2, vector2_1));
+                            Add(new TempleMirror(entity, entityOffset));
                             continue;
                         case "templeMirrorPortal":
-                            Add(new TempleMirrorPortal(entity2, vector2_1));
+                            Add(new TempleMirrorPortal(entity, entityOffset));
                             continue;
                         case "tentacles":
-                            Add(new ReflectionTentacles(entity2, vector2_1));
+                            Add(new ReflectionTentacles(entity, entityOffset));
                             continue;
                         case "theoCrystal":
-                            Add(new TheoCrystal(entity2, vector2_1));
+                            Add(new TheoCrystal(entity, entityOffset));
                             continue;
                         case "theoCrystalPedestal":
-                            Add(new TheoCrystalPedestal(entity2, vector2_1));
+                            Add(new TheoCrystalPedestal(entity, entityOffset));
                             continue;
                         case "torch":
-                            Add(new Torch(entity2, vector2_1, entityId));
+                            Add(new Torch(entity, entityOffset, entityId));
                             continue;
                         case "touchSwitch":
-                            Add(new TouchSwitch(entity2, vector2_1));
+                            Add(new TouchSwitch(entity, entityOffset));
                             continue;
                         case "towerviewer":
-                            Add(new Lookout(entity2, vector2_1));
+                            Add(new Lookout(entity, entityOffset));
                             continue;
                         case "trackSpinner":
                             if (Session.Area.ID == 10)
                             {
-                                Add(new StarTrackSpinner(entity2, vector2_1));
+                                Add(new StarTrackSpinner(entity, entityOffset));
                                 continue;
                             }
                             if (Session.Area.ID == 3 || Session.Area.ID == 7 && Session.Level.StartsWith("d-"))
                             {
-                                Add(new DustTrackSpinner(entity2, vector2_1));
+                                Add(new DustTrackSpinner(entity, entityOffset));
                                 continue;
                             }
-                            Add(new BladeTrackSpinner(entity2, vector2_1));
+                            Add(new BladeTrackSpinner(entity, entityOffset));
                             continue;
                         case "trapdoor":
-                            Add(new Trapdoor(entity2, vector2_1));
+                            Add(new Trapdoor(entity, entityOffset));
                             continue;
                         case "triggerSpikesDown":
-                            Add(new TriggerSpikes(entity2, vector2_1, TriggerSpikes.Directions.Down));
+                            Add(new TriggerSpikes(entity, entityOffset, TriggerSpikes.Directions.Down));
                             continue;
                         case "triggerSpikesLeft":
-                            Add(new TriggerSpikes(entity2, vector2_1, TriggerSpikes.Directions.Left));
+                            Add(new TriggerSpikes(entity, entityOffset, TriggerSpikes.Directions.Left));
                             continue;
                         case "triggerSpikesRight":
-                            Add(new TriggerSpikes(entity2, vector2_1, TriggerSpikes.Directions.Right));
+                            Add(new TriggerSpikes(entity, entityOffset, TriggerSpikes.Directions.Right));
                             continue;
                         case "triggerSpikesUp":
-                            Add(new TriggerSpikes(entity2, vector2_1, TriggerSpikes.Directions.Up));
+                            Add(new TriggerSpikes(entity, entityOffset, TriggerSpikes.Directions.Up));
                             continue;
                         case "wallBooster":
-                            Add(new WallBooster(entity2, vector2_1));
+                            Add(new WallBooster(entity, entityOffset));
                             continue;
                         case "wallSpringLeft":
-                            Add(new Spring(entity2, vector2_1, Spring.Orientations.WallLeft));
+                            Add(new Spring(entity, entityOffset, Spring.Orientations.WallLeft));
                             continue;
                         case "wallSpringRight":
-                            Add(new Spring(entity2, vector2_1, Spring.Orientations.WallRight));
+                            Add(new Spring(entity, entityOffset, Spring.Orientations.WallRight));
                             continue;
                         case "water":
-                            Add(new Water(entity2, vector2_1));
+                            Add(new Water(entity, entityOffset));
                             continue;
                         case "waterfall":
-                            Add(new WaterFall(entity2, vector2_1));
+                            Add(new WaterFall(entity, entityOffset));
                             continue;
                         case "wavedashmachine":
-                            Add(new WaveDashTutorialMachine(entity2, vector2_1));
+                            Add(new WaveDashTutorialMachine(entity, entityOffset));
                             continue;
                         case "whiteblock":
-                            Add(new WhiteBlock(entity2, vector2_1));
+                            Add(new WhiteBlock(entity, entityOffset));
                             continue;
                         case "wire":
-                            Add(new Wire(entity2, vector2_1));
+                            Add(new Wire(entity, entityOffset));
                             continue;
                         case "yellowBlocks":
                             ClutterBlockGenerator.Init(this);
-                            ClutterBlockGenerator.Add((int) (entity2.Position.X / 8.0), (int) (entity2.Position.Y / 8.0), entity2.Width / 8, entity2.Height / 8, ClutterBlock.Colors.Yellow);
+                            ClutterBlockGenerator.Add((int) (entity.Position.X / 8.0), (int) (entity.Position.Y / 8.0), entity.Width / 8, entity.Height / 8, ClutterBlock.Colors.Yellow);
                             continue;
                         case "zipMover":
-                            Add(new ZipMover(entity2, vector2_1));
+                            Add(new ZipMover(entity, entityOffset));
                             continue;
                         default:
                             continue;
@@ -1047,96 +1045,96 @@ namespace Celeste
                     switch (trigger.Name)
                     {
                         case "altMusicTrigger":
-                            Add(new AltMusicTrigger(trigger, vector2_1));
+                            Add(new AltMusicTrigger(trigger, entityOffset));
                             continue;
                         case "ambienceParamTrigger":
-                            Add(new AmbienceParamTrigger(trigger, vector2_1));
+                            Add(new AmbienceParamTrigger(trigger, entityOffset));
                             continue;
                         case "birdPathTrigger":
-                            Add(new BirdPathTrigger(trigger, vector2_1));
+                            Add(new BirdPathTrigger(trigger, entityOffset));
                             continue;
                         case "blackholeStrength":
-                            Add(new BlackholeStrengthTrigger(trigger, vector2_1));
+                            Add(new BlackholeStrengthTrigger(trigger, entityOffset));
                             continue;
                         case "bloomFadeTrigger":
-                            Add(new BloomFadeTrigger(trigger, vector2_1));
+                            Add(new BloomFadeTrigger(trigger, entityOffset));
                             continue;
                         case "cameraAdvanceTargetTrigger":
-                            Add(new CameraAdvanceTargetTrigger(trigger, vector2_1));
+                            Add(new CameraAdvanceTargetTrigger(trigger, entityOffset));
                             continue;
                         case "cameraOffsetTrigger":
-                            Add(new CameraOffsetTrigger(trigger, vector2_1));
+                            Add(new CameraOffsetTrigger(trigger, entityOffset));
                             continue;
                         case "cameraTargetTrigger":
                             string flag7 = trigger.Attr("deleteFlag");
                             if (string.IsNullOrEmpty(flag7) || !Session.GetFlag(flag7))
                             {
-                                Add(new CameraTargetTrigger(trigger, vector2_1));
+                                Add(new CameraTargetTrigger(trigger, entityOffset));
                                 continue;
                             }
                             continue;
                         case "changeRespawnTrigger":
-                            Add(new ChangeRespawnTrigger(trigger, vector2_1));
+                            Add(new ChangeRespawnTrigger(trigger, entityOffset));
                             continue;
                         case "checkpointBlockerTrigger":
-                            Add(new CheckpointBlockerTrigger(trigger, vector2_1));
+                            Add(new CheckpointBlockerTrigger(trigger, entityOffset));
                             continue;
                         case "creditsTrigger":
-                            Add(new CreditsTrigger(trigger, vector2_1));
+                            Add(new CreditsTrigger(trigger, entityOffset));
                             continue;
                         case "detachFollowersTrigger":
-                            Add(new DetachStrawberryTrigger(trigger, vector2_1));
+                            Add(new DetachStrawberryTrigger(trigger, entityOffset));
                             continue;
                         case "eventTrigger":
-                            Add(new EventTrigger(trigger, vector2_1));
+                            Add(new EventTrigger(trigger, entityOffset));
                             continue;
                         case "goldenBerryCollectTrigger":
-                            Add(new GoldBerryCollectTrigger(trigger, vector2_1));
+                            Add(new GoldBerryCollectTrigger(trigger, entityOffset));
                             continue;
                         case "interactTrigger":
-                            Add(new InteractTrigger(trigger, vector2_1));
+                            Add(new InteractTrigger(trigger, entityOffset));
                             continue;
                         case "lightFadeTrigger":
-                            Add(new LightFadeTrigger(trigger, vector2_1));
+                            Add(new LightFadeTrigger(trigger, entityOffset));
                             continue;
                         case "lookoutBlocker":
-                            Add(new LookoutBlocker(trigger, vector2_1));
+                            Add(new LookoutBlocker(trigger, entityOffset));
                             continue;
                         case "minitextboxTrigger":
-                            Add(new MiniTextboxTrigger(trigger, vector2_1, id));
+                            Add(new MiniTextboxTrigger(trigger, entityOffset, id));
                             continue;
                         case "moonGlitchBackgroundTrigger":
-                            Add(new MoonGlitchBackgroundTrigger(trigger, vector2_1));
+                            Add(new MoonGlitchBackgroundTrigger(trigger, entityOffset));
                             continue;
                         case "musicFadeTrigger":
-                            Add(new MusicFadeTrigger(trigger, vector2_1));
+                            Add(new MusicFadeTrigger(trigger, entityOffset));
                             continue;
                         case "musicTrigger":
-                            Add(new MusicTrigger(trigger, vector2_1));
+                            Add(new MusicTrigger(trigger, entityOffset));
                             continue;
                         case "noRefillTrigger":
-                            Add(new NoRefillTrigger(trigger, vector2_1));
+                            Add(new NoRefillTrigger(trigger, entityOffset));
                             continue;
                         case "oshiroTrigger":
-                            Add(new OshiroTrigger(trigger, vector2_1));
+                            Add(new OshiroTrigger(trigger, entityOffset));
                             continue;
                         case "respawnTargetTrigger":
-                            Add(new RespawnTargetTrigger(trigger, vector2_1));
+                            Add(new RespawnTargetTrigger(trigger, entityOffset));
                             continue;
                         case "rumbleTrigger":
-                            Add(new RumbleTrigger(trigger, vector2_1, id));
+                            Add(new RumbleTrigger(trigger, entityOffset, id));
                             continue;
                         case "spawnFacingTrigger":
-                            Add(new SpawnFacingTrigger(trigger, vector2_1));
+                            Add(new SpawnFacingTrigger(trigger, entityOffset));
                             continue;
                         case "stopBoostTrigger":
-                            Add(new StopBoostTrigger(trigger, vector2_1));
+                            Add(new StopBoostTrigger(trigger, entityOffset));
                             continue;
                         case "windAttackTrigger":
-                            Add(new WindAttackTrigger(trigger, vector2_1));
+                            Add(new WindAttackTrigger(trigger, entityOffset));
                             continue;
                         case "windTrigger":
-                            Add(new WindTrigger(trigger, vector2_1));
+                            Add(new WindTrigger(trigger, entityOffset));
                             continue;
                         default:
                             continue;
@@ -1144,9 +1142,9 @@ namespace Celeste
                 }
             }
             foreach (DecalData fgDecal in levelData.FgDecals)
-                Add(new Decal(fgDecal.Texture, vector2_1 + fgDecal.Position, fgDecal.Scale, -10500));
+                Add(new Decal(fgDecal.Texture, entityOffset + fgDecal.Position, fgDecal.Scale, -10500));
             foreach (DecalData bgDecal in levelData.BgDecals)
-                Add(new Decal(bgDecal.Texture, vector2_1 + bgDecal.Position, bgDecal.Scale, 9000));
+                Add(new Decal(bgDecal.Texture, entityOffset + bgDecal.Position, bgDecal.Scale, 9000));
             if (playerIntro != Player.IntroTypes.Transition)
             {
                 if (Session.JustStarted && !Session.StartedFromBeginning && nullable.HasValue && !StartPosition.HasValue)
@@ -1765,7 +1763,7 @@ namespace Celeste
             Distort.Render((RenderTarget2D)GameplayBuffers.Gameplay, (RenderTarget2D)GameplayBuffers.Displacement, Displacement.HasDisplacement(this));
             Bloom.Apply(GameplayBuffers.Level, this);
             Foreground.Render(this);
-            Glitch.Apply(GameplayBuffers.Level, glitchTimer * 2f, glitchSeed, 6.28318548f);
+            Glitch.Apply(GameplayBuffers.Level, glitchTimer * 2f, glitchSeed, MathHelper.Pi * 2);
             if (Engine.DashAssistFreeze)
             {
                 PlayerDashAssist entity = Tracker.GetEntity<PlayerDashAssist>();
@@ -1776,7 +1774,7 @@ namespace Celeste
                     Draw.SpriteBatch.End();
                 }
             }
-            if (flash > 0.0)
+            if (flash > 0f)
             {
                 Draw.SpriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, SamplerState.PointClamp, DepthStencilState.Default, RasterizerState.CullNone, null);
                 Draw.Rect(-1f, -1f, 322f, 182f, flashColor * flash);
@@ -1803,12 +1801,12 @@ namespace Celeste
                 ColorGrade.Set(orDefault1, orDefault2, colorGradeEase);
             else
                 ColorGrade.Set(orDefault2);
-            float scale = Zoom * (float) ((320.0 - ScreenPadding * 2.0) / 320.0);
+            float scale = Zoom * (320f - ScreenPadding * 2f) / 320f;
             Vector2 vector2_3 = new(ScreenPadding, ScreenPadding * (9f / 16f));
             if (SaveData.Instance.Assists.MirrorMode)
             {
                 vector2_3.X = -vector2_3.X;
-                origin.X = (float) (160.0 - (origin.X - 160.0));
+                origin.X = 160f - (origin.X - 160f);
             }
             Draw.SpriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, SamplerState.PointClamp, DepthStencilState.Default, RasterizerState.CullNone, ColorGrade.Effect, transformMatrix);
             Draw.SpriteBatch.Draw((RenderTarget2D)GameplayBuffers.Level, origin + vector2_3, new Rectangle?(GameplayBuffers.Level.Bounds), Color.White, 0.0f, origin, scale, SaveData.Instance.Assists.MirrorMode ? SpriteEffects.FlipHorizontally : SpriteEffects.None, 0.0f);

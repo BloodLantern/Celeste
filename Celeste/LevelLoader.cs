@@ -325,22 +325,12 @@ label_118:
             }
             Vector2 position = new Vector2(tileBounds1.X, tileBounds1.Y) * 8f;
             Calc.PushRandom(mapData.LoadSeed);
-            Level level1 = Level;
-            Level level2 = Level;
-            BackgroundTiles backgroundTiles1;
-            BackgroundTiles backgroundTiles2 = backgroundTiles1 = new BackgroundTiles(position, data1);
-            BackgroundTiles backgroundTiles3 = backgroundTiles1;
-            level2.BgTiles = backgroundTiles1;
-            BackgroundTiles backgroundTiles4 = backgroundTiles3;
-            level1.Add(backgroundTiles4);
-            Level level3 = Level;
-            Level level4 = Level;
-            SolidTiles solidTiles1;
-            SolidTiles solidTiles2 = solidTiles1 = new SolidTiles(position, data2);
-            SolidTiles solidTiles3 = solidTiles1;
-            level4.SolidTiles = solidTiles1;
-            SolidTiles solidTiles4 = solidTiles3;
-            level3.Add(solidTiles4);
+            BackgroundTiles backgroundTiles = new BackgroundTiles(position, data1);
+            Level.BgTiles = backgroundTiles;
+            Level.Add(backgroundTiles);
+            SolidTiles solidTiles = new SolidTiles(position, data2);
+            Level.SolidTiles = solidTiles;
+            Level.Add(solidTiles);
             Level.BgData = data1;
             Level.SolidsData = data2;
             Calc.PopRandom();
@@ -360,12 +350,12 @@ label_118:
                 if (!string.IsNullOrEmpty(level5.BgTiles))
                 {
                     int[,] tiles = Calc.ReadCSVIntGrid(level5.BgTiles, width, height);
-                    backgroundTiles2.Tiles.Overlay(GFX.SceneryTiles, tiles, left - tileBounds1.X, top - tileBounds1.Y);
+                    backgroundTiles.Tiles.Overlay(GFX.SceneryTiles, tiles, left - tileBounds1.X, top - tileBounds1.Y);
                 }
                 if (!string.IsNullOrEmpty(level5.FgTiles))
                 {
                     int[,] tiles = Calc.ReadCSVIntGrid(level5.FgTiles, width, height);
-                    solidTiles2.Tiles.Overlay(GFX.SceneryTiles, tiles, left - tileBounds1.X, top - tileBounds1.Y);
+                    solidTiles.Tiles.Overlay(GFX.SceneryTiles, tiles, left - tileBounds1.X, top - tileBounds1.Y);
                     Level.FgTilesLightMask.Overlay(GFX.SceneryTiles, tiles, left - tileBounds1.X, top - tileBounds1.Y);
                 }
             }
@@ -380,7 +370,7 @@ label_118:
         {
             started = true;
             Session session = Level.Session;
-            Level.LoadLevel(!PlayerIntroTypeOverride.HasValue ? (!session.FirstLevel || !session.StartedFromBeginning || !session.JustStarted ? Player.IntroTypes.Respawn : (session.Area.Mode != AreaMode.CSide ? AreaData.Get(Level).IntroType : Player.IntroTypes.WalkInRight)) : PlayerIntroTypeOverride.Value, true);
+            Level.LoadLevel(PlayerIntroTypeOverride ?? (!session.FirstLevel || !session.StartedFromBeginning || !session.JustStarted ? Player.IntroTypes.Respawn : (session.Area.Mode != AreaMode.CSide ? AreaData.Get(Level).IntroType : Player.IntroTypes.WalkInRight)), true);
             Level.Session.JustStarted = false;
             if (Engine.Scene != this)
                 return;

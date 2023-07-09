@@ -22,8 +22,8 @@ namespace Monocle
 
         public Entity(Vector2 position)
         {
-            this.Position = position;
-            this.Components = new ComponentList(this);
+            Position = position;
+            Components = new ComponentList(this);
         }
 
         public Entity()
@@ -37,294 +37,292 @@ namespace Monocle
 
         public virtual void SceneEnd(Scene scene)
         {
-            if (this.Components == null)
+            if (Components == null)
                 return;
-            foreach (Component component in this.Components)
+            foreach (Component component in Components)
                 component.SceneEnd(scene);
         }
 
         public virtual void Awake(Scene scene)
         {
-            if (this.Components == null)
+            if (Components == null)
                 return;
-            foreach (Component component in this.Components)
+            foreach (Component component in Components)
                 component.EntityAwake();
         }
 
         public virtual void Added(Scene scene)
         {
-            this.Scene = scene;
-            if (this.Components != null)
+            Scene = scene;
+            if (Components != null)
             {
-                foreach (Component component in this.Components)
+                foreach (Component component in Components)
                     component.EntityAdded(scene);
             }
-            this.Scene.SetActualDepth(this);
+            Scene.SetActualDepth(this);
         }
 
         public virtual void Removed(Scene scene)
         {
-            if (this.Components != null)
+            if (Components != null)
             {
-                foreach (Component component in this.Components)
+                foreach (Component component in Components)
                     component.EntityRemoved(scene);
             }
-            this.Scene = (Scene) null;
+            Scene = null;
         }
 
-        public virtual void Update() => this.Components.Update();
+        public virtual void Update() => Components.Update();
 
-        public virtual void Render() => this.Components.Render();
+        public virtual void Render() => Components.Render();
 
         public virtual void DebugRender(Camera camera)
         {
-            if (this.Collider != null)
-                this.Collider.Render(camera, this.Collidable ? Color.Red : Color.DarkRed);
-            this.Components.DebugRender(camera);
+            Collider?.Render(camera, Collidable ? Color.Red : Color.DarkRed);
+            Components.DebugRender(camera);
         }
 
-        public virtual void HandleGraphicsReset() => this.Components.HandleGraphicsReset();
+        public virtual void HandleGraphicsReset() => Components.HandleGraphicsReset();
 
-        public virtual void HandleGraphicsCreate() => this.Components.HandleGraphicsCreate();
+        public virtual void HandleGraphicsCreate() => Components.HandleGraphicsCreate();
 
         public void RemoveSelf()
         {
-            if (this.Scene == null)
+            if (Scene == null)
                 return;
-            this.Scene.Entities.Remove(this);
+            Scene.Entities.Remove(this);
         }
 
         public int Depth
         {
-            get => this.depth;
+            get => depth;
             set
             {
-                if (this.depth == value)
+                if (depth == value)
                     return;
-                this.depth = value;
-                if (this.Scene == null)
+                depth = value;
+                if (Scene == null)
                     return;
-                this.Scene.SetActualDepth(this);
+                Scene.SetActualDepth(this);
             }
         }
 
         public float X
         {
-            get => this.Position.X;
-            set => this.Position.X = value;
+            get => Position.X;
+            set => Position.X = value;
         }
 
         public float Y
         {
-            get => this.Position.Y;
-            set => this.Position.Y = value;
+            get => Position.Y;
+            set => Position.Y = value;
         }
 
         public Collider Collider
         {
-            get => this.collider;
+            get => collider;
             set
             {
-                if (value == this.collider)
+                if (value == collider)
                     return;
-                if (this.collider != null)
-                    this.collider.Removed();
-                this.collider = value;
-                if (this.collider == null)
+                collider?.Removed();
+                collider = value;
+                if (collider == null)
                     return;
-                this.collider.Added(this);
+                collider.Added(this);
             }
         }
 
-        public float Width => this.Collider == null ? 0.0f : this.Collider.Width;
+        public float Width => Collider == null ? 0.0f : Collider.Width;
 
-        public float Height => this.Collider == null ? 0.0f : this.Collider.Height;
+        public float Height => Collider == null ? 0.0f : Collider.Height;
 
         public float Left
         {
-            get => this.Collider == null ? this.X : this.Position.X + this.Collider.Left;
+            get => Collider == null ? X : Position.X + Collider.Left;
             set
             {
-                if (this.Collider == null)
-                    this.Position.X = value;
+                if (Collider == null)
+                    Position.X = value;
                 else
-                    this.Position.X = value - this.Collider.Left;
+                    Position.X = value - Collider.Left;
             }
         }
 
         public float Right
         {
-            get => this.Collider == null ? this.Position.X : this.Position.X + this.Collider.Right;
+            get => Collider == null ? Position.X : Position.X + Collider.Right;
             set
             {
-                if (this.Collider == null)
-                    this.Position.X = value;
+                if (Collider == null)
+                    Position.X = value;
                 else
-                    this.Position.X = value - this.Collider.Right;
+                    Position.X = value - Collider.Right;
             }
         }
 
         public float Top
         {
-            get => this.Collider == null ? this.Position.Y : this.Position.Y + this.Collider.Top;
+            get => Collider == null ? Position.Y : Position.Y + Collider.Top;
             set
             {
-                if (this.Collider == null)
-                    this.Position.Y = value;
+                if (Collider == null)
+                    Position.Y = value;
                 else
-                    this.Position.Y = value - this.Collider.Top;
+                    Position.Y = value - Collider.Top;
             }
         }
 
         public float Bottom
         {
-            get => this.Collider == null ? this.Position.Y : this.Position.Y + this.Collider.Bottom;
+            get => Collider == null ? Position.Y : Position.Y + Collider.Bottom;
             set
             {
-                if (this.Collider == null)
-                    this.Position.Y = value;
+                if (Collider == null)
+                    Position.Y = value;
                 else
-                    this.Position.Y = value - this.Collider.Bottom;
+                    Position.Y = value - Collider.Bottom;
             }
         }
 
         public float CenterX
         {
-            get => this.Collider == null ? this.Position.X : this.Position.X + this.Collider.CenterX;
+            get => Collider == null ? Position.X : Position.X + Collider.CenterX;
             set
             {
-                if (this.Collider == null)
-                    this.Position.X = value;
+                if (Collider == null)
+                    Position.X = value;
                 else
-                    this.Position.X = value - this.Collider.CenterX;
+                    Position.X = value - Collider.CenterX;
             }
         }
 
         public float CenterY
         {
-            get => this.Collider == null ? this.Position.Y : this.Position.Y + this.Collider.CenterY;
+            get => Collider == null ? Position.Y : Position.Y + Collider.CenterY;
             set
             {
-                if (this.Collider == null)
-                    this.Position.Y = value;
+                if (Collider == null)
+                    Position.Y = value;
                 else
-                    this.Position.Y = value - this.Collider.CenterY;
+                    Position.Y = value - Collider.CenterY;
             }
         }
 
         public Vector2 TopLeft
         {
-            get => new Vector2(this.Left, this.Top);
+            get => new(Left, Top);
             set
             {
-                this.Left = value.X;
-                this.Top = value.Y;
+                Left = value.X;
+                Top = value.Y;
             }
         }
 
         public Vector2 TopRight
         {
-            get => new Vector2(this.Right, this.Top);
+            get => new(Right, Top);
             set
             {
-                this.Right = value.X;
-                this.Top = value.Y;
+                Right = value.X;
+                Top = value.Y;
             }
         }
 
         public Vector2 BottomLeft
         {
-            get => new Vector2(this.Left, this.Bottom);
+            get => new(Left, Bottom);
             set
             {
-                this.Left = value.X;
-                this.Bottom = value.Y;
+                Left = value.X;
+                Bottom = value.Y;
             }
         }
 
         public Vector2 BottomRight
         {
-            get => new Vector2(this.Right, this.Bottom);
+            get => new(Right, Bottom);
             set
             {
-                this.Right = value.X;
-                this.Bottom = value.Y;
+                Right = value.X;
+                Bottom = value.Y;
             }
         }
 
         public Vector2 Center
         {
-            get => new Vector2(this.CenterX, this.CenterY);
+            get => new(CenterX, CenterY);
             set
             {
-                this.CenterX = value.X;
-                this.CenterY = value.Y;
+                CenterX = value.X;
+                CenterY = value.Y;
             }
         }
 
         public Vector2 CenterLeft
         {
-            get => new Vector2(this.Left, this.CenterY);
+            get => new(Left, CenterY);
             set
             {
-                this.Left = value.X;
-                this.CenterY = value.Y;
+                Left = value.X;
+                CenterY = value.Y;
             }
         }
 
         public Vector2 CenterRight
         {
-            get => new Vector2(this.Right, this.CenterY);
+            get => new(Right, CenterY);
             set
             {
-                this.Right = value.X;
-                this.CenterY = value.Y;
+                Right = value.X;
+                CenterY = value.Y;
             }
         }
 
         public Vector2 TopCenter
         {
-            get => new Vector2(this.CenterX, this.Top);
+            get => new(CenterX, Top);
             set
             {
-                this.CenterX = value.X;
-                this.Top = value.Y;
+                CenterX = value.X;
+                Top = value.Y;
             }
         }
 
         public Vector2 BottomCenter
         {
-            get => new Vector2(this.CenterX, this.Bottom);
+            get => new(CenterX, Bottom);
             set
             {
-                this.CenterX = value.X;
-                this.Bottom = value.Y;
+                CenterX = value.X;
+                Bottom = value.Y;
             }
         }
 
         public int Tag
         {
-            get => this.tag;
+            get => tag;
             set
             {
-                if (this.tag == value)
+                if (tag == value)
                     return;
-                if (this.Scene != null)
+                if (Scene != null)
                 {
                     for (int index = 0; index < BitTag.TotalTags; ++index)
                     {
                         int num = 1 << index;
                         bool flag = (value & num) != 0;
-                        if ((this.Tag & num) != 0 != flag)
+                        if ((Tag & num) != 0 != flag)
                         {
                             if (flag)
-                                this.Scene.TagLists[index].Add(this);
+                                Scene.TagLists[index].Add(this);
                             else
-                                this.Scene.TagLists[index].Remove(this);
+                                Scene.TagLists[index].Remove(this);
                         }
                     }
                 }
-                this.tag = value;
+                tag = value;
             }
         }
 
@@ -332,28 +330,28 @@ namespace Monocle
 
         public bool TagCheck(int tag) => (this.tag & tag) != 0;
 
-        public void AddTag(int tag) => this.Tag |= tag;
+        public void AddTag(int tag) => Tag |= tag;
 
-        public void RemoveTag(int tag) => this.Tag &= ~tag;
+        public void RemoveTag(int tag) => Tag &= ~tag;
 
         public bool CollideCheck(Entity other) => Collide.Check(this, other);
 
         public bool CollideCheck(Entity other, Vector2 at) => Collide.Check(this, other, at);
 
-        public bool CollideCheck(BitTag tag) => Collide.Check(this, (IEnumerable<Entity>) this.Scene[tag]);
+        public bool CollideCheck(BitTag tag) => Collide.Check(this, Scene[tag]);
 
-        public bool CollideCheck(BitTag tag, Vector2 at) => Collide.Check(this, (IEnumerable<Entity>) this.Scene[tag], at);
+        public bool CollideCheck(BitTag tag, Vector2 at) => Collide.Check(this, Scene[tag], at);
 
-        public bool CollideCheck<T>() where T : Entity => Collide.Check(this, (IEnumerable<Entity>) this.Scene.Tracker.Entities[typeof (T)]);
+        public bool CollideCheck<T>() where T : Entity => Collide.Check(this, Scene.Tracker.Entities[typeof(T)]);
 
-        public bool CollideCheck<T>(Vector2 at) where T : Entity => Collide.Check(this, (IEnumerable<Entity>) this.Scene.Tracker.Entities[typeof (T)], at);
+        public bool CollideCheck<T>(Vector2 at) where T : Entity => Collide.Check(this, Scene.Tracker.Entities[typeof(T)], at);
 
         public bool CollideCheck<T, Exclude>()
             where T : Entity
             where Exclude : Entity
         {
-            List<Entity> entity = this.Scene.Tracker.Entities[typeof (Exclude)];
-            foreach (Entity b in this.Scene.Tracker.Entities[typeof (T)])
+            List<Entity> entity = Scene.Tracker.Entities[typeof (Exclude)];
+            foreach (Entity b in Scene.Tracker.Entities[typeof (T)])
             {
                 if (!entity.Contains(b) && Collide.Check(this, b))
                     return true;
@@ -365,10 +363,10 @@ namespace Monocle
             where T : Entity
             where Exclude : Entity
         {
-            Vector2 position = this.Position;
-            this.Position = at;
-            int num = this.CollideCheck<T, Exclude>() ? 1 : 0;
-            this.Position = position;
+            Vector2 position = Position;
+            Position = at;
+            int num = CollideCheck<T, Exclude>() ? 1 : 0;
+            Position = position;
             return num != 0;
         }
 
@@ -377,9 +375,9 @@ namespace Monocle
             where Exclude1 : Entity
             where Exclude2 : Entity
         {
-            List<Entity> entity1 = this.Scene.Tracker.Entities[typeof (Exclude1)];
-            List<Entity> entity2 = this.Scene.Tracker.Entities[typeof (Exclude2)];
-            foreach (Entity b in this.Scene.Tracker.Entities[typeof (T)])
+            List<Entity> entity1 = Scene.Tracker.Entities[typeof (Exclude1)];
+            List<Entity> entity2 = Scene.Tracker.Entities[typeof (Exclude2)];
+            foreach (Entity b in Scene.Tracker.Entities[typeof (T)])
             {
                 if (!entity1.Contains(b) && !entity2.Contains(b) && Collide.Check(this, b))
                     return true;
@@ -392,16 +390,16 @@ namespace Monocle
             where Exclude1 : Entity
             where Exclude2 : Entity
         {
-            Vector2 position = this.Position;
-            this.Position = at;
-            int num = this.CollideCheck<T, Exclude1, Exclude2>() ? 1 : 0;
-            this.Position = position;
+            Vector2 position = Position;
+            Position = at;
+            int num = CollideCheck<T, Exclude1, Exclude2>() ? 1 : 0;
+            Position = position;
             return num != 0;
         }
 
         public bool CollideCheckByComponent<T>() where T : Component
         {
-            foreach (Component component in this.Scene.Tracker.Components[typeof (T)])
+            foreach (Component component in Scene.Tracker.Components[typeof (T)])
             {
                 if (Collide.Check(this, component.Entity))
                     return true;
@@ -411,10 +409,10 @@ namespace Monocle
 
         public bool CollideCheckByComponent<T>(Vector2 at) where T : Component
         {
-            Vector2 position = this.Position;
-            this.Position = at;
-            int num = this.CollideCheckByComponent<T>() ? 1 : 0;
-            this.Position = position;
+            Vector2 position = Position;
+            Position = at;
+            int num = CollideCheckByComponent<T>() ? 1 : 0;
+            Position = position;
             return num != 0;
         }
 
@@ -422,7 +420,7 @@ namespace Monocle
 
         public bool CollideCheckOutside(BitTag tag, Vector2 at)
         {
-            foreach (Entity b in this.Scene[tag])
+            foreach (Entity b in Scene[tag])
             {
                 if (!Collide.Check(this, b) && Collide.Check(this, b, at))
                     return true;
@@ -432,7 +430,7 @@ namespace Monocle
 
         public bool CollideCheckOutside<T>(Vector2 at) where T : Entity
         {
-            foreach (Entity b in this.Scene.Tracker.Entities[typeof (T)])
+            foreach (Entity b in Scene.Tracker.Entities[typeof (T)])
             {
                 if (!Collide.Check(this, b) && Collide.Check(this, b, at))
                     return true;
@@ -442,7 +440,7 @@ namespace Monocle
 
         public bool CollideCheckOutsideByComponent<T>(Vector2 at) where T : Component
         {
-            foreach (Component component in this.Scene.Tracker.Components[typeof (T)])
+            foreach (Component component in Scene.Tracker.Components[typeof (T)])
             {
                 if (!Collide.Check(this, component.Entity) && Collide.Check(this, component.Entity, at))
                     return true;
@@ -450,17 +448,17 @@ namespace Monocle
             return false;
         }
 
-        public Entity CollideFirst(BitTag tag) => Collide.First(this, (IEnumerable<Entity>) this.Scene[tag]);
+        public Entity CollideFirst(BitTag tag) => Collide.First(this, Scene[tag]);
 
-        public Entity CollideFirst(BitTag tag, Vector2 at) => Collide.First(this, (IEnumerable<Entity>) this.Scene[tag], at);
+        public Entity CollideFirst(BitTag tag, Vector2 at) => Collide.First(this, Scene[tag], at);
 
-        public T CollideFirst<T>() where T : Entity => Collide.First(this, (IEnumerable<Entity>) this.Scene.Tracker.Entities[typeof (T)]) as T;
+        public T CollideFirst<T>() where T : Entity => Collide.First(this, Scene.Tracker.Entities[typeof(T)]) as T;
 
-        public T CollideFirst<T>(Vector2 at) where T : Entity => Collide.First(this, (IEnumerable<Entity>) this.Scene.Tracker.Entities[typeof (T)], at) as T;
+        public T CollideFirst<T>(Vector2 at) where T : Entity => Collide.First(this, Scene.Tracker.Entities[typeof(T)], at) as T;
 
         public T CollideFirstByComponent<T>() where T : Component
         {
-            foreach (Component component in this.Scene.Tracker.Components[typeof (T)])
+            foreach (Component component in Scene.Tracker.Components[typeof (T)])
             {
                 if (Collide.Check(this, component.Entity))
                     return component as T;
@@ -470,7 +468,7 @@ namespace Monocle
 
         public T CollideFirstByComponent<T>(Vector2 at) where T : Component
         {
-            foreach (Component component in this.Scene.Tracker.Components[typeof (T)])
+            foreach (Component component in Scene.Tracker.Components[typeof (T)])
             {
                 if (Collide.Check(this, component.Entity, at))
                     return component as T;
@@ -480,17 +478,17 @@ namespace Monocle
 
         public Entity CollideFirstOutside(BitTag tag, Vector2 at)
         {
-            foreach (Entity b in this.Scene[tag])
+            foreach (Entity b in Scene[tag])
             {
                 if (!Collide.Check(this, b) && Collide.Check(this, b, at))
                     return b;
             }
-            return (Entity) null;
+            return null;
         }
 
         public T CollideFirstOutside<T>(Vector2 at) where T : Entity
         {
-            foreach (Entity b in this.Scene.Tracker.Entities[typeof (T)])
+            foreach (Entity b in Scene.Tracker.Entities[typeof (T)])
             {
                 if (!Collide.Check(this, b) && Collide.Check(this, b, at))
                     return b as T;
@@ -500,7 +498,7 @@ namespace Monocle
 
         public T CollideFirstOutsideByComponent<T>(Vector2 at) where T : Component
         {
-            foreach (Component component in this.Scene.Tracker.Components[typeof (T)])
+            foreach (Component component in Scene.Tracker.Components[typeof (T)])
             {
                 if (!Collide.Check(this, component.Entity) && Collide.Check(this, component.Entity, at))
                     return component as T;
@@ -508,24 +506,24 @@ namespace Monocle
             return default (T);
         }
 
-        public List<Entity> CollideAll(BitTag tag) => Collide.All(this, (IEnumerable<Entity>) this.Scene[tag]);
+        public List<Entity> CollideAll(BitTag tag) => Collide.All(this, Scene[tag]);
 
-        public List<Entity> CollideAll(BitTag tag, Vector2 at) => Collide.All(this, (IEnumerable<Entity>) this.Scene[tag], at);
+        public List<Entity> CollideAll(BitTag tag, Vector2 at) => Collide.All(this, Scene[tag], at);
 
-        public List<Entity> CollideAll<T>() where T : Entity => Collide.All(this, (IEnumerable<Entity>) this.Scene.Tracker.Entities[typeof (T)]);
+        public List<Entity> CollideAll<T>() where T : Entity => Collide.All(this, Scene.Tracker.Entities[typeof(T)]);
 
-        public List<Entity> CollideAll<T>(Vector2 at) where T : Entity => Collide.All(this, (IEnumerable<Entity>) this.Scene.Tracker.Entities[typeof (T)], at);
+        public List<Entity> CollideAll<T>(Vector2 at) where T : Entity => Collide.All(this, Scene.Tracker.Entities[typeof(T)], at);
 
         public List<Entity> CollideAll<T>(Vector2 at, List<Entity> into) where T : Entity
         {
             into.Clear();
-            return Collide.All(this, (IEnumerable<Entity>) this.Scene.Tracker.Entities[typeof (T)], into, at);
+            return Collide.All(this, Scene.Tracker.Entities[typeof(T)], into, at);
         }
 
         public List<T> CollideAllByComponent<T>() where T : Component
         {
-            List<T> objList = new List<T>();
-            foreach (Component component in this.Scene.Tracker.Components[typeof (T)])
+            List<T> objList = new();
+            foreach (Component component in Scene.Tracker.Components[typeof (T)])
             {
                 if (Collide.Check(this, component.Entity))
                     objList.Add(component as T);
@@ -535,19 +533,19 @@ namespace Monocle
 
         public List<T> CollideAllByComponent<T>(Vector2 at) where T : Component
         {
-            Vector2 position = this.Position;
-            this.Position = at;
-            List<T> objList = this.CollideAllByComponent<T>();
-            this.Position = position;
+            Vector2 position = Position;
+            Position = at;
+            List<T> objList = CollideAllByComponent<T>();
+            Position = position;
             return objList;
         }
 
         public bool CollideDo(BitTag tag, Action<Entity> action)
         {
             bool flag = false;
-            foreach (Entity other in this.Scene[tag])
+            foreach (Entity other in Scene[tag])
             {
-                if (this.CollideCheck(other))
+                if (CollideCheck(other))
                 {
                     action(other);
                     flag = true;
@@ -559,26 +557,26 @@ namespace Monocle
         public bool CollideDo(BitTag tag, Action<Entity> action, Vector2 at)
         {
             bool flag = false;
-            Vector2 position = this.Position;
-            this.Position = at;
-            foreach (Entity other in this.Scene[tag])
+            Vector2 position = Position;
+            Position = at;
+            foreach (Entity other in Scene[tag])
             {
-                if (this.CollideCheck(other))
+                if (CollideCheck(other))
                 {
                     action(other);
                     flag = true;
                 }
             }
-            this.Position = position;
+            Position = position;
             return flag;
         }
 
         public bool CollideDo<T>(Action<T> action) where T : Entity
         {
             bool flag = false;
-            foreach (Entity other in this.Scene.Tracker.Entities[typeof (T)])
+            foreach (Entity other in Scene.Tracker.Entities[typeof (T)])
             {
-                if (this.CollideCheck(other))
+                if (CollideCheck(other))
                 {
                     action(other as T);
                     flag = true;
@@ -590,26 +588,26 @@ namespace Monocle
         public bool CollideDo<T>(Action<T> action, Vector2 at) where T : Entity
         {
             bool flag = false;
-            Vector2 position = this.Position;
-            this.Position = at;
-            foreach (Entity other in this.Scene.Tracker.Entities[typeof (T)])
+            Vector2 position = Position;
+            Position = at;
+            foreach (Entity other in Scene.Tracker.Entities[typeof (T)])
             {
-                if (this.CollideCheck(other))
+                if (CollideCheck(other))
                 {
                     action(other as T);
                     flag = true;
                 }
             }
-            this.Position = position;
+            Position = position;
             return flag;
         }
 
         public bool CollideDoByComponent<T>(Action<T> action) where T : Component
         {
             bool flag = false;
-            foreach (Component component in this.Scene.Tracker.Components[typeof (T)])
+            foreach (Component component in Scene.Tracker.Components[typeof (T)])
             {
-                if (this.CollideCheck(component.Entity))
+                if (CollideCheck(component.Entity))
                 {
                     action(component as T);
                     flag = true;
@@ -621,17 +619,17 @@ namespace Monocle
         public bool CollideDoByComponent<T>(Action<T> action, Vector2 at) where T : Component
         {
             bool flag = false;
-            Vector2 position = this.Position;
-            this.Position = at;
-            foreach (Component component in this.Scene.Tracker.Components[typeof (T)])
+            Vector2 position = Position;
+            Position = at;
+            foreach (Component component in Scene.Tracker.Components[typeof (T)])
             {
-                if (this.CollideCheck(component.Entity))
+                if (CollideCheck(component.Entity))
                 {
                     action(component as T);
                     flag = true;
                 }
             }
-            this.Position = position;
+            Position = position;
             return flag;
         }
 
@@ -647,27 +645,27 @@ namespace Monocle
 
         public bool CollideRect(Rectangle rect, Vector2 at) => Collide.CheckRect(this, rect, at);
 
-        public void Add(Component component) => this.Components.Add(component);
+        public void Add(Component component) => Components.Add(component);
 
-        public void Remove(Component component) => this.Components.Remove(component);
+        public void Remove(Component component) => Components.Remove(component);
 
-        public void Add(params Component[] components) => this.Components.Add(components);
+        public void Add(params Component[] components) => Components.Add(components);
 
-        public void Remove(params Component[] components) => this.Components.Remove(components);
+        public void Remove(params Component[] components) => Components.Remove(components);
 
-        public T Get<T>() where T : Component => this.Components.Get<T>();
+        public T Get<T>() where T : Component => Components.Get<T>();
 
-        public IEnumerator<Component> GetEnumerator() => this.Components.GetEnumerator();
+        public IEnumerator<Component> GetEnumerator() => Components.GetEnumerator();
 
-        IEnumerator IEnumerable.GetEnumerator() => (IEnumerator) this.GetEnumerator();
+        IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
 
         public Entity Closest(params Entity[] entities)
         {
             Entity entity = entities[0];
-            float num1 = Vector2.DistanceSquared(this.Position, entity.Position);
+            float num1 = Vector2.DistanceSquared(Position, entity.Position);
             for (int index = 1; index < entities.Length; ++index)
             {
-                float num2 = Vector2.DistanceSquared(this.Position, entities[index].Position);
+                float num2 = Vector2.DistanceSquared(Position, entities[index].Position);
                 if ((double) num2 < (double) num1)
                 {
                     entity = entities[index];
@@ -679,15 +677,15 @@ namespace Monocle
 
         public Entity Closest(BitTag tag)
         {
-            List<Entity> entityList = this.Scene[tag];
-            Entity entity = (Entity) null;
+            List<Entity> entityList = Scene[tag];
+            Entity entity = null;
             if (entityList.Count >= 1)
             {
                 entity = entityList[0];
-                float num1 = Vector2.DistanceSquared(this.Position, entity.Position);
+                float num1 = Vector2.DistanceSquared(Position, entity.Position);
                 for (int index = 1; index < entityList.Count; ++index)
                 {
-                    float num2 = Vector2.DistanceSquared(this.Position, entityList[index].Position);
+                    float num2 = Vector2.DistanceSquared(Position, entityList[index].Position);
                     if ((double) num2 < (double) num1)
                     {
                         entity = entityList[index];
@@ -698,6 +696,6 @@ namespace Monocle
             return entity;
         }
 
-        public T SceneAs<T>() where T : Scene => this.Scene as T;
+        public T SceneAs<T>() where T : Scene => Scene as T;
     }
 }

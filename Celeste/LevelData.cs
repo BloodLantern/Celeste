@@ -49,10 +49,10 @@ namespace Celeste
                 switch (attribute.Key)
                 {
                     case "alt_music":
-                        AltMusic = (string)attribute.Value;
+                        AltMusic = attribute.Value as string;
                         continue;
                     case "ambience":
-                        Ambience = (string)attribute.Value;
+                        Ambience = attribute.Value as string;
                         continue;
                     case "ambienceProgress":
                         string s1 = attribute.Value.ToString();
@@ -63,7 +63,7 @@ namespace Celeste
                         }
                         continue;
                     case "c":
-                        EditorColorIndex = (int)attribute.Value;
+                        EditorColorIndex = (int) attribute.Value;
                         continue;
                     case "cameraOffsetX":
                         CameraOffset.X = Convert.ToSingle(attribute.Value, CultureInfo.InvariantCulture);
@@ -72,19 +72,19 @@ namespace Celeste
                         CameraOffset.Y = Convert.ToSingle(attribute.Value, CultureInfo.InvariantCulture);
                         continue;
                     case "dark":
-                        Dark = (bool)attribute.Value;
+                        Dark = (bool) attribute.Value;
                         continue;
                     case "delayAltMusicFade":
-                        DelayAltMusic = (bool)attribute.Value;
+                        DelayAltMusic = (bool) attribute.Value;
                         continue;
                     case "disableDownTransition":
-                        DisableDownTransition = (bool)attribute.Value;
+                        DisableDownTransition = (bool) attribute.Value;
                         continue;
                     case "enforceDashNumber":
-                        EnforceDashNumber = (int)attribute.Value;
+                        EnforceDashNumber = (int) attribute.Value;
                         continue;
                     case "height":
-                        Bounds.Height = (int)attribute.Value;
+                        Bounds.Height = (int) attribute.Value;
                         if (Bounds.Height == 184)
                         {
                             Bounds.Height = 180;
@@ -92,19 +92,19 @@ namespace Celeste
                         }
                         continue;
                     case "music":
-                        Music = (string)attribute.Value;
+                        Music = (string) attribute.Value;
                         continue;
                     case "musicLayer1":
-                        MusicLayers[0] = (bool)attribute.Value ? 1f : 0.0f;
+                        MusicLayers[0] = (bool) attribute.Value ? 1f : 0f;
                         continue;
                     case "musicLayer2":
-                        MusicLayers[1] = (bool)attribute.Value ? 1f : 0.0f;
+                        MusicLayers[1] = (bool) attribute.Value ? 1f : 0f;
                         continue;
                     case "musicLayer3":
-                        MusicLayers[2] = (bool)attribute.Value ? 1f : 0.0f;
+                        MusicLayers[2] = (bool) attribute.Value ? 1f : 0f;
                         continue;
                     case "musicLayer4":
-                        MusicLayers[3] = (bool)attribute.Value ? 1f : 0.0f;
+                        MusicLayers[3] = (bool) attribute.Value ? 1f : 0f;
                         continue;
                     case "musicProgress":
                         string s2 = attribute.Value.ToString();
@@ -118,25 +118,25 @@ namespace Celeste
                         Name = attribute.Value.ToString().Substring(4);
                         continue;
                     case "space":
-                        Space = (bool)attribute.Value;
+                        Space = (bool) attribute.Value;
                         continue;
                     case "underwater":
-                        Underwater = (bool)attribute.Value;
+                        Underwater = (bool) attribute.Value;
                         continue;
                     case "whisper":
-                        MusicWhispers = (bool)attribute.Value;
+                        MusicWhispers = (bool) attribute.Value;
                         continue;
                     case "width":
-                        Bounds.Width = (int)attribute.Value;
+                        Bounds.Width = (int) attribute.Value;
                         continue;
                     case "windPattern":
-                        WindPattern = (WindController.Patterns)Enum.Parse(typeof(WindController.Patterns), (string)attribute.Value);
+                        WindPattern = (WindController.Patterns) Enum.Parse(typeof(WindController.Patterns), (string) attribute.Value);
                         continue;
                     case "x":
-                        Bounds.X = (int)attribute.Value;
+                        Bounds.X = (int) attribute.Value;
                         continue;
                     case "y":
-                        Bounds.Y = (int)attribute.Value;
+                        Bounds.Y = (int) attribute.Value;
                         continue;
                     default:
                         continue;
@@ -262,7 +262,7 @@ namespace Celeste
 
         public bool Check(Vector2 at) => at.X >= Bounds.Left && at.Y >= Bounds.Top && at.X < Bounds.Right && at.Y < Bounds.Bottom;
 
-        public Rectangle TileBounds => new(Bounds.X / 8, Bounds.Y / 8, (int)Math.Ceiling(Bounds.Width / 8.0), (int)Math.Ceiling(Bounds.Height / 8.0));
+        public Rectangle TileBounds => new(Bounds.X / 8, Bounds.Y / 8, (int) Math.Ceiling(Bounds.Width / 8.0), (int) Math.Ceiling(Bounds.Height / 8.0));
 
         public Vector2 Position
         {
@@ -271,8 +271,8 @@ namespace Celeste
             {
                 for (int index = 0; index < Spawns.Count; ++index)
                     Spawns[index] -= Position;
-                Bounds.X = (int)value.X;
-                Bounds.Y = (int)value.Y;
+                Bounds.X = (int) value.X;
+                Bounds.Y = (int) value.Y;
                 for (int index = 0; index < Spawns.Count; ++index)
                     Spawns[index] += Position;
             }

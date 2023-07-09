@@ -260,8 +260,10 @@ namespace Monocle
             string[] dataPath,
             AtlasDataFormat format)
         {
-            Atlas atlas = new();
-            atlas.Sources = new List<VirtualTexture>();
+            Atlas atlas = new()
+            {
+                Sources = new List<VirtualTexture>()
+            };
             for (int index = 0; index < dataPath.Length; ++index)
                 ReadAtlasData(atlas, Path.Combine(rootPath, dataPath[index]), format);
             return atlas;
@@ -272,8 +274,10 @@ namespace Monocle
             string filename,
             AtlasDataFormat format)
         {
-            Atlas atlas = new();
-            atlas.Sources = new List<VirtualTexture>();
+            Atlas atlas = new()
+            {
+                Sources = new List<VirtualTexture>()
+            };
             int num = 0;
             while (true)
             {
@@ -291,8 +295,10 @@ namespace Monocle
 
         public static Atlas FromDirectory(string path)
         {
-            Atlas atlas = new();
-            atlas.Sources = new List<VirtualTexture>();
+            Atlas atlas = new()
+            {
+                Sources = new List<VirtualTexture>()
+            };
             string contentDirectory = Engine.ContentDirectory;
             int length1 = contentDirectory.Length;
             string path1 = Path.Combine(contentDirectory, path);

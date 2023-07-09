@@ -59,16 +59,16 @@ namespace Celeste
         public const string TentaclePull = "tentacle_pull";
         public const string TentacleDangling = "tentacle_dangling";
         public const string SitDown = "sitDown";
-        private string spriteName;
+        private readonly string spriteName;
         public int HairCount = 4;
-        private static Dictionary<string, PlayerAnimMetadata> FrameMetadata = new Dictionary<string, PlayerAnimMetadata>((IEqualityComparer<string>) StringComparer.OrdinalIgnoreCase);
+        private static readonly Dictionary<string, PlayerAnimMetadata> FrameMetadata = new(StringComparer.OrdinalIgnoreCase);
 
         public PlayerSpriteMode Mode { get; private set; }
 
         public PlayerSprite(PlayerSpriteMode mode)
-            : base((Atlas) null, (string) null)
+            : base(null, null)
         {
-            this.Mode = mode;
+            Mode = mode;
             string id = "";
             switch (mode)
             {
@@ -88,16 +88,15 @@ namespace Celeste
                     id = "player_playback";
                     break;
             }
-            this.spriteName = id;
-            GFX.SpriteBank.CreateOn((Sprite) this, id);
+            spriteName = id;
+            GFX.SpriteBank.CreateOn(this, id);
         }
 
         public Vector2 HairOffset
         {
             get
             {
-                PlayerAnimMetadata playerAnimMetadata;
-                return this.Texture != null && PlayerSprite.FrameMetadata.TryGetValue(this.Texture.AtlasPath, out playerAnimMetadata) ? playerAnimMetadata.HairOffset : Vector2.Zero;
+                return Texture != null && PlayerSprite.FrameMetadata.TryGetValue(Texture.AtlasPath, out PlayerAnimMetadata playerAnimMetadata) ? playerAnimMetadata.HairOffset : Vector2.Zero;
             }
         }
 
@@ -105,8 +104,7 @@ namespace Celeste
         {
             get
             {
-                PlayerAnimMetadata playerAnimMetadata;
-                return this.Texture != null && PlayerSprite.FrameMetadata.TryGetValue(this.Texture.AtlasPath, out playerAnimMetadata) ? (float) playerAnimMetadata.CarryYOffset * this.Scale.Y : 0.0f;
+                return Texture != null && PlayerSprite.FrameMetadata.TryGetValue(Texture.AtlasPath, out PlayerAnimMetadata playerAnimMetadata) ? playerAnimMetadata.CarryYOffset * Scale.Y : 0.0f;
             }
         }
 
@@ -114,8 +112,7 @@ namespace Celeste
         {
             get
             {
-                PlayerAnimMetadata playerAnimMetadata;
-                return this.Texture != null && PlayerSprite.FrameMetadata.TryGetValue(this.Texture.AtlasPath, out playerAnimMetadata) ? playerAnimMetadata.Frame : 0;
+                return Texture != null && PlayerSprite.FrameMetadata.TryGetValue(Texture.AtlasPath, out PlayerAnimMetadata playerAnimMetadata) ? playerAnimMetadata.Frame : 0;
             }
         }
 
@@ -123,8 +120,7 @@ namespace Celeste
         {
             get
             {
-                PlayerAnimMetadata playerAnimMetadata;
-                return this.Texture != null && PlayerSprite.FrameMetadata.TryGetValue(this.Texture.AtlasPath, out playerAnimMetadata) && playerAnimMetadata.HasHair;
+                return Texture != null && PlayerSprite.FrameMetadata.TryGetValue(Texture.AtlasPath, out PlayerAnimMetadata playerAnimMetadata) && playerAnimMetadata.HasHair;
             }
         }
 
@@ -132,20 +128,20 @@ namespace Celeste
         {
             get
             {
-                if (this.LastAnimationID == null)
+                if (LastAnimationID == null)
                     return false;
-                return this.LastAnimationID == "flip" || this.LastAnimationID.StartsWith("run");
+                return LastAnimationID == "flip" || LastAnimationID.StartsWith("run");
             }
         }
 
-        public bool DreamDashing => this.LastAnimationID != null && this.LastAnimationID.StartsWith("dreamDash");
+        public bool DreamDashing => LastAnimationID != null && LastAnimationID.StartsWith("dreamDash");
 
         public override void Render()
         {
-            Vector2 renderPosition = this.RenderPosition;
-            this.RenderPosition = this.RenderPosition.Floor();
+            Vector2 renderPosition = RenderPosition;
+            RenderPosition = RenderPosition.Floor();
             base.Render();
-            this.RenderPosition = renderPosition;
+            RenderPosition = renderPosition;
         }
 
         public static void CreateFramesMetadata(string sprite)
@@ -165,8 +161,8 @@ namespace Celeste
                         string[] strArray2 = xml.Attr("carry", "").Split(',');
                         for (int index = 0; index < Math.Max(strArray1.Length, strArray2.Length); ++index)
                         {
-                            PlayerAnimMetadata playerAnimMetadata = new PlayerAnimMetadata();
-                            string str3 = str2 + (index < 10 ? (object) "0" : (object) "") + (object) index;
+                            PlayerAnimMetadata playerAnimMetadata = new();
+                            string str3 = str2 + (index < 10 ? "0" : (object) "") + index;
                             if (index == 0 && !GFX.Game.Has(str3))
                                 str3 = str2;
                             PlayerSprite.FrameMetadata[str3] = playerAnimMetadata;
@@ -181,7 +177,7 @@ namespace Celeste
                                     string[] strArray3 = strArray1[index].Split(':');
                                     string[] strArray4 = strArray3[0].Split(',');
                                     playerAnimMetadata.HasHair = true;
-                                    playerAnimMetadata.HairOffset = new Vector2((float) Convert.ToInt32(strArray4[0]), (float) Convert.ToInt32(strArray4[1]));
+                                    playerAnimMetadata.HairOffset = new Vector2(Convert.ToInt32(strArray4[0]), Convert.ToInt32(strArray4[1]));
                                     playerAnimMetadata.Frame = strArray3.Length >= 2 ? Convert.ToInt32(strArray3[1]) : 0;
                                 }
                             }

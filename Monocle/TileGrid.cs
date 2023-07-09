@@ -15,83 +15,83 @@ namespace Monocle
         public TileGrid(int tileWidth, int tileHeight, int tilesX, int tilesY)
             : base(false, true)
         {
-            this.TileWidth = tileWidth;
-            this.TileHeight = tileHeight;
-            this.Tiles = new VirtualMap<MTexture>(tilesX, tilesY);
+            TileWidth = tileWidth;
+            TileHeight = tileHeight;
+            Tiles = new VirtualMap<MTexture>(tilesX, tilesY);
         }
 
         public int TileWidth { get; private set; }
 
         public int TileHeight { get; private set; }
 
-        public int TilesX => this.Tiles.Columns;
+        public int TilesX => Tiles.Columns;
 
-        public int TilesY => this.Tiles.Rows;
+        public int TilesY => Tiles.Rows;
 
         public void Populate(Tileset tileset, int[,] tiles, int offsetX = 0, int offsetY = 0)
         {
-            for (int index1 = 0; index1 < tiles.GetLength(0) && index1 + offsetX < this.TilesX; ++index1)
+            for (int x = 0; x < tiles.GetLength(0) && x + offsetX < TilesX; x++)
             {
-                for (int index2 = 0; index2 < tiles.GetLength(1) && index2 + offsetY < this.TilesY; ++index2)
-                    this.Tiles[index1 + offsetX, index2 + offsetY] = tileset[tiles[index1, index2]];
+                for (int y = 0; y < tiles.GetLength(1) && y + offsetY < TilesY; y++)
+                    Tiles[x + offsetX, y + offsetY] = tileset[tiles[x, y]];
             }
         }
 
         public void Overlay(Tileset tileset, int[,] tiles, int offsetX = 0, int offsetY = 0)
         {
-            for (int index1 = 0; index1 < tiles.GetLength(0) && index1 + offsetX < this.TilesX; ++index1)
+            for (int x = 0; x < tiles.GetLength(0) && x + offsetX < TilesX; x++)
             {
-                for (int index2 = 0; index2 < tiles.GetLength(1) && index2 + offsetY < this.TilesY; ++index2)
+                for (int y = 0; y < tiles.GetLength(1) && y + offsetY < TilesY; y++)
                 {
-                    if (tiles[index1, index2] >= 0)
-                        this.Tiles[index1 + offsetX, index2 + offsetY] = tileset[tiles[index1, index2]];
+                    if (tiles[x, y] >= 0)
+                        Tiles[x + offsetX, y + offsetY] = tileset[tiles[x, y]];
                 }
             }
         }
 
         public void Extend(int left, int right, int up, int down)
         {
-            this.Position -= new Vector2((float) (left * this.TileWidth), (float) (up * this.TileHeight));
-            int columns = this.TilesX + left + right;
-            int rows = this.TilesY + up + down;
+            Position -= new Vector2(left * TileWidth, up * TileHeight);
+            int columns = TilesX + left + right;
+            int rows = TilesY + up + down;
             if (columns <= 0 || rows <= 0)
             {
-                this.Tiles = new VirtualMap<MTexture>(0, 0);
+                Tiles = new VirtualMap<MTexture>(0, 0);
             }
             else
             {
-                VirtualMap<MTexture> virtualMap = new VirtualMap<MTexture>(columns, rows);
-                for (int x1 = 0; x1 < this.TilesX; ++x1)
+                VirtualMap<MTexture> virtualMap = new(columns, rows);
+                for (int x1 = 0; x1 < TilesX; x1++)
                 {
-                    for (int y1 = 0; y1 < this.TilesY; ++y1)
+                    for (int y1 = 0; y1 < TilesY; y1++)
                     {
                         int x2 = x1 + left;
                         int y2 = y1 + up;
                         if (x2 >= 0 && x2 < columns && y2 >= 0 && y2 < rows)
-                            virtualMap[x2, y2] = this.Tiles[x1, y1];
+                            virtualMap[x2, y2] = Tiles[x1, y1];
                     }
                 }
-                for (int x = 0; x < left; ++x)
+                for (int x = 0; x < left; x++)
                 {
-                    for (int y = 0; y < rows; ++y)
-                        virtualMap[x, y] = this.Tiles[0, Calc.Clamp(y - up, 0, this.TilesY - 1)];
+                    for (int y = 0; y < rows; y++)
+                        virtualMap[x, y] = Tiles[0, Calc.Clamp(y - up, 0, TilesY - 1)];
                 }
-                for (int x = columns - right; x < columns; ++x)
+                for (int x = columns - right; x < columns; x++)
                 {
-                    for (int y = 0; y < rows; ++y)
-                        virtualMap[x, y] = this.Tiles[this.TilesX - 1, Calc.Clamp(y - up, 0, this.TilesY - 1)];
+                    for (int y = 0; y < rows; y++)
+                        virtualMap[x, y] = Tiles[TilesX - 1, Calc.Clamp(y - up, 0, TilesY - 1)];
                 }
-                for (int y = 0; y < up; ++y)
+                for (int y = 0; y < up; y++)
                 {
-                    for (int x = 0; x < columns; ++x)
-                        virtualMap[x, y] = this.Tiles[Calc.Clamp(x - left, 0, this.TilesX - 1), 0];
+                    for (int x = 0; x < columns; x++)
+                        virtualMap[x, y] = Tiles[Calc.Clamp(x - left, 0, TilesX - 1), 0];
                 }
-                for (int y = rows - down; y < rows; ++y)
+                for (int y = rows - down; y < rows; y++)
                 {
-                    for (int x = 0; x < columns; ++x)
-                        virtualMap[x, y] = this.Tiles[Calc.Clamp(x - left, 0, this.TilesX - 1), this.TilesY - 1];
+                    for (int x = 0; x < columns; x++)
+                        virtualMap[x, y] = Tiles[Calc.Clamp(x - left, 0, TilesX - 1), TilesY - 1];
                 }
-                this.Tiles = virtualMap;
+                Tiles = virtualMap;
             }
         }
 
@@ -99,65 +99,66 @@ namespace Monocle
         {
             int num1 = Math.Max(0, x);
             int num2 = Math.Max(0, y);
-            int num3 = Math.Min(this.TilesX, x + columns);
-            int num4 = Math.Min(this.TilesY, y + rows);
-            for (int x1 = num1; x1 < num3; ++x1)
+            int num3 = Math.Min(TilesX, x + columns);
+            int num4 = Math.Min(TilesY, y + rows);
+            for (int x1 = num1; x1 < num3; x1++)
             {
-                for (int y1 = num2; y1 < num4; ++y1)
-                    this.Tiles[x1, y1] = tile;
+                for (int y1 = num2; y1 < num4; y1++)
+                    Tiles[x1, y1] = tile;
             }
         }
 
         public void Clear()
         {
-            for (int x = 0; x < this.TilesX; ++x)
+            for (int x = 0; x < TilesX; x++)
             {
-                for (int y = 0; y < this.TilesY; ++y)
-                    this.Tiles[x, y] = (MTexture) null;
+                for (int y = 0; y < TilesY; y++)
+                    Tiles[x, y] = null;
             }
         }
 
         public Rectangle GetClippedRenderTiles()
         {
-            Vector2 vector2 = this.Entity.Position + this.Position;
+            Vector2 vector2 = Entity.Position + Position;
             int val1_1;
             int val1_2;
             int val1_3;
             int val1_4;
-            if (this.ClipCamera == null)
+            if (ClipCamera == null)
             {
-                val1_1 = -this.VisualExtend;
-                val1_2 = -this.VisualExtend;
-                val1_3 = this.TilesX + this.VisualExtend;
-                val1_4 = this.TilesY + this.VisualExtend;
+                val1_1 = -VisualExtend;
+                val1_2 = -VisualExtend;
+                val1_3 = TilesX + VisualExtend;
+                val1_4 = TilesY + VisualExtend;
             }
             else
             {
-                Camera clipCamera = this.ClipCamera;
-                val1_1 = (int) Math.Max(0.0, Math.Floor(((double) clipCamera.Left - (double) vector2.X) / (double) this.TileWidth) - (double) this.VisualExtend);
-                val1_2 = (int) Math.Max(0.0, Math.Floor(((double) clipCamera.Top - (double) vector2.Y) / (double) this.TileHeight) - (double) this.VisualExtend);
-                val1_3 = (int) Math.Min((double) this.TilesX, Math.Ceiling(((double) clipCamera.Right - (double) vector2.X) / (double) this.TileWidth) + (double) this.VisualExtend);
-                val1_4 = (int) Math.Min((double) this.TilesY, Math.Ceiling(((double) clipCamera.Bottom - (double) vector2.Y) / (double) this.TileHeight) + (double) this.VisualExtend);
+                Camera clipCamera = ClipCamera;
+                val1_1 = (int) Math.Max(0, Math.Floor(((double) clipCamera.Left - vector2.X) / TileWidth) - VisualExtend);
+                val1_2 = (int) Math.Max(0, Math.Floor(((double) clipCamera.Top - vector2.Y) / TileHeight) - VisualExtend);
+                val1_3 = (int) Math.Min(TilesX, Math.Ceiling(((double) clipCamera.Right - vector2.X) / TileWidth) + VisualExtend);
+                val1_4 = (int) Math.Min(TilesY, Math.Ceiling(((double) clipCamera.Bottom - vector2.Y) / TileHeight) + VisualExtend);
             }
             int x = Math.Max(val1_1, 0);
             int y = Math.Max(val1_2, 0);
-            int num1 = Math.Min(val1_3, this.TilesX);
-            int num2 = Math.Min(val1_4, this.TilesY);
+            int num1 = Math.Min(val1_3, TilesX);
+            int num2 = Math.Min(val1_4, TilesY);
             return new Rectangle(x, y, num1 - x, num2 - y);
         }
 
-        public override void Render() => this.RenderAt(this.Entity.Position + this.Position);
+        public override void Render() => RenderAt(Entity.Position + Position);
 
         public void RenderAt(Vector2 position)
         {
-            if ((double) this.Alpha <= 0.0)
+            if (Alpha <= 0f)
                 return;
-            Rectangle clippedRenderTiles = this.GetClippedRenderTiles();
-            Color color = this.Color * this.Alpha;
-            for (int left = clippedRenderTiles.Left; left < clippedRenderTiles.Right; ++left)
+
+            Rectangle clippedRenderTiles = GetClippedRenderTiles();
+            Color color = Color * Alpha;
+            for (int left = clippedRenderTiles.Left; left < clippedRenderTiles.Right; left++)
             {
-                for (int top = clippedRenderTiles.Top; top < clippedRenderTiles.Bottom; ++top)
-                    this.Tiles[left, top]?.Draw(position + new Vector2((float) (left * this.TileWidth), (float) (top * this.TileHeight)), Vector2.Zero, color);
+                for (int top = clippedRenderTiles.Top; top < clippedRenderTiles.Bottom; top++)
+                    Tiles[left, top]?.Draw(position + new Vector2(left * TileWidth, top * TileHeight), Vector2.Zero, color);
             }
         }
     }

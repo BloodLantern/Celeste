@@ -132,9 +132,9 @@ namespace Monocle
                     Texture.GetData(data, 0, elementCount);
                     for (int index = 0; index < elementCount; ++index)
                     {
-                        data[index].R = (byte) (data[index].R * (data[index].A / (double) byte.MaxValue));
-                        data[index].G = (byte) (data[index].G * (data[index].A / (double) byte.MaxValue));
-                        data[index].B = (byte) (data[index].B * (data[index].A / (double) byte.MaxValue));
+                        data[index].R = (byte) (data[index].R * (data[index].A / (float) byte.MaxValue));
+                        data[index].G = (byte) (data[index].G * (data[index].A / (float) byte.MaxValue));
+                        data[index].B = (byte) (data[index].B * (data[index].A / (float) byte.MaxValue));
                     }
                     Texture.SetData(data, 0, elementCount);
                 }

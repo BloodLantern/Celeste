@@ -11,9 +11,9 @@ namespace Monocle
 
         public EverythingRenderer()
         {
-            this.BlendState = BlendState.AlphaBlend;
-            this.SamplerState = SamplerState.LinearClamp;
-            this.Camera = new Camera();
+            BlendState = BlendState.AlphaBlend;
+            SamplerState = SamplerState.LinearClamp;
+            Camera = new Camera();
         }
 
         public override void BeforeRender(Scene scene)
@@ -22,10 +22,10 @@ namespace Monocle
 
         public override void Render(Scene scene)
         {
-            Draw.SpriteBatch.Begin(SpriteSortMode.Deferred, this.BlendState, this.SamplerState, DepthStencilState.None, RasterizerState.CullNone, this.Effect, this.Camera.Matrix * Engine.ScreenMatrix);
+            Draw.SpriteBatch.Begin(SpriteSortMode.Deferred, BlendState, SamplerState, DepthStencilState.None, RasterizerState.CullNone, Effect, Camera.Matrix * Engine.ScreenMatrix);
             scene.Entities.Render();
             if (Engine.Commands.Open)
-                scene.Entities.DebugRender(this.Camera);
+                scene.Entities.DebugRender(Camera);
             Draw.SpriteBatch.End();
         }
 

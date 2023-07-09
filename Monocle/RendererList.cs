@@ -5,84 +5,84 @@ namespace Monocle
     public class RendererList
     {
         public List<Renderer> Renderers;
-        private List<Renderer> adding;
-        private List<Renderer> removing;
-        private Scene scene;
+        private readonly List<Renderer> adding;
+        private readonly List<Renderer> removing;
+        private readonly Scene scene;
 
         internal RendererList(Scene scene)
         {
             this.scene = scene;
-            this.Renderers = new List<Renderer>();
-            this.adding = new List<Renderer>();
-            this.removing = new List<Renderer>();
+            Renderers = new List<Renderer>();
+            adding = new List<Renderer>();
+            removing = new List<Renderer>();
         }
 
         internal void UpdateLists()
         {
-            if (this.adding.Count > 0)
+            if (adding.Count > 0)
             {
-                foreach (Renderer renderer in this.adding)
-                    this.Renderers.Add(renderer);
+                foreach (Renderer renderer in adding)
+                    Renderers.Add(renderer);
             }
-            this.adding.Clear();
-            if (this.removing.Count > 0)
+            adding.Clear();
+            if (removing.Count > 0)
             {
-                foreach (Renderer renderer in this.removing)
-                    this.Renderers.Remove(renderer);
+                foreach (Renderer renderer in removing)
+                    Renderers.Remove(renderer);
             }
-            this.removing.Clear();
+            removing.Clear();
         }
 
         internal void Update()
         {
-            foreach (Renderer renderer in this.Renderers)
-                renderer.Update(this.scene);
+            foreach (Renderer renderer in Renderers)
+                renderer.Update(scene);
         }
 
         internal void BeforeRender()
         {
-            for (int index = 0; index < this.Renderers.Count; ++index)
+            for (int index = 0; index < Renderers.Count; ++index)
             {
-                if (this.Renderers[index].Visible)
+                if (Renderers[index].Visible)
                 {
-                    Draw.Renderer = this.Renderers[index];
-                    this.Renderers[index].BeforeRender(this.scene);
+                    Draw.Renderer = Renderers[index];
+                    Renderers[index].BeforeRender(scene);
                 }
             }
         }
 
         internal void Render()
         {
-            for (int index = 0; index < this.Renderers.Count; ++index)
+            for (int index = 0; index < Renderers.Count; ++index)
             {
-                if (this.Renderers[index].Visible)
+                if (Renderers[index].Visible)
                 {
-                    Draw.Renderer = this.Renderers[index];
-                    this.Renderers[index].Render(this.scene);
+                    Draw.Renderer = Renderers[index];
+                    Renderers[index].Render(scene);
                 }
             }
         }
 
         internal void AfterRender()
         {
-            for (int index = 0; index < this.Renderers.Count; ++index)
+            for (int index = 0; index < Renderers.Count; ++index)
             {
-                if (this.Renderers[index].Visible)
+                if (Renderers[index].Visible)
                 {
-                    Draw.Renderer = this.Renderers[index];
-                    this.Renderers[index].AfterRender(this.scene);
+                    Draw.Renderer = Renderers[index];
+                    Renderers[index].AfterRender(scene);
                 }
             }
         }
 
         public void MoveToFront(Renderer renderer)
         {
-            this.Renderers.Remove(renderer);
-            this.Renderers.Add(renderer);
+            Renderers.Remove(renderer);
+            Renderers.Add(renderer);
         }
 
-        public void Add(Renderer renderer) => this.adding.Add(renderer);
+        public void Add(Renderer renderer) => adding.Add(renderer);
 
-        public void Remove(Renderer renderer) => this.removing.Add(renderer);
+        public void Remove(Renderer renderer) => removing.Add(renderer);
     }
 }
