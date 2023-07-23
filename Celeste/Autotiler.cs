@@ -92,63 +92,61 @@ namespace Celeste
             {
                 if (obj is not XmlComment)
                 {
-                    XmlElement xml1 = obj as XmlElement;
-                    string str1 = xml1.Attr("mask");
+                    XmlElement objXml = obj as XmlElement;
+                    string mask = objXml.Attr("mask");
                     Tiles tiles;
-                    if (str1 == "center")
+
+                    if (mask == "center")
                         tiles = data.Center;
-                    else if (str1 == "padding")
-                    {
+                    else if (mask == "padding")
                         tiles = data.Padded;
-                    }
                     else
                     {
                         Masked masked = new();
                         tiles = masked.Tiles;
-                        int index = 0;
+
                         int num = 0;
-                        for (; index < str1.Length; ++index)
+                        for (int i = 0; i < mask.Length; i++)
                         {
-                            if (str1[index] == '0')
+                            if (mask[i] == '0')
                                 masked.Mask[num++] = 0;
-                            else if (str1[index] == '1')
+                            else if (mask[i] == '1')
                                 masked.Mask[num++] = 1;
-                            else if (str1[index] is 'x' or 'X')
+                            else if (mask[i] is 'x' or 'X')
                                 masked.Mask[num++] = 2;
                         }
                         data.Masked.Add(masked);
                     }
-                    string str2 = xml1.Attr("tiles");
-                    char[] chArray1 = new char[1]{ ';' };
-                    foreach (string str3 in str2.Split(chArray1))
+
+                    string tilesStr = objXml.Attr("tiles");
+                    foreach (string tileStr in tilesStr.Split(';'))
                     {
-                        char[] chArray2 = new char[1]{ ',' };
-                        string[] strArray = str3.Split(chArray2);
+                        string[] strArray = tileStr.Split(',');
                         int x = int.Parse(strArray[0]);
                         int y = int.Parse(strArray[1]);
-                        MTexture mtexture = tileset[x, y];
-                        tiles.Textures.Add(mtexture);
+                        tiles.Textures.Add(tileset[x, y]);
                     }
-                    if (xml1.HasAttr("sprites"))
+
+                    if (objXml.HasAttr("sprites"))
                     {
-                        string str4 = xml1.Attr("sprites");
-                        char[] chArray3 = new char[1]{ ',' };
-                        foreach (string str5 in str4.Split(chArray3))
-                            tiles.OverlapSprites.Add(str5);
+                        string sprites = objXml.Attr("sprites");
+                        foreach (string sprite in sprites.Split(','))
+                            tiles.OverlapSprites.Add(sprite);
                         tiles.HasOverlays = true;
                     }
                 }
             }
+
             data.Masked.Sort((a, b) =>
             {
                 int num1 = 0;
                 int num2 = 0;
-                for (int index = 0; index < 9; ++index)
+                for (int i = 0; i < 9; i++)
                 {
-                    if (a.Mask[index] == 2)
-                        ++num1;
-                    if (b.Mask[index] == 2)
-                        ++num2;
+                    if (a.Mask[i] == 2)
+                        num1++;
+                    if (b.Mask[i] == 2)
+                        num2++;
                 }
                 return num1 - num2;
             });
@@ -250,9 +248,9 @@ namespace Celeste
                         Tiles tiles = TileHandler(null, x, y, forceFill, forceID, behaviour);
                         if (tiles != null)
                         {
-                            tileGrid.Tiles[x - startX, y - startY] = Calc.Random.Choose<MTexture>(tiles.Textures);
+                            tileGrid.Tiles[x - startX, y - startY] = Calc.Random.Choose(tiles.Textures);
                             if (tiles.HasOverlays)
-                                animatedTiles.Set(x - startX, y - startY, Calc.Random.Choose<string>(tiles.OverlapSprites));
+                                animatedTiles.Set(x - startX, y - startY, Calc.Random.Choose(tiles.OverlapSprites));
                         }
                     }
                 }
@@ -276,34 +274,43 @@ namespace Celeste
             char tile = GetTile(mapData, x, y, forceFill, forceID, behaviour);
             if (IsEmpty(tile))
                 return null;
+
             TerrainType set = lookup[tile];
             bool flag1 = true;
             int num = 0;
-            for (int index1 = -1; index1 < 2; ++index1)
+
+            for (int yOffset = -1; yOffset < 2; ++yOffset)
             {
-                for (int index2 = -1; index2 < 2; ++index2)
+                for (int xOffset = -1; xOffset < 2; ++xOffset)
                 {
-                    bool flag2 = CheckTile(set, mapData, x + index2, y + index1, forceFill, behaviour);
-                    if (!flag2 && behaviour.EdgesIgnoreOutOfLevel && !CheckForSameLevel(x, y, x + index2, y + index1))
+                    bool flag2 = CheckTile(set, mapData, x + xOffset, y + yOffset, forceFill, behaviour);
+                    if (!flag2 && behaviour.EdgesIgnoreOutOfLevel && !CheckForSameLevel(x, y, x + xOffset, y + yOffset))
                         flag2 = true;
-                    adjacent[num++] = flag2 ? (byte) 1 : (byte) 0;
+
+                    adjacent[num++] = (byte) (flag2 ? 1 : 0);
+
                     if (!flag2)
                         flag1 = false;
                 }
             }
+
             if (flag1)
-                return (behaviour.PaddingIgnoreOutOfLevel ? !CheckTile(set, mapData, x - 2, y, forceFill, behaviour) && CheckForSameLevel(x, y, x - 2, y) || !CheckTile(set, mapData, x + 2, y, forceFill, behaviour) && CheckForSameLevel(x, y, x + 2, y) || !CheckTile(set, mapData, x, y - 2, forceFill, behaviour) && CheckForSameLevel(x, y, x, y - 2) || !CheckTile(set, mapData, x, y + 2, forceFill, behaviour) && CheckForSameLevel(x, y, x, y + 2) : !CheckTile(set, mapData, x - 2, y, forceFill, behaviour) || !CheckTile(set, mapData, x + 2, y, forceFill, behaviour) || !CheckTile(set, mapData, x, y - 2, forceFill, behaviour) || !CheckTile(set, mapData, x, y + 2, forceFill, behaviour)) ? lookup[tile].Padded : lookup[tile].Center;
+                return (behaviour.PaddingIgnoreOutOfLevel ?
+                    !CheckTile(set, mapData, x - 2, y, forceFill, behaviour) && CheckForSameLevel(x, y, x - 2, y) || !CheckTile(set, mapData, x + 2, y, forceFill, behaviour) && CheckForSameLevel(x, y, x + 2, y) || !CheckTile(set, mapData, x, y - 2, forceFill, behaviour) && CheckForSameLevel(x, y, x, y - 2) || !CheckTile(set, mapData, x, y + 2, forceFill, behaviour) && CheckForSameLevel(x, y, x, y + 2) : !CheckTile(set, mapData, x - 2, y, forceFill, behaviour) || !CheckTile(set, mapData, x + 2, y, forceFill, behaviour) || !CheckTile(set, mapData, x, y - 2, forceFill, behaviour) || !CheckTile(set, mapData, x, y + 2, forceFill, behaviour)) ? lookup[tile].Padded : lookup[tile].Center;
+            
             foreach (Masked masked in set.Masked)
             {
                 bool flag3 = true;
-                for (int index = 0; index < 9 & flag3; ++index)
+                for (int i = 0; i < 9 & flag3; ++i)
                 {
-                    if (masked.Mask[index] != 2 && masked.Mask[index] != adjacent[index])
+                    if (masked.Mask[i] != 2 && masked.Mask[i] != adjacent[i])
                         flag3 = false;
                 }
+
                 if (flag3)
                     return masked.Tiles;
             }
+
             return null;
         }
 
@@ -327,8 +334,10 @@ namespace Celeste
         {
             if (forceFill.Contains(x, y))
                 return true;
+
             if (mapData == null)
                 return behaviour.EdgesExtend;
+
             if (x < 0 || y < 0 || x >= mapData.Columns || y >= mapData.Rows)
             {
                 if (!behaviour.EdgesExtend)
@@ -336,8 +345,9 @@ namespace Celeste
                 char ch = mapData[Calc.Clamp(x, 0, mapData.Columns - 1), Calc.Clamp(y, 0, mapData.Rows - 1)];
                 return !IsEmpty(ch) && !set.Ignore(ch);
             }
-            char ch1 = mapData[x, y];
-            return !IsEmpty(ch1) && !set.Ignore(ch1);
+
+            char tile = mapData[x, y];
+            return !IsEmpty(tile) && !set.Ignore(tile);
         }
 
         private char GetTile(
@@ -350,12 +360,16 @@ namespace Celeste
         {
             if (forceFill.Contains(x, y))
                 return forceID;
+
             if (mapData == null)
                 return !behaviour.EdgesExtend ? '0' : forceID;
+
             if (x >= 0 && y >= 0 && x < mapData.Columns && y < mapData.Rows)
                 return mapData[x, y];
+
             if (!behaviour.EdgesExtend)
                 return '0';
+
             int x1 = Calc.Clamp(x, 0, mapData.Columns - 1);
             int y1 = Calc.Clamp(y, 0, mapData.Rows - 1);
             return mapData[x1, y1];

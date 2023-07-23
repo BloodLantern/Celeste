@@ -61,15 +61,13 @@
 
         public void RemoveSelf()
         {
-            if (Entity == null)
-                return;
-            Entity.Remove(this);
+            Entity?.Remove(this);
         }
 
         public T SceneAs<T>() where T : Scene => Scene as T;
 
         public T EntityAs<T>() where T : Entity => Entity as T;
 
-        public Scene Scene => Entity == null ? null : Entity.Scene;
+        public Scene Scene => Entity?.Scene;
     }
 }

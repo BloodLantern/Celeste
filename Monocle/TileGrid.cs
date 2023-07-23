@@ -12,6 +12,12 @@ namespace Monocle
         public Camera ClipCamera;
         public float Alpha = 1f;
 
+        public int TileWidth { get; private set; }
+        public int TileHeight { get; private set; }
+
+        public int TilesX => Tiles.Columns;
+        public int TilesY => Tiles.Rows;
+
         public TileGrid(int tileWidth, int tileHeight, int tilesX, int tilesY)
             : base(false, true)
         {
@@ -19,14 +25,6 @@ namespace Monocle
             TileHeight = tileHeight;
             Tiles = new VirtualMap<MTexture>(tilesX, tilesY);
         }
-
-        public int TileWidth { get; private set; }
-
-        public int TileHeight { get; private set; }
-
-        public int TilesX => Tiles.Columns;
-
-        public int TilesY => Tiles.Rows;
 
         public void Populate(Tileset tileset, int[,] tiles, int offsetX = 0, int offsetY = 0)
         {
@@ -97,14 +95,14 @@ namespace Monocle
 
         public void FillRect(int x, int y, int columns, int rows, MTexture tile)
         {
-            int num1 = Math.Max(0, x);
-            int num2 = Math.Max(0, y);
-            int num3 = Math.Min(TilesX, x + columns);
-            int num4 = Math.Min(TilesY, y + rows);
-            for (int x1 = num1; x1 < num3; x1++)
+            int validX = Math.Max(0, x);
+            int validY = Math.Max(0, y);
+            int validColumns = Math.Min(TilesX, x + columns);
+            int validRows = Math.Min(TilesY, y + rows);
+            for (int currentX = validX; currentX < validColumns; currentX++)
             {
-                for (int y1 = num2; y1 < num4; y1++)
-                    Tiles[x1, y1] = tile;
+                for (int currentY = validY; currentY < validRows; currentY++)
+                    Tiles[currentX, currentY] = tile;
             }
         }
 

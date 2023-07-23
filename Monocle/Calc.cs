@@ -26,6 +26,7 @@ namespace Monocle
             1,
             1
         };
+
         public const float Right = 0f;
         public const float Up = -MathHelper.Pi / 2;
         public const float Left = MathHelper.Pi;
@@ -42,6 +43,7 @@ namespace Monocle
         public const float HalfCircle = MathHelper.Pi;
         public const float QuarterCircle = MathHelper.Pi / 2;
         public const float EighthCircle = MathHelper.Pi / 4;
+
         private const string Hex = "0123456789ABCDEF";
         private static Stopwatch stopwatch;
 

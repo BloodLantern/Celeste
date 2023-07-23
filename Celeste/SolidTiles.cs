@@ -20,26 +20,28 @@ namespace Celeste
             tileTypes = data;
             EnableAssistModeChecks = false;
             AllowStaticMovers = false;
+
             Collider = Grid = new Grid(data.Columns, data.Rows, 8f, 8f);
-            for (int x1 = 0; x1 < data.Columns; x1 += 50)
+            for (int x = 0; x < data.Columns; x += 50)
             {
-                for (int y1 = 0; y1 < data.Rows; y1 += 50)
+                for (int y = 0; y < data.Rows; y += 50)
                 {
-                    if (data.AnyInSegmentAtTile(x1, y1))
+                    if (!data.AnyInSegmentAtTile(x, y))
+                        return;
+
+                    int x2 = x;
+                    for (int index1 = Math.Min(x2 + 50, data.Columns); x2 < index1; ++x2)
                     {
-                        int x2 = x1;
-                        for (int index1 = Math.Min(x2 + 50, data.Columns); x2 < index1; ++x2)
+                        int y2 = y;
+                        for (int index2 = Math.Min(y2 + 50, data.Rows); y2 < index2; ++y2)
                         {
-                            int y2 = y1;
-                            for (int index2 = Math.Min(y2 + 50, data.Rows); y2 < index2; ++y2)
-                            {
-                                if (data[x2, y2] != '0')
-                                    Grid[x2, y2] = true;
-                            }
+                            if (data[x2, y2] != '0')
+                                Grid[x2, y2] = true;
                         }
                     }
                 }
             }
+
             Autotiler.Generated map = GFX.FGAutotiler.GenerateMap(data, true);
             Tiles = map.TileGrid;
             Tiles.VisualExtend = 1;

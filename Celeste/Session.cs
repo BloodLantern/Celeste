@@ -18,7 +18,7 @@ namespace Celeste
         public HashSet<EntityID> Strawberries = new();
         public HashSet<EntityID> DoNotLoad = new();
         public HashSet<EntityID> Keys = new();
-        public List<Session.Counter> Counters = new();
+        public List<Counter> Counters = new();
         public bool[] SummitGems = new bool[6];
         public AreaStats OldStats;
         public bool UnlockedCSide;
@@ -198,7 +198,7 @@ namespace Celeste
                     return;
                 }
             }
-            Counters.Add(new Session.Counter()
+            Counters.Add(new Counter()
             {
                 Key = counter,
                 Value = value
@@ -215,7 +215,7 @@ namespace Celeste
                     return;
                 }
             }
-            Counters.Add(new Session.Counter()
+            Counters.Add(new Counter()
             {
                 Key = counter,
                 Value = 1

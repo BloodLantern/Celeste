@@ -8,7 +8,7 @@
         {
             Texture = texture;
             TileWidth = tileWidth;
-            TileHeight = TileHeight;
+            TileHeight = TileHeight; // It doesn't change anything because they hardcoded the tile size anyway
 
             tiles = new MTexture[Texture.Width / tileWidth, Texture.Height / tileHeight];
 

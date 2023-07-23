@@ -9,18 +9,18 @@ namespace Celeste
 
         public BackgroundTiles(Vector2 position, VirtualMap<char> data)
         {
-            this.Position = position;
-            this.Tag = (int) Tags.Global;
-            this.Tiles = GFX.BGAutotiler.GenerateMap(data, false).TileGrid;
-            this.Tiles.VisualExtend = 1;
-            this.Add((Component) this.Tiles);
-            this.Depth = 10000;
+            Position = position;
+            Tag = (int) Tags.Global;
+            Tiles = GFX.BGAutotiler.GenerateMap(data, false).TileGrid;
+            Tiles.VisualExtend = 1;
+            Add(Tiles);
+            Depth = 10000;
         }
 
         public override void Added(Scene scene)
         {
             base.Added(scene);
-            this.Tiles.ClipCamera = this.SceneAs<Level>().Camera;
+            Tiles.ClipCamera = SceneAs<Level>().Camera;
         }
     }
 }

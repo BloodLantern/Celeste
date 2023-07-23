@@ -29,205 +29,187 @@ namespace Celeste
         {
             MapData mapData = session.MapData;
             AreaData areaData = AreaData.Get(session);
+
             if (session.Area.ID == 0)
                 SaveData.Instance.Assists.DashMode = Assists.DashModes.Normal;
+
             Level.Add(Level.GameplayRenderer = new GameplayRenderer());
             Level.Add(Level.Lighting = new LightingRenderer());
             Level.Add(Level.Bloom = new BloomRenderer());
             Level.Add(Level.Displacement = new DisplacementRenderer());
             Level.Add(Level.Background = new BackdropRenderer());
             Level.Add(Level.Foreground = new BackdropRenderer());
+
             Level.Add(new DustEdges());
             Level.Add(new WaterSurface());
             Level.Add(new MirrorSurfaces());
             Level.Add(new GlassBlockBg());
             Level.Add(new LightningRenderer());
             Level.Add(new SeekerBarrierRenderer());
+
             Level.Add(Level.HudRenderer = new HudRenderer());
+
             if (session.Area.ID == 9)
                 Level.Add(new IceTileOverlay());
+
             Level.BaseLightingAlpha = Level.Lighting.Alpha = areaData.DarknessAlpha;
             Level.Bloom.Base = areaData.BloomBase;
             Level.Bloom.Strength = areaData.BloomStrength;
             Level.BackgroundColor = mapData.BackgroundColor;
             Level.Background.Backdrops = mapData.CreateBackdrops(mapData.Background);
+
             foreach (Backdrop backdrop in Level.Background.Backdrops)
                 backdrop.Renderer = Level.Background;
             Level.Foreground.Backdrops = mapData.CreateBackdrops(mapData.Foreground);
             foreach (Backdrop backdrop in Level.Foreground.Backdrops)
                 backdrop.Renderer = Level.Foreground;
+
             Level.RendererList.UpdateLists();
             Level.Add(Level.FormationBackdrop = new FormationBackdrop());
+
             Level.Camera = Level.GameplayRenderer.Camera;
             Audio.SetCamera(Level.Camera);
+
             Level.Session = session;
             SaveData.Instance.StartSession(Level.Session);
+
             Level.Particles = new ParticleSystem(-8000, 400)
             {
                 Tag = (int)Tags.Global
             };
             Level.Add(Level.Particles);
+
             Level.ParticlesBG = new ParticleSystem(8000, 400)
             {
                 Tag = (int)Tags.Global
             };
             Level.Add(Level.ParticlesBG);
+
             Level.ParticlesFG = new ParticleSystem(-50000, 800)
             {
                 Tag = (int)Tags.Global
             };
             Level.ParticlesFG.Add(new MirrorReflection());
+
             Level.Add(Level.ParticlesFG);
+
             Level.Add(Level.strawberriesDisplay = new TotalStrawberriesDisplay());
             Level.Add(new SpeedrunTimerDisplay());
             Level.Add(new GameplayStats());
             Level.Add(new GrabbyIcon());
-            Rectangle tileBounds1 = mapData.TileBounds;
+
+            Rectangle mapTileBounds = mapData.TileBounds;
+
             GFX.FGAutotiler.LevelBounds.Clear();
-            VirtualMap<char> data1 = new(tileBounds1.Width, tileBounds1.Height, '0');
-            VirtualMap<char> data2 = new(tileBounds1.Width, tileBounds1.Height, '0');
-            VirtualMap<bool> virtualMap = new(tileBounds1.Width, tileBounds1.Height);
-            Regex regex = new("\\r\\n|\\n\\r|\\n|\\r");
+
+            VirtualMap<char> bgMap = new(mapTileBounds.Width, mapTileBounds.Height, '0');
+            VirtualMap<char> fgMap = new(mapTileBounds.Width, mapTileBounds.Height, '0');
+            VirtualMap<bool> solidMap = new(mapTileBounds.Width, mapTileBounds.Height);
+
+            Regex lineSeparator = new("\\r\\n|\\n\\r|\\n|\\r");
+
             foreach (LevelData level in mapData.Levels)
             {
-                Rectangle tileBounds2 = level.TileBounds;
-                int left1 = tileBounds2.Left;
-                tileBounds2 = level.TileBounds;
-                int top1 = tileBounds2.Top;
-                string[] strArray1 = regex.Split(level.Bg);
-                for (int index1 = top1; index1 < top1 + strArray1.Length; ++index1)
+                string[] bgTiles = lineSeparator.Split(level.Bg);
+                for (int y = mapTileBounds.Top; y < mapTileBounds.Top + bgTiles.Length; y++)
                 {
-                    for (int index2 = left1; index2 < left1 + strArray1[index1 - top1].Length; ++index2)
-                        data1[index2 - tileBounds1.X, index1 - tileBounds1.Y] = strArray1[index1 - top1][index2 - left1];
+                    for (int x = mapTileBounds.Left; x < mapTileBounds.Left + bgTiles[y - mapTileBounds.Top].Length; x++)
+                        bgMap[x - mapTileBounds.X, y - mapTileBounds.Y] = bgTiles[y - mapTileBounds.Top][x - mapTileBounds.Left];
                 }
-                string[] strArray2 = regex.Split(level.Solids);
-                for (int index3 = top1; index3 < top1 + strArray2.Length; ++index3)
+
+                string[] fgTiles = lineSeparator.Split(level.Solids);
+                for (int y = mapTileBounds.Top; y < mapTileBounds.Top + fgTiles.Length; y++)
                 {
-                    for (int index4 = left1; index4 < left1 + strArray2[index3 - top1].Length; ++index4)
-                        data2[index4 - tileBounds1.X, index3 - tileBounds1.Y] = strArray2[index3 - top1][index4 - left1];
+                    for (int x = mapTileBounds.Left; x < mapTileBounds.Left + fgTiles[y - mapTileBounds.Top].Length; x++)
+                        fgMap[x - mapTileBounds.X, y - mapTileBounds.Y] = fgTiles[y - mapTileBounds.Top][x - mapTileBounds.Left];
                 }
-                tileBounds2 = level.TileBounds;
-                int left2 = tileBounds2.Left;
-                while (true)
+
+                for (int left = mapTileBounds.Left; left < mapTileBounds.Right; left++)
                 {
-                    int num1 = left2;
-                    tileBounds2 = level.TileBounds;
-                    int right = tileBounds2.Right;
-                    if (num1 < right)
-                    {
-                        tileBounds2 = level.TileBounds;
-                        int top2 = tileBounds2.Top;
-                        while (true)
-                        {
-                            int num2 = top2;
-                            tileBounds2 = level.TileBounds;
-                            int bottom = tileBounds2.Bottom;
-                            if (num2 < bottom)
-                            {
-                                virtualMap[left2 - tileBounds1.Left, top2 - tileBounds1.Top] = true;
-                                ++top2;
-                            }
-                            else
-                                break;
-                        }
-                        ++left2;
-                    }
-                    else
-                        break;
+                    for (int top = mapTileBounds.Top; top < mapTileBounds.Bottom; top++)
+                        solidMap[left - mapTileBounds.Left, top - mapTileBounds.Top] = true;
                 }
-                GFX.FGAutotiler.LevelBounds.Add(new Rectangle(level.TileBounds.X - tileBounds1.X, level.TileBounds.Y - tileBounds1.Y, level.TileBounds.Width, level.TileBounds.Height));
+
+                GFX.FGAutotiler.LevelBounds.Add(new Rectangle(level.TileBounds.X - mapTileBounds.X, level.TileBounds.Y - mapTileBounds.Y, level.TileBounds.Width, level.TileBounds.Height));
             }
-            foreach (Rectangle rectangle in mapData.Filler)
+
+            foreach (Rectangle filler in mapData.Filler)
             {
-                for (int left = rectangle.Left; left < rectangle.Right; ++left)
+                for (int x = filler.Left; x < filler.Right; x++)
                 {
-                    for (int top = rectangle.Top; top < rectangle.Bottom; ++top)
+                    for (int y = filler.Top; y < filler.Bottom; y++)
                     {
-                        char ch1 = '0';
-                        if (rectangle.Top - tileBounds1.Y > 0)
+                        char fillerType = '0';
+
+                        if (filler.Top - mapTileBounds.Y > 0)
                         {
-                            char ch2 = data2[left - tileBounds1.X, rectangle.Top - tileBounds1.Y - 1];
-                            if (ch2 != '0')
-                                ch1 = ch2;
+                            char topType = fgMap[x - mapTileBounds.X, filler.Top - mapTileBounds.Y - 1];
+                            if (topType != '0')
+                                fillerType = topType;
                         }
-                        if (ch1 == '0' && rectangle.Left - tileBounds1.X > 0)
+
+                        if (fillerType == '0' && filler.Left - mapTileBounds.X > 0)
                         {
-                            char ch3 = data2[rectangle.Left - tileBounds1.X - 1, top - tileBounds1.Y];
-                            if (ch3 != '0')
-                                ch1 = ch3;
+                            char leftType = fgMap[filler.Left - mapTileBounds.X - 1, y - mapTileBounds.Y];
+                            if (leftType != '0')
+                                fillerType = leftType;
                         }
-                        if (ch1 == '0' && rectangle.Right - tileBounds1.X < tileBounds1.Width - 1)
+
+                        if (fillerType == '0' && filler.Right - mapTileBounds.X < mapTileBounds.Width - 1)
                         {
-                            char ch4 = data2[rectangle.Right - tileBounds1.X, top - tileBounds1.Y];
-                            if (ch4 != '0')
-                                ch1 = ch4;
+                            char rightType = fgMap[filler.Right - mapTileBounds.X, y - mapTileBounds.Y];
+                            if (rightType != '0')
+                                fillerType = rightType;
                         }
-                        if (ch1 == '0' && rectangle.Bottom - tileBounds1.Y < tileBounds1.Height - 1)
+
+                        if (fillerType == '0' && filler.Bottom - mapTileBounds.Y < mapTileBounds.Height - 1)
                         {
-                            char ch5 = data2[left - tileBounds1.X, rectangle.Bottom - tileBounds1.Y];
-                            if (ch5 != '0')
-                                ch1 = ch5;
+                            char bottomType = fgMap[x - mapTileBounds.X, filler.Bottom - mapTileBounds.Y];
+                            if (bottomType != '0')
+                                fillerType = bottomType;
                         }
-                        if (ch1 == '0')
-                            ch1 = '1';
-                        data2[left - tileBounds1.X, top - tileBounds1.Y] = ch1;
-                        virtualMap[left - tileBounds1.X, top - tileBounds1.Y] = true;
+
+                        if (fillerType == '0')
+                            fillerType = '1';
+
+                        fgMap[x - mapTileBounds.X, y - mapTileBounds.Y] = fillerType;
+                        solidMap[x - mapTileBounds.X, y - mapTileBounds.Y] = true;
                     }
                 }
             }
+
             using (List<LevelData>.Enumerator enumerator = mapData.Levels.GetEnumerator())
             {
-label_81:
+                const int halfTileSize = 4;
                 while (enumerator.MoveNext())
                 {
-                    LevelData current = enumerator.Current;
-                    Rectangle tileBounds3 = current.TileBounds;
-                    int left3 = tileBounds3.Left;
-                    while (true)
+                    LevelData level = enumerator.Current;
+                    Rectangle levelTileBounds = level.TileBounds;
+
+                    for (int x = levelTileBounds.Left; x < levelTileBounds.Right; x++)
                     {
-                        int num3 = left3;
-                        tileBounds3 = current.TileBounds;
-                        int right = tileBounds3.Right;
-                        if (num3 < right)
-                        {
-                            tileBounds3 = current.TileBounds;
-                            int top = tileBounds3.Top;
-                            char ch6 = data1[left3 - tileBounds1.X, top - tileBounds1.Y];
-                            for (int index = 1; index < 4 && !virtualMap[left3 - tileBounds1.X, top - tileBounds1.Y - index]; ++index)
-                                data1[left3 - tileBounds1.X, top - tileBounds1.Y - index] = ch6;
-                            tileBounds3 = current.TileBounds;
-                            int num4 = tileBounds3.Bottom - 1;
-                            char ch7 = data1[left3 - tileBounds1.X, num4 - tileBounds1.Y];
-                            for (int index = 1; index < 4 && !virtualMap[left3 - tileBounds1.X, num4 - tileBounds1.Y + index]; ++index)
-                                data1[left3 - tileBounds1.X, num4 - tileBounds1.Y + index] = ch7;
-                            ++left3;
-                        }
-                        else
-                            break;
+                        int top = levelTileBounds.Top;
+                        char ch6 = bgMap[x - mapTileBounds.X, top - mapTileBounds.Y];
+                        for (int i = 1; i < halfTileSize && !solidMap[x - mapTileBounds.X, top - mapTileBounds.Y - i]; i++)
+                            bgMap[x - mapTileBounds.X, top - mapTileBounds.Y - i] = ch6;
+
+                        int bottom = levelTileBounds.Bottom - 1;
+                        char ch7 = bgMap[x - mapTileBounds.X, bottom - mapTileBounds.Y];
+                        for (int i = 1; i < halfTileSize && !solidMap[x - mapTileBounds.X, bottom - mapTileBounds.Y + i]; i++)
+                            bgMap[x - mapTileBounds.X, bottom - mapTileBounds.Y + i] = ch7;
                     }
-                    tileBounds3 = current.TileBounds;
-                    int num5 = tileBounds3.Top - 4;
-                    while (true)
+                    
+                    for (int y = levelTileBounds.Top - halfTileSize; y < levelTileBounds.Bottom + halfTileSize; y++)
                     {
-                        int num6 = num5;
-                        tileBounds3 = current.TileBounds;
-                        int num7 = tileBounds3.Bottom + 4;
-                        if (num6 < num7)
-                        {
-                            tileBounds3 = current.TileBounds;
-                            int left4 = tileBounds3.Left;
-                            char ch8 = data1[left4 - tileBounds1.X, num5 - tileBounds1.Y];
-                            for (int index = 1; index < 4 && !virtualMap[left4 - tileBounds1.X - index, num5 - tileBounds1.Y]; ++index)
-                                data1[left4 - tileBounds1.X - index, num5 - tileBounds1.Y] = ch8;
-                            tileBounds3 = current.TileBounds;
-                            int num8 = tileBounds3.Right - 1;
-                            char ch9 = data1[num8 - tileBounds1.X, num5 - tileBounds1.Y];
-                            for (int index = 1; index < 4 && !virtualMap[num8 - tileBounds1.X + index, num5 - tileBounds1.Y]; ++index)
-                                data1[num8 - tileBounds1.X + index, num5 - tileBounds1.Y] = ch9;
-                            ++num5;
-                        }
-                        else
-                            goto label_81;
+                        int left = levelTileBounds.Left;
+                        char ch8 = bgMap[left - mapTileBounds.X, y - mapTileBounds.Y];
+                        for (int i = 1; i < halfTileSize && !solidMap[left - mapTileBounds.X - i, y - mapTileBounds.Y]; i++)
+                            bgMap[left - mapTileBounds.X - i, y - mapTileBounds.Y] = ch8;
+
+                        int right = levelTileBounds.Right - 1;
+                        char ch9 = bgMap[right - mapTileBounds.X, y - mapTileBounds.Y];
+                        for (int i = 1; i < halfTileSize && !solidMap[right - mapTileBounds.X + i, y - mapTileBounds.Y]; i++)
+                            bgMap[right - mapTileBounds.X + i, y - mapTileBounds.Y] = ch9;
                     }
                 }
             }
@@ -248,17 +230,17 @@ label_96:
                         {
                             tileBounds4 = current.TileBounds;
                             int top = tileBounds4.Top;
-                            if (data2[left - tileBounds1.X, top - tileBounds1.Y] == '0')
+                            if (fgMap[left - mapTileBounds.X, top - mapTileBounds.Y] == '0')
                             {
                                 for (int index = 1; index < 8; ++index)
-                                    virtualMap[left - tileBounds1.X, top - tileBounds1.Y - index] = true;
+                                    solidMap[left - mapTileBounds.X, top - mapTileBounds.Y - index] = true;
                             }
                             tileBounds4 = current.TileBounds;
                             int num10 = tileBounds4.Bottom - 1;
-                            if (data2[left - tileBounds1.X, num10 - tileBounds1.Y] == '0')
+                            if (fgMap[left - mapTileBounds.X, num10 - mapTileBounds.Y] == '0')
                             {
                                 for (int index = 1; index < 8; ++index)
-                                    virtualMap[left - tileBounds1.X, num10 - tileBounds1.Y + index] = true;
+                                    solidMap[left - mapTileBounds.X, num10 - mapTileBounds.Y + index] = true;
                             }
                             ++left;
                         }
@@ -269,12 +251,12 @@ label_96:
             }
             using (List<LevelData>.Enumerator enumerator = mapData.Levels.GetEnumerator())
             {
-label_118:
                 while (enumerator.MoveNext())
                 {
                     LevelData current = enumerator.Current;
                     Rectangle tileBounds5 = current.TileBounds;
                     int left5 = tileBounds5.Left;
+
                     while (true)
                     {
                         int num11 = left5;
@@ -284,21 +266,23 @@ label_118:
                         {
                             tileBounds5 = current.TileBounds;
                             int top = tileBounds5.Top;
-                            char ch10 = data2[left5 - tileBounds1.X, top - tileBounds1.Y];
-                            for (int index = 1; index < 4 && !virtualMap[left5 - tileBounds1.X, top - tileBounds1.Y - index]; ++index)
-                                data2[left5 - tileBounds1.X, top - tileBounds1.Y - index] = ch10;
+                            char ch10 = fgMap[left5 - mapTileBounds.X, top - mapTileBounds.Y];
+                            for (int index = 1; index < 4 && !solidMap[left5 - mapTileBounds.X, top - mapTileBounds.Y - index]; ++index)
+                                fgMap[left5 - mapTileBounds.X, top - mapTileBounds.Y - index] = ch10;
                             tileBounds5 = current.TileBounds;
                             int num12 = tileBounds5.Bottom - 1;
-                            char ch11 = data2[left5 - tileBounds1.X, num12 - tileBounds1.Y];
-                            for (int index = 1; index < 4 && !virtualMap[left5 - tileBounds1.X, num12 - tileBounds1.Y + index]; ++index)
-                                data2[left5 - tileBounds1.X, num12 - tileBounds1.Y + index] = ch11;
+                            char ch11 = fgMap[left5 - mapTileBounds.X, num12 - mapTileBounds.Y];
+                            for (int index = 1; index < 4 && !solidMap[left5 - mapTileBounds.X, num12 - mapTileBounds.Y + index]; ++index)
+                                fgMap[left5 - mapTileBounds.X, num12 - mapTileBounds.Y + index] = ch11;
                             ++left5;
                         }
                         else
                             break;
                     }
+
                     tileBounds5 = current.TileBounds;
                     int num13 = tileBounds5.Top - 4;
+
                     while (true)
                     {
                         int num14 = num13;
@@ -308,59 +292,59 @@ label_118:
                         {
                             tileBounds5 = current.TileBounds;
                             int left6 = tileBounds5.Left;
-                            char ch12 = data2[left6 - tileBounds1.X, num13 - tileBounds1.Y];
-                            for (int index = 1; index < 4 && !virtualMap[left6 - tileBounds1.X - index, num13 - tileBounds1.Y]; ++index)
-                                data2[left6 - tileBounds1.X - index, num13 - tileBounds1.Y] = ch12;
+                            char ch12 = fgMap[left6 - mapTileBounds.X, num13 - mapTileBounds.Y];
+                            for (int index = 1; index < 4 && !solidMap[left6 - mapTileBounds.X - index, num13 - mapTileBounds.Y]; ++index)
+                                fgMap[left6 - mapTileBounds.X - index, num13 - mapTileBounds.Y] = ch12;
                             tileBounds5 = current.TileBounds;
                             int num16 = tileBounds5.Right - 1;
-                            char ch13 = data2[num16 - tileBounds1.X, num13 - tileBounds1.Y];
-                            for (int index = 1; index < 4 && !virtualMap[num16 - tileBounds1.X + index, num13 - tileBounds1.Y]; ++index)
-                                data2[num16 - tileBounds1.X + index, num13 - tileBounds1.Y] = ch13;
+                            char ch13 = fgMap[num16 - mapTileBounds.X, num13 - mapTileBounds.Y];
+                            for (int index = 1; index < 4 && !solidMap[num16 - mapTileBounds.X + index, num13 - mapTileBounds.Y]; ++index)
+                                fgMap[num16 - mapTileBounds.X + index, num13 - mapTileBounds.Y] = ch13;
                             ++num13;
                         }
                         else
-                            goto label_118;
+                            break;
                     }
                 }
             }
-            Vector2 position = new Vector2(tileBounds1.X, tileBounds1.Y) * 8f;
+
+            Vector2 position = new Vector2(mapTileBounds.X, mapTileBounds.Y) * 8f;
             Calc.PushRandom(mapData.LoadSeed);
-            BackgroundTiles backgroundTiles = new BackgroundTiles(position, data1);
+            BackgroundTiles backgroundTiles = new(position, bgMap);
             Level.BgTiles = backgroundTiles;
             Level.Add(backgroundTiles);
-            SolidTiles solidTiles = new SolidTiles(position, data2);
+            SolidTiles solidTiles = new(position, fgMap);
             Level.SolidTiles = solidTiles;
             Level.Add(solidTiles);
-            Level.BgData = data1;
-            Level.SolidsData = data2;
+            Level.BgData = bgMap;
+            Level.SolidsData = fgMap;
             Calc.PopRandom();
             new Entity(position)
             {
-                 (Level.FgTilesLightMask = new TileGrid(8, 8, tileBounds1.Width, tileBounds1.Height))
+                 (Level.FgTilesLightMask = new TileGrid(8, 8, mapTileBounds.Width, mapTileBounds.Height))
             };
             Level.FgTilesLightMask.Color = Color.Black;
-            foreach (LevelData level5 in mapData.Levels)
+            foreach (LevelData level in mapData.Levels)
             {
-                Rectangle tileBounds6 = level5.TileBounds;
+                Rectangle tileBounds6 = level.TileBounds;
                 int left = tileBounds6.Left;
-                tileBounds6 = level5.TileBounds;
+                tileBounds6 = level.TileBounds;
                 int top = tileBounds6.Top;
-                int width = level5.TileBounds.Width;
-                int height = level5.TileBounds.Height;
-                if (!string.IsNullOrEmpty(level5.BgTiles))
+                int width = level.TileBounds.Width;
+                int height = level.TileBounds.Height;
+                if (!string.IsNullOrEmpty(level.BgTiles))
                 {
-                    int[,] tiles = Calc.ReadCSVIntGrid(level5.BgTiles, width, height);
-                    backgroundTiles.Tiles.Overlay(GFX.SceneryTiles, tiles, left - tileBounds1.X, top - tileBounds1.Y);
+                    int[,] tiles = Calc.ReadCSVIntGrid(level.BgTiles, width, height);
+                    backgroundTiles.Tiles.Overlay(GFX.SceneryTiles, tiles, left - mapTileBounds.X, top - mapTileBounds.Y);
                 }
-                if (!string.IsNullOrEmpty(level5.FgTiles))
+                if (!string.IsNullOrEmpty(level.FgTiles))
                 {
-                    int[,] tiles = Calc.ReadCSVIntGrid(level5.FgTiles, width, height);
-                    solidTiles.Tiles.Overlay(GFX.SceneryTiles, tiles, left - tileBounds1.X, top - tileBounds1.Y);
-                    Level.FgTilesLightMask.Overlay(GFX.SceneryTiles, tiles, left - tileBounds1.X, top - tileBounds1.Y);
+                    int[,] tiles = Calc.ReadCSVIntGrid(level.FgTiles, width, height);
+                    solidTiles.Tiles.Overlay(GFX.SceneryTiles, tiles, left - mapTileBounds.X, top - mapTileBounds.Y);
+                    Level.FgTilesLightMask.Overlay(GFX.SceneryTiles, tiles, left - mapTileBounds.X, top - mapTileBounds.Y);
                 }
             }
-            if (areaData.OnLevelBegin != null)
-                areaData.OnLevelBegin(Level);
+            areaData.OnLevelBegin?.Invoke(Level);
             Level.StartPosition = startPosition;
             Level.Pathfinder = new Pathfinder(Level);
             Loaded = true;

@@ -6,8 +6,8 @@ namespace Celeste
 {
     public class AnimatedTilesBank
     {
-        public Dictionary<string, AnimatedTilesBank.Animation> AnimationsByName = new Dictionary<string, AnimatedTilesBank.Animation>();
-        public List<AnimatedTilesBank.Animation> Animations = new List<AnimatedTilesBank.Animation>();
+        public Dictionary<string, Animation> AnimationsByName = new();
+        public List<Animation> Animations = new();
 
         public void Add(
             string name,
@@ -16,7 +16,7 @@ namespace Celeste
             Vector2 origin,
             List<MTexture> textures)
         {
-            AnimatedTilesBank.Animation animation = new AnimatedTilesBank.Animation()
+            Animation animation = new Animation()
             {
                 Name = name,
                 Delay = delay,
@@ -25,10 +25,10 @@ namespace Celeste
                 Frames = textures.ToArray()
             } with
             {
-                ID = this.Animations.Count
+                ID = Animations.Count
             };
-            this.Animations.Add(animation);
-            this.AnimationsByName.Add(name, animation);
+            Animations.Add(animation);
+            AnimationsByName.Add(name, animation);
         }
 
         public struct Animation
