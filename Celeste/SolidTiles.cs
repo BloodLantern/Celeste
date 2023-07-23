@@ -27,7 +27,7 @@ namespace Celeste
                 for (int y = 0; y < data.Rows; y += 50)
                 {
                     if (!data.AnyInSegmentAtTile(x, y))
-                        return;
+                        continue;
 
                     int x2 = x;
                     for (int index1 = Math.Min(x2 + 50, data.Columns); x2 < index1; ++x2)

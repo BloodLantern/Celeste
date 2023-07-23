@@ -110,26 +110,51 @@ namespace Celeste
 
             foreach (LevelData level in mapData.Levels)
             {
-                string[] bgTiles = lineSeparator.Split(level.Bg);
-                for (int y = mapTileBounds.Top; y < mapTileBounds.Top + bgTiles.Length; y++)
+                Rectangle tileBounds2 = level.TileBounds;
+                int left1 = tileBounds2.Left;
+                tileBounds2 = level.TileBounds;
+                int top1 = tileBounds2.Top;
+                string[] strArray1 = lineSeparator.Split(level.Bg);
+                for (int index1 = top1; index1 < top1 + strArray1.Length; ++index1)
                 {
-                    for (int x = mapTileBounds.Left; x < mapTileBounds.Left + bgTiles[y - mapTileBounds.Top].Length; x++)
-                        bgMap[x - mapTileBounds.X, y - mapTileBounds.Y] = bgTiles[y - mapTileBounds.Top][x - mapTileBounds.Left];
+                    for (int index2 = left1; index2 < left1 + strArray1[index1 - top1].Length; ++index2)
+                        bgMap[index2 - mapTileBounds.X, index1 - mapTileBounds.Y] = strArray1[index1 - top1][index2 - left1];
                 }
-
-                string[] fgTiles = lineSeparator.Split(level.Solids);
-                for (int y = mapTileBounds.Top; y < mapTileBounds.Top + fgTiles.Length; y++)
+                string[] strArray2 = lineSeparator.Split(level.Solids);
+                for (int index3 = top1; index3 < top1 + strArray2.Length; ++index3)
                 {
-                    for (int x = mapTileBounds.Left; x < mapTileBounds.Left + fgTiles[y - mapTileBounds.Top].Length; x++)
-                        fgMap[x - mapTileBounds.X, y - mapTileBounds.Y] = fgTiles[y - mapTileBounds.Top][x - mapTileBounds.Left];
+                    for (int index4 = left1; index4 < left1 + strArray2[index3 - top1].Length; ++index4)
+                        fgMap[index4 - mapTileBounds.X, index3 - mapTileBounds.Y] = strArray2[index3 - top1][index4 - left1];
                 }
-
-                for (int left = mapTileBounds.Left; left < mapTileBounds.Right; left++)
+                tileBounds2 = level.TileBounds;
+                int left2 = tileBounds2.Left;
+                while (true)
                 {
-                    for (int top = mapTileBounds.Top; top < mapTileBounds.Bottom; top++)
-                        solidMap[left - mapTileBounds.Left, top - mapTileBounds.Top] = true;
+                    int num1 = left2;
+                    tileBounds2 = level.TileBounds;
+                    int right = tileBounds2.Right;
+                    if (num1 < right)
+                    {
+                        tileBounds2 = level.TileBounds;
+                        int top2 = tileBounds2.Top;
+                        while (true)
+                        {
+                            int num2 = top2;
+                            tileBounds2 = level.TileBounds;
+                            int bottom = tileBounds2.Bottom;
+                            if (num2 < bottom)
+                            {
+                                solidMap[left2 - mapTileBounds.Left, top2 - mapTileBounds.Top] = true;
+                                ++top2;
+                            }
+                            else
+                                break;
+                        }
+                        ++left2;
+                    }
+                    else
+                        break;
                 }
-
                 GFX.FGAutotiler.LevelBounds.Add(new Rectangle(level.TileBounds.X - mapTileBounds.X, level.TileBounds.Y - mapTileBounds.Y, level.TileBounds.Width, level.TileBounds.Height));
             }
 

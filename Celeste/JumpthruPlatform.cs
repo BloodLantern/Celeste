@@ -5,9 +5,9 @@ namespace Celeste
 {
     public class JumpthruPlatform : JumpThru
     {
-        private int columns;
-        private string overrideTexture;
-        private int overrideSoundIndex = -1;
+        private readonly int columns;
+        private readonly string overrideTexture;
+        private readonly int overrideSoundIndex = -1;
 
         public JumpthruPlatform(
             Vector2 position,
@@ -16,8 +16,8 @@ namespace Celeste
             int overrideSoundIndex = -1)
             : base(position, width, true)
         {
-            this.columns = width / 8;
-            this.Depth = -60;
+            columns = width / 8;
+            Depth = -60;
             this.overrideTexture = overrideTexture;
             this.overrideSoundIndex = overrideSoundIndex;
         }
@@ -29,58 +29,60 @@ namespace Celeste
 
         public override void Awake(Scene scene)
         {
-            string str = AreaData.Get(scene).Jumpthru;
-            if (!string.IsNullOrEmpty(this.overrideTexture) && !this.overrideTexture.Equals("default"))
-                str = this.overrideTexture;
-            if (this.overrideSoundIndex > 0)
+            string type = AreaData.Get(scene).Jumpthru;
+            if (!string.IsNullOrEmpty(overrideTexture) && !overrideTexture.Equals("default"))
+                type = overrideTexture;
+            if (overrideSoundIndex > 0)
             {
-                this.SurfaceSoundIndex = this.overrideSoundIndex;
+                SurfaceSoundIndex = overrideSoundIndex;
             }
             else
             {
-                string lower = str.ToLower();
-                if (!(lower == "dream"))
+                string lowerType = type.ToLower();
+                if (!(lowerType == "dream"))
                 {
-                    if (!(lower == "temple") && !(lower == "templeb"))
+                    if (lowerType is not "temple" and not "templeb")
                     {
-                        if (!(lower == "core"))
+                        if (!(lowerType == "core"))
                         {
-                            if (lower == "wood" || lower == "cliffside")
-                                this.SurfaceSoundIndex = 5;
+                            if (lowerType is "wood" or "cliffside")
+                                SurfaceSoundIndex = 5;
                         }
                         else
-                            this.SurfaceSoundIndex = 3;
+                            SurfaceSoundIndex = 3;
                     }
                     else
-                        this.SurfaceSoundIndex = 8;
+                        SurfaceSoundIndex = 8;
                 }
                 else
-                    this.SurfaceSoundIndex = 32;
+                    SurfaceSoundIndex = 32;
             }
-            MTexture mtexture = GFX.Game["objects/jumpthru/" + str];
+            MTexture mtexture = GFX.Game["objects/jumpthru/" + type];
             int num1 = mtexture.Width / 8;
-            for (int index = 0; index < this.columns; ++index)
+            for (int index = 0; index < columns; ++index)
             {
                 int num2;
                 int num3;
                 if (index == 0)
                 {
                     num2 = 0;
-                    num3 = this.CollideCheck<Solid, SwapBlock, ExitBlock>(this.Position + new Vector2(-1f, 0.0f)) ? 0 : 1;
+                    num3 = CollideCheck<Solid, SwapBlock, ExitBlock>(Position + new Vector2(-1f, 0.0f)) ? 0 : 1;
                 }
-                else if (index == this.columns - 1)
+                else if (index == columns - 1)
                 {
                     num2 = num1 - 1;
-                    num3 = this.CollideCheck<Solid, SwapBlock, ExitBlock>(this.Position + new Vector2(1f, 0.0f)) ? 0 : 1;
+                    num3 = CollideCheck<Solid, SwapBlock, ExitBlock>(Position + new Vector2(1f, 0.0f)) ? 0 : 1;
                 }
                 else
                 {
                     num2 = 1 + Calc.Random.Next(num1 - 2);
                     num3 = Calc.Random.Choose<int>(0, 1);
                 }
-                Monocle.Image image = new Monocle.Image(mtexture.GetSubtexture(num2 * 8, num3 * 8, 8, 8));
-                image.X = (float) (index * 8);
-                this.Add((Component) image);
+                Image image = new(mtexture.GetSubtexture(num2 * 8, num3 * 8, 8, 8))
+                {
+                    X = index * 8
+                };
+                Add(image);
             }
         }
     }

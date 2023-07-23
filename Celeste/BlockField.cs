@@ -9,7 +9,7 @@ namespace Celeste
         public BlockField(Vector2 position, int width, int height)
             : base(position)
         {
-            this.Collider = (Collider) new Hitbox((float) width, (float) height);
+            Collider = new Hitbox(width, height);
         }
 
         public BlockField(EntityData data, Vector2 offset)

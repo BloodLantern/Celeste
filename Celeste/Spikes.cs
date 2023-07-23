@@ -224,7 +224,7 @@ namespace Celeste
                 case Directions.Down:
                     return data.Width;
                 default:
-                    int num = (int) (dir - 2);
+                    int num = (int) (dir - 2); // ???
                     return data.Height;
             }
         }

@@ -5,7 +5,7 @@ namespace Monocle
     public class Image : GraphicsComponent
     {
         public MTexture Texture;
-        public bool TEST;
+        public bool TEST; // Seriously ?
 
         public Image(MTexture texture)
             : base(false)
