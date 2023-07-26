@@ -266,15 +266,15 @@ namespace Monocle
 
         public static void PopRandom() => Random = randomStack.Pop();
 
-        public static T Choose<T>(this Random random, T a, T b) => GiveMe<T>(random.Next(2), a, b);
+        public static T Choose<T>(this Random random, T a, T b) => GiveMe(random.Next(2), a, b);
 
-        public static T Choose<T>(this Random random, T a, T b, T c) => GiveMe<T>(random.Next(3), a, b, c);
+        public static T Choose<T>(this Random random, T a, T b, T c) => GiveMe(random.Next(3), a, b, c);
 
-        public static T Choose<T>(this Random random, T a, T b, T c, T d) => GiveMe<T>(random.Next(4), a, b, c, d);
+        public static T Choose<T>(this Random random, T a, T b, T c, T d) => GiveMe(random.Next(4), a, b, c, d);
 
-        public static T Choose<T>(this Random random, T a, T b, T c, T d, T e) => GiveMe<T>(random.Next(5), a, b, c, d, e);
+        public static T Choose<T>(this Random random, T a, T b, T c, T d, T e) => GiveMe(random.Next(5), a, b, c, d, e);
 
-        public static T Choose<T>(this Random random, T a, T b, T c, T d, T e, T f) => GiveMe<T>(random.Next(6), a, b, c, d, e, f);
+        public static T Choose<T>(this Random random, T a, T b, T c, T d, T e, T f) => GiveMe(random.Next(6), a, b, c, d, e, f);
 
         public static T Choose<T>(this Random random, params T[] choices) => choices[random.Next(choices.Length)];
 

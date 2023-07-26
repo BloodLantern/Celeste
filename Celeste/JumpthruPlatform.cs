@@ -57,32 +57,39 @@ namespace Celeste
                 else
                     SurfaceSoundIndex = 32;
             }
-            MTexture mtexture = GFX.Game["objects/jumpthru/" + type];
-            int num1 = mtexture.Width / 8;
-            for (int index = 0; index < columns; ++index)
+
+            MTexture texture = GFX.Game["objects/jumpthru/" + type];
+            int partWidth = texture.Width / 8;
+            for (int x = 0; x < columns; x++)
             {
-                int num2;
-                int num3;
-                if (index == 0)
+                int offsetX;
+                int offsetY;
+
+                // Left
+                if (x == 0)
                 {
-                    num2 = 0;
-                    num3 = CollideCheck<Solid, SwapBlock, ExitBlock>(Position + new Vector2(-1f, 0.0f)) ? 0 : 1;
+                    offsetX = 0;
+                    offsetY = CollideCheck<Solid, SwapBlock, ExitBlock>(Position + new Vector2(-1f, 0f)) ? 0 : 1;
                 }
-                else if (index == columns - 1)
+                // Right
+                else if (x == columns - 1)
                 {
-                    num2 = num1 - 1;
-                    num3 = CollideCheck<Solid, SwapBlock, ExitBlock>(Position + new Vector2(1f, 0.0f)) ? 0 : 1;
+                    offsetX = partWidth - 1;
+                    offsetY = CollideCheck<Solid, SwapBlock, ExitBlock>(Position + new Vector2(1f, 0f)) ? 0 : 1;
                 }
+                // Middle
                 else
                 {
-                    num2 = 1 + Calc.Random.Next(num1 - 2);
-                    num3 = Calc.Random.Choose<int>(0, 1);
+                    offsetX = 1 + Calc.Random.Next(partWidth - 2);
+                    offsetY = Calc.Random.Choose(0, 1);
                 }
-                Image image = new(mtexture.GetSubtexture(num2 * 8, num3 * 8, 8, 8))
-                {
-                    X = index * 8
-                };
-                Add(image);
+
+                Add(
+                    new Image(texture.GetSubtexture(offsetX * 8, offsetY * 8, 8, 8))
+                    {
+                        X = x * 8
+                    }
+                );
             }
         }
     }

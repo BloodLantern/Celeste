@@ -96,7 +96,7 @@ namespace Celeste
         {
             get
             {
-                return Texture != null && PlayerSprite.FrameMetadata.TryGetValue(Texture.AtlasPath, out PlayerAnimMetadata playerAnimMetadata) ? playerAnimMetadata.HairOffset : Vector2.Zero;
+                return Texture != null && FrameMetadata.TryGetValue(Texture.AtlasPath, out PlayerAnimMetadata playerAnimMetadata) ? playerAnimMetadata.HairOffset : Vector2.Zero;
             }
         }
 
@@ -104,7 +104,7 @@ namespace Celeste
         {
             get
             {
-                return Texture != null && PlayerSprite.FrameMetadata.TryGetValue(Texture.AtlasPath, out PlayerAnimMetadata playerAnimMetadata) ? playerAnimMetadata.CarryYOffset * Scale.Y : 0.0f;
+                return Texture != null && FrameMetadata.TryGetValue(Texture.AtlasPath, out PlayerAnimMetadata playerAnimMetadata) ? playerAnimMetadata.CarryYOffset * Scale.Y : 0.0f;
             }
         }
 
@@ -112,7 +112,7 @@ namespace Celeste
         {
             get
             {
-                return Texture != null && PlayerSprite.FrameMetadata.TryGetValue(Texture.AtlasPath, out PlayerAnimMetadata playerAnimMetadata) ? playerAnimMetadata.Frame : 0;
+                return Texture != null && FrameMetadata.TryGetValue(Texture.AtlasPath, out PlayerAnimMetadata playerAnimMetadata) ? playerAnimMetadata.Frame : 0;
             }
         }
 
@@ -120,7 +120,7 @@ namespace Celeste
         {
             get
             {
-                return Texture != null && PlayerSprite.FrameMetadata.TryGetValue(Texture.AtlasPath, out PlayerAnimMetadata playerAnimMetadata) && playerAnimMetadata.HasHair;
+                return Texture != null && FrameMetadata.TryGetValue(Texture.AtlasPath, out PlayerAnimMetadata playerAnimMetadata) && playerAnimMetadata.HasHair;
             }
         }
 
@@ -165,7 +165,7 @@ namespace Celeste
                             string str3 = str2 + (index < 10 ? "0" : (object) "") + index;
                             if (index == 0 && !GFX.Game.Has(str3))
                                 str3 = str2;
-                            PlayerSprite.FrameMetadata[str3] = playerAnimMetadata;
+                            FrameMetadata[str3] = playerAnimMetadata;
                             if (index < strArray1.Length)
                             {
                                 if (strArray1[index].Equals("x", StringComparison.OrdinalIgnoreCase) || strArray1[index].Length <= 0)
@@ -189,6 +189,6 @@ namespace Celeste
             }
         }
 
-        public static void ClearFramesMetadata() => PlayerSprite.FrameMetadata.Clear();
+        public static void ClearFramesMetadata() => FrameMetadata.Clear();
     }
 }

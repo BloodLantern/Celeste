@@ -63,6 +63,9 @@ namespace Monocle
 
         public static ulong FrameCounter { get; private set; }
 
+        /// <summary>
+        /// Absolute content directory path.
+        /// </summary>
         public static string ContentDirectory => Path.Combine(AssemblyDirectory, Instance.Content.RootDirectory);
 
         public Engine(

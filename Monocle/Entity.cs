@@ -375,11 +375,11 @@ namespace Monocle
             where Exclude1 : Entity
             where Exclude2 : Entity
         {
-            List<Entity> entity1 = Scene.Tracker.Entities[typeof (Exclude1)];
-            List<Entity> entity2 = Scene.Tracker.Entities[typeof (Exclude2)];
-            foreach (Entity b in Scene.Tracker.Entities[typeof (T)])
+            List<Entity> exclude1List = Scene.Tracker.Entities[typeof (Exclude1)];
+            List<Entity> exculde2List = Scene.Tracker.Entities[typeof (Exclude2)];
+            foreach (Entity entity in Scene.Tracker.Entities[typeof (T)])
             {
-                if (!entity1.Contains(b) && !entity2.Contains(b) && Collide.Check(this, b))
+                if (!exclude1List.Contains(entity) && !exculde2List.Contains(entity) && Collide.Check(this, entity))
                     return true;
             }
             return false;
@@ -392,9 +392,9 @@ namespace Monocle
         {
             Vector2 position = Position;
             Position = at;
-            int num = CollideCheck<T, Exclude1, Exclude2>() ? 1 : 0;
+            bool result = CollideCheck<T, Exclude1, Exclude2>();
             Position = position;
-            return num != 0;
+            return result;
         }
 
         public bool CollideCheckByComponent<T>() where T : Component

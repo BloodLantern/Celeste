@@ -56,7 +56,7 @@ namespace Celeste
                 }
                 if ((double) (Nodes[index] - node).Length() > (double) num1)
                     Nodes[index] = node + (Nodes[index] - node).SafeNormalize() * num1;
-                target = Nodes[index] + new Vector2(-(int) Facing * StepInFacingPerSegment, (float) Math.Sin(wave + index * 0.800000011920929) * StepYSinePerSegment) + StepPerSegment;
+                target = Nodes[index] + new Vector2(-(int) Facing * StepInFacingPerSegment, (float) Math.Sin(wave + index * 0.8f) * StepYSinePerSegment) + StepPerSegment;
                 node = Nodes[index];
             }
         }
@@ -79,13 +79,13 @@ namespace Celeste
                 return;
 
             Vector2 origin = new(5f, 5f);
-            Color color1 = Border * Alpha;
-            Color color2 = Color * Alpha;
+            Color borderColor = Border * Alpha;
+            Color centerColor = Color * Alpha;
             if (DrawPlayerSpriteOutline)
             {
                 Color color3 = Sprite.Color;
                 Vector2 position = Sprite.Position;
-                Sprite.Color = color1;
+                Sprite.Color = borderColor;
                 Sprite.Position = position + new Vector2(0f, -1f);
                 Sprite.Render();
                 Sprite.Position = position + new Vector2(0f, 1f);
@@ -98,30 +98,30 @@ namespace Celeste
                 Sprite.Position = position;
             }
             Nodes[0] = Nodes[0].Floor();
-            if (color1.A > 0)
+            if (borderColor.A > 0)
             {
-                for (int index = 0; index < Sprite.HairCount; ++index)
+                for (int i = 0; i < Sprite.HairCount; ++i)
                 {
                     int hairFrame = Sprite.HairFrame;
-                    MTexture mtexture = index == 0 ? bangs[hairFrame] : GFX.Game["characters/player/hair00"];
-                    Vector2 hairScale = GetHairScale(index);
-                    mtexture.Draw(Nodes[index] + new Vector2(-1f, 0f), origin, color1, hairScale);
-                    mtexture.Draw(Nodes[index] + new Vector2(1f, 0f), origin, color1, hairScale);
-                    mtexture.Draw(Nodes[index] + new Vector2(0f, -1f), origin, color1, hairScale);
-                    mtexture.Draw(Nodes[index] + new Vector2(0f, 1f), origin, color1, hairScale);
+                    MTexture mtexture = i == 0 ? bangs[hairFrame] : GFX.Game["characters/player/hair00"];
+                    Vector2 hairScale = GetHairScale(i);
+                    mtexture.Draw(Nodes[i] + new Vector2(-1f, 0f), origin, borderColor, hairScale);
+                    mtexture.Draw(Nodes[i] + new Vector2(1f, 0f), origin, borderColor, hairScale);
+                    mtexture.Draw(Nodes[i] + new Vector2(0f, -1f), origin, borderColor, hairScale);
+                    mtexture.Draw(Nodes[i] + new Vector2(0f, 1f), origin, borderColor, hairScale);
                 }
             }
-            for (int index = Sprite.HairCount - 1; index >= 0; --index)
+            for (int i = Sprite.HairCount - 1; i >= 0; --i)
             {
                 int hairFrame = Sprite.HairFrame;
-                (index == 0 ? bangs[hairFrame] : GFX.Game["characters/player/hair00"]).Draw(Nodes[index], origin, color2, GetHairScale(index));
+                (i == 0 ? bangs[hairFrame] : GFX.Game["characters/player/hair00"]).Draw(Nodes[i], origin, centerColor, GetHairScale(i));
             }
         }
 
         private Vector2 GetHairScale(int index)
         {
-            float y = (float) (0.25 + (1.0 - index / (double) Sprite.HairCount) * 0.75);
-            return new Vector2((index == 0 ? (float) Facing : y) * Math.Abs(Sprite.Scale.X), y);
+            float scale = 0.25f + (1f - index / Sprite.HairCount) * 0.75f;
+            return new Vector2((index == 0 ? (float) Facing : scale) * Math.Abs(Sprite.Scale.X), scale);
         }
     }
 }
