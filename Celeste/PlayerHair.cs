@@ -120,7 +120,7 @@ namespace Celeste
 
         private Vector2 GetHairScale(int index)
         {
-            float scale = 0.25f + (1f - index / Sprite.HairCount) * 0.75f;
+            float scale = 0.25f + (1f - index / (float) Sprite.HairCount) * 0.75f;
             return new Vector2((index == 0 ? (float) Facing : scale) * Math.Abs(Sprite.Scale.X), scale);
         }
     }

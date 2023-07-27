@@ -638,7 +638,7 @@ namespace Monocle
 
         public static bool BetweenInterval(float val, float interval) => val % (interval * 2) > interval;
 
-        public static bool OnInterval(float val, float prevVal, float interval) => prevVal / interval != val / interval;
+        public static bool OnInterval(float val, float prevVal, float interval) => (int) (prevVal / interval) != (int) (val / interval);
 
         public static Vector2 Toward(Vector2 from, Vector2 to, float length) => from == to ? Vector2.Zero : (to - from).SafeNormalize(length);
 
