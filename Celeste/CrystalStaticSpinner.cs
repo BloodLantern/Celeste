@@ -144,14 +144,14 @@ namespace Celeste
         {
             foreach (Component component in Components)
             {
-                if (component is Monocle.Image image)
+                if (component is Image image)
                     image.Color = GetHue(Position + image.Position);
             }
             if (filler == null)
                 return;
             foreach (Component component in filler.Components)
             {
-                if (component is Monocle.Image image)
+                if (component is Image image)
                     image.Color = GetHue(Position + image.Position);
             }
         }
@@ -159,7 +159,7 @@ namespace Celeste
         private bool InView()
         {
             Camera camera = (Scene as Level).Camera;
-            return (double) X > (double) camera.X - 16.0 && (double) Y > (double) camera.Y - 16.0 && (double) X < (double) camera.X + 320.0 + 16.0 && (double) Y < (double) camera.Y + 180.0 + 16.0;
+            return X > camera.X - 16f && Y > camera.Y - 16f && X < camera.X + 320f + 16f && Y < camera.Y + 180f + 16f;
         }
 
         private void CreateSprites()
@@ -180,11 +180,13 @@ namespace Celeste
                 Add(new Image(mtexture.GetSubtexture(10, 10, 14, 14)).SetOrigin(2f, 2f).SetColor(color));
             if (!SolidCheck(new Vector2(X - 4f, Y + 4f)))
                 Add(new Image(mtexture.GetSubtexture(0, 10, 14, 14)).SetOrigin(12f, 2f).SetColor(color));
-            foreach (CrystalStaticSpinner entity in Scene.Tracker.GetEntities<CrystalStaticSpinner>().Cast<CrystalStaticSpinner>())
+
+            foreach (CrystalStaticSpinner spinner in Scene.Tracker.GetEntities<CrystalStaticSpinner>().Cast<CrystalStaticSpinner>())
             {
-                if (entity != this && entity.AttachToSolid == AttachToSolid && (double) entity.X >= (double) X && (double) (entity.Position - Position).Length() < 24.0)
-                    AddSprite((Position + entity.Position) / 2f - Position);
+                if (spinner != this && spinner.AttachToSolid == AttachToSolid && spinner.X >= X && (spinner.Position - Position).Length() < 24f)
+                    AddSprite((Position + spinner.Position) / 2f - Position);
             }
+
             Scene.Add(border = new Border(this, filler));
             expanded = true;
             Calc.PopRandom();
@@ -197,10 +199,12 @@ namespace Celeste
                 Scene.Add(filler = new Entity(Position));
                 filler.Depth = Depth + 1;
             }
-            List<MTexture> atlasSubtextures = GFX.Game.GetAtlasSubtextures(CrystalStaticSpinner.bgTextureLookup[color]);
-            Monocle.Image image = new(Calc.Random.Choose<MTexture>(atlasSubtextures));
-            image.Position = offset;
-            image.Rotation = Calc.Random.Choose<int>(0, 1, 2, 3) * 1.57079637f;
+            List<MTexture> atlasSubtextures = GFX.Game.GetAtlasSubtextures(bgTextureLookup[color]);
+            Image image = new(Calc.Random.Choose(atlasSubtextures))
+            {
+                Position = offset,
+                Rotation = Calc.Random.Choose(0, 1, 2, 3) * MathHelper.PiOver2
+            };
             image.CenterOrigin();
             if (color == CrystalColor.Rainbow)
                 image.Color = GetHue(Position + offset);
@@ -225,7 +229,7 @@ namespace Celeste
             filler = null;
             border?.RemoveSelf();
             border = null;
-            foreach (Component component in Components.GetAll<Monocle.Image>())
+            foreach (Component component in Components.GetAll<Image>())
                 component.RemoveSelf();
             expanded = false;
         }
@@ -234,8 +238,8 @@ namespace Celeste
         {
             foreach (Component component in Components)
             {
-                if (component is Monocle.Image)
-                    (component as Monocle.Image).Position = pos;
+                if (component is Image)
+                    (component as Image).Position = pos;
             }
         }
 
@@ -274,7 +278,7 @@ namespace Celeste
         private Color GetHue(Vector2 position)
         {
             float num = 280f;
-            return Calc.HsvToColor((float) (0.40000000596046448 + (double) Calc.YoYo((position.Length() + Scene.TimeActive * 50f) % num / num) * 0.40000000596046448), 0.4f, 0.9f);
+            return Calc.HsvToColor(0.4f + Calc.YoYo((position.Length() + Scene.TimeActive * 50f) % num / num) * 0.4f, 0.4f, 0.9f);
         }
 
         private class CoreModeListener : Component
@@ -323,7 +327,7 @@ namespace Celeste
                     return;
                 foreach (Component component in entity.Components)
                 {
-                    if (component is Monocle.Image image)
+                    if (component is Image image)
                     {
                         Color color = image.Color;
                         Vector2 position = image.Position;

@@ -1141,10 +1141,12 @@ namespace Celeste
                     }
                 }
             }
+
             foreach (DecalData fgDecal in levelData.FgDecals)
                 Add(new Decal(fgDecal.Texture, entityOffset + fgDecal.Position, fgDecal.Scale, -10500));
             foreach (DecalData bgDecal in levelData.BgDecals)
                 Add(new Decal(bgDecal.Texture, entityOffset + bgDecal.Position, bgDecal.Scale, 9000));
+
             if (playerIntro != Player.IntroTypes.Transition)
             {
                 if (Session.JustStarted && !Session.StartedFromBeginning && nullable.HasValue && !StartPosition.HasValue)

@@ -76,7 +76,7 @@ namespace Celeste
             if (!string.IsNullOrEmpty(overrideType) && !overrideType.Equals("default"))
                 spikeType = overrideType;
             string directionStr = Direction.ToString().ToLower();
-            if (spikeType == "tentacles")
+            if (spikeType == TentacleType)
             {
                 for (int i = 0; i < size / 16; i++)
                     AddTentacle(i);
@@ -116,7 +116,7 @@ namespace Celeste
 
         private void AddTentacle(float i)
         {
-            Sprite sprite = GFX.SpriteBank.Create("tentacles");
+            Sprite sprite = GFX.SpriteBank.Create(TentacleType);
             sprite.Play(Calc.Random.Next(3).ToString(), true, true);
             sprite.Position = (Direction is Directions.Up or Directions.Down ? Vector2.UnitX : Vector2.UnitY) * (i + 0.5f) * 16f;
             sprite.Scale.X = Calc.Random.Choose<int>(-1, 1);

@@ -6,160 +6,163 @@ namespace Celeste
 {
     public class Spring : Entity
     {
-        private Sprite sprite;
-        private Wiggler wiggler;
-        private StaticMover staticMover;
-        public Spring.Orientations Orientation;
-        private bool playerCanUse;
+        private readonly Sprite sprite;
+        private readonly Wiggler wiggler;
+        private readonly StaticMover staticMover;
+        public Orientations Orientation;
+        private readonly bool playerCanUse;
         public Color DisabledColor = Color.White;
         public bool VisibleWhenDisabled;
 
-        public Spring(Vector2 position, Spring.Orientations orientation, bool playerCanUse)
+        public Spring(Vector2 position, Orientations orientation, bool playerCanUse)
             : base(position)
         {
-            this.Orientation = orientation;
+            Orientation = orientation;
             this.playerCanUse = playerCanUse;
-            this.Add((Component) new PlayerCollider(new Action<Player>(this.OnCollide)));
-            this.Add((Component) new HoldableCollider(new Action<Holdable>(this.OnHoldable)));
-            PufferCollider pufferCollider = new PufferCollider(new Action<Puffer>(this.OnPuffer));
-            this.Add((Component) pufferCollider);
-            this.Add((Component) (this.sprite = new Sprite(GFX.Game, "objects/spring/")));
-            this.sprite.Add("idle", "", 0.0f, new int[1]);
-            this.sprite.Add("bounce", "", 0.07f, "idle", 0, 1, 2, 2, 2, 2, 2, 2, 2, 2, 2, 3, 4, 5);
-            this.sprite.Add("disabled", "white", 0.07f);
-            this.sprite.Play("idle");
-            this.sprite.Origin.X = this.sprite.Width / 2f;
-            this.sprite.Origin.Y = this.sprite.Height;
-            this.Depth = -8501;
-            this.staticMover = new StaticMover();
-            this.staticMover.OnAttach = (Action<Platform>) (p => this.Depth = p.Depth + 1);
+            Add(new PlayerCollider(new Action<Player>(OnCollide)));
+            Add(new HoldableCollider(new Action<Holdable>(OnHoldable)));
+            PufferCollider pufferCollider = new(new Action<Puffer>(OnPuffer));
+            Add(pufferCollider);
+            Add(sprite = new Sprite(GFX.Game, "objects/spring/"));
+            sprite.Add("idle", "", 0.0f, new int[1]);
+            sprite.Add("bounce", "", 0.07f, "idle", 0, 1, 2, 2, 2, 2, 2, 2, 2, 2, 2, 3, 4, 5);
+            sprite.Add("disabled", "white", 0.07f);
+            sprite.Play("idle");
+            sprite.Origin.X = sprite.Width / 2f;
+            sprite.Origin.Y = sprite.Height;
+            Depth = -8501;
+            staticMover = new StaticMover
+            {
+                OnAttach = p => Depth = p.Depth + 1
+            };
             switch (orientation)
             {
-                case Spring.Orientations.Floor:
-                    this.staticMover.SolidChecker = (Func<Solid, bool>) (s => this.CollideCheck((Entity) s, this.Position + Vector2.UnitY));
-                    this.staticMover.JumpThruChecker = (Func<JumpThru, bool>) (jt => this.CollideCheck((Entity) jt, this.Position + Vector2.UnitY));
-                    this.Add((Component) this.staticMover);
+                case Orientations.Floor:
+                    staticMover.SolidChecker = s => CollideCheck(s, Position + Vector2.UnitY);
+                    staticMover.JumpThruChecker = jt => CollideCheck(jt, Position + Vector2.UnitY);
+                    Add(staticMover);
                     break;
-                case Spring.Orientations.WallLeft:
-                    this.staticMover.SolidChecker = (Func<Solid, bool>) (s => this.CollideCheck((Entity) s, this.Position - Vector2.UnitX));
-                    this.staticMover.JumpThruChecker = (Func<JumpThru, bool>) (jt => this.CollideCheck((Entity) jt, this.Position - Vector2.UnitX));
-                    this.Add((Component) this.staticMover);
+                case Orientations.WallLeft:
+                    staticMover.SolidChecker = s => CollideCheck(s, Position - Vector2.UnitX);
+                    staticMover.JumpThruChecker = jt => CollideCheck(jt, Position - Vector2.UnitX);
+                    Add(staticMover);
                     break;
-                case Spring.Orientations.WallRight:
-                    this.staticMover.SolidChecker = (Func<Solid, bool>) (s => this.CollideCheck((Entity) s, this.Position + Vector2.UnitX));
-                    this.staticMover.JumpThruChecker = (Func<JumpThru, bool>) (jt => this.CollideCheck((Entity) jt, this.Position + Vector2.UnitX));
-                    this.Add((Component) this.staticMover);
+                case Orientations.WallRight:
+                    staticMover.SolidChecker = s => CollideCheck(s, Position + Vector2.UnitX);
+                    staticMover.JumpThruChecker = jt => CollideCheck(jt, Position + Vector2.UnitX);
+                    Add(staticMover);
                     break;
             }
-            this.Add((Component) (this.wiggler = Wiggler.Create(1f, 4f, (Action<float>) (v => this.sprite.Scale.Y = (float) (1.0 + (double) v * 0.20000000298023224)))));
-            if (orientation == Spring.Orientations.Floor)
+            Add(wiggler = Wiggler.Create(1f, 4f, v => sprite.Scale.Y = 1f + v * 0.2f));
+            switch (orientation)
             {
-                this.Collider = (Collider) new Hitbox(16f, 6f, -8f, -6f);
-                pufferCollider.Collider = (Collider) new Hitbox(16f, 10f, -8f, -10f);
-            }
-            else if (orientation == Spring.Orientations.WallLeft)
-            {
-                this.Collider = (Collider) new Hitbox(6f, 16f, y: -8f);
-                pufferCollider.Collider = (Collider) new Hitbox(12f, 16f, y: -8f);
-                this.sprite.Rotation = 1.57079637f;
-            }
-            else
-            {
-                if (orientation != Spring.Orientations.WallRight)
+                case Orientations.Floor:
+                    Collider = new Hitbox(16f, 6f, -8f, -6f);
+                    pufferCollider.Collider = new Hitbox(16f, 10f, -8f, -10f);
+                    break;
+                case Orientations.WallLeft:
+                    Collider = new Hitbox(6f, 16f, y: -8f);
+                    pufferCollider.Collider = new Hitbox(12f, 16f, y: -8f);
+                    sprite.Rotation = MathHelper.PiOver2;
+                    break;
+                case Orientations.WallRight:
+                    Collider = new Hitbox(6f, 16f, -6f, -8f);
+                    pufferCollider.Collider = new Hitbox(12f, 16f, -12f, -8f);
+                    sprite.Rotation = -MathHelper.PiOver2;
+                    break;
+                default:
                     throw new Exception("Orientation not supported!");
-                this.Collider = (Collider) new Hitbox(6f, 16f, -6f, -8f);
-                pufferCollider.Collider = (Collider) new Hitbox(12f, 16f, -12f, -8f);
-                this.sprite.Rotation = -1.57079637f;
             }
-            this.staticMover.OnEnable = new Action(this.OnEnable);
-            this.staticMover.OnDisable = new Action(this.OnDisable);
+            staticMover.OnEnable = new Action(OnEnable);
+            staticMover.OnDisable = new Action(OnDisable);
         }
 
-        public Spring(EntityData data, Vector2 offset, Spring.Orientations orientation)
+        public Spring(EntityData data, Vector2 offset, Orientations orientation)
             : this(data.Position + offset, orientation, data.Bool(nameof (playerCanUse), true))
         {
         }
 
         private void OnEnable()
         {
-            this.Visible = this.Collidable = true;
-            this.sprite.Color = Color.White;
-            this.sprite.Play("idle");
+            Visible = Collidable = true;
+            sprite.Color = Color.White;
+            sprite.Play("idle");
         }
 
         private void OnDisable()
         {
-            this.Collidable = false;
-            if (this.VisibleWhenDisabled)
+            Collidable = false;
+            if (VisibleWhenDisabled)
             {
-                this.sprite.Play("disabled");
-                this.sprite.Color = this.DisabledColor;
+                sprite.Play("disabled");
+                sprite.Color = DisabledColor;
             }
             else
-                this.Visible = false;
+                Visible = false;
         }
 
         private void OnCollide(Player player)
         {
-            if (player.StateMachine.State == 9 || !this.playerCanUse)
+            if (player.StateMachine.State == Player.StDreamDash || !playerCanUse)
                 return;
-            if (this.Orientation == Spring.Orientations.Floor)
+
+            if (Orientation == Orientations.Floor)
             {
-                if ((double) player.Speed.Y < 0.0)
+                if (player.Speed.Y < 0.0)
                     return;
-                this.BounceAnimate();
-                player.SuperBounce(this.Top);
+                BounceAnimate();
+                player.SuperBounce(Top);
             }
-            else if (this.Orientation == Spring.Orientations.WallLeft)
+            else if (Orientation == Orientations.WallLeft)
             {
-                if (!player.SideBounce(1, this.Right, this.CenterY))
+                if (!player.SideBounce(1, Right, CenterY))
                     return;
-                this.BounceAnimate();
+                BounceAnimate();
             }
             else
             {
-                if (this.Orientation != Spring.Orientations.WallRight)
+                if (Orientation != Orientations.WallRight)
                     throw new Exception("Orientation not supported!");
-                if (!player.SideBounce(-1, this.Left, this.CenterY))
+                if (!player.SideBounce(-1, Left, CenterY))
                     return;
-                this.BounceAnimate();
+                BounceAnimate();
             }
         }
 
         private void BounceAnimate()
         {
-            Audio.Play("event:/game/general/spring", this.BottomCenter);
-            this.staticMover.TriggerPlatform();
-            this.sprite.Play("bounce", true);
-            this.wiggler.Start();
+            Audio.Play("event:/game/general/spring", BottomCenter);
+            staticMover.TriggerPlatform();
+            sprite.Play("bounce", true);
+            wiggler.Start();
         }
 
         private void OnHoldable(Holdable h)
         {
             if (!h.HitSpring(this))
                 return;
-            this.BounceAnimate();
+            BounceAnimate();
         }
 
         private void OnPuffer(Puffer p)
         {
             if (!p.HitSpring(this))
                 return;
-            this.BounceAnimate();
+            BounceAnimate();
         }
 
         private void OnSeeker(Seeker seeker)
         {
-            if ((double) seeker.Speed.Y < -120.0)
+            if (seeker.Speed.Y < -120f)
                 return;
-            this.BounceAnimate();
+            BounceAnimate();
             seeker.HitSpring();
         }
 
         public override void Render()
         {
-            if (this.Collidable)
-                this.sprite.DrawOutline();
+            if (Collidable)
+                sprite.DrawOutline();
             base.Render();
         }
 

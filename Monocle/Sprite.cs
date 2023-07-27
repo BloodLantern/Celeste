@@ -359,8 +359,8 @@ namespace Monocle
             if (Texture == null)
                 return;
             Rectangle relativeRect = Texture.GetRelativeRect(rectangle);
-            Vector2 vector2 = new(-Math.Min(rectangle.X - Texture.DrawOffset.X, 0.0f), -Math.Min(rectangle.Y - Texture.DrawOffset.Y, 0.0f));
-            Draw.SpriteBatch.Draw(Texture.Texture.Texture, RenderPosition + offset, new Rectangle?(relativeRect), Color, Rotation, Origin - vector2, Scale, Effects, 0.0f);
+            Vector2 vector2 = new(-Math.Min(rectangle.X - Texture.DrawOffset.X, 0f), -Math.Min(rectangle.Y - Texture.DrawOffset.Y, 0f));
+            Draw.SpriteBatch.Draw(Texture.Texture.Texture, RenderPosition + offset, new Rectangle?(relativeRect), Color, Rotation, Origin - vector2, Scale, Effects, 0f);
         }
 
         public void LogAnimations()

@@ -296,7 +296,15 @@ namespace Celeste
 
             if (flag1)
                 return (behaviour.PaddingIgnoreOutOfLevel ?
-                    !CheckTile(set, mapData, x - 2, y, forceFill, behaviour) && CheckForSameLevel(x, y, x - 2, y) || !CheckTile(set, mapData, x + 2, y, forceFill, behaviour) && CheckForSameLevel(x, y, x + 2, y) || !CheckTile(set, mapData, x, y - 2, forceFill, behaviour) && CheckForSameLevel(x, y, x, y - 2) || !CheckTile(set, mapData, x, y + 2, forceFill, behaviour) && CheckForSameLevel(x, y, x, y + 2) : !CheckTile(set, mapData, x - 2, y, forceFill, behaviour) || !CheckTile(set, mapData, x + 2, y, forceFill, behaviour) || !CheckTile(set, mapData, x, y - 2, forceFill, behaviour) || !CheckTile(set, mapData, x, y + 2, forceFill, behaviour)) ? lookup[tile].Padded : lookup[tile].Center;
+                    !CheckTile(set, mapData, x - 2, y, forceFill, behaviour) && CheckForSameLevel(x, y, x - 2, y)
+                    || !CheckTile(set, mapData, x + 2, y, forceFill, behaviour) && CheckForSameLevel(x, y, x + 2, y)
+                    || !CheckTile(set, mapData, x, y - 2, forceFill, behaviour) && CheckForSameLevel(x, y, x, y - 2)
+                    || !CheckTile(set, mapData, x, y + 2, forceFill, behaviour) && CheckForSameLevel(x, y, x, y + 2)
+                    : !CheckTile(set, mapData, x - 2, y, forceFill, behaviour)
+                    || !CheckTile(set, mapData, x + 2, y, forceFill, behaviour)
+                    || !CheckTile(set, mapData, x, y - 2, forceFill, behaviour)
+                    || !CheckTile(set, mapData, x, y + 2, forceFill, behaviour))
+                    ? lookup[tile].Padded : lookup[tile].Center;
             
             foreach (Masked masked in set.Masked)
             {
