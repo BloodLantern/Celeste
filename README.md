@@ -10,8 +10,8 @@ As it is coded in C#, most of it was done using DotPeek, and what's left is code
 
 ## How to build
 
-Simply clone the project, open the Visual Studio solution file, and you should be good to go! The only thing to do left is to copy the Content folder from the game to the build folder (bin/x86/(Debug|Release)).
+Simply clone the project, open the Visual Studio solution file, and you should be good to go!
 
-<br/><br/><br/><br/>
+## How to run
 
-This Readme will be improved at some point, I'm just too lazy for now.
+The only thing left to do after building is to copy the Content folder from a copy of the game to the build folder (bin/x86/(Debug|Release)). **This project doesn't aim at giving the game for free as you need the assets which aren't included here.**
