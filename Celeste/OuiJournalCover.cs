@@ -8,7 +8,7 @@ namespace Celeste
         public OuiJournalCover(OuiJournal journal)
             : base(journal)
         {
-            this.PageTexture = "cover";
+            PageTexture = "cover";
         }
 
         public override void Redraw(VirtualRenderTarget buffer)

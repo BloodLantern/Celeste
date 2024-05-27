@@ -2,7 +2,7 @@
 
 namespace Celeste
 {
-    [Tracked(false)]
+    [Tracked()]
     public class WaterSurface : Entity
     {
         public override void Update()

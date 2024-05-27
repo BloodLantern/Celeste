@@ -5,7 +5,7 @@ using System;
 
 namespace Celeste
 {
-    [Tracked(false)]
+    [Tracked()]
     public class SwapBlock : Solid
     {
         public static ParticleType P_Move;
@@ -49,9 +49,9 @@ namespace Celeste
             maxBackwardSpeed = maxForwardSpeed * 0.4f;
             Direction.X = Math.Sign(end.X - start.X);
             Direction.Y = Math.Sign(end.Y - start.Y);
-            Add(new DashListener()
+            Add(new DashListener
             {
-                OnDash = new Action<Vector2>(OnDash)
+                OnDash = OnDash
             });
             int x = (int) MathHelper.Min(X, node.X);
             int y = (int) MathHelper.Min(Y, node.Y);
@@ -261,8 +261,8 @@ namespace Celeste
             Sprite middle,
             Color color)
         {
-            int num1 = (int) ((double) width / 8.0);
-            int num2 = (int) ((double) height / 8.0);
+            int num1 = (int) (width / 8.0);
+            int num2 = (int) (height / 8.0);
             ninSlice[0, 0].Draw(pos + new Vector2(0.0f, 0.0f), Vector2.Zero, color);
             ninSlice[2, 0].Draw(pos + new Vector2(width - 8f, 0.0f), Vector2.Zero, color);
             ninSlice[0, 2].Draw(pos + new Vector2(0.0f, height - 8f), Vector2.Zero, color);

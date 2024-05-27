@@ -3,7 +3,7 @@ using System;
 
 namespace Celeste
 {
-    [Tracked(false)]
+    [Tracked()]
     public class DisplacementRenderHook : Component
     {
         public Action RenderDisplacement;
@@ -11,7 +11,7 @@ namespace Celeste
         public DisplacementRenderHook(Action render)
             : base(false, true)
         {
-            this.RenderDisplacement = render;
+            RenderDisplacement = render;
         }
     }
 }

@@ -19,9 +19,9 @@ namespace Celeste
         {
             Orientation = orientation;
             this.playerCanUse = playerCanUse;
-            Add(new PlayerCollider(new Action<Player>(OnCollide)));
-            Add(new HoldableCollider(new Action<Holdable>(OnHoldable)));
-            PufferCollider pufferCollider = new(new Action<Puffer>(OnPuffer));
+            Add(new PlayerCollider(OnCollide));
+            Add(new HoldableCollider(OnHoldable));
+            PufferCollider pufferCollider = new(OnPuffer);
             Add(pufferCollider);
             Add(sprite = new Sprite(GFX.Game, "objects/spring/"));
             sprite.Add("idle", "", 0.0f, new int[1]);
@@ -73,8 +73,8 @@ namespace Celeste
                 default:
                     throw new Exception("Orientation not supported!");
             }
-            staticMover.OnEnable = new Action(OnEnable);
-            staticMover.OnDisable = new Action(OnDisable);
+            staticMover.OnEnable = OnEnable;
+            staticMover.OnDisable = OnDisable;
         }
 
         public Spring(EntityData data, Vector2 offset, Orientations orientation)

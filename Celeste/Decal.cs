@@ -357,7 +357,7 @@ namespace Celeste
             }
         }
 
-        private Vector2 GetMirrorOffset() => new(Calc.Random.Range(5, 14) * Calc.Random.Choose<int>(1, -1), Calc.Random.Range(2, 6) * Calc.Random.Choose<int>(1, -1));
+        private Vector2 GetMirrorOffset() => new(Calc.Random.Range(5, 14) * Calc.Random.Choose(1, -1), Calc.Random.Range(2, 6) * Calc.Random.Choose(1, -1));
 
         private void MakeParallax(float amount)
         {
@@ -393,9 +393,9 @@ namespace Celeste
                 Player entity = Scene.Tracker.GetEntity<Player>();
                 if (entity != null)
                 {
-                    if (image.CurrentAnimationID == "idle" && (double) (entity.Position - Position).Length() < 32.0)
+                    if (image.CurrentAnimationID == "idle" && (entity.Position - Position).Length() < 32.0)
                         image.Play("hide");
-                    else if (image.CurrentAnimationID == "hidden" && (double) (entity.Position - Position).Length() > 48.0)
+                    else if (image.CurrentAnimationID == "hidden" && (entity.Position - Position).Length() > 48.0)
                         image.Play("return");
                 }
             }
@@ -449,7 +449,7 @@ namespace Celeste
                 {
                     float x = (Scene as Level).Wind.X;
                     WindMultiplier = Calc.Approach(WindMultiplier, Math.Min(3f, Math.Abs(x) * 0.004f), Engine.DeltaTime * 4f);
-                    if ((double) x != 0.0)
+                    if (x != 0.0)
                         Offset = Math.Sign(x) * Math.Abs(Offset);
                 }
                 sineTimer += Engine.DeltaTime * WindMultiplier;
@@ -463,7 +463,7 @@ namespace Celeste
                 for (int index = 0; index < segment.Count; ++index)
                 {
                     float num = (EaseDown ? index / (float) segment.Count : (float) (1.0 - index / (double) segment.Count)) * WindMultiplier;
-                    float x = (float) (Math.Sin(sineTimer * (double) WaveSpeed + index * (double) SliceSinIncrement) * (double) num * WaveAmplitude + (double) num * Offset);
+                    float x = (float) (Math.Sin(sineTimer * (double) WaveSpeed + index * (double) SliceSinIncrement) * num * WaveAmplitude + (double) num * Offset);
                     segment[index].Draw(Decal.Position + new Vector2(x, 0.0f), new Vector2(texture.Width / 2, texture.Height / 2 - index * SliceSize), Color.White, Decal.scale);
                 }
             }

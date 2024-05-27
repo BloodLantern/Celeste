@@ -4,7 +4,7 @@ using System;
 
 namespace Celeste
 {
-    [Tracked(false)]
+    [Tracked()]
     public class SolidTiles : Solid
     {
         public TileGrid Tiles;

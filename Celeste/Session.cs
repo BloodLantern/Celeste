@@ -198,7 +198,7 @@ namespace Celeste
                     return;
                 }
             }
-            Counters.Add(new Counter()
+            Counters.Add(new Counter
             {
                 Key = counter,
                 Value = value
@@ -215,7 +215,7 @@ namespace Celeste
                     return;
                 }
             }
-            Counters.Add(new Counter()
+            Counters.Add(new Counter
             {
                 Key = counter,
                 Value = 1

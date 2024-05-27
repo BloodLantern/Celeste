@@ -3,7 +3,7 @@ using Monocle;
 
 namespace Celeste
 {
-    [Tracked(false)]
+    [Tracked()]
     public class CheckpointBlockerTrigger : Trigger
     {
         public CheckpointBlockerTrigger(EntityData data, Vector2 offset)

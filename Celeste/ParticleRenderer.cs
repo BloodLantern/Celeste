@@ -4,27 +4,27 @@ using System.Collections.Generic;
 
 namespace Celeste
 {
-    public class ParticleRenderer : Monocle.Renderer
+    public class ParticleRenderer : Renderer
     {
         public List<ParticleSystem> Systems;
 
         public ParticleRenderer(params ParticleSystem[] system)
         {
-            this.Systems = new List<ParticleSystem>();
-            this.Systems.AddRange((IEnumerable<ParticleSystem>) system);
+            Systems = new List<ParticleSystem>();
+            Systems.AddRange(system);
         }
 
         public override void Update(Scene scene)
         {
-            foreach (Entity system in this.Systems)
+            foreach (Entity system in Systems)
                 system.Update();
             base.Update(scene);
         }
 
         public override void Render(Scene scene)
         {
-            Draw.SpriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, SamplerState.LinearClamp, DepthStencilState.None, RasterizerState.CullNone, (Effect) null, Engine.ScreenMatrix);
-            foreach (Entity system in this.Systems)
+            Draw.SpriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, SamplerState.LinearClamp, DepthStencilState.None, RasterizerState.CullNone, null, Engine.ScreenMatrix);
+            foreach (Entity system in Systems)
                 system.Render();
             Draw.SpriteBatch.End();
         }

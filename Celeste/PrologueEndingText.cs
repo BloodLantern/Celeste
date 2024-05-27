@@ -10,27 +10,27 @@ namespace Celeste
 
         public PrologueEndingText(bool instant)
         {
-            this.Tag = (int) Tags.HUD;
-            this.text = FancyText.Parse(Dialog.Clean("CH0_END"), 960, 4, 0.0f);
-            this.Add((Component) new Coroutine(this.Routine(instant)));
+            Tag = (int) Tags.HUD;
+            text = FancyText.Parse(Dialog.Clean("CH0_END"), 960, 4, 0.0f);
+            Add(new Coroutine(Routine(instant)));
         }
 
         private IEnumerator Routine(bool instant)
         {
             if (!instant)
-                yield return (object) 4f;
-            for (int i = 0; i < this.text.Count; ++i)
+                yield return 4f;
+            for (int i = 0; i < text.Count; ++i)
             {
-                if (this.text[i] is FancyText.Char c)
+                if (text[i] is FancyText.Char c)
                 {
-                    while ((double) (c.Fade += Engine.DeltaTime * 20f) < 1.0)
-                        yield return (object) null;
+                    while ((c.Fade += Engine.DeltaTime * 20f) < 1.0)
+                        yield return null;
                     c.Fade = 1f;
-                    c = (FancyText.Char) null;
+                    c = null;
                 }
             }
         }
 
-        public override void Render() => this.text.Draw(this.Position, new Vector2(0.5f, 0.5f), Vector2.One, 1f);
+        public override void Render() => text.Draw(Position, new Vector2(0.5f, 0.5f), Vector2.One, 1f);
     }
 }

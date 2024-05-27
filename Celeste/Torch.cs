@@ -1,6 +1,5 @@
 ﻿using Microsoft.Xna.Framework;
 using Monocle;
-using System;
 
 namespace Celeste
 {
@@ -24,20 +23,20 @@ namespace Celeste
         {
             this.id = id;
             this.startLit = startLit;
-            this.Collider = (Collider) new Hitbox(32f, 32f, -16f, -16f);
-            this.Add((Component) new PlayerCollider(new Action<Player>(this.OnPlayer)));
-            this.Add((Component) (this.light = new VertexLight(Torch.Color, 1f, 48, 64)));
-            this.Add((Component) (this.bloom = new BloomPoint(0.5f, 8f)));
-            this.bloom.Visible = false;
-            this.light.Visible = false;
-            this.Depth = 2000;
+            Collider = new Hitbox(32f, 32f, -16f, -16f);
+            Add(new PlayerCollider(OnPlayer));
+            Add(light = new VertexLight(Torch.Color, 1f, 48, 64));
+            Add(bloom = new BloomPoint(0.5f, 8f));
+            bloom.Visible = false;
+            light.Visible = false;
+            Depth = 2000;
             if (startLit)
             {
-                this.light.Color = Torch.StartLitColor;
-                this.Add((Component) (this.sprite = GFX.SpriteBank.Create("litTorch")));
+                light.Color = Torch.StartLitColor;
+                Add(sprite = GFX.SpriteBank.Create("litTorch"));
             }
             else
-                this.Add((Component) (this.sprite = GFX.SpriteBank.Create("torch")));
+                Add(sprite = GFX.SpriteBank.Create("torch"));
         }
 
         public Torch(EntityData data, Vector2 offset, EntityID id)
@@ -48,37 +47,37 @@ namespace Celeste
         public override void Added(Scene scene)
         {
             base.Added(scene);
-            if (!this.startLit && !this.SceneAs<Level>().Session.GetFlag(this.FlagName))
+            if (!startLit && !SceneAs<Level>().Session.GetFlag(FlagName))
                 return;
-            this.bloom.Visible = this.light.Visible = true;
-            this.lit = true;
-            this.Collidable = false;
-            this.sprite.Play("on");
+            bloom.Visible = light.Visible = true;
+            lit = true;
+            Collidable = false;
+            sprite.Play("on");
         }
 
         private void OnPlayer(Player player)
         {
-            if (this.lit)
+            if (lit)
                 return;
-            Audio.Play("event:/game/05_mirror_temple/torch_activate", this.Position);
-            this.lit = true;
-            this.bloom.Visible = true;
-            this.light.Visible = true;
-            this.Collidable = false;
-            this.sprite.Play("turnOn");
+            Audio.Play("event:/game/05_mirror_temple/torch_activate", Position);
+            lit = true;
+            bloom.Visible = true;
+            light.Visible = true;
+            Collidable = false;
+            sprite.Play("turnOn");
             Tween tween = Tween.Create(Tween.TweenMode.Oneshot, Ease.BackOut, start: true);
-            tween.OnUpdate = (Action<Tween>) (t =>
+            tween.OnUpdate = t =>
             {
-                this.light.Color = Color.Lerp(Color.White, Torch.Color, t.Eased);
-                this.light.StartRadius = (float) (48.0 + (1.0 - (double) t.Eased) * 32.0);
-                this.light.EndRadius = (float) (64.0 + (1.0 - (double) t.Eased) * 32.0);
-                this.bloom.Alpha = (float) (0.5 + 0.5 * (1.0 - (double) t.Eased));
-            });
-            this.Add((Component) tween);
-            this.SceneAs<Level>().Session.SetFlag(this.FlagName);
-            this.SceneAs<Level>().ParticlesFG.Emit(Torch.P_OnLight, 12, this.Position, new Vector2(3f, 3f));
+                light.Color = Color.Lerp(Color.White, Torch.Color, t.Eased);
+                light.StartRadius = (float) (48.0 + (1.0 - t.Eased) * 32.0);
+                light.EndRadius = (float) (64.0 + (1.0 - t.Eased) * 32.0);
+                bloom.Alpha = (float) (0.5 + 0.5 * (1.0 - t.Eased));
+            };
+            Add(tween);
+            SceneAs<Level>().Session.SetFlag(FlagName);
+            SceneAs<Level>().ParticlesFG.Emit(Torch.P_OnLight, 12, Position, new Vector2(3f, 3f));
         }
 
-        private string FlagName => "torch_" + this.id.Key;
+        private string FlagName => "torch_" + id.Key;
     }
 }

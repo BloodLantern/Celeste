@@ -97,7 +97,7 @@ namespace Celeste
                         else if (!entity.TreatNaive && CollideCheck(entity, Position + Vector2.UnitY * move) && !CollideCheck(entity))
                         {
                             Collidable = false;
-                            entity.MoveVExact((int) ((double) Top + move - (double) entity.Bottom));
+                            entity.MoveVExact((int) ((double) Top + move - entity.Bottom));
                             entity.LiftSpeed = LiftSpeed;
                             Collidable = true;
                         }

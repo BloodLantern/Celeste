@@ -5,7 +5,7 @@ using System.Collections;
 
 namespace Celeste
 {
-    [Tracked(false)]
+    [Tracked]
     public class TempleGate : Solid
     {
         private const int OpenHeight = 0;
@@ -14,7 +14,7 @@ namespace Celeste
         private const float HoldingCloseDistSq = 6400f;
         private const int MinDrawHeight = 4;
         public string LevelID;
-        public TempleGate.Types Type;
+        public Types Type;
         public bool ClaimedByASwitch;
         private bool theoGate;
         private int closedHeight;
@@ -30,106 +30,106 @@ namespace Celeste
         public TempleGate(
             Vector2 position,
             int height,
-            TempleGate.Types type,
+            Types type,
             string spriteName,
             string levelID)
-            : base(position, 8f, (float) height, true)
+            : base(position, 8f, height, true)
         {
-            this.Type = type;
-            this.closedHeight = height;
-            this.LevelID = levelID;
-            this.Add((Component) (this.sprite = GFX.SpriteBank.Create("templegate_" + spriteName)));
-            this.sprite.X = this.Collider.Width / 2f;
-            this.sprite.Play("idle");
-            this.Add((Component) (this.shaker = new Shaker(false)));
-            this.Depth = -9000;
-            this.theoGate = spriteName.Equals("theo", StringComparison.InvariantCultureIgnoreCase);
-            this.holdingCheckFrom = this.Position + new Vector2(this.Width / 2f, (float) (height / 2));
+            Type = type;
+            closedHeight = height;
+            LevelID = levelID;
+            Add(sprite = GFX.SpriteBank.Create("templegate_" + spriteName));
+            sprite.X = Collider.Width / 2f;
+            sprite.Play("idle");
+            Add(shaker = new Shaker(false));
+            Depth = -9000;
+            theoGate = spriteName.Equals("theo", StringComparison.InvariantCultureIgnoreCase);
+            holdingCheckFrom = Position + new Vector2(Width / 2f, height / 2);
         }
 
         public TempleGate(EntityData data, Vector2 offset, string levelID)
-            : this(data.Position + offset, data.Height, data.Enum<TempleGate.Types>("type"), data.Attr(nameof (sprite), "default"), levelID)
+            : this(data.Position + offset, data.Height, data.Enum<Types>("type"), data.Attr(nameof (sprite), "default"), levelID)
         {
         }
 
         public override void Awake(Scene scene)
         {
             base.Awake(scene);
-            if (this.Type == TempleGate.Types.CloseBehindPlayer)
+            if (Type == Types.CloseBehindPlayer)
             {
-                Player entity = this.Scene.Tracker.GetEntity<Player>();
-                if (entity != null && (double) entity.Left < (double) this.Right && (double) entity.Bottom >= (double) this.Top && (double) entity.Top <= (double) this.Bottom)
+                Player entity = Scene.Tracker.GetEntity<Player>();
+                if (entity != null && entity.Left < (double) Right && entity.Bottom >= (double) Top && entity.Top <= (double) Bottom)
                 {
-                    this.StartOpen();
-                    this.Add((Component) new Coroutine(this.CloseBehindPlayer()));
+                    StartOpen();
+                    Add(new Coroutine(CloseBehindPlayer()));
                 }
             }
-            else if (this.Type == TempleGate.Types.CloseBehindPlayerAlways)
+            else if (Type == Types.CloseBehindPlayerAlways)
             {
-                this.StartOpen();
-                this.Add((Component) new Coroutine(this.CloseBehindPlayer()));
+                StartOpen();
+                Add(new Coroutine(CloseBehindPlayer()));
             }
-            else if (this.Type == TempleGate.Types.CloseBehindPlayerAndTheo)
+            else if (Type == Types.CloseBehindPlayerAndTheo)
             {
-                this.StartOpen();
-                this.Add((Component) new Coroutine(this.CloseBehindPlayerAndTheo()));
+                StartOpen();
+                Add(new Coroutine(CloseBehindPlayerAndTheo()));
             }
-            else if (this.Type == TempleGate.Types.HoldingTheo)
+            else if (Type == Types.HoldingTheo)
             {
-                if (this.TheoIsNearby())
-                    this.StartOpen();
-                this.Hitbox.Width = 16f;
+                if (TheoIsNearby())
+                    StartOpen();
+                Hitbox.Width = 16f;
             }
-            else if (this.Type == TempleGate.Types.TouchSwitches)
-                this.Add((Component) new Coroutine(this.CheckTouchSwitches()));
-            this.drawHeight = Math.Max(4f, this.Height);
+            else if (Type == Types.TouchSwitches)
+                Add(new Coroutine(CheckTouchSwitches()));
+            drawHeight = Math.Max(4f, Height);
         }
 
         public bool CloseBehindPlayerCheck()
         {
-            Player entity = this.Scene.Tracker.GetEntity<Player>();
-            return entity != null && (double) entity.X < (double) this.X;
+            Player entity = Scene.Tracker.GetEntity<Player>();
+            return entity != null && entity.X < (double) X;
         }
 
         public void SwitchOpen()
         {
-            this.sprite.Play("open");
-            Alarm.Set((Entity) this, 0.2f, (Action) (() =>
+            sprite.Play("open");
+            Alarm.Set(this, 0.2f, () =>
             {
-                this.shaker.ShakeFor(0.2f, false);
-                Alarm.Set((Entity) this, 0.2f, new Action(this.Open));
-            }));
+                shaker.ShakeFor(0.2f, false);
+                Alarm.Set(this, 0.2f, Open);
+            });
         }
 
         public void Open()
         {
-            Audio.Play(this.theoGate ? "event:/game/05_mirror_temple/gate_theo_open" : "event:/game/05_mirror_temple/gate_main_open", this.Position);
-            this.holdingWaitTimer = 0.2f;
-            this.drawHeightMoveSpeed = 200f;
-            this.drawHeight = this.Height;
-            this.shaker.ShakeFor(0.2f, false);
-            this.SetHeight(0);
-            this.sprite.Play("open");
-            this.open = true;
+            Audio.Play(theoGate ? "event:/game/05_mirror_temple/gate_theo_open" : "event:/game/05_mirror_temple/gate_main_open", Position);
+            holdingWaitTimer = 0.2f;
+            drawHeightMoveSpeed = 200f;
+            drawHeight = Height;
+            shaker.ShakeFor(0.2f, false);
+            SetHeight(0);
+            sprite.Play("open");
+            open = true;
         }
 
         public void StartOpen()
         {
-            this.SetHeight(0);
-            this.drawHeight = 4f;
-            this.open = true;
+            SetHeight(0);
+            drawHeight = 4f;
+            open = true;
         }
 
         public void Close()
         {
-            Audio.Play(this.theoGate ? "event:/game/05_mirror_temple/gate_theo_close" : "event:/game/05_mirror_temple/gate_main_close", this.Position);
-            this.holdingWaitTimer = 0.2f;
-            this.drawHeightMoveSpeed = 300f;
-            this.drawHeight = Math.Max(4f, this.Height);
-            this.shaker.ShakeFor(0.2f, false);
-            this.SetHeight(this.closedHeight);
-            this.sprite.Play("hit");
-            this.open = false;
+            Audio.Play(theoGate ? "event:/game/05_mirror_temple/gate_theo_close" : "event:/game/05_mirror_temple/gate_main_close", Position);
+            holdingWaitTimer = 0.2f;
+            drawHeightMoveSpeed = 300f;
+            drawHeight = Math.Max(4f, Height);
+            shaker.ShakeFor(0.2f, false);
+            SetHeight(closedHeight);
+            sprite.Play("hit");
+            open = false;
         }
 
         private IEnumerator CloseBehindPlayer()
@@ -138,8 +138,8 @@ namespace Celeste
             while (true)
             {
                 Player entity = templeGate.Scene.Tracker.GetEntity<Player>();
-                if (templeGate.lockState || entity == null || (double) entity.Left <= (double) templeGate.Right + 4.0)
-                    yield return (object) null;
+                if (templeGate.lockState || entity == null || entity.Left <= templeGate.Right + 4.0)
+                    yield return null;
                 else
                     break;
             }
@@ -152,13 +152,13 @@ namespace Celeste
             while (true)
             {
                 Player entity1 = templeGate.Scene.Tracker.GetEntity<Player>();
-                if (entity1 != null && (double) entity1.Left > (double) templeGate.Right + 4.0)
+                if (entity1 != null && entity1.Left > templeGate.Right + 4.0)
                 {
                     TheoCrystal entity2 = templeGate.Scene.Tracker.GetEntity<TheoCrystal>();
-                    if (!templeGate.lockState && entity2 != null && (double) entity2.Left > (double) templeGate.Right + 4.0)
+                    if (!templeGate.lockState && entity2 != null && entity2.Left > templeGate.Right + 4.0)
                         break;
                 }
-                yield return (object) null;
+                yield return null;
             }
             templeGate.Close();
         }
@@ -167,76 +167,76 @@ namespace Celeste
         {
             TempleGate templeGate = this;
             while (!Switch.Check(templeGate.Scene))
-                yield return (object) null;
+                yield return null;
             templeGate.sprite.Play("open");
-            yield return (object) 0.5f;
+            yield return 0.5f;
             templeGate.shaker.ShakeFor(0.2f, false);
-            yield return (object) 0.2f;
+            yield return 0.2f;
             while (templeGate.lockState)
-                yield return (object) null;
+                yield return null;
             templeGate.Open();
         }
 
         public bool TheoIsNearby()
         {
-            TheoCrystal entity = this.Scene.Tracker.GetEntity<TheoCrystal>();
-            return entity == null || (double) entity.X > (double) this.X + 10.0 || (double) Vector2.DistanceSquared(this.holdingCheckFrom, entity.Center) < (this.open ? 6400.0 : 4096.0);
+            TheoCrystal entity = Scene.Tracker.GetEntity<TheoCrystal>();
+            return entity == null || entity.X > X + 10.0 || Vector2.DistanceSquared(holdingCheckFrom, entity.Center) < (open ? 6400.0 : 4096.0);
         }
 
         private void SetHeight(int height)
         {
-            if ((double) height < (double) this.Collider.Height)
+            if (height < (double) Collider.Height)
             {
-                this.Collider.Height = (float) height;
+                Collider.Height = height;
             }
             else
             {
-                float y = this.Y;
-                int height1 = (int) this.Collider.Height;
-                if ((double) this.Collider.Height < 64.0)
+                float y = Y;
+                int height1 = (int) Collider.Height;
+                if (Collider.Height < 64.0)
                 {
-                    this.Y -= 64f - this.Collider.Height;
-                    this.Collider.Height = 64f;
+                    Y -= 64f - Collider.Height;
+                    Collider.Height = 64f;
                 }
-                this.MoveVExact(height - height1);
-                this.Y = y;
-                this.Collider.Height = (float) height;
+                MoveVExact(height - height1);
+                Y = y;
+                Collider.Height = height;
             }
         }
 
         public override void Update()
         {
             base.Update();
-            if (this.Type == TempleGate.Types.HoldingTheo)
+            if (Type == Types.HoldingTheo)
             {
-                if ((double) this.holdingWaitTimer > 0.0)
-                    this.holdingWaitTimer -= Engine.DeltaTime;
-                else if (!this.lockState)
+                if (holdingWaitTimer > 0.0)
+                    holdingWaitTimer -= Engine.DeltaTime;
+                else if (!lockState)
                 {
-                    if (this.open && !this.TheoIsNearby())
+                    if (open && !TheoIsNearby())
                     {
-                        this.Close();
-                        this.CollideFirst<Player>(this.Position + new Vector2(8f, 0.0f))?.Die(Vector2.Zero);
+                        Close();
+                        CollideFirst<Player>(Position + new Vector2(8f, 0.0f))?.Die(Vector2.Zero);
                     }
-                    else if (!this.open && this.TheoIsNearby())
-                        this.Open();
+                    else if (!open && TheoIsNearby())
+                        Open();
                 }
             }
-            float target = Math.Max(4f, this.Height);
-            if ((double) this.drawHeight != (double) target)
+            float target = Math.Max(4f, Height);
+            if (drawHeight != (double) target)
             {
-                this.lockState = true;
-                this.drawHeight = Calc.Approach(this.drawHeight, target, this.drawHeightMoveSpeed * Engine.DeltaTime);
+                lockState = true;
+                drawHeight = Calc.Approach(drawHeight, target, drawHeightMoveSpeed * Engine.DeltaTime);
             }
             else
-                this.lockState = false;
+                lockState = false;
         }
 
         public override void Render()
         {
-            Vector2 vector2 = new Vector2((float) Math.Sign(this.shaker.Value.X), 0.0f);
-            Draw.Rect(this.X - 2f, this.Y - 8f, 14f, 10f, Color.Black);
-            this.sprite.DrawSubrect(Vector2.Zero + vector2, new Rectangle(0, (int) ((double) this.sprite.Height - (double) this.drawHeight), (int) this.sprite.Width, (int) this.drawHeight));
+            Vector2 vector2 = new Vector2(Math.Sign(shaker.Value.X), 0.0f);
+            Draw.Rect(X - 2f, Y - 8f, 14f, 10f, Color.Black);
+            sprite.DrawSubrect(Vector2.Zero + vector2, new Rectangle(0, (int) (sprite.Height - (double) drawHeight), (int) sprite.Width, (int) drawHeight));
         }
 
         public enum Types

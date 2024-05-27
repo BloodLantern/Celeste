@@ -38,7 +38,7 @@ namespace Celeste
 
         private static VirtualRenderTarget Create(int width, int height)
         {
-            VirtualRenderTarget renderTarget = VirtualContent.CreateRenderTarget("gameplay-buffer-" + (object) GameplayBuffers.all.Count, width, height);
+            VirtualRenderTarget renderTarget = VirtualContent.CreateRenderTarget("gameplay-buffer-" + GameplayBuffers.all.Count, width, height);
             GameplayBuffers.all.Add(renderTarget);
             return renderTarget;
         }

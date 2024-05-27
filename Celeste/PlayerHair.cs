@@ -5,7 +5,7 @@ using System.Collections.Generic;
 
 namespace Celeste
 {
-    [Tracked(false)]
+    [Tracked()]
     public class PlayerHair : Component
     {
         public const string Hair = "characters/player/hair00";
@@ -54,7 +54,7 @@ namespace Celeste
                     float num2 = (float) (1.0 - index / (double) Sprite.HairCount * 0.5) * StepApproach;
                     Nodes[index] = Calc.Approach(Nodes[index], target, num2 * Engine.DeltaTime);
                 }
-                if ((double) (Nodes[index] - node).Length() > (double) num1)
+                if ((Nodes[index] - node).Length() > (double) num1)
                     Nodes[index] = node + (Nodes[index] - node).SafeNormalize() * num1;
                 target = Nodes[index] + new Vector2(-(int) Facing * StepInFacingPerSegment, (float) Math.Sin(wave + index * 0.8f) * StepYSinePerSegment) + StepPerSegment;
                 node = Nodes[index];

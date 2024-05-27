@@ -9,23 +9,23 @@ namespace Celeste
 
         public GameplayStats()
         {
-            this.Depth = -101;
-            this.Tag = (int) Tags.HUD | (int) Tags.Global | (int) Tags.PauseUpdate | (int) Tags.TransitionUpdate;
+            Depth = -101;
+            Tag = (int) Tags.HUD | (int) Tags.Global | (int) Tags.PauseUpdate | (int) Tags.TransitionUpdate;
         }
 
         public override void Update()
         {
             base.Update();
-            Level scene = this.Scene as Level;
-            this.DrawLerp = Calc.Approach(this.DrawLerp, !scene.Paused || !scene.PauseMainMenuOpen || scene.Wipe != null ? 0.0f : 1f, Engine.DeltaTime * 8f);
+            Level scene = Scene as Level;
+            DrawLerp = Calc.Approach(DrawLerp, !scene.Paused || !scene.PauseMainMenuOpen || scene.Wipe != null ? 0.0f : 1f, Engine.DeltaTime * 8f);
         }
 
         public override void Render()
         {
-            if ((double) this.DrawLerp <= 0.0)
+            if (DrawLerp <= 0.0)
                 return;
-            float num1 = Ease.CubeOut(this.DrawLerp);
-            Level scene = this.Scene as Level;
+            float num1 = Ease.CubeOut(DrawLerp);
+            Level scene = Scene as Level;
             AreaKey area = scene.Session.Area;
             AreaModeStats mode = SaveData.Instance.Areas[area.ID].Modes[(int) area.Mode];
             if (!mode.Completed && !SaveData.Instance.CheatMode && !SaveData.Instance.DebugMode)
@@ -33,7 +33,7 @@ namespace Celeste
             ModeProperties modeProperties = AreaData.Get(area).Mode[(int) area.Mode];
             int totalStrawberries = modeProperties.TotalStrawberries;
             int num2 = 32;
-            Vector2 position = new Vector2((float) ((1920 - (totalStrawberries - 1) * num2 - (totalStrawberries <= 0 || modeProperties.Checkpoints == null ? 0 : modeProperties.Checkpoints.Length * num2)) / 2), (float) (1016.0 + (1.0 - (double) num1) * 80.0));
+            Vector2 position = new Vector2((1920 - (totalStrawberries - 1) * num2 - (totalStrawberries <= 0 || modeProperties.Checkpoints == null ? 0 : modeProperties.Checkpoints.Length * num2)) / 2, (float) (1016.0 + (1.0 - num1) * 80.0));
             if (totalStrawberries <= 0)
                 return;
             int num3 = modeProperties.Checkpoints == null ? 1 : modeProperties.Checkpoints.Length + 1;
@@ -70,15 +70,15 @@ namespace Celeste
                             if (flag2)
                                 mtexture.DrawOutlineCentered(position, Calc.HexToColor("4193ff"), 1f);
                             else
-                                Draw.Rect(position.X - (float) mtexture.ClipRect.Width * 0.5f, position.Y - 4f, (float) mtexture.ClipRect.Width, 8f, Color.DarkGray);
+                                Draw.Rect(position.X - mtexture.ClipRect.Width * 0.5f, position.Y - 4f, mtexture.ClipRect.Width, 8f, Color.DarkGray);
                         }
-                        position.X += (float) num2;
+                        position.X += num2;
                     }
                 }
                 if (modeProperties.Checkpoints != null && index1 < modeProperties.Checkpoints.Length)
                 {
                     Draw.Rect(position.X - 3f, position.Y - 16f, 6f, 32f, Color.DarkGray);
-                    position.X += (float) num2;
+                    position.X += num2;
                 }
             }
         }

@@ -5,7 +5,7 @@ using System.Collections.Generic;
 
 namespace Celeste
 {
-    public class LightingRenderer : Monocle.Renderer
+    public class LightingRenderer : Renderer
     {
         public static BlendState GradientBlendState = new()
         {
@@ -37,7 +37,7 @@ namespace Celeste
         public Color BaseColor = Color.Black;
         public float Alpha = 0.1f;
         private readonly VertexPositionColor[] verts = new VertexPositionColor[11520];
-        private readonly LightingRenderer.VertexPositionColorMaskTexture[] resultVerts = new LightingRenderer.VertexPositionColorMaskTexture[384];
+        private readonly VertexPositionColorMaskTexture[] resultVerts = new VertexPositionColorMaskTexture[384];
         private readonly int[] indices = new int[11520];
         private int vertexCount;
         private int indexCount;
@@ -83,7 +83,7 @@ namespace Celeste
             }
             foreach (VertexLight component in scene.Tracker.GetComponents<VertexLight>())
             {
-                if ((component.Entity == null || !component.Entity.Visible || !component.Visible || component.Alpha <= 0.0 || component.Color.A <= 0 || component.Center.X + (double) component.EndRadius <= (double) camera.X || component.Center.Y + (double) component.EndRadius <= (double) camera.Y || component.Center.X - (double) component.EndRadius >= (double) camera.X + 320.0 ? 0 : (component.Center.Y - (double) component.EndRadius < (double) camera.Y + 180.0 ? 1 : 0)) != 0)
+                if ((component.Entity == null || !component.Entity.Visible || !component.Visible || component.Alpha <= 0.0 || component.Color.A <= 0 || component.Center.X + (double) component.EndRadius <= camera.X || component.Center.Y + (double) component.EndRadius <= camera.Y || component.Center.X - (double) component.EndRadius >= camera.X + 320.0 ? 0 : (component.Center.Y - (double) component.EndRadius < camera.Y + 180.0 ? 1 : 0)) != 0)
                 {
                     if (component.Index < 0)
                     {
@@ -129,13 +129,13 @@ namespace Celeste
                     component.Started = false;
                 }
             }
-            Engine.Graphics.GraphicsDevice.SetRenderTarget((RenderTarget2D) GameplayBuffers.LightBuffer);
+            Engine.Graphics.GraphicsDevice.SetRenderTarget(GameplayBuffers.LightBuffer);
             Engine.Instance.GraphicsDevice.RasterizerState = RasterizerState.CullNone;
             Matrix matrix = Matrix.CreateScale(0.0009765625f) * Matrix.CreateScale(2f, -2f, 1f) * Matrix.CreateTranslation(-1f, 1f, 0.0f);
             ClearDirtyLights(matrix);
             DrawLightGradients(matrix);
             DrawLightOccluders(matrix, level);
-            Engine.Graphics.GraphicsDevice.SetRenderTarget((RenderTarget2D) GameplayBuffers.Light);
+            Engine.Graphics.GraphicsDevice.SetRenderTarget(GameplayBuffers.Light);
             Engine.Graphics.GraphicsDevice.Clear(BaseColor);
             Engine.Graphics.GraphicsDevice.Textures[0] = (RenderTarget2D) GameplayBuffers.LightBuffer;
             StartDrawingPrimitives();
@@ -148,7 +148,7 @@ namespace Celeste
                     float num = light.Alpha * light.InSolidAlphaMultiplier;
                     if (nonSpotlightAlphaMultiplier < 1.0 && light != spotlight)
                         num *= nonSpotlightAlphaMultiplier;
-                    if ((double) num > 0.0 && light.Color.A > 0 && (double) light.EndRadius >= 2.0)
+                    if (num > 0.0 && light.Color.A > 0 && light.EndRadius >= 2.0)
                     {
                         int radius = 128;
                         while ((double) light.EndRadius <= radius / 2)
@@ -158,7 +158,7 @@ namespace Celeste
                 }
             }
             if (vertexCount > 0)
-                GFX.DrawIndexedVertices<LightingRenderer.VertexPositionColorMaskTexture>(camera.Matrix, resultVerts, vertexCount, indices, indexCount / 3, GFX.FxLighting, BlendState.Additive);
+                GFX.DrawIndexedVertices(camera.Matrix, resultVerts, vertexCount, indices, indexCount / 3, GFX.FxLighting, BlendState.Additive);
             GaussianBlur.Blur((RenderTarget2D) GameplayBuffers.Light, GameplayBuffers.TempA, GameplayBuffers.Light);
         }
 
@@ -178,7 +178,7 @@ namespace Celeste
             foreach (EffectPass pass in GFX.FxPrimitive.CurrentTechnique.Passes)
             {
                 pass.Apply();
-                Engine.Instance.GraphicsDevice.DrawUserIndexedPrimitives<VertexPositionColor>(PrimitiveType.TriangleList, verts, 0, vertexCount, indices, 0, indexCount / 3);
+                Engine.Instance.GraphicsDevice.DrawUserIndexedPrimitives(PrimitiveType.TriangleList, verts, 0, vertexCount, indices, 0, indexCount / 3);
             }
         }
 
@@ -202,7 +202,7 @@ namespace Celeste
             foreach (EffectPass pass in GFX.FxPrimitive.CurrentTechnique.Passes)
             {
                 pass.Apply();
-                Engine.Instance.GraphicsDevice.DrawUserIndexedPrimitives<VertexPositionColor>(PrimitiveType.TriangleList, verts, 0, vertexCount, indices, 0, indexCount / 3);
+                Engine.Instance.GraphicsDevice.DrawUserIndexedPrimitives(PrimitiveType.TriangleList, verts, 0, vertexCount, indices, 0, indexCount / 3);
             }
         }
 
@@ -346,7 +346,7 @@ namespace Celeste
             foreach (EffectPass pass in GFX.FxPrimitive.CurrentTechnique.Passes)
             {
                 pass.Apply();
-                Engine.Instance.GraphicsDevice.DrawUserIndexedPrimitives<VertexPositionColor>(PrimitiveType.TriangleList, verts, 0, vertexCount, indices, 0, indexCount / 3);
+                Engine.Instance.GraphicsDevice.DrawUserIndexedPrimitives(PrimitiveType.TriangleList, verts, 0, vertexCount, indices, 0, indexCount / 3);
             }
         }
 
@@ -434,7 +434,7 @@ namespace Celeste
             verts[this.vertexCount++].Color = mask;
             verts[this.vertexCount].Position = center + new Vector3(vector2, 0.0f);
             verts[this.vertexCount++].Color = mask;
-            for (; (double) num != (double) target; num = Calc.AngleApproach(num, target, 0.7853982f))
+            for (; num != (double) target; num = Calc.AngleApproach(num, target, 0.7853982f))
             {
                 verts[this.vertexCount].Position = center + new Vector3(Calc.AngleToVector(num, 128f), 0.0f);
                 verts[this.vertexCount].Color = mask;
@@ -519,15 +519,9 @@ namespace Celeste
             public Color Color;
             public Color Mask;
             public Vector2 Texcoord;
-            public static readonly VertexDeclaration VertexDeclaration = new(new VertexElement[4]
-            {
-                new VertexElement(0, VertexElementFormat.Vector3, VertexElementUsage.Position, 0),
-                new VertexElement(12, VertexElementFormat.Color, VertexElementUsage.Color, 0),
-                new VertexElement(16, VertexElementFormat.Color, VertexElementUsage.Color, 1),
-                new VertexElement(20, VertexElementFormat.Vector2, VertexElementUsage.TextureCoordinate, 0)
-            });
+            public static readonly VertexDeclaration VertexDeclaration = new(new VertexElement(0, VertexElementFormat.Vector3, VertexElementUsage.Position, 0), new VertexElement(12, VertexElementFormat.Color, VertexElementUsage.Color, 0), new VertexElement(16, VertexElementFormat.Color, VertexElementUsage.Color, 1), new VertexElement(20, VertexElementFormat.Vector2, VertexElementUsage.TextureCoordinate, 0));
 
-            VertexDeclaration IVertexType.VertexDeclaration => LightingRenderer.VertexPositionColorMaskTexture.VertexDeclaration;
+            VertexDeclaration IVertexType.VertexDeclaration => VertexPositionColorMaskTexture.VertexDeclaration;
         }
     }
 }

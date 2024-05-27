@@ -7,25 +7,25 @@ namespace Celeste
 {
     public class SummitGemManager : Entity
     {
-        private List<SummitGemManager.Gem> gems = new List<SummitGemManager.Gem>();
+        private List<Gem> gems = new List<Gem>();
 
         public SummitGemManager(EntityData data, Vector2 offset)
             : base(data.Position + offset)
         {
-            this.Depth = -10010;
+            Depth = -10010;
             int index = 0;
             foreach (Vector2 position in data.NodesOffset(offset))
             {
-                this.gems.Add(new SummitGemManager.Gem(index, position));
+                gems.Add(new Gem(index, position));
                 ++index;
             }
-            this.Add((Component) new Coroutine(this.Routine()));
+            Add(new Coroutine(Routine()));
         }
 
         public override void Awake(Scene scene)
         {
-            foreach (SummitGemManager.Gem gem in this.gems)
-                scene.Add((Entity) gem);
+            foreach (Gem gem in gems)
+                scene.Add(gem);
             base.Awake(scene);
         }
 
@@ -35,7 +35,7 @@ namespace Celeste
             Level level = summitGemManager.Scene as Level;
             if (level.Session.HeartGem)
             {
-                foreach (SummitGemManager.Gem gem in summitGemManager.gems)
+                foreach (Gem gem in summitGemManager.gems)
                     gem.Sprite.RemoveSelf();
                 summitGemManager.gems.Clear();
             }
@@ -44,16 +44,16 @@ namespace Celeste
                 while (true)
                 {
                     Player entity = summitGemManager.Scene.Tracker.GetEntity<Player>();
-                    if (entity == null || (double) (entity.Position - summitGemManager.Position).Length() >= 64.0)
-                        yield return (object) null;
+                    if (entity == null || (entity.Position - summitGemManager.Position).Length() >= 64.0)
+                        yield return null;
                     else
                         break;
                 }
-                yield return (object) 0.5f;
+                yield return 0.5f;
                 bool alreadyHasHeart = level.Session.OldStats.Modes[0].HeartGem;
                 int broken = 0;
                 int index = 0;
-                foreach (SummitGemManager.Gem gem in summitGemManager.gems)
+                foreach (Gem gem in summitGemManager.gems)
                 {
                     bool flag = level.Session.SummitGems[index];
                     if (!alreadyHasHeart)
@@ -85,21 +85,21 @@ namespace Celeste
                         while (gem.Sprite.CurrentAnimationID == "spin")
                         {
                             gem.Bloom.Alpha = Calc.Approach(gem.Bloom.Alpha, 1f, Engine.DeltaTime * 3f);
-                            if ((double) gem.Bloom.Alpha > 0.5)
+                            if (gem.Bloom.Alpha > 0.5)
                                 gem.Shake = Calc.Random.ShakeVector();
                             gem.Sprite.Y -= Engine.DeltaTime * 8f;
-                            gem.Sprite.Scale = Vector2.One * (float) (1.0 + (double) gem.Bloom.Alpha * 0.10000000149011612);
-                            yield return (object) null;
+                            gem.Sprite.Scale = Vector2.One * (float) (1.0 + gem.Bloom.Alpha * 0.10000000149011612);
+                            yield return null;
                         }
-                        yield return (object) 0.2f;
+                        yield return 0.2f;
                         level.Shake();
                         Input.Rumble(RumbleStrength.Light, RumbleLength.Short);
                         for (int index1 = 0; index1 < 20; ++index1)
-                            level.ParticlesFG.Emit(SummitGem.P_Shatter, gem.Position + new Vector2((float) Calc.Random.Range(-8, 8), (float) Calc.Random.Range(-8, 8)), SummitGem.GemColors[index], Calc.Random.NextFloat(6.28318548f));
+                            level.ParticlesFG.Emit(SummitGem.P_Shatter, gem.Position + new Vector2(Calc.Random.Range(-8, 8), Calc.Random.Range(-8, 8)), SummitGem.GemColors[index], Calc.Random.NextFloat(6.28318548f));
                         ++broken;
                         gem.Bloom.RemoveSelf();
                         gem.Sprite.RemoveSelf();
-                        yield return (object) 0.25f;
+                        yield return 0.25f;
                     }
                     ++index;
                 }
@@ -109,16 +109,16 @@ namespace Celeste
                     if (heart != null)
                     {
                         Audio.Play("event:/game/07_summit/gem_unlock_complete", heart.Position);
-                        yield return (object) 0.1f;
+                        yield return 0.1f;
                         Vector2 from = heart.Position;
-                        for (float p = 0.0f; (double) p < 1.0 && heart.Scene != null; p += Engine.DeltaTime)
+                        for (float p = 0.0f; p < 1.0 && heart.Scene != null; p += Engine.DeltaTime)
                         {
                             heart.Position = Vector2.Lerp(from, summitGemManager.Position + new Vector2(0.0f, -16f), Ease.CubeOut(p));
-                            yield return (object) null;
+                            yield return null;
                         }
                         from = new Vector2();
                     }
-                    heart = (HeartGem) null;
+                    heart = null;
                 }
             }
         }
@@ -127,36 +127,36 @@ namespace Celeste
         {
             public Vector2 Shake;
             public Sprite Sprite;
-            public Monocle.Image Bg;
+            public Image Bg;
             public BloomPoint Bloom;
 
             public Gem(int index, Vector2 position)
                 : base(position)
             {
-                this.Depth = -10010;
-                this.Add((Component) (this.Bg = new Monocle.Image(GFX.Game["collectables/summitgems/" + (object) index + "/bg"])));
-                this.Add((Component) (this.Sprite = new Sprite(GFX.Game, "collectables/summitgems/" + (object) index + "/gem")));
-                this.Add((Component) (this.Bloom = new BloomPoint(0.0f, 20f)));
-                this.Sprite.AddLoop("idle", "", 0.05f, new int[1]);
-                this.Sprite.Add("spin", "", 0.05f, "idle");
-                this.Sprite.Play("idle");
-                this.Sprite.CenterOrigin();
-                this.Bg.CenterOrigin();
+                Depth = -10010;
+                Add(Bg = new Image(GFX.Game["collectables/summitgems/" + index + "/bg"]));
+                Add(Sprite = new Sprite(GFX.Game, "collectables/summitgems/" + index + "/gem"));
+                Add(Bloom = new BloomPoint(0.0f, 20f));
+                Sprite.AddLoop("idle", "", 0.05f, new int[1]);
+                Sprite.Add("spin", "", 0.05f, "idle");
+                Sprite.Play("idle");
+                Sprite.CenterOrigin();
+                Bg.CenterOrigin();
             }
 
             public override void Update()
             {
-                this.Bloom.Position = this.Sprite.Position;
+                Bloom.Position = Sprite.Position;
                 base.Update();
             }
 
             public override void Render()
             {
-                Vector2 position = this.Sprite.Position;
-                Sprite sprite = this.Sprite;
-                sprite.Position = sprite.Position + this.Shake;
+                Vector2 position = Sprite.Position;
+                Sprite sprite = Sprite;
+                sprite.Position += Shake;
                 base.Render();
-                this.Sprite.Position = position;
+                Sprite.Position = position;
             }
         }
     }

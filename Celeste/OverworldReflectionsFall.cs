@@ -18,60 +18,60 @@ namespace Celeste
         {
             this.returnTo = returnTo;
             this.returnCallback = returnCallback;
-            this.Add((Monocle.Renderer) (this.mountain = new MountainRenderer()));
-            this.mountain.SnapCamera(-1, new MountainCamera(this.startCamera.Position + (this.startCamera.Target - this.startCamera.Position).SafeNormalize() * 2f, this.startCamera.Target));
-            this.Add((Monocle.Renderer) new HiresSnow()
+            Add(mountain = new MountainRenderer());
+            mountain.SnapCamera(-1, new MountainCamera(startCamera.Position + (startCamera.Target - startCamera.Position).SafeNormalize() * 2f, startCamera.Target));
+            Add(new HiresSnow
             {
                 ParticleAlpha = 0.0f
             });
-            this.Add((Entity) new Snow3D(this.mountain.Model));
-            this.Add((Entity) (this.maddy = new Maddy3D(this.mountain)));
-            this.maddy.Falling();
-            this.Add(new Entity()
+            Add(new Snow3D(mountain.Model));
+            Add(maddy = new Maddy3D(mountain));
+            maddy.Falling();
+            Add(new Entity
             {
-                (Component) new Coroutine(this.Routine())
+                new Coroutine(Routine())
             });
         }
 
         private IEnumerator Routine()
         {
-            double num1 = (double) this.mountain.EaseCamera(-1, this.startCamera, new float?(0.4f));
+            double num1 = mountain.EaseCamera(-1, startCamera, 0.4f);
             float duration = 4f;
-            this.maddy.Position = this.startCamera.Target;
+            maddy.Position = startCamera.Target;
             for (int i = 0; i < 30; ++i)
             {
-                this.maddy.Position = this.startCamera.Target + new Vector3(Calc.Random.Range(-0.05f, 0.05f), Calc.Random.Range(-0.05f, 0.05f), Calc.Random.Range(-0.05f, 0.05f));
-                yield return (object) 0.01f;
+                maddy.Position = startCamera.Target + new Vector3(Calc.Random.Range(-0.05f, 0.05f), Calc.Random.Range(-0.05f, 0.05f), Calc.Random.Range(-0.05f, 0.05f));
+                yield return 0.01f;
             }
-            yield return (object) 0.1f;
-            this.maddy.Add((Component) new Coroutine(this.MaddyFall(duration + 0.1f)));
-            yield return (object) 0.1f;
-            double num2 = (double) this.mountain.EaseCamera(-1, this.fallCamera, new float?(duration));
-            this.mountain.ForceNearFog = true;
-            yield return (object) duration;
-            yield return (object) 0.25f;
-            double num3 = (double) this.mountain.EaseCamera(-1, new MountainCamera(this.fallCamera.Position + this.mountain.Model.Forward * 3f, this.fallCamera.Target), new float?(0.5f));
-            this.Return();
+            yield return 0.1f;
+            maddy.Add(new Coroutine(MaddyFall(duration + 0.1f)));
+            yield return 0.1f;
+            double num2 = mountain.EaseCamera(-1, fallCamera, duration);
+            mountain.ForceNearFog = true;
+            yield return duration;
+            yield return 0.25f;
+            double num3 = mountain.EaseCamera(-1, new MountainCamera(fallCamera.Position + mountain.Model.Forward * 3f, fallCamera.Target), 0.5f);
+            Return();
         }
 
         private IEnumerator MaddyFall(float duration)
         {
-            for (float p = 0.0f; (double) p < 1.0; p += Engine.DeltaTime / duration)
+            for (float p = 0.0f; p < 1.0; p += Engine.DeltaTime / duration)
             {
-                this.maddy.Position = Vector3.Lerp(this.startCamera.Target, this.fallCamera.Target, p);
-                yield return (object) null;
+                maddy.Position = Vector3.Lerp(startCamera.Target, fallCamera.Target, p);
+                yield return null;
             }
         }
 
         private void Return()
         {
-            FadeWipe fadeWipe = new FadeWipe((Scene) this, false, (Action) (() =>
+            FadeWipe fadeWipe = new FadeWipe(this, false, () =>
             {
-                this.mountain.Dispose();
-                if (this.returnTo != null)
-                    Engine.Scene = (Scene) this.returnTo;
-                this.returnCallback();
-            }));
+                mountain.Dispose();
+                if (returnTo != null)
+                    Engine.Scene = returnTo;
+                returnCallback();
+            });
         }
     }
 }

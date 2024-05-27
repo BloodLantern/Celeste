@@ -26,15 +26,15 @@ namespace Celeste
             : base(position, 32, false)
         {
             this.fragile = fragile;
-            this.startY = this.Y;
-            this.Collider.Position.X = -16f;
-            this.timer = Calc.Random.NextFloat() * 4f;
-            this.Add((Component) (this.wiggler = Wiggler.Create(0.3f, 4f)));
-            this.particleType = fragile ? Cloud.P_FragileCloud : Cloud.P_Cloud;
-            this.SurfaceSoundIndex = 4;
-            this.Add((Component) new LightOcclude(0.2f));
-            this.scale = Vector2.One;
-            this.Add((Component) (this.sfx = new SoundSource()));
+            startY = Y;
+            Collider.Position.X = -16f;
+            timer = Calc.Random.NextFloat() * 4f;
+            Add(wiggler = Wiggler.Create(0.3f, 4f));
+            particleType = fragile ? Cloud.P_FragileCloud : Cloud.P_Cloud;
+            SurfaceSoundIndex = 4;
+            Add(new LightOcclude(0.2f));
+            scale = Vector2.One;
+            Add(sfx = new SoundSource());
         }
 
         public Cloud(EntityData data, Vector2 offset)
@@ -45,122 +45,122 @@ namespace Celeste
         public override void Added(Scene scene)
         {
             base.Added(scene);
-            string id = this.fragile ? "cloudFragile" : "cloud";
-            if (this.SceneAs<Level>().Session.Area.Mode != AreaMode.Normal)
+            string id = fragile ? "cloudFragile" : "cloud";
+            if (SceneAs<Level>().Session.Area.Mode != AreaMode.Normal)
             {
-                this.Collider.Position.X += 2f;
-                this.Collider.Width -= 6f;
+                Collider.Position.X += 2f;
+                Collider.Width -= 6f;
                 id += "Remix";
             }
-            this.Add((Component) (this.sprite = GFX.SpriteBank.Create(id)));
-            this.sprite.Origin = new Vector2(this.sprite.Width / 2f, 8f);
-            this.sprite.OnFrameChange = (Action<string>) (s =>
+            Add(sprite = GFX.SpriteBank.Create(id));
+            sprite.Origin = new Vector2(sprite.Width / 2f, 8f);
+            sprite.OnFrameChange = s =>
             {
-                if (!(s == "spawn") || this.sprite.CurrentAnimationFrame != 6)
+                if (!(s == "spawn") || sprite.CurrentAnimationFrame != 6)
                     return;
-                this.wiggler.Start();
-            });
+                wiggler.Start();
+            };
         }
 
         public override void Update()
         {
             base.Update();
-            this.scale.X = Calc.Approach(this.scale.X, 1f, 1f * Engine.DeltaTime);
-            this.scale.Y = Calc.Approach(this.scale.Y, 1f, 1f * Engine.DeltaTime);
-            this.timer += Engine.DeltaTime;
-            if (this.GetPlayerRider() != null)
-                this.sprite.Position = Vector2.Zero;
+            scale.X = Calc.Approach(scale.X, 1f, 1f * Engine.DeltaTime);
+            scale.Y = Calc.Approach(scale.Y, 1f, 1f * Engine.DeltaTime);
+            timer += Engine.DeltaTime;
+            if (GetPlayerRider() != null)
+                sprite.Position = Vector2.Zero;
             else
-                this.sprite.Position = Calc.Approach(this.sprite.Position, new Vector2(0.0f, (float) Math.Sin((double) this.timer * 2.0)), Engine.DeltaTime * 4f);
-            if ((double) this.respawnTimer > 0.0)
+                sprite.Position = Calc.Approach(sprite.Position, new Vector2(0.0f, (float) Math.Sin(timer * 2.0)), Engine.DeltaTime * 4f);
+            if (respawnTimer > 0.0)
             {
-                this.respawnTimer -= Engine.DeltaTime;
-                if ((double) this.respawnTimer > 0.0)
+                respawnTimer -= Engine.DeltaTime;
+                if (respawnTimer > 0.0)
                     return;
-                this.waiting = true;
-                this.Y = this.startY;
-                this.speed = 0.0f;
-                this.scale = Vector2.One;
-                this.Collidable = true;
-                this.sprite.Play("spawn");
-                this.sfx.Play("event:/game/04_cliffside/cloud_pink_reappear");
+                waiting = true;
+                Y = startY;
+                speed = 0.0f;
+                scale = Vector2.One;
+                Collidable = true;
+                sprite.Play("spawn");
+                sfx.Play("event:/game/04_cliffside/cloud_pink_reappear");
             }
-            else if (this.waiting)
+            else if (waiting)
             {
-                Player playerRider = this.GetPlayerRider();
-                if (playerRider == null || (double) playerRider.Speed.Y < 0.0)
+                Player playerRider = GetPlayerRider();
+                if (playerRider == null || playerRider.Speed.Y < 0.0)
                     return;
-                this.canRumble = true;
-                this.speed = 180f;
-                this.scale = new Vector2(1.3f, 0.7f);
-                this.waiting = false;
-                if (this.fragile)
-                    Audio.Play("event:/game/04_cliffside/cloud_pink_boost", this.Position);
+                canRumble = true;
+                speed = 180f;
+                scale = new Vector2(1.3f, 0.7f);
+                waiting = false;
+                if (fragile)
+                    Audio.Play("event:/game/04_cliffside/cloud_pink_boost", Position);
                 else
-                    Audio.Play("event:/game/04_cliffside/cloud_blue_boost", this.Position);
+                    Audio.Play("event:/game/04_cliffside/cloud_blue_boost", Position);
             }
-            else if (this.returning)
+            else if (returning)
             {
-                this.speed = Calc.Approach(this.speed, 180f, 600f * Engine.DeltaTime);
-                this.MoveTowardsY(this.startY, this.speed * Engine.DeltaTime);
-                if ((double) this.ExactPosition.Y != (double) this.startY)
+                speed = Calc.Approach(speed, 180f, 600f * Engine.DeltaTime);
+                MoveTowardsY(startY, speed * Engine.DeltaTime);
+                if (ExactPosition.Y != (double) startY)
                     return;
-                this.returning = false;
-                this.waiting = true;
-                this.speed = 0.0f;
+                returning = false;
+                waiting = true;
+                speed = 0.0f;
             }
             else
             {
-                if (this.fragile && this.Collidable && !this.HasPlayerRider())
+                if (fragile && Collidable && !HasPlayerRider())
                 {
-                    this.Collidable = false;
-                    this.sprite.Play("fade");
+                    Collidable = false;
+                    sprite.Play("fade");
                 }
-                if ((double) this.speed < 0.0 && this.canRumble)
+                if (speed < 0.0 && canRumble)
                 {
-                    this.canRumble = false;
-                    if (this.HasPlayerRider())
+                    canRumble = false;
+                    if (HasPlayerRider())
                         Input.Rumble(RumbleStrength.Medium, RumbleLength.Medium);
                 }
-                if ((double) this.speed < 0.0 && this.Scene.OnInterval(0.02f))
-                    (this.Scene as Level).ParticlesBG.Emit(this.particleType, 1, this.Position + new Vector2(0.0f, 2f), new Vector2(this.Collider.Width / 2f, 1f), 1.57079637f);
-                if (this.fragile && (double) this.speed < 0.0)
-                    this.sprite.Scale.Y = Calc.Approach(this.sprite.Scale.Y, 0.0f, Engine.DeltaTime * 4f);
-                if ((double) this.Y >= (double) this.startY)
+                if (speed < 0.0 && Scene.OnInterval(0.02f))
+                    (Scene as Level).ParticlesBG.Emit(particleType, 1, Position + new Vector2(0.0f, 2f), new Vector2(Collider.Width / 2f, 1f), 1.57079637f);
+                if (fragile && speed < 0.0)
+                    sprite.Scale.Y = Calc.Approach(sprite.Scale.Y, 0.0f, Engine.DeltaTime * 4f);
+                if (Y >= (double) startY)
                 {
-                    this.speed -= 1200f * Engine.DeltaTime;
+                    speed -= 1200f * Engine.DeltaTime;
                 }
                 else
                 {
-                    this.speed += 1200f * Engine.DeltaTime;
-                    if ((double) this.speed >= -100.0)
+                    speed += 1200f * Engine.DeltaTime;
+                    if (speed >= -100.0)
                     {
-                        Player playerRider = this.GetPlayerRider();
-                        if (playerRider != null && (double) playerRider.Speed.Y >= 0.0)
+                        Player playerRider = GetPlayerRider();
+                        if (playerRider != null && playerRider.Speed.Y >= 0.0)
                             playerRider.Speed.Y = -200f;
-                        if (this.fragile)
+                        if (fragile)
                         {
-                            this.Collidable = false;
-                            this.sprite.Play("fade");
-                            this.respawnTimer = 2.5f;
+                            Collidable = false;
+                            sprite.Play("fade");
+                            respawnTimer = 2.5f;
                         }
                         else
                         {
-                            this.scale = new Vector2(0.7f, 1.3f);
-                            this.returning = true;
+                            scale = new Vector2(0.7f, 1.3f);
+                            returning = true;
                         }
                     }
                 }
-                float liftSpeedV = this.speed;
-                if ((double) liftSpeedV < 0.0)
+                float liftSpeedV = speed;
+                if (liftSpeedV < 0.0)
                     liftSpeedV = -220f;
-                this.MoveV(this.speed * Engine.DeltaTime, liftSpeedV);
+                MoveV(speed * Engine.DeltaTime, liftSpeedV);
             }
         }
 
         public override void Render()
         {
-            this.sprite.Scale = this.scale * (float) (1.0 + 0.10000000149011612 * (double) this.wiggler.Value);
+            sprite.Scale = scale * (float) (1.0 + 0.10000000149011612 * wiggler.Value);
             base.Render();
         }
     }

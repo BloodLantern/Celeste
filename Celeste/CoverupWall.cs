@@ -3,7 +3,7 @@ using Monocle;
 
 namespace Celeste
 {
-    [Tracked(false)]
+    [Tracked]
     public class CoverupWall : Entity
     {
         private char fillTile;
@@ -13,29 +13,29 @@ namespace Celeste
         public CoverupWall(Vector2 position, char tile, float width, float height)
             : base(position)
         {
-            this.fillTile = tile;
-            this.Depth = -13000;
-            this.Collider = (Collider) new Hitbox(width, height);
-            this.Add((Component) (this.cutout = new EffectCutout()));
+            fillTile = tile;
+            Depth = -13000;
+            Collider = new Hitbox(width, height);
+            Add(cutout = new EffectCutout());
         }
 
         public CoverupWall(EntityData data, Vector2 offset)
-            : this(data.Position + offset, data.Char("tiletype", '3'), (float) data.Width, (float) data.Height)
+            : this(data.Position + offset, data.Char("tiletype", '3'), data.Width, data.Height)
         {
         }
 
         public override void Added(Scene scene)
         {
             base.Added(scene);
-            int tilesX = (int) this.Width / 8;
-            int tilesY = (int) this.Height / 8;
-            Level level = this.SceneAs<Level>();
+            int tilesX = (int) Width / 8;
+            int tilesY = (int) Height / 8;
+            Level level = SceneAs<Level>();
             Rectangle tileBounds = level.Session.MapData.TileBounds;
             VirtualMap<char> solidsData = level.SolidsData;
-            int x = (int) this.X / 8 - tileBounds.Left;
-            int y = (int) this.Y / 8 - tileBounds.Top;
-            this.Add((Component) (this.tiles = GFX.FGAutotiler.GenerateOverlay(this.fillTile, x, y, tilesX, tilesY, solidsData).TileGrid));
-            this.Add((Component) new TileInterceptor(this.tiles, false));
+            int x = (int) X / 8 - tileBounds.Left;
+            int y = (int) Y / 8 - tileBounds.Top;
+            Add(tiles = GFX.FGAutotiler.GenerateOverlay(fillTile, x, y, tilesX, tilesY, solidsData).TileGrid);
+            Add(new TileInterceptor(tiles, false));
         }
     }
 }

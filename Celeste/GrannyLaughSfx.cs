@@ -16,17 +16,17 @@ namespace Celeste
 
         public override void Update()
         {
-            if (this.sprite.CurrentAnimationID == "laugh" && this.sprite.CurrentAnimationFrame == 0 && this.ready)
+            if (sprite.CurrentAnimationID == "laugh" && sprite.CurrentAnimationFrame == 0 && ready)
             {
-                if (this.FirstPlay)
-                    Audio.Play("event:/char/granny/laugh_firstphrase", this.Entity.Position);
+                if (FirstPlay)
+                    Audio.Play("event:/char/granny/laugh_firstphrase", Entity.Position);
                 else
-                    Audio.Play("event:/char/granny/laugh_oneha", this.Entity.Position);
-                this.ready = false;
+                    Audio.Play("event:/char/granny/laugh_oneha", Entity.Position);
+                ready = false;
             }
-            if (this.FirstPlay || !(this.sprite.CurrentAnimationID != "laugh") && this.sprite.CurrentAnimationFrame <= 0)
+            if (FirstPlay || !(sprite.CurrentAnimationID != "laugh") && sprite.CurrentAnimationFrame <= 0)
                 return;
-            this.ready = true;
+            ready = true;
         }
     }
 }

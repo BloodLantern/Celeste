@@ -26,7 +26,7 @@ namespace Celeste
         public static PixelFont Get(string face)
         {
             PixelFont pixelFont;
-            return Fonts.loadedFonts.TryGetValue(face, out pixelFont) ? pixelFont : (PixelFont) null;
+            return Fonts.loadedFonts.TryGetValue(face, out pixelFont) ? pixelFont : null;
         }
 
         public static void Unload(string face)
@@ -56,8 +56,8 @@ namespace Celeste
             settings.CloseInput = true;
             foreach (string file in Directory.GetFiles(Path.Combine(Engine.ContentDirectory, "Dialog"), "*.fnt", SearchOption.AllDirectories))
             {
-                string key = (string) null;
-                using (XmlReader xmlReader = XmlReader.Create((Stream) File.OpenRead(file), settings))
+                string key = null;
+                using (XmlReader xmlReader = XmlReader.Create(File.OpenRead(file), settings))
                 {
                     while (xmlReader.Read())
                     {
@@ -77,16 +77,16 @@ namespace Celeste
 
         public static void Log()
         {
-            Engine.Commands.Log((object) "EXISTING FONTS:");
+            Engine.Commands.Log("EXISTING FONTS:");
             foreach (KeyValuePair<string, List<string>> path in Fonts.paths)
             {
-                Engine.Commands.Log((object) (" - " + path.Key));
+                Engine.Commands.Log(" - " + path.Key);
                 foreach (string str in path.Value)
-                    Engine.Commands.Log((object) (" - > " + str));
+                    Engine.Commands.Log(" - > " + str);
             }
-            Engine.Commands.Log((object) "LOADED:");
+            Engine.Commands.Log("LOADED:");
             foreach (KeyValuePair<string, PixelFont> loadedFont in Fonts.loadedFonts)
-                Engine.Commands.Log((object) (" - " + loadedFont.Key));
+                Engine.Commands.Log(" - " + loadedFont.Key);
         }
     }
 }

@@ -172,16 +172,8 @@ namespace Monocle
         public void Draw(Vector2 position, Vector2 origin, Color color, float scale, float rotation)
             => Monocle.Draw.SpriteBatch.Draw(Texture.Texture, position, ClipRect, color, rotation, origin - DrawOffset, scale, SpriteEffects.None, 0f);
 
-        public void Draw(
-            Vector2 position,
-            Vector2 origin,
-            Color color,
-            float scale,
-            float rotation,
-            SpriteEffects flip)
-        {
-            Monocle.Draw.SpriteBatch.Draw(Texture.Texture, position, ClipRect, color, rotation, origin - DrawOffset, scale, flip, 0f);
-        }
+        public void Draw(Vector2 position, Vector2 origin, Color color, float scale, float rotation, SpriteEffects flip)
+            => Monocle.Draw.SpriteBatch.Draw(Texture.Texture, position, ClipRect, color, rotation, origin - DrawOffset, scale, flip, 0f);
 
         public void Draw(Vector2 position, Vector2 origin, Color color, Vector2 scale)
             => Monocle.Draw.SpriteBatch.Draw(Texture.Texture, position, ClipRect, color, 0f, origin - DrawOffset, scale, SpriteEffects.None, 0f);

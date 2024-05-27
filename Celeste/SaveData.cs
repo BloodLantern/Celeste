@@ -428,9 +428,9 @@ namespace Celeste
                 float num3 = TotalStrawberries < 175 ? num2 + (float) (TotalStrawberries / 175.0 * 55.0) : num2 + 55f;
                 float num4 = TotalCassettes < 8 ? num3 + (float) (TotalCassettes / 8.0 * 7.0) : num3 + 7f;
                 float completionPercent = TotalCompletions < 8 ? num4 + (float) (TotalCompletions / 8.0 * 14.0) : num4 + 14f;
-                if ((double) completionPercent < 0.0)
+                if (completionPercent < 0.0)
                     completionPercent = 0.0f;
-                else if ((double) completionPercent > 100.0)
+                else if (completionPercent > 100.0)
                     completionPercent = 100f;
                 return (int) completionPercent;
             }

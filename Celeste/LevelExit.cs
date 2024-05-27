@@ -1,6 +1,5 @@
 ﻿using Microsoft.Xna.Framework;
 using Monocle;
-using System;
 using System.Collections;
 using System.IO;
 using System.Xml;
@@ -9,7 +8,7 @@ namespace Celeste
 {
     public class LevelExit : Scene
     {
-        private readonly LevelExit.Mode mode;
+        private readonly Mode mode;
         private readonly Session session;
         private float timer;
         private XmlElement completeXml;
@@ -20,7 +19,7 @@ namespace Celeste
         public string GoldenStrawberryEntryLevel;
         private const float MinTimeForCompleteScreen = 3.3f;
 
-        public LevelExit(LevelExit.Mode mode, Session session, HiresSnow snow = null)
+        public LevelExit(Mode mode, Session session, HiresSnow snow = null)
         {
             Add(new HudRenderer());
             this.session = session;
@@ -31,17 +30,17 @@ namespace Celeste
         public override void Begin()
         {
             base.Begin();
-            if (mode != LevelExit.Mode.GoldenBerryRestart)
+            if (mode != Mode.GoldenBerryRestart)
                 SaveLoadIcon.Show(this);
             bool flag = snow == null;
             if (flag)
                 snow = new HiresSnow();
-            if (mode == LevelExit.Mode.Completed)
+            if (mode == Mode.Completed)
             {
                 snow.Direction = new Vector2(0.0f, 16f);
                 if (flag)
                     snow.Reset();
-                RunThread.Start(new Action(LoadCompleteThread), "COMPLETE_LEVEL");
+                RunThread.Start(LoadCompleteThread, "COMPLETE_LEVEL");
                 if (session.Area.Mode != AreaMode.Normal)
                     Audio.SetMusic("event:/music/menu/complete_bside");
                 else if (session.Area.ID == 7)
@@ -50,16 +49,16 @@ namespace Celeste
                     Audio.SetMusic("event:/music/menu/complete_area");
                 Audio.SetAmbience(null);
             }
-            if (mode == LevelExit.Mode.GiveUp)
+            if (mode == Mode.GiveUp)
                 overworldLoader = new OverworldLoader(Overworld.StartMode.AreaQuit, snow);
-            else if (mode == LevelExit.Mode.SaveAndQuit)
+            else if (mode == Mode.SaveAndQuit)
                 overworldLoader = new OverworldLoader(Overworld.StartMode.MainMenu, snow);
-            else if (mode == LevelExit.Mode.CompletedInterlude)
+            else if (mode == Mode.CompletedInterlude)
                 overworldLoader = new OverworldLoader(Overworld.StartMode.AreaComplete, snow);
             Entity entity;
             Add(entity = new Entity());
             entity.Add(new Coroutine(Routine()));
-            if (mode is not LevelExit.Mode.Restart and not LevelExit.Mode.GoldenBerryRestart)
+            if (mode is not Mode.Restart and not Mode.GoldenBerryRestart)
             {
                 Add(snow);
                 if (flag)
@@ -81,12 +80,12 @@ namespace Celeste
 
         private IEnumerator Routine()
         {
-            if (mode != LevelExit.Mode.GoldenBerryRestart)
+            if (mode != Mode.GoldenBerryRestart)
             {
                 UserIO.SaveHandler(true, true);
                 while (UserIO.Saving)
                     yield return null;
-                if (mode == LevelExit.Mode.Completed)
+                if (mode == Mode.Completed)
                 {
                     while (!completeLoaded)
                         yield return null;
@@ -94,7 +93,7 @@ namespace Celeste
                 while (SaveLoadIcon.OnScreen)
                     yield return null;
             }
-            if (mode == LevelExit.Mode.Completed)
+            if (mode == Mode.Completed)
             {
                 while (timer < 3.2999999523162842)
                     yield return null;
@@ -116,7 +115,7 @@ namespace Celeste
                     session = this.session.Restart();
                 LevelLoader levelLoader = new(session);
                 if (mode == Mode.GoldenBerryRestart)
-                    levelLoader.PlayerIntroTypeOverride = new Player.IntroTypes?(Player.IntroTypes.Respawn);
+                    levelLoader.PlayerIntroTypeOverride = Player.IntroTypes.Respawn;
                 Engine.Scene = levelLoader;
             }
         }

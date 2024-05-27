@@ -30,11 +30,11 @@ namespace Celeste
         private float leftArrowEase;
         private float rightArrowEase;
 
-        public OuiJournalPage Page => this.Pages[this.PageIndex];
+        public OuiJournalPage Page => Pages[PageIndex];
 
-        public OuiJournalPage NextPage => this.Pages[this.PageIndex + 1];
+        public OuiJournalPage NextPage => Pages[PageIndex + 1];
 
-        public OuiJournalPage PrevPage => this.Pages[this.PageIndex - 1];
+        public OuiJournalPage PrevPage => Pages[PageIndex - 1];
 
         public override IEnumerator Enter(Oui from)
         {
@@ -55,13 +55,13 @@ namespace Celeste
             journal.rightArrowEase = 0.0f;
             journal.NextPageBuffer = VirtualContent.CreateRenderTarget("journal-a", 1610, 1000);
             journal.CurrentPageBuffer = VirtualContent.CreateRenderTarget("journal-b", 1610, 1000);
-            journal.Pages.Add((OuiJournalPage) new OuiJournalCover(journal));
-            journal.Pages.Add((OuiJournalPage) new OuiJournalProgress(journal));
-            journal.Pages.Add((OuiJournalPage) new OuiJournalSpeedrun(journal));
-            journal.Pages.Add((OuiJournalPage) new OuiJournalDeaths(journal));
-            journal.Pages.Add((OuiJournalPage) new OuiJournalPoem(journal));
+            journal.Pages.Add(new OuiJournalCover(journal));
+            journal.Pages.Add(new OuiJournalProgress(journal));
+            journal.Pages.Add(new OuiJournalSpeedrun(journal));
+            journal.Pages.Add(new OuiJournalDeaths(journal));
+            journal.Pages.Add(new OuiJournalPoem(journal));
             if (Stats.Has())
-                journal.Pages.Add((OuiJournalPage) new OuiJournalGlobal(journal));
+                journal.Pages.Add(new OuiJournalGlobal(journal));
             int num1 = 0;
             foreach (OuiJournalPage page in journal.Pages)
                 page.PageIndex = num1++;
@@ -69,14 +69,14 @@ namespace Celeste
             journal.cameraStart = journal.Overworld.Mountain.UntiltedCamera;
             journal.cameraEnd = journal.cameraStart;
             journal.cameraEnd.Position += -journal.cameraStart.Rotation.Forward() * 1f;
-            double num2 = (double) journal.Overworld.Mountain.EaseCamera(journal.Overworld.Mountain.Area, journal.cameraEnd, new float?(2f));
+            double num2 = journal.Overworld.Mountain.EaseCamera(journal.Overworld.Mountain.Area, journal.cameraEnd, 2f);
             journal.Overworld.Mountain.AllowUserRotation = false;
-            for (float p = 0.0f; (double) p < 1.0; p += Engine.DeltaTime / 0.4f)
+            for (float p = 0.0f; p < 1.0; p += Engine.DeltaTime / 0.4f)
             {
                 journal.rotation = -0.025f * Ease.BackOut(p);
-                journal.X = (float) (1920.0 * (double) Ease.CubeInOut(p) - 1920.0);
+                journal.X = (float) (1920.0 * Ease.CubeInOut(p) - 1920.0);
                 journal.dotEase = p;
-                yield return (object) null;
+                yield return null;
             }
             journal.dotEase = 1f;
         }
@@ -84,47 +84,47 @@ namespace Celeste
         public override void HandleGraphicsReset()
         {
             base.HandleGraphicsReset();
-            if (this.Pages.Count <= 0)
+            if (Pages.Count <= 0)
                 return;
-            this.Page.Redraw(this.CurrentPageBuffer);
+            Page.Redraw(CurrentPageBuffer);
         }
 
         public IEnumerator TurnPage(int direction)
         {
-            this.turningPage = true;
+            turningPage = true;
             if (direction < 0)
             {
-                --this.PageIndex;
-                this.turningScale = -1f;
-                --this.dotTarget;
-                this.Page.Redraw(this.CurrentPageBuffer);
-                this.NextPage.Redraw(this.NextPageBuffer);
-                while ((double) (this.turningScale = Calc.Approach(this.turningScale, 1f, Engine.DeltaTime * 8f)) < 1.0)
-                    yield return (object) null;
+                --PageIndex;
+                turningScale = -1f;
+                --dotTarget;
+                Page.Redraw(CurrentPageBuffer);
+                NextPage.Redraw(NextPageBuffer);
+                while ((turningScale = Calc.Approach(turningScale, 1f, Engine.DeltaTime * 8f)) < 1.0)
+                    yield return null;
             }
             else
             {
-                this.NextPage.Redraw(this.NextPageBuffer);
-                this.turningScale = 1f;
-                ++this.dotTarget;
-                while ((double) (this.turningScale = Calc.Approach(this.turningScale, -1f, Engine.DeltaTime * 8f)) > -1.0)
-                    yield return (object) null;
-                ++this.PageIndex;
-                this.Page.Redraw(this.CurrentPageBuffer);
+                NextPage.Redraw(NextPageBuffer);
+                turningScale = 1f;
+                ++dotTarget;
+                while ((turningScale = Calc.Approach(turningScale, -1f, Engine.DeltaTime * 8f)) > -1.0)
+                    yield return null;
+                ++PageIndex;
+                Page.Redraw(CurrentPageBuffer);
             }
-            this.turningScale = 1f;
-            this.turningPage = false;
+            turningScale = 1f;
+            turningPage = false;
         }
 
         public override IEnumerator Leave(Oui next)
         {
             OuiJournal ouiJournal = this;
             Audio.Play("event:/ui/world_map/journal/back");
-            double num = (double) ouiJournal.Overworld.Mountain.EaseCamera(ouiJournal.Overworld.Mountain.Area, ouiJournal.cameraStart, new float?(0.4f));
+            double num = ouiJournal.Overworld.Mountain.EaseCamera(ouiJournal.Overworld.Mountain.Area, ouiJournal.cameraStart, 0.4f);
             UserIO.SaveHandler(false, true);
-            yield return (object) ouiJournal.EaseOut(0.4f);
+            yield return ouiJournal.EaseOut(0.4f);
             while (UserIO.Saving)
-                yield return (object) null;
+                yield return null;
             ouiJournal.CurrentPageBuffer.Dispose();
             ouiJournal.NextPageBuffer.Dispose();
             ouiJournal.Overworld.ShowConfirmUI = true;
@@ -137,12 +137,12 @@ namespace Celeste
         {
             OuiJournal ouiJournal = this;
             float rotFrom = ouiJournal.rotation;
-            for (float p = 0.0f; (double) p < 1.0; p += Engine.DeltaTime / duration)
+            for (float p = 0.0f; p < 1.0; p += Engine.DeltaTime / duration)
             {
                 ouiJournal.rotation = rotFrom * (1f - Ease.BackOut(p));
-                ouiJournal.X = (float) (0.0 + -1920.0 * (double) Ease.CubeInOut(p));
+                ouiJournal.X = (float) (0.0 + -1920.0 * Ease.CubeInOut(p));
                 ouiJournal.dotEase = 1f - p;
-                yield return (object) null;
+                yield return null;
             }
             ouiJournal.dotEase = 0.0f;
         }
@@ -150,81 +150,81 @@ namespace Celeste
         public override void Update()
         {
             base.Update();
-            this.dot = Calc.Approach(this.dot, this.dotTarget, Engine.DeltaTime * 8f);
-            this.leftArrowEase = Calc.Approach(this.leftArrowEase, (double) this.dotTarget > 0.0 ? 1f : 0.0f, Engine.DeltaTime * 5f) * this.dotEase;
-            this.rightArrowEase = Calc.Approach(this.rightArrowEase, (double) this.dotTarget < (double) (this.Pages.Count - 1) ? 1f : 0.0f, Engine.DeltaTime * 5f) * this.dotEase;
-            if (!this.Focused || this.turningPage)
+            dot = Calc.Approach(dot, dotTarget, Engine.DeltaTime * 8f);
+            leftArrowEase = Calc.Approach(leftArrowEase, dotTarget > 0.0 ? 1f : 0.0f, Engine.DeltaTime * 5f) * dotEase;
+            rightArrowEase = Calc.Approach(rightArrowEase, dotTarget < (double) (Pages.Count - 1) ? 1f : 0.0f, Engine.DeltaTime * 5f) * dotEase;
+            if (!Focused || turningPage)
                 return;
-            this.Page.Update();
-            if (!this.PageTurningLocked)
+            Page.Update();
+            if (!PageTurningLocked)
             {
-                if (Input.MenuLeft.Pressed && this.PageIndex > 0)
+                if (Input.MenuLeft.Pressed && PageIndex > 0)
                 {
-                    if (this.PageIndex == 1)
+                    if (PageIndex == 1)
                         Audio.Play("event:/ui/world_map/journal/page_cover_back");
                     else
                         Audio.Play("event:/ui/world_map/journal/page_main_back");
-                    this.Add((Component) new Coroutine(this.TurnPage(-1)));
+                    Add(new Coroutine(TurnPage(-1)));
                 }
-                else if (Input.MenuRight.Pressed && this.PageIndex < this.Pages.Count - 1)
+                else if (Input.MenuRight.Pressed && PageIndex < Pages.Count - 1)
                 {
-                    if (this.PageIndex == 0)
+                    if (PageIndex == 0)
                         Audio.Play("event:/ui/world_map/journal/page_cover_forward");
                     else
                         Audio.Play("event:/ui/world_map/journal/page_main_forward");
-                    this.Add((Component) new Coroutine(this.TurnPage(1)));
+                    Add(new Coroutine(TurnPage(1)));
                 }
             }
-            if (this.PageTurningLocked || !Input.MenuJournal.Pressed && !Input.MenuCancel.Pressed)
+            if (PageTurningLocked || !Input.MenuJournal.Pressed && !Input.MenuCancel.Pressed)
                 return;
-            this.Close();
+            Close();
         }
 
         private void Close()
         {
-            if (this.fromAreaInspect)
-                this.Overworld.Goto<OuiChapterPanel>();
+            if (fromAreaInspect)
+                Overworld.Goto<OuiChapterPanel>();
             else
-                this.Overworld.Goto<OuiChapterSelect>();
+                Overworld.Goto<OuiChapterSelect>();
         }
 
         public override void Render()
         {
-            Vector2 position = this.Position + new Vector2(128f, 120f);
-            float x1 = Ease.CubeInOut(Math.Max(0.0f, this.turningScale));
-            float num1 = Ease.CubeInOut(Math.Abs(Math.Min(0.0f, this.turningScale)));
+            Vector2 position = Position + new Vector2(128f, 120f);
+            float x1 = Ease.CubeInOut(Math.Max(0.0f, turningScale));
+            float num1 = Ease.CubeInOut(Math.Abs(Math.Min(0.0f, turningScale)));
             if (SaveData.Instance.CheatMode)
                 MTN.FileSelect["cheatmode"].DrawCentered(position + new Vector2(80f, 360f), Color.White, 1f, 1.57079637f);
             if (SaveData.Instance.AssistMode)
                 MTN.FileSelect["assist"].DrawCentered(position + new Vector2(100f, 370f), Color.White, 1f, 1.57079637f);
             MTexture mtexture1 = MTN.Journal["edge"];
-            mtexture1.Draw(position + new Vector2((float) -mtexture1.Width, 0.0f), Vector2.Zero, Color.White, 1f, this.rotation);
-            if (this.PageIndex > 0)
-                MTN.Journal[this.PrevPage.PageTexture].Draw(position, Vector2.Zero, this.backColor, new Vector2(-1f, 1f), this.rotation);
-            if (this.turningPage)
+            mtexture1.Draw(position + new Vector2(-mtexture1.Width, 0.0f), Vector2.Zero, Color.White, 1f, rotation);
+            if (PageIndex > 0)
+                MTN.Journal[PrevPage.PageTexture].Draw(position, Vector2.Zero, backColor, new Vector2(-1f, 1f), rotation);
+            if (turningPage)
             {
-                MTN.Journal[this.NextPage.PageTexture].Draw(position, Vector2.Zero, Color.White, 1f, this.rotation);
-                Draw.SpriteBatch.Draw((Texture2D) (RenderTarget2D) this.NextPageBuffer, position, new Rectangle?(this.NextPageBuffer.Bounds), Color.White, this.rotation, Vector2.Zero, Vector2.One, SpriteEffects.None, 0.0f);
+                MTN.Journal[NextPage.PageTexture].Draw(position, Vector2.Zero, Color.White, 1f, rotation);
+                Draw.SpriteBatch.Draw((RenderTarget2D) NextPageBuffer, position, NextPageBuffer.Bounds, Color.White, rotation, Vector2.Zero, Vector2.One, SpriteEffects.None, 0.0f);
             }
-            if (this.turningPage && (double) num1 > 0.0)
-                MTN.Journal[this.Page.PageTexture].Draw(position, Vector2.Zero, this.backColor, new Vector2(-1f * num1, 1f), this.rotation);
-            if ((double) x1 > 0.0)
+            if (turningPage && num1 > 0.0)
+                MTN.Journal[Page.PageTexture].Draw(position, Vector2.Zero, backColor, new Vector2(-1f * num1, 1f), rotation);
+            if (x1 > 0.0)
             {
-                MTN.Journal[this.Page.PageTexture].Draw(position, Vector2.Zero, Color.White, new Vector2(x1, 1f), this.rotation);
-                Draw.SpriteBatch.Draw((Texture2D) (RenderTarget2D) this.CurrentPageBuffer, position, new Rectangle?(this.CurrentPageBuffer.Bounds), Color.White, this.rotation, Vector2.Zero, new Vector2(x1, 1f), SpriteEffects.None, 0.0f);
+                MTN.Journal[Page.PageTexture].Draw(position, Vector2.Zero, Color.White, new Vector2(x1, 1f), rotation);
+                Draw.SpriteBatch.Draw((RenderTarget2D) CurrentPageBuffer, position, CurrentPageBuffer.Bounds, Color.White, rotation, Vector2.Zero, new Vector2(x1, 1f), SpriteEffects.None, 0.0f);
             }
-            if (this.Pages.Count <= 0)
+            if (Pages.Count <= 0)
                 return;
-            int count = this.Pages.Count;
+            int count = Pages.Count;
             MTexture mtexture2 = GFX.Gui["dot_outline"];
             int num2 = mtexture2.Width * count;
-            Vector2 vector2 = new Vector2(960f, (float) (1040.0 - 40.0 * (double) Ease.CubeOut(this.dotEase)));
+            Vector2 vector2 = new Vector2(960f, (float) (1040.0 - 40.0 * Ease.CubeOut(dotEase)));
             for (int index = 0; index < count; ++index)
-                mtexture2.DrawCentered(vector2 + new Vector2((float) (-num2 / 2) + (float) mtexture2.Width * ((float) index + 0.5f), 0.0f), Color.White * 0.25f);
-            float x2 = (float) (1.0 + (double) Calc.YoYo(this.dot % 1f) * 4.0);
-            mtexture2.DrawCentered(vector2 + new Vector2((float) (-num2 / 2) + (float) mtexture2.Width * (this.dot + 0.5f), 0.0f), Color.White, new Vector2(x2, 1f));
-            GFX.Gui["dotarrow_outline"].DrawCentered(vector2 + new Vector2((float) (-num2 / 2 - 50), (float) (32.0 * (1.0 - (double) Ease.CubeOut(this.leftArrowEase)))), Color.White * this.leftArrowEase, new Vector2(-1f, 1f));
-            GFX.Gui["dotarrow_outline"].DrawCentered(vector2 + new Vector2((float) (num2 / 2 + 50), (float) (32.0 * (1.0 - (double) Ease.CubeOut(this.rightArrowEase)))), Color.White * this.rightArrowEase);
+                mtexture2.DrawCentered(vector2 + new Vector2(-num2 / 2 + mtexture2.Width * (index + 0.5f), 0.0f), Color.White * 0.25f);
+            float x2 = (float) (1.0 + Calc.YoYo(dot % 1f) * 4.0);
+            mtexture2.DrawCentered(vector2 + new Vector2(-num2 / 2 + mtexture2.Width * (dot + 0.5f), 0.0f), Color.White, new Vector2(x2, 1f));
+            GFX.Gui["dotarrow_outline"].DrawCentered(vector2 + new Vector2(-num2 / 2 - 50, (float) (32.0 * (1.0 - Ease.CubeOut(leftArrowEase)))), Color.White * leftArrowEase, new Vector2(-1f, 1f));
+            GFX.Gui["dotarrow_outline"].DrawCentered(vector2 + new Vector2(num2 / 2 + 50, (float) (32.0 * (1.0 - Ease.CubeOut(rightArrowEase)))), Color.White * rightArrowEase);
         }
     }
 }

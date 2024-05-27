@@ -23,25 +23,25 @@ namespace Celeste
         public string PeriodCharacters = ".!?";
         public int Lines;
         public int Words;
-        public Dictionary<string, string> Dialog = new Dictionary<string, string>((IEqualityComparer<string>) StringComparer.OrdinalIgnoreCase);
-        public Dictionary<string, string> Cleaned = new Dictionary<string, string>((IEqualityComparer<string>) StringComparer.OrdinalIgnoreCase);
+        public Dictionary<string, string> Dialog = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
+        public Dictionary<string, string> Cleaned = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
         private static readonly Regex command = new Regex("\\{(.*?)\\}", RegexOptions.RightToLeft);
         private static readonly Regex insert = new Regex("\\{\\+\\s*(.*?)\\}");
         private static readonly Regex variable = new Regex("^\\w+\\=.*");
         private static readonly Regex portrait = new Regex("\\[(?<content>[^\\[\\\\]*(?:\\\\.[^\\]\\\\]*)*)\\]", RegexOptions.IgnoreCase);
 
-        public PixelFont Font => Fonts.Get(this.FontFace);
+        public PixelFont Font => Fonts.Get(FontFace);
 
-        public PixelFontSize FontSize => this.Font.Get(this.FontFaceSize);
+        public PixelFontSize FontSize => Font.Get(FontFaceSize);
 
-        public string this[string name] => this.Dialog[name];
+        public string this[string name] => Dialog[name];
 
         public bool CanDisplay(string text)
         {
-            PixelFontSize fontSize = this.FontSize;
+            PixelFontSize fontSize = FontSize;
             for (int index = 0; index < text.Length; ++index)
             {
-                if (text[index] != ' ' && fontSize.Get((int) text[index]) == null)
+                if (text[index] != ' ' && fontSize.Get(text[index]) == null)
                     return false;
             }
             return true;
@@ -49,25 +49,25 @@ namespace Celeste
 
         public void Export(string path)
         {
-            using (BinaryWriter binaryWriter = new BinaryWriter((Stream) File.OpenWrite(path)))
+            using (BinaryWriter binaryWriter = new BinaryWriter(File.OpenWrite(path)))
             {
-                binaryWriter.Write(this.Id);
-                binaryWriter.Write(this.Label);
-                binaryWriter.Write(this.IconPath);
-                binaryWriter.Write(this.Order);
-                binaryWriter.Write(this.FontFace);
-                binaryWriter.Write(this.FontFaceSize);
-                binaryWriter.Write(this.SplitRegex);
-                binaryWriter.Write(this.CommaCharacters);
-                binaryWriter.Write(this.PeriodCharacters);
-                binaryWriter.Write(this.Lines);
-                binaryWriter.Write(this.Words);
-                binaryWriter.Write(this.Dialog.Count);
-                foreach (KeyValuePair<string, string> keyValuePair in this.Dialog)
+                binaryWriter.Write(Id);
+                binaryWriter.Write(Label);
+                binaryWriter.Write(IconPath);
+                binaryWriter.Write(Order);
+                binaryWriter.Write(FontFace);
+                binaryWriter.Write(FontFaceSize);
+                binaryWriter.Write(SplitRegex);
+                binaryWriter.Write(CommaCharacters);
+                binaryWriter.Write(PeriodCharacters);
+                binaryWriter.Write(Lines);
+                binaryWriter.Write(Words);
+                binaryWriter.Write(Dialog.Count);
+                foreach (KeyValuePair<string, string> keyValuePair in Dialog)
                 {
                     binaryWriter.Write(keyValuePair.Key);
                     binaryWriter.Write(keyValuePair.Value);
-                    binaryWriter.Write(this.Cleaned[keyValuePair.Key]);
+                    binaryWriter.Write(Cleaned[keyValuePair.Key]);
                 }
             }
         }
@@ -75,7 +75,7 @@ namespace Celeste
         public static Language FromExport(string path)
         {
             Language language = new Language();
-            using (BinaryReader binaryReader = new BinaryReader((Stream) File.OpenRead(path)))
+            using (BinaryReader binaryReader = new BinaryReader(File.OpenRead(path)))
             {
                 language.Id = binaryReader.ReadString();
                 language.Label = binaryReader.ReadString();
@@ -102,7 +102,7 @@ namespace Celeste
 
         public static Language FromTxt(string path)
         {
-            Language language = (Language) null;
+            Language language = null;
             string key1 = "";
             StringBuilder stringBuilder = new StringBuilder();
             string input1 = "";
@@ -127,7 +127,7 @@ namespace Celeste
                             {
                                 string[] strArray2 = str2.Split(',');
                                 language = new Language();
-                                language.FontFace = (string) null;
+                                language.FontFace = null;
                                 language.Id = strArray2[0];
                                 language.FilePath = Path.GetFileName(path);
                                 if (strArray2.Length > 1)
@@ -145,7 +145,7 @@ namespace Celeste
                             {
                                 string[] strArray3 = str2.Split(',');
                                 language.FontFace = strArray3[0];
-                                language.FontFaceSize = float.Parse(strArray3[1], (IFormatProvider) CultureInfo.InvariantCulture);
+                                language.FontFaceSize = float.Parse(strArray3[1], CultureInfo.InvariantCulture);
                             }
                             else if (str1.Equals("SPLIT_REGEX", StringComparison.OrdinalIgnoreCase))
                                 language.SplitRegex = str2;
@@ -184,7 +184,7 @@ namespace Celeste
             foreach (string key2 in stringList)
             {
                 string input4 = language.Dialog[key2];
-                MatchCollection matchCollection = (MatchCollection) null;
+                MatchCollection matchCollection = null;
                 while (matchCollection == null || matchCollection.Count > 0)
                 {
                     matchCollection = Language.insert.Matches(input4);
@@ -215,9 +215,9 @@ namespace Celeste
 
         public void Dispose()
         {
-            if (this.Icon.Texture == null || this.Icon.Texture.IsDisposed)
+            if (Icon.Texture == null || Icon.Texture.IsDisposed)
                 return;
-            this.Icon.Texture.Dispose();
+            Icon.Texture.Dispose();
         }
     }
 }

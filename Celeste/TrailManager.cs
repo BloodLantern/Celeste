@@ -1,14 +1,13 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Monocle;
-using System;
 
 namespace Celeste
 {
-    [Tracked(false)]
+    [Tracked]
     public class TrailManager : Entity
     {
-        private static BlendState MaxBlendState = new BlendState()
+        private static BlendState MaxBlendState = new BlendState
         {
             ColorSourceBlend = Blend.DestinationAlpha,
             AlphaSourceBlend = Blend.DestinationAlpha
@@ -16,58 +15,58 @@ namespace Celeste
         private const int size = 64;
         private const int columns = 8;
         private const int rows = 8;
-        private TrailManager.Snapshot[] snapshots = new TrailManager.Snapshot[64];
+        private Snapshot[] snapshots = new Snapshot[64];
         private VirtualRenderTarget buffer;
         private bool dirty;
 
         public TrailManager()
         {
-            this.Tag = (int) Tags.Global;
-            this.Depth = 10;
-            this.Add((Component) new BeforeRenderHook(new Action(this.BeforeRender)));
-            this.Add((Component) new MirrorReflection());
+            Tag = (int) Tags.Global;
+            Depth = 10;
+            Add(new BeforeRenderHook(BeforeRender));
+            Add(new MirrorReflection());
         }
 
         public override void Removed(Scene scene)
         {
-            this.Dispose();
+            Dispose();
             base.Removed(scene);
         }
 
         public override void SceneEnd(Scene scene)
         {
-            this.Dispose();
+            Dispose();
             base.SceneEnd(scene);
         }
 
         private void Dispose()
         {
-            if (this.buffer != null)
-                this.buffer.Dispose();
-            this.buffer = (VirtualRenderTarget) null;
+            if (buffer != null)
+                buffer.Dispose();
+            buffer = null;
         }
 
         private void BeforeRender()
         {
-            if (!this.dirty)
+            if (!dirty)
                 return;
-            if (this.buffer == null)
-                this.buffer = VirtualContent.CreateRenderTarget("trail-manager", 512, 512);
-            Engine.Graphics.GraphicsDevice.SetRenderTarget((RenderTarget2D) this.buffer);
+            if (buffer == null)
+                buffer = VirtualContent.CreateRenderTarget("trail-manager", 512, 512);
+            Engine.Graphics.GraphicsDevice.SetRenderTarget(buffer);
             Draw.SpriteBatch.Begin(SpriteSortMode.Deferred, LightingRenderer.OccludeBlendState);
-            for (int index = 0; index < this.snapshots.Length; ++index)
+            for (int index = 0; index < snapshots.Length; ++index)
             {
-                if (this.snapshots[index] != null && !this.snapshots[index].Drawn)
-                    Draw.Rect((float) (index % 8 * 64), (float) (index / 8 * 64), 64f, 64f, Color.Transparent);
+                if (snapshots[index] != null && !snapshots[index].Drawn)
+                    Draw.Rect(index % 8 * 64, index / 8 * 64, 64f, 64f, Color.Transparent);
             }
             Draw.SpriteBatch.End();
-            Draw.SpriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, SamplerState.PointClamp, (DepthStencilState) null, RasterizerState.CullNone);
-            for (int index1 = 0; index1 < this.snapshots.Length; ++index1)
+            Draw.SpriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, SamplerState.PointClamp, null, RasterizerState.CullNone);
+            for (int index1 = 0; index1 < snapshots.Length; ++index1)
             {
-                if (this.snapshots[index1] != null && !this.snapshots[index1].Drawn)
+                if (snapshots[index1] != null && !snapshots[index1].Drawn)
                 {
-                    TrailManager.Snapshot snapshot = this.snapshots[index1];
-                    Vector2 vector2 = new Vector2((float) (((double) (index1 % 8) + 0.5) * 64.0), (float) (((double) (index1 / 8) + 0.5) * 64.0)) - snapshot.Position;
+                    Snapshot snapshot = snapshots[index1];
+                    Vector2 vector2 = new Vector2((float) ((index1 % 8 + 0.5) * 64.0), (float) ((index1 / 8 + 0.5) * 64.0)) - snapshot.Position;
                     if (snapshot.Hair != null)
                     {
                         for (int index2 = 0; index2 < snapshot.Hair.Nodes.Count; ++index2)
@@ -78,20 +77,20 @@ namespace Celeste
                     }
                     Vector2 scale = snapshot.Sprite.Scale;
                     snapshot.Sprite.Scale = snapshot.SpriteScale;
-                    Monocle.Image sprite1 = snapshot.Sprite;
-                    sprite1.Position = sprite1.Position + vector2;
+                    Image sprite1 = snapshot.Sprite;
+                    sprite1.Position += vector2;
                     snapshot.Sprite.Render();
                     snapshot.Sprite.Scale = scale;
-                    Monocle.Image sprite2 = snapshot.Sprite;
-                    sprite2.Position = sprite2.Position - vector2;
+                    Image sprite2 = snapshot.Sprite;
+                    sprite2.Position -= vector2;
                     snapshot.Drawn = true;
                 }
             }
             Draw.SpriteBatch.End();
             Draw.SpriteBatch.Begin(SpriteSortMode.Deferred, TrailManager.MaxBlendState);
-            Draw.Rect(0.0f, 0.0f, (float) this.buffer.Width, (float) this.buffer.Height, new Color(1f, 1f, 1f, 1f));
+            Draw.Rect(0.0f, 0.0f, buffer.Width, buffer.Height, new Color(1f, 1f, 1f, 1f));
             Draw.SpriteBatch.End();
-            this.dirty = false;
+            dirty = false;
         }
 
         public static void Add(
@@ -101,23 +100,23 @@ namespace Celeste
             bool frozenUpdate = false,
             bool useRawDeltaTime = false)
         {
-            Monocle.Image sprite = (Monocle.Image) entity.Get<PlayerSprite>() ?? (Monocle.Image) entity.Get<Sprite>();
+            Image sprite = (Image) entity.Get<PlayerSprite>() ?? entity.Get<Sprite>();
             PlayerHair hair = entity.Get<PlayerHair>();
             TrailManager.Add(entity.Position, sprite, hair, sprite.Scale, color, entity.Depth + 1, duration, frozenUpdate, useRawDeltaTime);
         }
 
         public static void Add(Entity entity, Vector2 scale, Color color, float duration = 1f)
         {
-            Monocle.Image sprite = (Monocle.Image) entity.Get<PlayerSprite>() ?? (Monocle.Image) entity.Get<Sprite>();
+            Image sprite = (Image) entity.Get<PlayerSprite>() ?? entity.Get<Sprite>();
             PlayerHair hair = entity.Get<PlayerHair>();
             TrailManager.Add(entity.Position, sprite, hair, scale, color, entity.Depth + 1, duration);
         }
 
-        public static void Add(Vector2 position, Monocle.Image image, Color color, int depth, float duration = 1f) => TrailManager.Add(position, image, (PlayerHair) null, image.Scale, color, depth, duration);
+        public static void Add(Vector2 position, Image image, Color color, int depth, float duration = 1f) => TrailManager.Add(position, image, null, image.Scale, color, depth, duration);
 
-        public static TrailManager.Snapshot Add(
+        public static Snapshot Add(
             Vector2 position,
-            Monocle.Image sprite,
+            Image sprite,
             PlayerHair hair,
             Vector2 scale,
             Color color,
@@ -130,21 +129,21 @@ namespace Celeste
             if (manager == null)
             {
                 manager = new TrailManager();
-                Engine.Scene.Add((Entity) manager);
+                Engine.Scene.Add(manager);
             }
             for (int index = 0; index < manager.snapshots.Length; ++index)
             {
                 if (manager.snapshots[index] == null)
                 {
-                    TrailManager.Snapshot snapshot = Engine.Pooler.Create<TrailManager.Snapshot>();
+                    Snapshot snapshot = Engine.Pooler.Create<Snapshot>();
                     snapshot.Init(manager, index, position, sprite, hair, scale, color, duration, depth, frozenUpdate, useRawDeltaTime);
                     manager.snapshots[index] = snapshot;
                     manager.dirty = true;
-                    Engine.Scene.Add((Entity) snapshot);
+                    Engine.Scene.Add(snapshot);
                     return snapshot;
                 }
             }
-            return (TrailManager.Snapshot) null;
+            return null;
         }
 
         public static void Clear()
@@ -160,11 +159,11 @@ namespace Celeste
         }
 
         [Pooled]
-        [Tracked(false)]
+        [Tracked]
         public class Snapshot : Entity
         {
             public TrailManager Manager;
-            public Monocle.Image Sprite;
+            public Image Sprite;
             public Vector2 SpriteScale;
             public PlayerHair Hair;
             public int Index;
@@ -174,13 +173,13 @@ namespace Celeste
             public bool Drawn;
             public bool UseRawDeltaTime;
 
-            public Snapshot() => this.Add((Component) new MirrorReflection());
+            public Snapshot() => Add(new MirrorReflection());
 
             public void Init(
                 TrailManager manager,
                 int index,
                 Vector2 position,
-                Monocle.Image sprite,
+                Image sprite,
                 PlayerHair hair,
                 Vector2 scale,
                 Color color,
@@ -189,53 +188,53 @@ namespace Celeste
                 bool frozenUpdate,
                 bool useRawDeltaTime)
             {
-                this.Tag = (int) Tags.Global;
+                Tag = (int) Tags.Global;
                 if (frozenUpdate)
-                    this.Tag |= (int) Tags.FrozenUpdate;
-                this.Manager = manager;
-                this.Index = index;
-                this.Position = position;
-                this.Sprite = sprite;
-                this.SpriteScale = scale;
-                this.Hair = hair;
-                this.Color = color;
-                this.Percent = 0.0f;
-                this.Duration = duration;
-                this.Depth = depth;
-                this.Drawn = false;
-                this.UseRawDeltaTime = useRawDeltaTime;
+                    Tag |= (int) Tags.FrozenUpdate;
+                Manager = manager;
+                Index = index;
+                Position = position;
+                Sprite = sprite;
+                SpriteScale = scale;
+                Hair = hair;
+                Color = color;
+                Percent = 0.0f;
+                Duration = duration;
+                Depth = depth;
+                Drawn = false;
+                UseRawDeltaTime = useRawDeltaTime;
             }
 
             public override void Update()
             {
-                if ((double) this.Duration <= 0.0)
+                if (Duration <= 0.0)
                 {
-                    if (!this.Drawn)
+                    if (!Drawn)
                         return;
-                    this.RemoveSelf();
+                    RemoveSelf();
                 }
                 else
                 {
-                    if ((double) this.Percent >= 1.0)
-                        this.RemoveSelf();
-                    this.Percent += (this.UseRawDeltaTime ? Engine.RawDeltaTime : Engine.DeltaTime) / this.Duration;
+                    if (Percent >= 1.0)
+                        RemoveSelf();
+                    Percent += (UseRawDeltaTime ? Engine.RawDeltaTime : Engine.DeltaTime) / Duration;
                 }
             }
 
             public override void Render()
             {
-                VirtualRenderTarget buffer = this.Manager.buffer;
-                Rectangle rectangle = new Rectangle(this.Index % 8 * 64, this.Index / 8 * 64, 64, 64);
-                float num = (double) this.Duration > 0.0 ? (float) (0.75 * (1.0 - (double) Ease.CubeOut(this.Percent))) : 1f;
+                VirtualRenderTarget buffer = Manager.buffer;
+                Rectangle rectangle = new Rectangle(Index % 8 * 64, Index / 8 * 64, 64, 64);
+                float num = Duration > 0.0 ? (float) (0.75 * (1.0 - Ease.CubeOut(Percent))) : 1f;
                 if (buffer == null)
                     return;
-                Draw.SpriteBatch.Draw((Texture2D) (RenderTarget2D) buffer, this.Position, new Rectangle?(rectangle), this.Color * num, 0.0f, new Vector2(64f, 64f) * 0.5f, Vector2.One, SpriteEffects.None, 0.0f);
+                Draw.SpriteBatch.Draw((RenderTarget2D) buffer, Position, rectangle, Color * num, 0.0f, new Vector2(64f, 64f) * 0.5f, Vector2.One, SpriteEffects.None, 0.0f);
             }
 
             public override void Removed(Scene scene)
             {
-                if (this.Manager != null)
-                    this.Manager.snapshots[this.Index] = (TrailManager.Snapshot) null;
+                if (Manager != null)
+                    Manager.snapshots[Index] = null;
                 base.Removed(scene);
             }
         }

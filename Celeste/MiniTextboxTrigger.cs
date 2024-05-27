@@ -1,6 +1,5 @@
 ﻿using Microsoft.Xna.Framework;
 using Monocle;
-using System;
 
 namespace Celeste
 {
@@ -8,7 +7,7 @@ namespace Celeste
     {
         private EntityID id;
         private string[] dialogOptions;
-        private MiniTextboxTrigger.Modes mode;
+        private Modes mode;
         private bool triggered;
         private bool onlyOnce;
         private int deathCount;
@@ -17,39 +16,39 @@ namespace Celeste
             : base(data, offset)
         {
             this.id = id;
-            this.mode = data.Enum<MiniTextboxTrigger.Modes>(nameof (mode));
-            this.dialogOptions = data.Attr("dialog_id").Split(',');
-            this.onlyOnce = data.Bool("only_once");
-            this.deathCount = data.Int("death_count", -1);
-            if (this.mode != MiniTextboxTrigger.Modes.OnTheoEnter)
+            mode = data.Enum<Modes>(nameof (mode));
+            dialogOptions = data.Attr("dialog_id").Split(',');
+            onlyOnce = data.Bool("only_once");
+            deathCount = data.Int("death_count", -1);
+            if (mode != Modes.OnTheoEnter)
                 return;
-            this.Add((Component) new HoldableCollider((Action<Holdable>) (c => this.Trigger())));
+            Add(new HoldableCollider(c => Trigger()));
         }
 
         public override void Awake(Scene scene)
         {
             base.Awake(scene);
-            if (this.mode != MiniTextboxTrigger.Modes.OnLevelStart)
+            if (mode != Modes.OnLevelStart)
                 return;
-            this.Trigger();
+            Trigger();
         }
 
         public override void OnEnter(Player player)
         {
-            if (this.mode != MiniTextboxTrigger.Modes.OnPlayerEnter)
+            if (mode != Modes.OnPlayerEnter)
                 return;
-            this.Trigger();
+            Trigger();
         }
 
         private void Trigger()
         {
-            if (this.triggered || this.deathCount >= 0 && (this.Scene as Level).Session.DeathsInCurrentLevel != this.deathCount)
+            if (triggered || deathCount >= 0 && (Scene as Level).Session.DeathsInCurrentLevel != deathCount)
                 return;
-            this.triggered = true;
-            this.Scene.Add((Entity) new MiniTextbox(Calc.Random.Choose<string>(this.dialogOptions)));
-            if (!this.onlyOnce)
+            triggered = true;
+            Scene.Add(new MiniTextbox(Calc.Random.Choose(dialogOptions)));
+            if (!onlyOnce)
                 return;
-            (this.Scene as Level).Session.DoNotLoad.Add(this.id);
+            (Scene as Level).Session.DoNotLoad.Add(id);
         }
 
         private enum Modes

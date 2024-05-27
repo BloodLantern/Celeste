@@ -8,7 +8,7 @@ namespace Celeste
     public class CrystalDebris : Actor
     {
         public static ParticleType P_Dust;
-        private Monocle.Image image;
+        private Image image;
         private float percent;
         private float duration;
         private Vector2 speed;
@@ -20,91 +20,91 @@ namespace Celeste
         public CrystalDebris()
             : base(Vector2.Zero)
         {
-            this.Depth = -9990;
-            this.Collider = (Collider) new Hitbox(2f, 2f, -1f, -1f);
-            this.collideH = new Collision(this.OnCollideH);
-            this.collideV = new Collision(this.OnCollideV);
-            this.image = new Monocle.Image(GFX.Game["particles/shard"]);
-            this.image.CenterOrigin();
-            this.Add((Component) this.image);
+            Depth = -9990;
+            Collider = new Hitbox(2f, 2f, -1f, -1f);
+            collideH = OnCollideH;
+            collideV = OnCollideV;
+            image = new Image(GFX.Game["particles/shard"]);
+            image.CenterOrigin();
+            Add(image);
         }
 
         private void Init(Vector2 position, Color color, bool boss)
         {
-            this.Position = position;
-            this.image.Color = this.color = color;
-            this.image.Scale = Vector2.One;
-            this.percent = 0.0f;
-            this.duration = boss ? Calc.Random.Range(0.25f, 1f) : Calc.Random.Range(1f, 2f);
-            this.speed = Calc.AngleToVector(Calc.Random.NextAngle(), boss ? (float) Calc.Random.Range(200, 240) : (float) Calc.Random.Range(60, 160));
-            this.bossShatter = boss;
+            Position = position;
+            image.Color = this.color = color;
+            image.Scale = Vector2.One;
+            percent = 0.0f;
+            duration = boss ? Calc.Random.Range(0.25f, 1f) : Calc.Random.Range(1f, 2f);
+            speed = Calc.AngleToVector(Calc.Random.NextAngle(), boss ? Calc.Random.Range(200, 240) : (float) Calc.Random.Range(60, 160));
+            bossShatter = boss;
         }
 
         public override void Update()
         {
             base.Update();
-            if ((double) this.percent > 1.0)
+            if (percent > 1.0)
             {
-                this.RemoveSelf();
+                RemoveSelf();
             }
             else
             {
-                this.percent += Engine.DeltaTime / this.duration;
-                if (!this.bossShatter)
+                percent += Engine.DeltaTime / duration;
+                if (!bossShatter)
                 {
-                    this.speed.X = Calc.Approach(this.speed.X, 0.0f, Engine.DeltaTime * 20f);
-                    this.speed.Y += 200f * Engine.DeltaTime;
+                    speed.X = Calc.Approach(speed.X, 0.0f, Engine.DeltaTime * 20f);
+                    speed.Y += 200f * Engine.DeltaTime;
                 }
                 else
                 {
-                    float num = Calc.Approach(this.speed.Length(), 0.0f, 300f * Engine.DeltaTime);
-                    this.speed = this.speed.SafeNormalize() * num;
+                    float num = Calc.Approach(speed.Length(), 0.0f, 300f * Engine.DeltaTime);
+                    speed = speed.SafeNormalize() * num;
                 }
-                if ((double) this.speed.Length() > 0.0)
-                    this.image.Rotation = this.speed.Angle();
-                this.image.Scale = Vector2.One * Calc.ClampedMap(this.percent, 0.8f, 1f, 1f, 0.0f);
-                this.image.Scale.X *= Calc.ClampedMap(this.speed.Length(), 0.0f, 400f, 1f, 2f);
-                this.image.Scale.Y *= Calc.ClampedMap(this.speed.Length(), 0.0f, 400f, 1f, 0.2f);
-                this.MoveH(this.speed.X * Engine.DeltaTime, this.collideH);
-                this.MoveV(this.speed.Y * Engine.DeltaTime, this.collideV);
-                if (!this.Scene.OnInterval(0.05f))
+                if (speed.Length() > 0.0)
+                    image.Rotation = speed.Angle();
+                image.Scale = Vector2.One * Calc.ClampedMap(percent, 0.8f, 1f, 1f, 0.0f);
+                image.Scale.X *= Calc.ClampedMap(speed.Length(), 0.0f, 400f, 1f, 2f);
+                image.Scale.Y *= Calc.ClampedMap(speed.Length(), 0.0f, 400f, 1f, 0.2f);
+                MoveH(speed.X * Engine.DeltaTime, collideH);
+                MoveV(speed.Y * Engine.DeltaTime, collideV);
+                if (!Scene.OnInterval(0.05f))
                     return;
-                (this.Scene as Level).ParticlesFG.Emit(CrystalDebris.P_Dust, this.Position);
+                (Scene as Level).ParticlesFG.Emit(CrystalDebris.P_Dust, Position);
             }
         }
 
         public override void Render()
         {
-            Color color = this.image.Color;
-            this.image.Color = Color.Black;
-            this.image.Position = new Vector2(-1f, 0.0f);
-            this.image.Render();
-            this.image.Position = new Vector2(0.0f, -1f);
-            this.image.Render();
-            this.image.Position = new Vector2(1f, 0.0f);
-            this.image.Render();
-            this.image.Position = new Vector2(0.0f, 1f);
-            this.image.Render();
-            this.image.Position = Vector2.Zero;
-            this.image.Color = color;
+            Color color = image.Color;
+            image.Color = Color.Black;
+            image.Position = new Vector2(-1f, 0.0f);
+            image.Render();
+            image.Position = new Vector2(0.0f, -1f);
+            image.Render();
+            image.Position = new Vector2(1f, 0.0f);
+            image.Render();
+            image.Position = new Vector2(0.0f, 1f);
+            image.Render();
+            image.Position = Vector2.Zero;
+            image.Color = color;
             base.Render();
         }
 
-        private void OnCollideH(CollisionData hit) => this.speed.X *= -0.8f;
+        private void OnCollideH(CollisionData hit) => speed.X *= -0.8f;
 
         private void OnCollideV(CollisionData hit)
         {
-            if (this.bossShatter)
+            if (bossShatter)
             {
-                this.RemoveSelf();
+                RemoveSelf();
             }
             else
             {
-                if (Math.Sign(this.speed.X) != 0)
-                    this.speed.X += (float) (Math.Sign(this.speed.X) * 5);
+                if (Math.Sign(speed.X) != 0)
+                    speed.X += Math.Sign(speed.X) * 5;
                 else
-                    this.speed.X += (float) (Calc.Random.Choose<int>(-1, 1) * 5);
-                this.speed.Y *= -1.2f;
+                    speed.X += Calc.Random.Choose(-1, 1) * 5;
+                speed.Y *= -1.2f;
             }
         }
 
@@ -113,9 +113,9 @@ namespace Celeste
             for (int index = 0; index < count; ++index)
             {
                 CrystalDebris crystalDebris = Engine.Pooler.Create<CrystalDebris>();
-                Vector2 position1 = position + new Vector2((float) Calc.Random.Range(-4, 4), (float) Calc.Random.Range(-4, 4));
+                Vector2 position1 = position + new Vector2(Calc.Random.Range(-4, 4), Calc.Random.Range(-4, 4));
                 crystalDebris.Init(position1, color, boss);
-                Engine.Scene.Add((Entity) crystalDebris);
+                Engine.Scene.Add(crystalDebris);
             }
         }
     }

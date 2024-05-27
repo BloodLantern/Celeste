@@ -38,7 +38,7 @@ namespace Celeste
 
         public bool Moon { get; private set; }
 
-        private string gotSeedFlag => "collected_seeds_of_" + ID.ToString();
+        private string gotSeedFlag => "collected_seeds_of_" + ID;
 
         public Strawberry(EntityData data, Vector2 offset, EntityID gid)
         {
@@ -50,14 +50,14 @@ namespace Celeste
             isGhostBerry = SaveData.Instance.CheckStrawberry(ID);
             Depth = -100;
             Collider = new Hitbox(14f, 14f, -7f, -7f);
-            Add(new PlayerCollider(new Action<Player>(OnPlayer)));
+            Add(new PlayerCollider(OnPlayer));
             Add(new MirrorReflection());
-            Add(Follower = new Follower(ID, onLoseLeader: new Action(OnLoseLeader)));
+            Add(Follower = new Follower(ID, onLoseLeader: OnLoseLeader));
             Follower.FollowDelay = 0.3f;
             if (Winged)
-                Add(new DashListener()
+                Add(new DashListener
                 {
-                    OnDash = new Action<Vector2>(OnDash)
+                    OnDash = OnDash
                 });
             if (data.Nodes == null || data.Nodes.Length == 0)
                 return;
@@ -79,9 +79,9 @@ namespace Celeste
             Add(sprite);
             if (Winged)
                 sprite.Play("flap");
-            sprite.OnFrameChange = new Action<string>(OnAnimate);
-            Add(wiggler = Wiggler.Create(0.4f, 4f, v => sprite.Scale = Vector2.One * (float)(1.0 + (double)v * 0.34999999403953552)));
-            Add(rotateWiggler = Wiggler.Create(0.5f, 4f, v => sprite.Rotation = (float)((double)v * 30.0 * (Math.PI / 180.0))));
+            sprite.OnFrameChange = OnAnimate;
+            Add(wiggler = Wiggler.Create(0.4f, 4f, v => sprite.Scale = Vector2.One * (float)(1.0 + v * 0.34999999403953552)));
+            Add(rotateWiggler = Wiggler.Create(0.5f, 4f, v => sprite.Rotation = (float)(v * 30.0 * (Math.PI / 180.0))));
             Add(bloom = new BloomPoint(Golden || Moon || isGhostBerry ? 0.5f : 1f, 12f));
             Add(light = new VertexLight(Color.White, 1f, 16, 24));
             Add(lightTween = light.CreatePulseTween());
@@ -148,9 +148,9 @@ namespace Celeste
                         else
                         {
                             flapSpeed = Calc.Approach(flapSpeed, 20f, 170f * Engine.DeltaTime);
-                            if ((double) Y < start.Y - 5.0)
+                            if (Y < start.Y - 5.0)
                                 Y = start.Y - 5f;
-                            else if ((double) Y > start.Y + 5.0)
+                            else if (Y > start.Y + 5.0)
                                 Y = start.Y + 5f;
                         }
                     }
@@ -314,7 +314,7 @@ namespace Celeste
                 Vector2 vector = (start - Position).SafeNormalize();
                 float val = Vector2.Distance(Position, start);
                 float num = Calc.ClampedMap(val, 16f, 120f, 16f, 96f);
-                SimpleCurve curve = new(Position, start, start + vector * 16f + vector.Perpendicular() * num * Calc.Random.Choose<int>(1, -1));
+                SimpleCurve curve = new(Position, start, start + vector * 16f + vector.Perpendicular() * num * Calc.Random.Choose(1, -1));
                 Tween tween = Tween.Create(Tween.TweenMode.Oneshot, Ease.SineOut, MathHelper.Max(val / 100f, 0.4f), true);
                 tween.OnUpdate = f => Position = curve.GetPoint(f.Eased);
                 tween.OnComplete = f => Depth = 0;

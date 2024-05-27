@@ -90,7 +90,7 @@ namespace Celeste
                 overworld.ShowInputUI = false;
                 overworld.Mountain.SnapState(Data.MountainState);
                 overworld.Mountain.SnapCamera(Area.ID, Data.MountainZoom);
-                double num = (double) overworld.Mountain.EaseCamera(Area.ID, Data.MountainSelect, new float?(1f));
+                double num = overworld.Mountain.EaseCamera(Area.ID, Data.MountainSelect, 1f);
                 OverworldStartMode = start;
                 return true;
             }
@@ -104,8 +104,8 @@ namespace Celeste
             ouiChapterPanel.Visible = true;
             ouiChapterPanel.Area.Mode = AreaMode.Normal;
             ouiChapterPanel.Reset();
-            double num = (double) ouiChapterPanel.Overworld.Mountain.EaseCamera(ouiChapterPanel.Area.ID, ouiChapterPanel.Data.MountainSelect);
-            for (float p = 0.0f; (double) p < 1.0; p += Engine.DeltaTime * 4f)
+            double num = ouiChapterPanel.Overworld.Mountain.EaseCamera(ouiChapterPanel.Area.ID, ouiChapterPanel.Data.MountainSelect);
+            for (float p = 0.0f; p < 1.0; p += Engine.DeltaTime * 4f)
             {
                 yield return null;
                 ouiChapterPanel.Position = ouiChapterPanel.ClosePosition + (ouiChapterPanel.OpenPosition - ouiChapterPanel.ClosePosition) * Ease.CubeOut(p);
@@ -131,7 +131,7 @@ namespace Celeste
             if (!Data.Interlude && Data.HasMode(AreaMode.BSide) && (DisplayedStats.Cassette || (SaveData.Instance.DebugMode || SaveData.Instance.CheatMode) && DisplayedStats.Cassette == RealStats.Cassette))
                 flag = true;
             int num = Data.Interlude || !Data.HasMode(AreaMode.CSide) || SaveData.Instance.UnlockedModes < 3 ? 0 : (Celeste.PlayMode != Celeste.PlayModes.Event ? 1 : 0);
-            modes.Add(new Option()
+            modes.Add(new Option
             {
                 Label = Dialog.Clean(Data.Interlude ? "FILE_BEGIN" : "overworld_normal").ToUpper(),
                 Icon = GFX.Gui["menu/play"],
@@ -140,7 +140,7 @@ namespace Celeste
             if (flag)
                 AddRemixButton();
             if (num != 0)
-                modes.Add(new Option()
+                modes.Add(new Option
                 {
                     Label = Dialog.Clean("overworld_remix2"),
                     Icon = GFX.Gui["menu/rmx2"],
@@ -180,15 +180,15 @@ namespace Celeste
         // ISSUE: reference to a compiler-generated field
         public override IEnumerator Leave(Oui next)
         {
-                Overworld.Mountain.EaseCamera(Area.ID, Data.MountainIdle, null, true, false);
-                Add(new Coroutine(EaseOut(true), true));
+                Overworld.Mountain.EaseCamera(Area.ID, Data.MountainIdle);
+                Add(new Coroutine(EaseOut()));
                 yield break;
         }
 
         public IEnumerator EaseOut(bool removeChildren = true)
         {
             OuiChapterPanel ouiChapterPanel = this;
-            for (float p = 0.0f; (double) p < 1.0; p += Engine.DeltaTime * 4f)
+            for (float p = 0.0f; p < 1.0; p += Engine.DeltaTime * 4f)
             {
                 ouiChapterPanel.Position = ouiChapterPanel.OpenPosition + (ouiChapterPanel.ClosePosition - ouiChapterPanel.OpenPosition) * Ease.CubeIn(p);
                 yield return null;
@@ -209,7 +209,7 @@ namespace Celeste
             OuiChapterPanel ouiChapterPanel = this;
             ouiChapterPanel.EnteringChapter = true;
             ouiChapterPanel.Overworld.Maddy.Hide(false);
-            float num = ouiChapterPanel.Overworld.Mountain.EaseCamera(ouiChapterPanel.Area.ID, ouiChapterPanel.Data.MountainZoom, new float?(1f));
+            float num = ouiChapterPanel.Overworld.Mountain.EaseCamera(ouiChapterPanel.Area.ID, ouiChapterPanel.Data.MountainZoom, 1f);
             ouiChapterPanel.Add(new Coroutine(ouiChapterPanel.EaseOut(false)));
             yield return 0.2f;
 
@@ -243,10 +243,10 @@ namespace Celeste
             ouiChapterPanel.PlayExpandSfx(fromHeight, toHeight);
             float offset = 800f;
             float p;
-            for (p = 0.0f; (double) p < 1.0; p += Engine.DeltaTime * 4f)
+            for (p = 0.0f; p < 1.0; p += Engine.DeltaTime * 4f)
             {
                 yield return null;
-                ouiChapterPanel.contentOffset.X = (float) (440.0 + (double) offset * (double) Ease.CubeIn(p));
+                ouiChapterPanel.contentOffset.X = (float) (440.0 + offset * (double) Ease.CubeIn(p));
                 ouiChapterPanel.height = MathHelper.Lerp(fromHeight, toHeight, Ease.CubeOut(p * 0.5f));
             }
             ouiChapterPanel.selectingMode = !ouiChapterPanel.selectingMode;
@@ -255,24 +255,24 @@ namespace Celeste
                 HashSet<string> checkpoints = SaveData.Instance.GetCheckpoints(ouiChapterPanel.Area);
                 int num = checkpoints.Count + 1;
                 ouiChapterPanel.checkpoints.Clear();
-                ouiChapterPanel.checkpoints.Add(new Option()
+                ouiChapterPanel.checkpoints.Add(new Option
                 {
                     Label = Dialog.Clean("overworld_start"),
                     BgColor = Calc.HexToColor("eabe26"),
                     Icon = GFX.Gui["areaselect/startpoint"],
                     CheckpointLevelName = null,
-                    CheckpointRotation = Calc.Random.Choose<int>(-1, 1) * Calc.Random.Range(0.05f, 0.2f),
+                    CheckpointRotation = Calc.Random.Choose(-1, 1) * Calc.Random.Range(0.05f, 0.2f),
                     CheckpointOffset = new Vector2(Calc.Random.Range(-16, 16), Calc.Random.Range(-16, 16)),
                     Large = false,
                     Siblings = num
                 });
                 foreach (string level in checkpoints)
-                    ouiChapterPanel.checkpoints.Add(new Option()
+                    ouiChapterPanel.checkpoints.Add(new Option
                     {
                         Label = AreaData.GetCheckpointName(ouiChapterPanel.Area, level),
                         Icon = GFX.Gui["areaselect/checkpoint"],
                         CheckpointLevelName = level,
-                        CheckpointRotation = Calc.Random.Choose<int>(-1, 1) * Calc.Random.Range(0.05f, 0.2f),
+                        CheckpointRotation = Calc.Random.Choose(-1, 1) * Calc.Random.Range(0.05f, 0.2f),
                         CheckpointOffset = new Vector2(Calc.Random.Range(-16, 16), Calc.Random.Range(-16, 16)),
                         Large = false,
                         Siblings = num
@@ -289,11 +289,11 @@ namespace Celeste
                     ouiChapterPanel.options[index].SlideTowards(index, ouiChapterPanel.options.Count, true);
             }
             ouiChapterPanel.options[ouiChapterPanel.option].Pop = 1f;
-            for (p = 0.0f; (double) p < 1.0; p += Engine.DeltaTime * 4f)
+            for (p = 0.0f; p < 1.0; p += Engine.DeltaTime * 4f)
             {
                 yield return null;
-                ouiChapterPanel.height = MathHelper.Lerp(fromHeight, toHeight, Ease.CubeOut(Math.Min(1f, (float) (0.5 + (double) p * 0.5))));
-                ouiChapterPanel.contentOffset.X = (float) (440.0 + (double) offset * (1.0 - (double) Ease.CubeOut(p)));
+                ouiChapterPanel.height = MathHelper.Lerp(fromHeight, toHeight, Ease.CubeOut(Math.Min(1f, (float) (0.5 + p * 0.5))));
+                ouiChapterPanel.contentOffset.X = (float) (440.0 + offset * (1.0 - Ease.CubeOut(p)));
             }
             ouiChapterPanel.contentOffset.X = 440f;
             ouiChapterPanel.height = toHeight;
@@ -413,7 +413,7 @@ namespace Celeste
                 if (options[index].OnTopOfUI)
                     options[index].Render(optionsRenderPosition, option == index, wiggler, modeAppearWiggler);
             }
-            ActiveFont.Draw(options[option].Label, optionsRenderPosition + new Vector2(0.0f, -140f), Vector2.One * 0.5f, Vector2.One * (float) (1.0 + (double) wiggler.Value * 0.10000000149011612), Color.Black * 0.8f);
+            ActiveFont.Draw(options[option].Label, optionsRenderPosition + new Vector2(0.0f, -140f), Vector2.One * 0.5f, Vector2.One * (float) (1.0 + wiggler.Value * 0.10000000149011612), Color.Black * 0.8f);
             if (selectingMode)
             {
                 strawberries.Position = contentOffset + new Vector2(0.0f, 170f) + strawberriesOffset;
@@ -454,7 +454,7 @@ namespace Celeste
             Vector2 position1 = center + option.CheckpointOffset + Vector2.UnitX * 800f * Ease.CubeIn(option.CheckpointSlideOut);
             Vector2 position2 = position1;
             Color white = Color.White;
-            double rotation = (double) checkpointRotation;
+            double rotation = checkpointRotation;
             checkpoint.DrawCentered(position2, white, 0.75f, (float) rotation);
             MTexture mtexture = GFX.Gui["collectables/strawberry"];
             if (checkpointPreview != null)
@@ -550,7 +550,7 @@ namespace Celeste
             }
         }
 
-        private Vector2 Approach(Vector2 from, Vector2 to, bool snap) => snap ? to : (from += (to - from) * (1f - (float) Math.Pow(1.0 / 1000.0, (double) Engine.DeltaTime)));
+        private Vector2 Approach(Vector2 from, Vector2 to, bool snap) => snap ? to : (from += (to - from) * (1f - (float) Math.Pow(1.0 / 1000.0, Engine.DeltaTime)));
 
         private IEnumerator IncrementStatsDisplay(
             AreaModeStats modeStats,
@@ -634,14 +634,14 @@ namespace Celeste
                 yield return 0.5f;
                 ouiChapterPanel.spotlightPosition = o.GetRenderPosition(ouiChapterPanel.OptionsRenderPosition);
                 float t;
-                for (t = 0.0f; (double) t < 1.0; t += Engine.DeltaTime / 0.5f)
+                for (t = 0.0f; t < 1.0; t += Engine.DeltaTime / 0.5f)
                 {
                     ouiChapterPanel.spotlightAlpha = t * 0.9f;
                     ouiChapterPanel.spotlightRadius = 128f * Ease.CubeOut(t);
                     yield return null;
                 }
                 yield return 0.3f;
-                while ((double) (o.IconEase += Engine.DeltaTime * 2f) < 1.0)
+                while ((o.IconEase += Engine.DeltaTime * 2f) < 1.0)
                     yield return null;
                 o.IconEase = 1f;
                 ouiChapterPanel.modeAppearWiggler.Start();
@@ -650,10 +650,10 @@ namespace Celeste
                 ouiChapterPanel.remixUnlockText.Tag = (int) Tags.HUD;
                 ouiChapterPanel.Overworld.Add(ouiChapterPanel.remixUnlockText);
                 yield return 1.5f;
-                for (t = 0.0f; (double) t < 1.0; t += Engine.DeltaTime / 0.5f)
+                for (t = 0.0f; t < 1.0; t += Engine.DeltaTime / 0.5f)
                 {
-                    ouiChapterPanel.spotlightAlpha = (float) ((1.0 - (double) t) * 0.5);
-                    ouiChapterPanel.spotlightRadius = (float) (128.0 + 128.0 * (double) Ease.CubeOut(t));
+                    ouiChapterPanel.spotlightAlpha = (float) ((1.0 - t) * 0.5);
+                    ouiChapterPanel.spotlightRadius = (float) (128.0 + 128.0 * Ease.CubeOut(t));
                     ouiChapterPanel.remixUnlockText.Alpha = 1f - Ease.CubeOut(t);
                     yield return null;
                 }
@@ -737,7 +737,7 @@ namespace Celeste
                     doStrawberries = doStrawberries && modeStats.TotalStrawberries != newModeStats.TotalStrawberries;
                     doDeaths &= modeStats.Deaths != newModeStats.Deaths;
                     doHeartGem = doHeartGem && !ouiChapterPanel.heart.Visible;
-                    ouiChapterPanel.UpdateStats(overrideStrawberryWiggle: new bool?(doStrawberries), overrideDeathWiggle: new bool?(doDeaths), overrideHeartWiggle: new bool?(doHeartGem));
+                    ouiChapterPanel.UpdateStats(overrideStrawberryWiggle: doStrawberries, overrideDeathWiggle: doDeaths, overrideHeartWiggle: doHeartGem);
                 }
                 yield return null;
                 routine = null;
@@ -789,19 +789,19 @@ namespace Celeste
 
         private void PlayExpandSfx(float currentHeight, float nextHeight)
         {
-            if ((double) nextHeight > (double) currentHeight)
+            if (nextHeight > (double) currentHeight)
             {
                 Audio.Play("event:/ui/world_map/chapter/pane_expand");
             }
             else
             {
-                if ((double) nextHeight >= (double) currentHeight)
+                if (nextHeight >= (double) currentHeight)
                     return;
                 Audio.Play("event:/ui/world_map/chapter/pane_contract");
             }
         }
 
-        public static string GetCheckpointPreviewName(AreaKey area, string level) => level == null ? area.ToString() : area.ToString() + "_" + level;
+        public static string GetCheckpointPreviewName(AreaKey area, string level) => level == null ? area.ToString() : area + "_" + level;
 
         private MTexture GetCheckpointPreview(AreaKey area, string level)
         {
@@ -849,14 +849,14 @@ namespace Celeste
                 if (Siblings > 0 && (double) num * Siblings > 750.0)
                     num = 750 / Siblings;
                 Vector2 renderPosition = center + new Vector2(Slide * num, (float) (Math.Sin(Pop * 3.1415927410125732) * 70.0 - Pop * 12.0));
-                renderPosition.Y += (float) ((1.0 - (double) Ease.CubeOut(Appear)) * -200.0);
-                renderPosition.Y -= (float) ((1.0 - (double) Scale) * 80.0);
+                renderPosition.Y += (float) ((1.0 - Ease.CubeOut(Appear)) * -200.0);
+                renderPosition.Y -= (float) ((1.0 - Scale) * 80.0);
                 return renderPosition;
             }
 
             public void Render(Vector2 center, bool selected, Wiggler wiggler, Wiggler appearWiggler)
             {
-                float num1 = (float) ((double) Scale + (selected ? (double) wiggler.Value * 0.25 : 0.0) + (Appeared ? (double) appearWiggler.Value * 0.25 : 0.0));
+                float num1 = (float) (Scale + (selected ? wiggler.Value * 0.25 : 0.0) + (Appeared ? appearWiggler.Value * 0.25 : 0.0));
                 Vector2 renderPosition = GetRenderPosition(center);
                 Color color1 = Color.Lerp(BgColor, Color.Black, (float) ((1.0 - Pop) * 0.60000002384185791));
                 Bg.DrawCentered(renderPosition + new Vector2(0.0f, 10f), color1, (Appeared ? Scale : num1) * new Vector2(Large ? 1f : 0.9f, 1f));
@@ -864,7 +864,7 @@ namespace Celeste
                     return;
                 float num2 = Ease.CubeIn(IconEase);
                 Color color2 = Color.Lerp(Color.White, Color.Black, Faded * 0.6f) * num2;
-                Icon.DrawCentered(renderPosition, color2, (float) ((Bg.Width - 50) / (double) Icon.Width * (double) num1 * (2.5 - (double) num2 * 1.5)));
+                Icon.DrawCentered(renderPosition, color2, (float) ((Bg.Width - 50) / (double) Icon.Width * num1 * (2.5 - num2 * 1.5)));
             }
         }
     }

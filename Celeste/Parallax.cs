@@ -15,65 +15,65 @@ namespace Celeste
 
         public Parallax(MTexture texture)
         {
-            this.Name = texture.AtlasPath;
-            this.Texture = texture;
+            Name = texture.AtlasPath;
+            Texture = texture;
         }
 
         public override void Update(Scene scene)
         {
             base.Update(scene);
-            this.Position = this.Position + this.Speed * Engine.DeltaTime;
-            this.Position = this.Position + this.WindMultiplier * (scene as Level).Wind * Engine.DeltaTime;
-            if (this.DoFadeIn)
-                this.fadeIn = Calc.Approach(this.fadeIn, this.Visible ? 1f : 0.0f, Engine.DeltaTime);
+            Position += Speed * Engine.DeltaTime;
+            Position += WindMultiplier * (scene as Level).Wind * Engine.DeltaTime;
+            if (DoFadeIn)
+                fadeIn = Calc.Approach(fadeIn, Visible ? 1f : 0.0f, Engine.DeltaTime);
             else
-                this.fadeIn = this.Visible ? 1f : 0.0f;
+                fadeIn = Visible ? 1f : 0.0f;
         }
 
         public override void Render(Scene scene)
         {
-            Vector2 vector2_1 = ((scene as Level).Camera.Position + this.CameraOffset).Floor();
-            Vector2 vector2_2 = (this.Position - vector2_1 * this.Scroll).Floor();
-            float num = this.fadeIn * this.Alpha * this.FadeAlphaMultiplier;
-            if (this.FadeX != null)
-                num *= this.FadeX.Value(vector2_1.X + 160f);
-            if (this.FadeY != null)
-                num *= this.FadeY.Value(vector2_1.Y + 90f);
-            Color color = this.Color;
-            if ((double) num < 1.0)
+            Vector2 vector2_1 = ((scene as Level).Camera.Position + CameraOffset).Floor();
+            Vector2 vector2_2 = (Position - vector2_1 * Scroll).Floor();
+            float num = fadeIn * Alpha * FadeAlphaMultiplier;
+            if (FadeX != null)
+                num *= FadeX.Value(vector2_1.X + 160f);
+            if (FadeY != null)
+                num *= FadeY.Value(vector2_1.Y + 90f);
+            Color color = Color;
+            if (num < 1.0)
                 color *= num;
-            if (color.A <= (byte) 1)
+            if (color.A <= 1)
                 return;
-            if (this.LoopX)
+            if (LoopX)
             {
-                while ((double) vector2_2.X < 0.0)
-                    vector2_2.X += (float) this.Texture.Width;
-                while ((double) vector2_2.X > 0.0)
-                    vector2_2.X -= (float) this.Texture.Width;
+                while (vector2_2.X < 0.0)
+                    vector2_2.X += Texture.Width;
+                while (vector2_2.X > 0.0)
+                    vector2_2.X -= Texture.Width;
             }
-            if (this.LoopY)
+            if (LoopY)
             {
-                while ((double) vector2_2.Y < 0.0)
-                    vector2_2.Y += (float) this.Texture.Height;
-                while ((double) vector2_2.Y > 0.0)
-                    vector2_2.Y -= (float) this.Texture.Height;
+                while (vector2_2.Y < 0.0)
+                    vector2_2.Y += Texture.Height;
+                while (vector2_2.Y > 0.0)
+                    vector2_2.Y -= Texture.Height;
             }
             SpriteEffects flip = SpriteEffects.None;
-            if (this.FlipX && this.FlipY)
+            if (FlipX && FlipY)
                 flip = SpriteEffects.FlipHorizontally | SpriteEffects.FlipVertically;
-            else if (this.FlipX)
+            else if (FlipX)
                 flip = SpriteEffects.FlipHorizontally;
-            else if (this.FlipY)
+            else if (FlipY)
                 flip = SpriteEffects.FlipVertically;
-            for (float x = vector2_2.X; (double) x < 320.0; x += (float) this.Texture.Width)
+            for (float x = vector2_2.X; x < 320.0; x += Texture.Width)
             {
-                for (float y = vector2_2.Y; (double) y < 180.0; y += (float) this.Texture.Height)
+                for (float y = vector2_2.Y; y < 180.0; y += Texture.Height)
                 {
-                    this.Texture.Draw(new Vector2(x, y), Vector2.Zero, color, 1f, 0.0f, flip);
-                    if (!this.LoopY)
+                    Texture.Draw(new Vector2(x, y), Vector2.Zero, color, 1f, 0.0f, flip);
+                    if (!LoopY)
                         break;
                 }
-                if (!this.LoopX)
+                if (!LoopX)
                     break;
             }
         }

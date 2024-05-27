@@ -23,24 +23,24 @@ namespace Celeste
 
         public AreaComplete(Session session, XmlElement xml, Atlas atlas, HiresSnow snow)
         {
-            this.Session = session;
-            this.version = Celeste.Instance.Version.ToString();
+            Session = session;
+            version = Celeste.Instance.Version.ToString();
             if (session.Area.ID != 7)
             {
-                string text = Dialog.Clean("areacomplete_" + (object) session.Area.Mode + (session.FullClear ? (object) "_fullclear" : (object) ""));
+                string text = Dialog.Clean("areacomplete_" + session.Area.Mode + (session.FullClear ? "_fullclear" : (object) ""));
                 Vector2 origin = new Vector2(960f, 200f);
                 float scale = Math.Min(1600f / ActiveFont.Measure(text).X, 3f);
-                this.title = new AreaCompleteTitle(origin, text, scale);
+                title = new AreaCompleteTitle(origin, text, scale);
             }
-            this.Add((Monocle.Renderer) (this.complete = new CompleteRenderer(xml, atlas, 1f, (Action) (() => this.finishedSlide = true))));
-            if (this.title != null)
-                this.complete.RenderUI = (Action<Vector2>) (v => this.title.DrawLineUI());
-            this.complete.RenderPostUI = new Action(this.RenderUI);
-            this.speedrunTimerChapterString = TimeSpan.FromTicks(this.Session.Time).ShortGameplayFormat();
-            this.speedrunTimerFileString = Dialog.FileTime(SaveData.Instance.Time);
+            Add(complete = new CompleteRenderer(xml, atlas, 1f, () => finishedSlide = true));
+            if (title != null)
+                complete.RenderUI = v => title.DrawLineUI();
+            complete.RenderPostUI = RenderUI;
+            speedrunTimerChapterString = TimeSpan.FromTicks(Session.Time).ShortGameplayFormat();
+            speedrunTimerFileString = Dialog.FileTime(SaveData.Instance.Time);
             SpeedrunTimerDisplay.CalculateBaseSizes();
-            this.Add((Monocle.Renderer) (this.snow = snow));
-            this.RendererList.UpdateLists();
+            Add(this.snow = snow);
+            RendererList.UpdateLists();
             AreaKey area = session.Area;
             if (area.Mode != AreaMode.Normal)
                 return;
@@ -69,73 +69,73 @@ namespace Celeste
         public override void End()
         {
             base.End();
-            this.complete.Dispose();
+            complete.Dispose();
         }
 
         public override void Update()
         {
             base.Update();
-            if (Input.MenuConfirm.Pressed && this.finishedSlide && this.canConfirm)
+            if (Input.MenuConfirm.Pressed && finishedSlide && canConfirm)
             {
-                this.canConfirm = false;
-                if (this.Session.Area.ID == 7 && this.Session.Area.Mode == AreaMode.Normal)
+                canConfirm = false;
+                if (Session.Area.ID == 7 && Session.Area.Mode == AreaMode.Normal)
                 {
-                    FadeWipe fadeWipe = new FadeWipe((Scene) this, false, (Action) (() =>
+                    FadeWipe fadeWipe = new FadeWipe(this, false, () =>
                     {
-                        this.Session.RespawnPoint = new Vector2?();
-                        this.Session.FirstLevel = false;
-                        this.Session.Level = "credits-summit";
-                        this.Session.Audio.Music.Event = "event:/music/lvl8/main";
-                        this.Session.Audio.Apply();
-                        Engine.Scene = (Scene) new LevelLoader(this.Session)
+                        Session.RespawnPoint = new Vector2?();
+                        Session.FirstLevel = false;
+                        Session.Level = "credits-summit";
+                        Session.Audio.Music.Event = "event:/music/lvl8/main";
+                        Session.Audio.Apply();
+                        Engine.Scene = new LevelLoader(Session)
                         {
-                            PlayerIntroTypeOverride = new Player.IntroTypes?(Player.IntroTypes.None),
+                            PlayerIntroTypeOverride = Player.IntroTypes.None,
                             Level = {
-                                (Entity) new CS07_Credits()
+                                new CS07_Credits()
                             }
                         };
-                    }));
+                    });
                 }
                 else
                 {
-                    HiresSnow outSnow = new HiresSnow()
+                    HiresSnow outSnow = new HiresSnow
                     {
                         Alpha = 0.0f
                     };
-                    outSnow.AttachAlphaTo = (ScreenWipe) new FadeWipe((Scene) this, false, (Action) (() => Engine.Scene = (Scene) new OverworldLoader(Overworld.StartMode.AreaComplete, outSnow)));
-                    this.Add((Monocle.Renderer) outSnow);
+                    outSnow.AttachAlphaTo = new FadeWipe(this, false, () => Engine.Scene = new OverworldLoader(Overworld.StartMode.AreaComplete, outSnow));
+                    Add(outSnow);
                 }
             }
-            this.snow.Alpha = Calc.Approach(this.snow.Alpha, 0.0f, Engine.DeltaTime * 0.5f);
-            this.snow.Direction.Y = Calc.Approach(this.snow.Direction.Y, 1f, Engine.DeltaTime * 24f);
-            this.speedrunTimerDelay -= Engine.DeltaTime;
-            if ((double) this.speedrunTimerDelay <= 0.0)
-                this.speedrunTimerEase = Calc.Approach(this.speedrunTimerEase, 1f, Engine.DeltaTime * 2f);
-            if (this.title != null)
-                this.title.Update();
+            snow.Alpha = Calc.Approach(snow.Alpha, 0.0f, Engine.DeltaTime * 0.5f);
+            snow.Direction.Y = Calc.Approach(snow.Direction.Y, 1f, Engine.DeltaTime * 24f);
+            speedrunTimerDelay -= Engine.DeltaTime;
+            if (speedrunTimerDelay <= 0.0)
+                speedrunTimerEase = Calc.Approach(speedrunTimerEase, 1f, Engine.DeltaTime * 2f);
+            if (title != null)
+                title.Update();
             if (Celeste.PlayMode != Celeste.PlayModes.Debug)
                 return;
             if (MInput.Keyboard.Pressed(Keys.F2))
             {
                 Celeste.ReloadAssets(false, true, false);
-                Engine.Scene = (Scene) new LevelExit(LevelExit.Mode.Completed, this.Session);
+                Engine.Scene = new LevelExit(LevelExit.Mode.Completed, Session);
             }
             else
             {
                 if (!MInput.Keyboard.Pressed(Keys.F3))
                     return;
                 Celeste.ReloadAssets(false, true, true);
-                Engine.Scene = (Scene) new LevelExit(LevelExit.Mode.Completed, this.Session);
+                Engine.Scene = new LevelExit(LevelExit.Mode.Completed, Session);
             }
         }
 
         private void RenderUI()
         {
-            this.Entities.Render();
-            AreaComplete.Info(this.speedrunTimerEase, this.speedrunTimerChapterString, this.speedrunTimerFileString, this.chapterSpeedrunText, this.version);
-            if (!this.complete.HasUI || this.title == null)
+            Entities.Render();
+            AreaComplete.Info(speedrunTimerEase, speedrunTimerChapterString, speedrunTimerFileString, chapterSpeedrunText, version);
+            if (!complete.HasUI || title == null)
                 return;
-            this.title.Render();
+            title.Render();
         }
 
         public static void Info(
@@ -145,9 +145,9 @@ namespace Celeste
             string chapterSpeedrunText,
             string versionText)
         {
-            if ((double) ease <= 0.0 || Settings.Instance.SpeedrunClock == SpeedrunType.Off)
+            if (ease <= 0.0 || Settings.Instance.SpeedrunClock == SpeedrunType.Off)
                 return;
-            Vector2 position = new Vector2((float) (80.0 - 300.0 * (1.0 - (double) Ease.CubeOut(ease))), 1000f);
+            Vector2 position = new Vector2((float) (80.0 - 300.0 * (1.0 - Ease.CubeOut(ease))), 1000f);
             if (Settings.Instance.SpeedrunClock == SpeedrunType.Chapter)
             {
                 SpeedrunTimerDisplay.DrawTime(position, speedrunTimerChapterString);
@@ -157,14 +157,14 @@ namespace Celeste
                 position.Y -= 16f;
                 SpeedrunTimerDisplay.DrawTime(position, speedrunTimerFileString);
                 ActiveFont.DrawOutline(chapterSpeedrunText, position + new Vector2(0.0f, 40f), new Vector2(0.0f, 1f), Vector2.One * 0.6f, Color.White, 2f, Color.Black);
-                SpeedrunTimerDisplay.DrawTime(position + new Vector2((float) ((double) ActiveFont.Measure(chapterSpeedrunText).X * 0.60000002384185791 + 8.0), 40f), speedrunTimerChapterString, 0.6f);
+                SpeedrunTimerDisplay.DrawTime(position + new Vector2((float) (ActiveFont.Measure(chapterSpeedrunText).X * 0.60000002384185791 + 8.0), 40f), speedrunTimerChapterString, 0.6f);
             }
             AreaComplete.VersionNumberAndVariants(versionText, ease, 1f);
         }
 
         public static void VersionNumberAndVariants(string version, float ease, float alpha)
         {
-            Vector2 position1 = new Vector2((float) (1820.0 + 300.0 * (1.0 - (double) Ease.CubeOut(ease))), 1020f);
+            Vector2 position1 = new Vector2((float) (1820.0 + 300.0 * (1.0 - Ease.CubeOut(ease))), 1020f);
             if (SaveData.Instance.AssistMode || SaveData.Instance.VariantMode)
             {
                 MTexture mtexture = GFX.Gui[SaveData.Instance.AssistMode ? "cs_assistmode" : "cs_variantmode"];

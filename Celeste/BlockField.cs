@@ -3,7 +3,7 @@ using Monocle;
 
 namespace Celeste
 {
-    [Tracked(false)]
+    [Tracked()]
     public class BlockField : Entity
     {
         public BlockField(Vector2 position, int width, int height)

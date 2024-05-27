@@ -59,7 +59,7 @@ namespace Celeste
         private static void CreateLookupTable(XmlElement element)
         {
             AddLookupValue(element.Name);
-            foreach (XmlAttribute attribute in (XmlNamedNodeMap)element.Attributes)
+            foreach (XmlAttribute attribute in element.Attributes)
             {
                 if (!IgnoreAttributes.Contains(attribute.Name))
                 {
@@ -92,7 +92,7 @@ namespace Celeste
                     ++num1;
             }
             int num2 = 0;
-            foreach (XmlAttribute attribute in (XmlNamedNodeMap)element.Attributes)
+            foreach (XmlAttribute attribute in element.Attributes)
             {
                 if (!IgnoreAttributes.Contains(attribute.Name))
                     ++num2;
@@ -101,7 +101,7 @@ namespace Celeste
                 ++num2;
             writer.Write(stringValue[element.Name]);
             writer.Write(num2);
-            foreach (XmlAttribute attribute in (XmlNamedNodeMap)element.Attributes)
+            foreach (XmlAttribute attribute in element.Attributes)
             {
                 if (!IgnoreAttributes.Contains(attribute.Name))
                 {

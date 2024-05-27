@@ -7,7 +7,7 @@ namespace Celeste
 {
     public class StarfieldWipe : ScreenWipe
     {
-        public static readonly BlendState SubtractBlendmode = new BlendState()
+        public static readonly BlendState SubtractBlendmode = new BlendState
         {
             ColorSourceBlend = Blend.One,
             ColorDestinationBlend = Blend.One,
@@ -16,7 +16,7 @@ namespace Celeste
             AlphaDestinationBlend = Blend.One,
             AlphaBlendFunction = BlendFunction.Add
         };
-        private StarfieldWipe.Star[] stars = new StarfieldWipe.Star[64];
+        private Star[] stars = new Star[64];
         private VertexPositionColor[] verts = new VertexPositionColor[1536];
         private Vector2[] starShape = new Vector2[5];
         private bool hasDrawn;
@@ -25,72 +25,72 @@ namespace Celeste
             : base(scene, wipeIn, onComplete)
         {
             for (int index = 0; index < 5; ++index)
-                this.starShape[index] = Calc.AngleToVector((float) ((double) index / 5.0 * 6.2831854820251465), 1f);
-            for (int index = 0; index < this.stars.Length; ++index)
-                this.stars[index] = new StarfieldWipe.Star((float) Math.Pow((double) index / (double) this.stars.Length, 5.0));
-            for (int index = 0; index < this.verts.Length; ++index)
-                this.verts[index].Color = this.WipeIn ? Color.Black : Color.White;
+                starShape[index] = Calc.AngleToVector((float) (index / 5.0 * 6.2831854820251465), 1f);
+            for (int index = 0; index < stars.Length; ++index)
+                stars[index] = new Star((float) Math.Pow(index / (double) stars.Length, 5.0));
+            for (int index = 0; index < verts.Length; ++index)
+                verts[index].Color = WipeIn ? Color.Black : Color.White;
         }
 
         public override void Update(Scene scene)
         {
             base.Update(scene);
-            for (int index = 0; index < this.stars.Length; ++index)
-                this.stars[index].Update();
+            for (int index = 0; index < stars.Length; ++index)
+                stars[index].Update();
         }
 
         public override void BeforeRender(Scene scene)
         {
-            this.hasDrawn = true;
-            Engine.Graphics.GraphicsDevice.SetRenderTarget((RenderTarget2D) Celeste.WipeTarget);
-            Engine.Graphics.GraphicsDevice.Clear(this.WipeIn ? Color.White : Color.Black);
-            if ((double) this.Percent > 0.800000011920929)
+            hasDrawn = true;
+            Engine.Graphics.GraphicsDevice.SetRenderTarget(Celeste.WipeTarget);
+            Engine.Graphics.GraphicsDevice.Clear(WipeIn ? Color.White : Color.Black);
+            if (Percent > 0.800000011920929)
             {
-                float height = Calc.Map(this.Percent, 0.8f, 1f) * 1082f;
+                float height = Calc.Map(Percent, 0.8f, 1f) * 1082f;
                 Draw.SpriteBatch.Begin();
-                Draw.Rect(-1f, (float) ((1080.0 - (double) height) * 0.5), 1922f, height, !this.WipeIn ? Color.White : Color.Black);
+                Draw.Rect(-1f, (float) ((1080.0 - height) * 0.5), 1922f, height, !WipeIn ? Color.White : Color.Black);
                 Draw.SpriteBatch.End();
             }
             int index1 = 0;
-            for (int index2 = 0; index2 < this.stars.Length; ++index2)
+            for (int index2 = 0; index2 < stars.Length; ++index2)
             {
-                float xPosition = (float) ((double) this.stars[index2].X % 2920.0 - 500.0);
-                float yPosition = this.stars[index2].Y + (float) Math.Sin((double) this.stars[index2].Sine) * this.stars[index2].SineDistance;
-                float scale = (float) ((0.10000000149011612 + (double) this.stars[index2].Scale * 0.89999997615814209) * 1080.0 * 0.800000011920929) * Ease.CubeIn(this.Percent);
-                this.DrawStar(ref index1, Matrix.CreateRotationZ(this.stars[index2].Rotation) * Matrix.CreateScale(scale) * Matrix.CreateTranslation(xPosition, yPosition, 0.0f));
+                float xPosition = (float) (stars[index2].X % 2920.0 - 500.0);
+                float yPosition = stars[index2].Y + (float) Math.Sin(stars[index2].Sine) * stars[index2].SineDistance;
+                float scale = (float) ((0.10000000149011612 + stars[index2].Scale * 0.89999997615814209) * 1080.0 * 0.800000011920929) * Ease.CubeIn(Percent);
+                DrawStar(ref index1, Matrix.CreateRotationZ(stars[index2].Rotation) * Matrix.CreateScale(scale) * Matrix.CreateTranslation(xPosition, yPosition, 0.0f));
             }
-            GFX.DrawVertices<VertexPositionColor>(Matrix.Identity, this.verts, this.verts.Length);
+            GFX.DrawVertices(Matrix.Identity, verts, verts.Length);
         }
 
         private void DrawStar(ref int index, Matrix matrix)
         {
             int num = index;
-            for (int index1 = 1; index1 < this.starShape.Length - 1; ++index1)
+            for (int index1 = 1; index1 < starShape.Length - 1; ++index1)
             {
-                this.verts[index++].Position = new Vector3(this.starShape[0], 0.0f);
-                this.verts[index++].Position = new Vector3(this.starShape[index1], 0.0f);
-                this.verts[index++].Position = new Vector3(this.starShape[index1 + 1], 0.0f);
+                verts[index++].Position = new Vector3(starShape[0], 0.0f);
+                verts[index++].Position = new Vector3(starShape[index1], 0.0f);
+                verts[index++].Position = new Vector3(starShape[index1 + 1], 0.0f);
             }
             for (int index2 = 0; index2 < 5; ++index2)
             {
-                Vector2 vector2_1 = this.starShape[index2];
-                Vector2 vector2_2 = this.starShape[(index2 + 1) % 5];
+                Vector2 vector2_1 = starShape[index2];
+                Vector2 vector2_2 = starShape[(index2 + 1) % 5];
                 Vector2 vector2_3 = (vector2_1 + vector2_2) * 0.5f + (vector2_1 - vector2_2).SafeNormalize().TurnRight();
-                this.verts[index++].Position = new Vector3(vector2_1, 0.0f);
-                this.verts[index++].Position = new Vector3(vector2_3, 0.0f);
-                this.verts[index++].Position = new Vector3(vector2_2, 0.0f);
+                verts[index++].Position = new Vector3(vector2_1, 0.0f);
+                verts[index++].Position = new Vector3(vector2_3, 0.0f);
+                verts[index++].Position = new Vector3(vector2_2, 0.0f);
             }
             for (int index3 = num; index3 < num + 24; ++index3)
-                this.verts[index3].Position = Vector3.Transform(this.verts[index3].Position, matrix);
+                verts[index3].Position = Vector3.Transform(verts[index3].Position, matrix);
         }
 
         public override void Render(Scene scene)
         {
-            Draw.SpriteBatch.Begin(SpriteSortMode.Deferred, StarfieldWipe.SubtractBlendmode, SamplerState.LinearClamp, (DepthStencilState) null, (RasterizerState) null, (Effect) null, Engine.ScreenMatrix);
-            if (this.WipeIn && (double) this.Percent <= 0.0099999997764825821 || !this.WipeIn && (double) this.Percent >= 0.99000000953674316)
+            Draw.SpriteBatch.Begin(SpriteSortMode.Deferred, StarfieldWipe.SubtractBlendmode, SamplerState.LinearClamp, null, null, null, Engine.ScreenMatrix);
+            if (WipeIn && Percent <= 0.0099999997764825821 || !WipeIn && Percent >= 0.99000000953674316)
                 Draw.Rect(-1f, -1f, 1922f, 1082f, Color.White);
-            else if (this.hasDrawn)
-                Draw.SpriteBatch.Draw((Texture2D) (RenderTarget2D) Celeste.WipeTarget, new Vector2(-1f, -1f), Color.White);
+            else if (hasDrawn)
+                Draw.SpriteBatch.Draw((RenderTarget2D) Celeste.WipeTarget, new Vector2(-1f, -1f), Color.White);
             Draw.SpriteBatch.End();
         }
 
@@ -106,21 +106,21 @@ namespace Celeste
 
             public Star(float scale)
             {
-                this.Scale = scale;
+                Scale = scale;
                 float num = 1f - scale;
-                this.X = (float) Calc.Random.Range(0, 2920);
-                this.Y = (float) (1080.0 * (0.5 + (double) Calc.Random.Choose<int>(-1, 1) * (double) num * (double) Calc.Random.Range(0.25f, 0.5f)));
-                this.Sine = Calc.Random.NextFloat(6.28318548f);
-                this.SineDistance = (float) ((double) scale * 1080.0 * 0.05000000074505806);
-                this.Speed = (float) ((0.5 + (1.0 - (double) this.Scale) * 0.5) * 1920.0 * 0.05000000074505806);
-                this.Rotation = Calc.Random.NextFloat(6.28318548f);
+                X = Calc.Random.Range(0, 2920);
+                Y = (float) (1080.0 * (0.5 + Calc.Random.Choose(-1, 1) * (double) num * Calc.Random.Range(0.25f, 0.5f)));
+                Sine = Calc.Random.NextFloat(6.28318548f);
+                SineDistance = (float) (scale * 1080.0 * 0.05000000074505806);
+                Speed = (float) ((0.5 + (1.0 - Scale) * 0.5) * 1920.0 * 0.05000000074505806);
+                Rotation = Calc.Random.NextFloat(6.28318548f);
             }
 
             public void Update()
             {
-                this.X += this.Speed * Engine.DeltaTime;
-                this.Sine += (float) ((1.0 - (double) this.Scale) * 8.0) * Engine.DeltaTime;
-                this.Rotation += (1f - this.Scale) * Engine.DeltaTime;
+                X += Speed * Engine.DeltaTime;
+                Sine += (float) ((1.0 - Scale) * 8.0) * Engine.DeltaTime;
+                Rotation += (1f - Scale) * Engine.DeltaTime;
             }
         }
     }

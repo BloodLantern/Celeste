@@ -794,7 +794,7 @@ namespace Celeste
             {
                 if (field.FieldType == typeof (string))
                 {
-                    string key = field.GetValue((object) null).ToString();
+                    string key = field.GetValue(null).ToString();
                     SFX.byHandle.Add(field.Name, key);
                     if (key.StartsWith("event:/char/madeline/"))
                         SFX.MadelineToBadelineSound.Add(key, key.Replace("madeline", "badeline"));

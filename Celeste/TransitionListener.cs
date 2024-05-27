@@ -3,7 +3,7 @@ using System;
 
 namespace Celeste
 {
-    [Tracked(false)]
+    [Tracked()]
     public class TransitionListener : Component
     {
         public Action OnInBegin;

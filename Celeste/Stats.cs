@@ -58,6 +58,6 @@ namespace Celeste
             SteamUserStats.StoreStats();
         }
 
-        public static string Name(Stat stat) => Dialog.Clean("STAT_" + stat.ToString());
+        public static string Name(Stat stat) => Dialog.Clean("STAT_" + stat);
     }
 }

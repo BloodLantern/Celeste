@@ -23,8 +23,8 @@ namespace Celeste
         private VertexPositionColor[] verts;
         private bool dirty;
         private int vertCount;
-        private LavaRect.Bubble[] bubbles;
-        private LavaRect.SurfaceBubble[] surfaceBubbles;
+        private Bubble[] bubbles;
+        private SurfaceBubble[] surfaceBubbles;
         private int surfaceBubbleIndex;
         private List<List<MTexture>> surfaceBubbleAnimations;
 
@@ -47,8 +47,8 @@ namespace Celeste
             SurfaceStep = step;
             dirty = true;
             verts = new VertexPositionColor[(int) ((double) width / SurfaceStep * 2.0 + (double) height / SurfaceStep * 2.0 + 4.0) * 3 * 6 + 6];
-            bubbles = new LavaRect.Bubble[(int) ((double) width * (double) height * 0.004999999888241291)];
-            surfaceBubbles = new LavaRect.SurfaceBubble[(int) Math.Max(4f, bubbles.Length * 0.25f)];
+            bubbles = new Bubble[(int) (width * (double) height * 0.004999999888241291)];
+            surfaceBubbles = new SurfaceBubble[(int) Math.Max(4f, bubbles.Length * 0.25f)];
             for (int index = 0; index < bubbles.Length; ++index)
             {
                 bubbles[index].Position = new Vector2(1f + Calc.Random.NextFloat(Width - 2f), Calc.Random.NextFloat(Height));
@@ -69,7 +69,7 @@ namespace Celeste
             for (int index = 0; index < bubbles.Length; ++index)
             {
                 bubbles[index].Position.Y -= UpdateMultiplier * bubbles[index].Speed * Engine.DeltaTime;
-                if (bubbles[index].Position.Y < 2.0 - (double) Wave((int) (bubbles[index].Position.X / (double) SurfaceStep), Width))
+                if (bubbles[index].Position.Y < 2.0 - Wave((int) (bubbles[index].Position.X / (double) SurfaceStep), Width))
                 {
                     bubbles[index].Position.Y = Height - 1f;
                     if (Calc.Random.Chance(0.75f))
@@ -93,7 +93,7 @@ namespace Celeste
             base.Update();
         }
 
-        private float Sin(float value) => (float) ((1.0 + Math.Sin((double) value)) / 2.0);
+        private float Sin(float value) => (float) ((1.0 + Math.Sin(value)) / 2.0);
 
         private float Wave(int step, float length)
         {
@@ -197,7 +197,7 @@ namespace Celeste
                 dirty = false;
             }
             Camera camera = (Scene as Level).Camera;
-            GFX.DrawVertices<VertexPositionColor>(Matrix.CreateTranslation(new Vector3(Entity.Position + Position, 0.0f)) * camera.Matrix, verts, vertCount);
+            GFX.DrawVertices(Matrix.CreateTranslation(new Vector3(Entity.Position + Position, 0.0f)) * camera.Matrix, verts, vertCount);
             GameplayRenderer.Begin();
             Vector2 vector2 = Entity.Position + Position;
             MTexture mtexture1 = GFX.Game["particles/bubble"];

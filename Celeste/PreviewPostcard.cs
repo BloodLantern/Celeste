@@ -9,31 +9,31 @@ namespace Celeste
 
         public PreviewPostcard(Postcard postcard)
         {
-            Audio.SetMusic((string) null);
-            Audio.SetAmbience((string) null);
+            Audio.SetMusic(null);
+            Audio.SetAmbience(null);
             this.postcard = postcard;
-            this.Add(new Entity()
+            Add(new Entity
             {
-                (Component) new Coroutine(this.Routine(postcard))
+                new Coroutine(Routine(postcard))
             });
-            this.Add((Monocle.Renderer) new HudRenderer());
+            Add(new HudRenderer());
         }
 
         private IEnumerator Routine(Postcard postcard)
         {
             PreviewPostcard previewPostcard = this;
-            yield return (object) 0.25f;
-            previewPostcard.Add((Entity) postcard);
-            yield return (object) postcard.DisplayRoutine();
-            Engine.Scene = (Scene) new OverworldLoader(Overworld.StartMode.MainMenu);
+            yield return 0.25f;
+            previewPostcard.Add(postcard);
+            yield return postcard.DisplayRoutine();
+            Engine.Scene = new OverworldLoader(Overworld.StartMode.MainMenu);
         }
 
         public override void BeforeRender()
         {
             base.BeforeRender();
-            if (this.postcard == null)
+            if (postcard == null)
                 return;
-            this.postcard.BeforeRender();
+            postcard.BeforeRender();
         }
     }
 }

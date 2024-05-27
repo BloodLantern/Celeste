@@ -3,7 +3,7 @@ using Monocle;
 
 namespace Celeste
 {
-    [Tracked(false)]
+    [Tracked()]
     public class WindTrigger : Trigger
     {
         public WindController.Patterns Pattern;
@@ -11,17 +11,17 @@ namespace Celeste
         public WindTrigger(EntityData data, Vector2 offset)
             : base(data, offset)
         {
-            this.Pattern = data.Enum<WindController.Patterns>("pattern");
+            Pattern = data.Enum<WindController.Patterns>("pattern");
         }
 
         public override void OnEnter(Player player)
         {
             base.OnEnter(player);
-            WindController first = this.Scene.Entities.FindFirst<WindController>();
+            WindController first = Scene.Entities.FindFirst<WindController>();
             if (first == null)
-                this.Scene.Add((Entity) new WindController(this.Pattern));
+                Scene.Add(new WindController(Pattern));
             else
-                first.SetPattern(this.Pattern);
+                first.SetPattern(Pattern);
         }
     }
 }

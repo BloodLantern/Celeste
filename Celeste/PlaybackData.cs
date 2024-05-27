@@ -23,7 +23,7 @@ namespace Celeste
         {
             float timeStamp = list[0].TimeStamp;
             Vector2 position = list[0].Position;
-            using (BinaryWriter binaryWriter = new BinaryWriter((Stream) File.OpenWrite(path)))
+            using (BinaryWriter binaryWriter = new BinaryWriter(File.OpenWrite(path)))
             {
                 binaryWriter.Write("TIMELINE");
                 binaryWriter.Write(2);
@@ -51,7 +51,7 @@ namespace Celeste
         public static List<Player.ChaserState> Import(byte[] buffer)
         {
             List<Player.ChaserState> chaserStateList = new List<Player.ChaserState>();
-            using (BinaryReader binaryReader = new BinaryReader((Stream) new MemoryStream(buffer)))
+            using (BinaryReader binaryReader = new BinaryReader(new MemoryStream(buffer)))
             {
                 int num1 = 1;
                 if (binaryReader.ReadString() == "TIMELINE")
@@ -68,7 +68,7 @@ namespace Celeste
                     chaserState.Animation = binaryReader.ReadString();
                     chaserState.Facing = (Facings) binaryReader.ReadInt32();
                     chaserState.OnGround = binaryReader.ReadBoolean();
-                    chaserState.HairColor = new Color((int) binaryReader.ReadByte(), (int) binaryReader.ReadByte(), (int) binaryReader.ReadByte(), (int) byte.MaxValue);
+                    chaserState.HairColor = new Color(binaryReader.ReadByte(), binaryReader.ReadByte(), binaryReader.ReadByte(), byte.MaxValue);
                     chaserState.Depth = binaryReader.ReadInt32();
                     chaserState.Sounds = 0;
                     if (num1 == 1)

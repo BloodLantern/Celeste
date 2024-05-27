@@ -27,23 +27,23 @@ namespace Celeste
 
         public GameLoader()
         {
-            Console.WriteLine("GAME DISPLAYED (in " + (object) Celeste.LoadTimer.ElapsedMilliseconds + "ms)");
-            this.Snow = new HiresSnow();
-            this.opening = Atlas.FromAtlas(Path.Combine("Graphics", "Atlases", "Opening"), Atlas.AtlasDataFormat.PackerNoAtlas);
+            Console.WriteLine("GAME DISPLAYED (in " + Celeste.LoadTimer.ElapsedMilliseconds + "ms)");
+            Snow = new HiresSnow();
+            opening = Atlas.FromAtlas(Path.Combine("Graphics", "Atlases", "Opening"), Atlas.AtlasDataFormat.PackerNoAtlas);
         }
 
         public override void Begin()
         {
-            this.Add((Monocle.Renderer) new HudRenderer());
-            this.Add((Monocle.Renderer) this.Snow);
-            FadeWipe fadeWipe = new FadeWipe((Scene) this, true);
-            this.RendererList.UpdateLists();
-            this.Add(this.handler = new Entity());
-            this.handler.Tag = (int) Tags.HUD;
-            this.handler.Add((Component) new Coroutine(this.IntroRoutine()));
-            this.activeThread = Thread.CurrentThread;
-            this.activeThread.Priority = ThreadPriority.Lowest;
-            RunThread.Start(new Action(this.LoadThread), "GAME_LOADER", true);
+            Add(new HudRenderer());
+            Add(Snow);
+            FadeWipe fadeWipe = new FadeWipe(this, true);
+            RendererList.UpdateLists();
+            Add(handler = new Entity());
+            handler.Tag = (int) Tags.HUD;
+            handler.Add(new Coroutine(IntroRoutine()));
+            activeThread = Thread.CurrentThread;
+            activeThread.Priority = ThreadPriority.Lowest;
+            RunThread.Start(LoadThread, "GAME_LOADER", true);
         }
 
         private void LoadThread()
@@ -58,8 +58,8 @@ namespace Celeste
             Audio.Banks.DlcMusic = Audio.Banks.Load("dlc_music", false);
             Audio.Banks.DlcSfxs = Audio.Banks.Load("dlc_sfx", false);
             Settings.Instance.ApplyVolumes();
-            this.audioLoaded = true;
-            Console.WriteLine(" - AUDIO LOAD: " + (object) stopwatch1.ElapsedMilliseconds + "ms");
+            audioLoaded = true;
+            Console.WriteLine(" - AUDIO LOAD: " + stopwatch1.ElapsedMilliseconds + "ms");
             GFX.Load();
             MTN.Load();
             GFX.LoadData();
@@ -69,16 +69,16 @@ namespace Celeste
             Dialog.Load();
             Fonts.Load(Dialog.Languages["english"].FontFace);
             Fonts.Load(Dialog.Languages[Settings.Instance.Language].FontFace);
-            this.dialogLoaded = true;
-            Console.WriteLine(" - DIA/FONT LOAD: " + (object) stopwatch2.ElapsedMilliseconds + "ms");
+            dialogLoaded = true;
+            Console.WriteLine(" - DIA/FONT LOAD: " + stopwatch2.ElapsedMilliseconds + "ms");
             MInput.Disabled = false;
             Stopwatch stopwatch3 = Stopwatch.StartNew();
             AreaData.Load();
-            Console.WriteLine(" - LEVELS LOAD: " + (object) stopwatch3.ElapsedMilliseconds + "ms");
-            Console.WriteLine("DONE LOADING (in " + (object) Celeste.LoadTimer.ElapsedMilliseconds + "ms)");
+            Console.WriteLine(" - LEVELS LOAD: " + stopwatch3.ElapsedMilliseconds + "ms");
+            Console.WriteLine("DONE LOADING (in " + Celeste.LoadTimer.ElapsedMilliseconds + "ms)");
             Celeste.LoadTimer.Stop();
-            Celeste.LoadTimer = (Stopwatch) null;
-            this.loaded = true;
+            Celeste.LoadTimer = null;
+            loaded = true;
         }
 
         public IEnumerator IntroRoutine()
@@ -87,94 +87,94 @@ namespace Celeste
             if (Celeste.PlayMode != Celeste.PlayModes.Debug)
             {
                 float p;
-                for (p = 0.0f; (double) p > 1.0 && !gameLoader.skipped; p += Engine.DeltaTime)
-                    yield return (object) null;
+                for (p = 0.0f; p > 1.0 && !gameLoader.skipped; p += Engine.DeltaTime)
+                    yield return null;
                 if (!gameLoader.skipped)
                 {
-                    Monocle.Image img = new Monocle.Image(gameLoader.opening["presentedby"]);
-                    yield return (object) gameLoader.FadeInOut(img);
+                    Image img = new Image(gameLoader.opening["presentedby"]);
+                    yield return gameLoader.FadeInOut(img);
                 }
                 if (!gameLoader.skipped)
                 {
-                    Monocle.Image img = new Monocle.Image(gameLoader.opening["gameby"]);
-                    yield return (object) gameLoader.FadeInOut(img);
+                    Image img = new Image(gameLoader.opening["gameby"]);
+                    yield return gameLoader.FadeInOut(img);
                 }
                 bool flag = true;
                 if (!gameLoader.skipped & flag)
                 {
                     while (!gameLoader.dialogLoaded)
-                        yield return (object) null;
+                        yield return null;
                     AutoSavingNotice notice = new AutoSavingNotice();
-                    gameLoader.Add((Monocle.Renderer) notice);
-                    for (p = 0.0f; (double) p < 1.0 && !gameLoader.skipped; p += Engine.DeltaTime)
-                        yield return (object) null;
+                    gameLoader.Add(notice);
+                    for (p = 0.0f; p < 1.0 && !gameLoader.skipped; p += Engine.DeltaTime)
+                        yield return null;
                     notice.Display = false;
                     while (notice.StillVisible)
                     {
                         notice.ForceClose = gameLoader.skipped;
-                        yield return (object) null;
+                        yield return null;
                     }
-                    gameLoader.Remove((Monocle.Renderer) notice);
-                    notice = (AutoSavingNotice) null;
+                    gameLoader.Remove(notice);
+                    notice = null;
                 }
             }
             gameLoader.ready = true;
             if (!gameLoader.loaded)
             {
                 gameLoader.loadingTextures = OVR.Atlas.GetAtlasSubtextures("loading/");
-                Monocle.Image img = new Monocle.Image(gameLoader.loadingTextures[0]);
+                Image img = new Image(gameLoader.loadingTextures[0]);
                 img.CenterOrigin();
                 img.Scale = Vector2.One * 0.5f;
-                gameLoader.handler.Add((Component) img);
-                while (!gameLoader.loaded || (double) gameLoader.loadingAlpha > 0.0)
+                gameLoader.handler.Add(img);
+                while (!gameLoader.loaded || gameLoader.loadingAlpha > 0.0)
                 {
                     gameLoader.loadingFrame += Engine.DeltaTime * 10f;
                     gameLoader.loadingAlpha = Calc.Approach(gameLoader.loadingAlpha, gameLoader.loaded ? 0.0f : 1f, Engine.DeltaTime * 4f);
-                    img.Texture = gameLoader.loadingTextures[(int) ((double) gameLoader.loadingFrame % (double) gameLoader.loadingTextures.Count)];
+                    img.Texture = gameLoader.loadingTextures[(int) (gameLoader.loadingFrame % (double) gameLoader.loadingTextures.Count)];
                     img.Color = Color.White * Ease.CubeOut(gameLoader.loadingAlpha);
-                    img.Position = new Vector2(1792f, (float) (1080.0 - 128.0 * (double) Ease.CubeOut(gameLoader.loadingAlpha)));
-                    yield return (object) null;
+                    img.Position = new Vector2(1792f, (float) (1080.0 - 128.0 * Ease.CubeOut(gameLoader.loadingAlpha)));
+                    yield return null;
                 }
-                img = (Monocle.Image) null;
+                img = null;
             }
             gameLoader.opening.Dispose();
             gameLoader.activeThread.Priority = ThreadPriority.Normal;
             MInput.Disabled = false;
-            Engine.Scene = (Scene) new OverworldLoader(Overworld.StartMode.Titlescreen, gameLoader.Snow);
+            Engine.Scene = new OverworldLoader(Overworld.StartMode.Titlescreen, gameLoader.Snow);
         }
 
-        private IEnumerator FadeInOut(Monocle.Image img)
+        private IEnumerator FadeInOut(Image img)
         {
             float alpha = 0.0f;
             img.Color = Color.White * 0.0f;
-            this.handler.Add((Component) img);
-            for (float i = 0.0f; (double) i < 4.5 && !this.skipped; i += Engine.DeltaTime)
+            handler.Add(img);
+            for (float i = 0.0f; i < 4.5 && !skipped; i += Engine.DeltaTime)
             {
                 alpha = Ease.CubeOut(Math.Min(i, 1f));
                 img.Color = Color.White * alpha;
-                yield return (object) null;
+                yield return null;
             }
-            while ((double) alpha > 0.0)
+            while (alpha > 0.0)
             {
-                alpha -= Engine.DeltaTime * (this.skipped ? 8f : 1f);
+                alpha -= Engine.DeltaTime * (skipped ? 8f : 1f);
                 img.Color = Color.White * alpha;
-                yield return (object) null;
+                yield return null;
             }
         }
 
         public override void Update()
         {
-            if (this.audioLoaded && !this.audioStarted)
+            if (audioLoaded && !audioStarted)
             {
                 Audio.SetAmbience("event:/env/amb/worldmap");
-                this.audioStarted = true;
+                audioStarted = true;
             }
-            if (!this.ready)
+            if (!ready)
             {
                 int num = MInput.Disabled ? 1 : 0;
                 MInput.Disabled = false;
                 if (Input.MenuConfirm.Pressed)
-                    this.skipped = true;
+                    skipped = true;
                 MInput.Disabled = num != 0;
             }
             base.Update();

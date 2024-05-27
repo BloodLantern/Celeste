@@ -1,6 +1,5 @@
 ﻿using Microsoft.Xna.Framework;
 using Monocle;
-using System;
 using System.Collections.Generic;
 using System.Text.RegularExpressions;
 
@@ -22,7 +21,7 @@ namespace Celeste
             this.session = session;
             this.startPosition = startPosition.HasValue ? startPosition : session.RespawnPoint;
             Level = new Level();
-            RunThread.Start(new Action(LoadingThread), "LEVEL_LOADER");
+            RunThread.Start(LoadingThread, "LEVEL_LOADER");
         }
 
         private void LoadingThread()

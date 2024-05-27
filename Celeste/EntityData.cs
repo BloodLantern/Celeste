@@ -90,12 +90,12 @@ namespace Celeste
         {
             if (Nodes == null || Nodes.Length == 0)
                 return new Vector2?();
-            return offset.HasValue ? new Vector2?(Nodes[0] + offset.Value) : new Vector2?(Nodes[0]);
+            return offset.HasValue ? Nodes[0] + offset.Value : Nodes[0];
         }
 
         public T Enum<T>(string key, T defaultValue = default) where T : struct
         {
-            return Values != null && Values.TryGetValue(key, out object obj) && System.Enum.TryParse<T>(obj.ToString(), true, out T result) ? result : defaultValue;
+            return Values != null && Values.TryGetValue(key, out object obj) && System.Enum.TryParse(obj.ToString(), true, out T result) ? result : defaultValue;
         }
 
         public Color HexColor(string key, Color defaultValue = default)

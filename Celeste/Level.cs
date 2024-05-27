@@ -311,7 +311,6 @@ namespace Celeste
                             if (!Session.HeartGem || Session.Area.Mode != AreaMode.Normal)
                             {
                                 Add(new HeartGem(entity, entityOffset));
-                                continue;
                             }
                             continue;
                         case "blockField":
@@ -336,7 +335,6 @@ namespace Celeste
                             if (!Session.Cassette)
                             {
                                 Add(new Cassette(entity, entityOffset));
-                                continue;
                             }
                             continue;
                         case "cassetteBlock":
@@ -352,9 +350,7 @@ namespace Celeste
                                 if (Tracker.GetEntity<CassetteBlockManager>() == null && ShouldCreateCassetteManager)
                                 {
                                     Add(new CassetteBlockManager());
-                                    continue;
                                 }
-                                continue;
                             }
                             continue;
                         case "chaserBarrier":
@@ -365,8 +361,7 @@ namespace Celeste
                             {
                                 Checkpoint checkpoint = new(entity, entityOffset);
                                 Add(checkpoint);
-                                nullable = new Vector2?(entity.Position + entityOffset + checkpoint.SpawnOffset);
-                                continue;
+                                nullable = entity.Position + entityOffset + checkpoint.SpawnOffset;
                             }
                             continue;
                         case "cliffflag":
@@ -409,7 +404,6 @@ namespace Celeste
                             if (hasExitBlock)
                             {
                                 Add(new ExitBlock(entity, entityOffset));
-                                continue;
                             }
                             continue;
                         case "coreMessage":
@@ -454,7 +448,6 @@ namespace Celeste
                             if (!Session.HeartGem)
                             {
                                 Add(new DreamHeartGem(entity, entityOffset));
-                                continue;
                             }
                             continue;
                         case "dreammirror":
@@ -528,7 +521,6 @@ namespace Celeste
                             if (((num1 != 0 ? 1 : (flag6 & completed ? 1 : 0)) & (flag5 ? 1 : 0)) != 0)
                             {
                                 Add(new Strawberry(entity, entityOffset, entityId));
-                                continue;
                             }
                             continue;
                         case "goldenBlock":
@@ -591,7 +583,6 @@ namespace Celeste
                             {
                                 Add(new Lightning(entity, entityOffset));
                                 flag2 = true;
-                                continue;
                             }
                             continue;
                         case "lightningBlock":
@@ -607,7 +598,6 @@ namespace Celeste
                             if (Session.Dashes == 0 && Session.StartedFromBeginning)
                             {
                                 Add(new Strawberry(entity, entityOffset, entityId));
-                                continue;
                             }
                             continue;
                         case "moonCreature":
@@ -645,7 +635,6 @@ namespace Celeste
                                 if (!Session.GetFlag("resort_theo"))
                                 {
                                     Add(new NPC03_Theo_Escaping(position));
-                                    continue;
                                 }
                                 continue;
                             }
@@ -772,7 +761,6 @@ namespace Celeste
                             if (npcName == "granny_10_never")
                             {
                                 Add(new NPC07X_Granny_Ending(entity, entityOffset, true));
-                                continue;
                             }
                             continue;
                         case "oshirodoor":
@@ -822,7 +810,6 @@ namespace Celeste
                             if (GotCollectables(entity))
                             {
                                 Add(new RidgeGate(entity, entityOffset));
-                                continue;
                             }
                             continue;
                         case "risingLava":
@@ -1070,7 +1057,6 @@ namespace Celeste
                             if (string.IsNullOrEmpty(flag7) || !Session.GetFlag(flag7))
                             {
                                 Add(new CameraTargetTrigger(trigger, entityOffset));
-                                continue;
                             }
                             continue;
                         case "changeRespawnTrigger":
@@ -1152,7 +1138,7 @@ namespace Celeste
                 if (Session.JustStarted && !Session.StartedFromBeginning && nullable.HasValue && !StartPosition.HasValue)
                     StartPosition = nullable;
                 if (!Session.RespawnPoint.HasValue)
-                    Session.RespawnPoint = !StartPosition.HasValue ? new Vector2?(DefaultSpawnPoint) : new Vector2?(GetSpawnPoint(StartPosition.Value));
+                    Session.RespawnPoint = !StartPosition.HasValue ? DefaultSpawnPoint : GetSpawnPoint(StartPosition.Value);
                 Player player = new(Session.RespawnPoint.Value, Session.Inventory.Backpack ? PlayerSpriteMode.Madeline : PlayerSpriteMode.MadelineNoBackpack)
                 {
                     IntroType = playerIntro
@@ -1320,7 +1306,7 @@ namespace Celeste
                 if (component.DisposeOnTransition)
                     component.Stop();
             }
-            level.PreviousBounds = new Rectangle?(level.Bounds);
+            level.PreviousBounds = level.Bounds;
             level.Session.Level = next.Name;
             level.Session.FirstLevel = false;
             level.Session.DeathsInCurrentLevel = 0;
@@ -1365,21 +1351,21 @@ namespace Celeste
             float lightingStart = level.Lighting.Alpha;
             float lightingEnd = level.DarkRoom ? level.Session.DarkRoomAlpha : level.BaseLightingAlpha + level.Session.LightingAlphaAdd;
             bool lightingWait = (double) lightingStart >= level.Session.DarkRoomAlpha || (double) lightingEnd >= level.Session.DarkRoomAlpha;
-            if ((double) lightingEnd > (double) lightingStart & lightingWait)
+            if (lightingEnd > (double) lightingStart & lightingWait)
             {
                 Audio.Play("event:/game/05_mirror_temple/room_lightlevel_down");
                 for (; level.Lighting.Alpha != (double) lightingEnd; level.Lighting.Alpha = Calc.Approach(level.Lighting.Alpha, lightingEnd, 2f * Engine.DeltaTime))
                     yield return null;
             }
             bool cameraFinished = false;
-            while (!player.TransitionTo(playerTo, direction) || (double) cameraAt < 1.0)
+            while (!player.TransitionTo(playerTo, direction) || cameraAt < 1.0)
             {
                 yield return null;
                 if (!cameraFinished)
                 {
                     cameraAt = Calc.Approach(cameraAt, 1f, Engine.DeltaTime / level.NextTransitionDuration);
-                    level.Camera.Position = (double) cameraAt <= 0.89999997615814209 ? Vector2.Lerp(cameraFrom, cameraTo, Ease.CubeOut(cameraAt)) : cameraTo;
-                    if (!lightingWait && (double) lightingStart < (double) lightingEnd)
+                    level.Camera.Position = cameraAt <= 0.89999997615814209 ? Vector2.Lerp(cameraFrom, cameraTo, Ease.CubeOut(cameraAt)) : cameraTo;
+                    if (!lightingWait && lightingStart < (double) lightingEnd)
                         level.Lighting.Alpha = lightingStart + (lightingEnd - lightingStart) * cameraAt;
                     foreach (TransitionListener transitionListener in transitionOut)
                     {
@@ -1391,11 +1377,11 @@ namespace Celeste
                         if (transitionListener.OnIn != null)
                             transitionListener.OnIn(cameraAt);
                     }
-                    if ((double) cameraAt >= 1.0)
+                    if (cameraAt >= 1.0)
                         cameraFinished = true;
                 }
             }
-            if ((double) lightingEnd < (double) lightingStart & lightingWait)
+            if (lightingEnd < (double) lightingStart & lightingWait)
             {
                 Audio.Play("event:/game/05_mirror_temple/room_lightlevel_up");
                 for (; level.Lighting.Alpha != (double) lightingEnd; level.Lighting.Alpha = Calc.Approach(level.Lighting.Alpha, lightingEnd, 2f * Engine.DeltaTime))
@@ -1410,7 +1396,7 @@ namespace Celeste
             level.ParticlesFG.ClearRect(bounds, false);
             RespawnTargetTrigger respawnTargetTrigger = player.CollideFirst<RespawnTargetTrigger>();
             Vector2 to = respawnTargetTrigger != null ? respawnTargetTrigger.Target : player.Position;
-            level.Session.RespawnPoint = new Vector2?(level.Session.LevelData.Spawns.ClosestTo(to));
+            level.Session.RespawnPoint = level.Session.LevelData.Spawns.ClosestTo(to);
             player.OnTransition();
             foreach (TransitionListener transitionListener in transitionIn)
             {
@@ -1482,7 +1468,7 @@ namespace Celeste
             double left = bounds.Left;
             bounds = Bounds;
             double top = bounds.Top;
-            Vector2? nullable = new Vector2?(GetSpawnPoint(new Vector2((float) left, (float) top) + (nearestSpawn.HasValue ? nearestSpawn.Value : Vector2.Zero)));
+            Vector2? nullable = GetSpawnPoint(new Vector2((float) left, (float) top) + (nearestSpawn.HasValue ? nearestSpawn.Value : Vector2.Zero));
             session.RespawnPoint = nullable;
             if (introType == Player.IntroTypes.Transition)
             {
@@ -1525,7 +1511,7 @@ namespace Celeste
         {
             if (InCredits || Session.Area.ID == 8 || TimerStopped)
                 return;
-            long ticks = TimeSpan.FromSeconds((double) Engine.RawDeltaTime).Ticks;
+            long ticks = TimeSpan.FromSeconds(Engine.RawDeltaTime).Ticks;
             SaveData.Instance.AddTime(Session.Area, ticks);
             if (!TimerStarted && !InCutscene)
             {
@@ -1723,17 +1709,17 @@ namespace Celeste
                     Engine.Scene = new MapEditor(Session.Area);
                 if (MInput.Keyboard.Pressed(Keys.F1))
                 {
-                    Celeste.ReloadAssets(true, false, false, new AreaKey?(Session.Area));
+                    Celeste.ReloadAssets(true, false, false, Session.Area);
                     Engine.Scene = new LevelLoader(Session);
                 }
                 else if (MInput.Keyboard.Pressed(Keys.F2))
                 {
-                    Celeste.ReloadAssets(true, true, false, new AreaKey?(Session.Area));
+                    Celeste.ReloadAssets(true, true, false, Session.Area);
                     Engine.Scene = new LevelLoader(Session);
                 }
                 else if(MInput.Keyboard.Pressed(Keys.F3))
                 {
-                    Celeste.ReloadAssets(true, true, true, new AreaKey?(Session.Area));
+                    Celeste.ReloadAssets(true, true, true, Session.Area);
                     Engine.Scene = new LevelLoader(Session);
                 }
             }
@@ -1755,11 +1741,11 @@ namespace Celeste
 
         public override void Render()
         {
-            Engine.Instance.GraphicsDevice.SetRenderTarget((RenderTarget2D) GameplayBuffers.Gameplay);
+            Engine.Instance.GraphicsDevice.SetRenderTarget(GameplayBuffers.Gameplay);
             Engine.Instance.GraphicsDevice.Clear(Color.Transparent);
             GameplayRenderer.Render(this);
             Lighting.Render(this);
-            Engine.Instance.GraphicsDevice.SetRenderTarget((RenderTarget2D) GameplayBuffers.Level);
+            Engine.Instance.GraphicsDevice.SetRenderTarget(GameplayBuffers.Level);
             Engine.Instance.GraphicsDevice.Clear(BackgroundColor);
             Background.Render(this);
             Distort.Render((RenderTarget2D)GameplayBuffers.Gameplay, (RenderTarget2D)GameplayBuffers.Displacement, Displacement.HasDisplacement(this));
@@ -1811,7 +1797,7 @@ namespace Celeste
                 origin.X = 160f - (origin.X - 160f);
             }
             Draw.SpriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, SamplerState.PointClamp, DepthStencilState.Default, RasterizerState.CullNone, ColorGrade.Effect, transformMatrix);
-            Draw.SpriteBatch.Draw((RenderTarget2D)GameplayBuffers.Level, origin + vector2_3, new Rectangle?(GameplayBuffers.Level.Bounds), Color.White, 0.0f, origin, scale, SaveData.Instance.Assists.MirrorMode ? SpriteEffects.FlipHorizontally : SpriteEffects.None, 0.0f);
+            Draw.SpriteBatch.Draw((RenderTarget2D)GameplayBuffers.Level, origin + vector2_3, GameplayBuffers.Level.Bounds, Color.White, 0.0f, origin, scale, SaveData.Instance.Assists.MirrorMode ? SpriteEffects.FlipHorizontally : SpriteEffects.None, 0.0f);
             Draw.SpriteBatch.End();
             if (Pathfinder != null && Pathfinder.DebugRenderEnabled)
             {
@@ -2085,7 +2071,7 @@ namespace Celeste
             Paused = true;
             TextMenu menu = new();
             menu.Add(new TextMenu.Header(Dialog.Clean("MENU_ASSIST_TITLE")));
-            menu.Add(new TextMenu.Slider(Dialog.Clean("MENU_ASSIST_GAMESPEED"), i => (i * 10).ToString() + "%", 5, 10, SaveData.Instance.Assists.GameSpeed).Change(i =>
+            menu.Add(new TextMenu.Slider(Dialog.Clean("MENU_ASSIST_GAMESPEED"), i => (i * 10) + "%", 5, 10, SaveData.Instance.Assists.GameSpeed).Change(i =>
             {
                 SaveData.Instance.Assists.GameSpeed = i;
                 Engine.TimeRateB = SaveData.Instance.Assists.GameSpeed / 10f;
@@ -2139,7 +2125,7 @@ namespace Celeste
             string label1 = Dialog.Clean("MENU_ASSIST_GAMESPEED");
             int gameSpeed = SaveData.Instance.Assists.GameSpeed;
             TextMenu.Slider speed;
-            TextMenu.Slider slider = speed = new TextMenu.Slider(label1, i => (i * 10).ToString() + "%", 5, 16, gameSpeed);
+            TextMenu.Slider slider = speed = new TextMenu.Slider(label1, i => (i * 10) + "%", 5, 16, gameSpeed);
             textMenu1.Add(slider);
             speed.Change(i =>
             {
@@ -2276,7 +2262,7 @@ namespace Celeste
             ZoomFocusPoint = screenSpaceFocusPoint;
             ZoomTarget = zoom;
             float from = Zoom;
-            for (float p = 0.0f; (double) p < 1.0; p += Engine.DeltaTime / duration)
+            for (float p = 0.0f; p < 1.0; p += Engine.DeltaTime / duration)
             {
                 Zoom = MathHelper.Lerp(from, ZoomTarget, Ease.SineInOut(MathHelper.Clamp(p, 0.0f, 1f)));
                 yield return null;
@@ -2291,7 +2277,7 @@ namespace Celeste
         {
             float fromZoom = Zoom;
             Vector2 fromFocus = ZoomFocusPoint;
-            for (float p = 0.0f; (double) p < 1.0; p += Engine.DeltaTime / duration)
+            for (float p = 0.0f; p < 1.0; p += Engine.DeltaTime / duration)
             {
                 float amount = Ease.SineInOut(MathHelper.Clamp(p, 0.0f, 1f));
                 Zoom = ZoomTarget = MathHelper.Lerp(fromZoom, zoom, amount);
@@ -2306,7 +2292,7 @@ namespace Celeste
         {
             float from = Zoom;
             float to = 1f;
-            for (float p = 0.0f; (double) p < 1.0; p += Engine.DeltaTime / duration)
+            for (float p = 0.0f; p < 1.0; p += Engine.DeltaTime / duration)
             {
                 Zoom = MathHelper.Lerp(from, to, Ease.SineInOut(MathHelper.Clamp(p, 0.0f, 1f)));
                 yield return null;
@@ -2355,7 +2341,7 @@ namespace Celeste
             }
         }
 
-        public bool InsideCamera(Vector2 position, float expand = 0.0f) => position.X >= (double) Camera.Left - (double) expand && position.X < (double) Camera.Right + (double) expand && position.Y >= (double) Camera.Top - (double) expand && position.Y < (double) Camera.Bottom + (double) expand;
+        public bool InsideCamera(Vector2 position, float expand = 0.0f) => position.X >= Camera.Left - (double) expand && position.X < Camera.Right + (double) expand && position.Y >= Camera.Top - (double) expand && position.Y < Camera.Bottom + (double) expand;
 
         public void EnforceBounds(Player player)
         {

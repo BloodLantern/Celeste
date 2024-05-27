@@ -1,6 +1,5 @@
 ﻿using Microsoft.Xna.Framework;
 using Monocle;
-using System;
 using System.Collections;
 using System.Collections.Generic;
 
@@ -15,37 +14,37 @@ namespace Celeste
 
         public WaveDashPage04()
         {
-            this.Transition = WaveDashPage.Transitions.FadeIn;
-            this.ClearColor = Calc.HexToColor("f4cccc");
+            Transition = Transitions.FadeIn;
+            ClearColor = Calc.HexToColor("f4cccc");
         }
 
         public override void Added(WaveDashPresentation presentation)
         {
             base.Added(presentation);
-            List<MTexture> textures = this.Presentation.Gfx.GetAtlasSubtextures("playback/platforms");
-            this.tutorial = new WaveDashPlaybackTutorial("wavedashppt", new Vector2(-126f, 0.0f), new Vector2(1f, 1f), new Vector2(1f, -1f));
-            this.tutorial.OnRender = (Action) (() => textures[(int) ((double) this.time % (double) textures.Count)].DrawCentered(Vector2.Zero));
+            List<MTexture> textures = Presentation.Gfx.GetAtlasSubtextures("playback/platforms");
+            tutorial = new WaveDashPlaybackTutorial("wavedashppt", new Vector2(-126f, 0.0f), new Vector2(1f, 1f), new Vector2(1f, -1f));
+            tutorial.OnRender = () => textures[(int) (time % (double) textures.Count)].DrawCentered(Vector2.Zero);
         }
 
         public override IEnumerator Routine()
         {
             WaveDashPage04 waveDashPage04 = this;
-            yield return (object) 0.5f;
-            waveDashPage04.list = FancyText.Parse(Dialog.Get("WAVEDASH_PAGE4_LIST"), waveDashPage04.Width, 32, defaultColor: new Color?(Color.Black * 0.7f));
+            yield return 0.5f;
+            waveDashPage04.list = FancyText.Parse(Dialog.Get("WAVEDASH_PAGE4_LIST"), waveDashPage04.Width, 32, defaultColor: Color.Black * 0.7f);
             float delay = 0.0f;
             for (; waveDashPage04.listIndex < waveDashPage04.list.Nodes.Count; ++waveDashPage04.listIndex)
             {
                 if (waveDashPage04.list.Nodes[waveDashPage04.listIndex] is FancyText.NewLine)
                 {
-                    yield return (object) waveDashPage04.PressButton();
+                    yield return waveDashPage04.PressButton();
                 }
                 else
                 {
                     delay += 0.008f;
-                    if ((double) delay >= 0.016000000759959221)
+                    if (delay >= 0.016000000759959221)
                     {
                         delay -= 0.016f;
-                        yield return (object) 0.016f;
+                        yield return 0.016f;
                     }
                 }
             }
@@ -53,17 +52,17 @@ namespace Celeste
 
         public override void Update()
         {
-            this.time += Engine.DeltaTime * 4f;
-            this.tutorial.Update();
+            time += Engine.DeltaTime * 4f;
+            tutorial.Update();
         }
 
         public override void Render()
         {
             ActiveFont.DrawOutline(Dialog.Clean("WAVEDASH_PAGE4_TITLE"), new Vector2(128f, 100f), Vector2.Zero, Vector2.One * 1.5f, Color.White, 2f, Color.Black);
-            this.tutorial.Render(new Vector2((float) this.Width / 2f, (float) ((double) this.Height / 2.0 - 100.0)), 4f);
-            if (this.list == null)
+            tutorial.Render(new Vector2(Width / 2f, (float) (Height / 2.0 - 100.0)), 4f);
+            if (list == null)
                 return;
-            this.list.Draw(new Vector2(160f, (float) (this.Height - 400)), new Vector2(0.0f, 0.0f), Vector2.One, 1f, end: this.listIndex);
+            list.Draw(new Vector2(160f, Height - 400), new Vector2(0.0f, 0.0f), Vector2.One, 1f, end: listIndex);
         }
     }
 }

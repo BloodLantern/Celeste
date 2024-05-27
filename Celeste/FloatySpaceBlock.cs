@@ -5,7 +5,7 @@ using System.Collections.Generic;
 
 namespace Celeste
 {
-    [Tracked(false)]
+    [Tracked()]
     public class FloatySpaceBlock : Solid
     {
         private TileGrid tiles;
@@ -68,17 +68,17 @@ namespace Celeste
                 VirtualMap<char> mapData = new(rectangle.Width, rectangle.Height, '0');
                 foreach (FloatySpaceBlock floatySpaceBlock in Group)
                 {
-                    int num1 = (int) ((double) floatySpaceBlock.X / 8.0) - rectangle.X;
-                    int num2 = (int) ((double) floatySpaceBlock.Y / 8.0) - rectangle.Y;
-                    int num3 = (int) ((double) floatySpaceBlock.Width / 8.0);
-                    int num4 = (int) ((double) floatySpaceBlock.Height / 8.0);
+                    int num1 = (int) (floatySpaceBlock.X / 8.0) - rectangle.X;
+                    int num2 = (int) (floatySpaceBlock.Y / 8.0) - rectangle.Y;
+                    int num3 = (int) (floatySpaceBlock.Width / 8.0);
+                    int num4 = (int) (floatySpaceBlock.Height / 8.0);
                     for (int x = num1; x < num1 + num3; ++x)
                     {
                         for (int y = num2; y < num2 + num4; ++y)
                             mapData[x, y] = tileType;
                     }
                 }
-                tiles = GFX.FGAutotiler.GenerateMap(mapData, new Autotiler.Behaviour()
+                tiles = GFX.FGAutotiler.GenerateMap(mapData, new Autotiler.Behaviour
                 {
                     EdgesExtend = false,
                     EdgesIgnoreOutOfLevel = false,
@@ -136,7 +136,7 @@ namespace Celeste
             if ((double) from.Bottom > GroupBoundsMax.Y)
                 GroupBoundsMax.Y = (int) from.Bottom;
             from.HasGroup = true;
-            from.OnDashCollide = new DashCollision(OnDash);
+            from.OnDashCollide = OnDash;
             Group.Add(from);
             Moves.Add(from, from.Position);
             if (from != this)
@@ -160,7 +160,7 @@ namespace Celeste
 
         private void AddJumpThru(JumpThru jp)
         {
-            jp.OnDashCollide = new DashCollision(OnDash);
+            jp.OnDashCollide = OnDash;
             Jumpthrus.Add(jp);
             Moves.Add(jp, jp.Position);
             foreach (FloatySpaceBlock entity in Scene.Tracker.GetEntities<FloatySpaceBlock>())
@@ -252,8 +252,8 @@ namespace Celeste
             {
                 foreach (Component component in jumpthru.Components)
                 {
-                    if (component is Monocle.Image image)
-                        image.Position = image.Position + amount;
+                    if (component is Image image)
+                        image.Position += amount;
                 }
             }
         }

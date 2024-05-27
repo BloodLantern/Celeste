@@ -222,7 +222,7 @@ namespace Celeste
         {
             Process process = new()
             {
-                StartInfo = new ProcessStartInfo()
+                StartInfo = new ProcessStartInfo
                 {
                     FileName = path,
                     WorkingDirectory = Path.GetDirectoryName(path),

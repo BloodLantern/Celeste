@@ -6,7 +6,7 @@ namespace Celeste
 {
     public static class SpawnManager
     {
-        public static Dictionary<string, Spawn> SpawnActions = new Dictionary<string, Spawn>((IEqualityComparer<string>) StringComparer.InvariantCultureIgnoreCase);
+        public static Dictionary<string, Spawn> SpawnActions = new Dictionary<string, Spawn>(StringComparer.InvariantCultureIgnoreCase);
 
         public static void Init()
         {

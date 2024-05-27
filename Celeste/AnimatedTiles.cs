@@ -26,7 +26,7 @@ namespace Celeste
             if (string.IsNullOrEmpty(name))
                 return;
             AnimatedTilesBank.Animation animation = Bank.AnimationsByName[name];
-            (tiles[x, y] ?? (tiles[x, y] = new List<Tile>())).Add(new Tile()
+            (tiles[x, y] ?? (tiles[x, y] = new List<Tile>())).Add(new Tile
             {
                 AnimationID = animation.ID,
                 Frame = Calc.Random.Next(animation.Frames.Length),

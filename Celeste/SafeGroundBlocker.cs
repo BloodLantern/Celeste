@@ -3,7 +3,7 @@ using Monocle;
 
 namespace Celeste
 {
-    [Tracked(false)]
+    [Tracked()]
     public class SafeGroundBlocker : Component
     {
         public bool Blocking = true;
@@ -12,28 +12,28 @@ namespace Celeste
         public SafeGroundBlocker(Collider checkWith = null)
             : base(false, false)
         {
-            this.CheckWith = checkWith;
+            CheckWith = checkWith;
         }
 
         public bool Check(Player player)
         {
-            if (!this.Blocking)
+            if (!Blocking)
                 return false;
-            Collider collider = this.Entity.Collider;
-            if (this.CheckWith != null)
-                this.Entity.Collider = this.CheckWith;
-            int num = player.CollideCheck(this.Entity) ? 1 : 0;
-            this.Entity.Collider = collider;
+            Collider collider = Entity.Collider;
+            if (CheckWith != null)
+                Entity.Collider = CheckWith;
+            int num = player.CollideCheck(Entity) ? 1 : 0;
+            Entity.Collider = collider;
             return num != 0;
         }
 
         public override void DebugRender(Camera camera)
         {
-            Collider collider = this.Entity.Collider;
-            if (this.CheckWith != null)
-                this.Entity.Collider = this.CheckWith;
-            this.Entity.Collider.Render(camera, Color.Aqua);
-            this.Entity.Collider = collider;
+            Collider collider = Entity.Collider;
+            if (CheckWith != null)
+                Entity.Collider = CheckWith;
+            Entity.Collider.Render(camera, Color.Aqua);
+            Entity.Collider = collider;
         }
     }
 }

@@ -3,7 +3,7 @@ using Monocle;
 
 namespace Celeste
 {
-    public class GameplayRenderer : Monocle.Renderer
+    public class GameplayRenderer : Renderer
     {
         public Camera Camera;
         private static GameplayRenderer instance;

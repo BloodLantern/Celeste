@@ -11,17 +11,17 @@ namespace Celeste
         public SoundSourceEntity(EntityData data, Vector2 offset)
             : base(data.Position + offset)
         {
-            this.Tag = (int) Tags.TransitionUpdate;
-            this.Add((Component) (this.sfx = new SoundSource()));
-            this.eventName = SFX.EventnameByHandle(data.Attr("sound"));
-            this.Visible = true;
-            this.Depth = -8500;
+            Tag = (int) Tags.TransitionUpdate;
+            Add(sfx = new SoundSource());
+            eventName = SFX.EventnameByHandle(data.Attr("sound"));
+            Visible = true;
+            Depth = -8500;
         }
 
         public override void Awake(Scene scene)
         {
             base.Awake(scene);
-            this.sfx.Play(this.eventName);
+            sfx.Play(eventName);
         }
     }
 }

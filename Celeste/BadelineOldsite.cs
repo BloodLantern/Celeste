@@ -6,7 +6,7 @@ using System.Collections.Generic;
 
 namespace Celeste
 {
-    [Tracked(false)]
+    [Tracked]
     public class BadelineOldsite : Entity
     {
         public static ParticleType P_Vanish;
@@ -29,20 +29,20 @@ namespace Celeste
             : base(position)
         {
             this.index = index;
-            this.Depth = -1;
-            this.Collider = (Collider) new Hitbox(6f, 6f, -3f, -7f);
-            this.Collidable = false;
-            this.Sprite = new PlayerSprite(PlayerSpriteMode.Badeline);
-            this.Sprite.Play("fallSlow", true);
-            this.Hair = new PlayerHair(this.Sprite);
-            this.Hair.Color = Color.Lerp(BadelineOldsite.HairColor, Color.White, (float) index / 6f);
-            this.Hair.Border = Color.Black;
-            this.Add((Component) this.Hair);
-            this.Add((Component) this.Sprite);
-            this.Visible = false;
-            this.followBehindTime = 1.55f;
-            this.followBehindIndexDelay = 0.4f * (float) index;
-            this.Add((Component) new PlayerCollider(new Action<Player>(this.OnPlayer)));
+            Depth = -1;
+            Collider = new Hitbox(6f, 6f, -3f, -7f);
+            Collidable = false;
+            Sprite = new PlayerSprite(PlayerSpriteMode.Badeline);
+            Sprite.Play("fallSlow", true);
+            Hair = new PlayerHair(Sprite);
+            Hair.Color = Color.Lerp(BadelineOldsite.HairColor, Color.White, index / 6f);
+            Hair.Border = Color.Black;
+            Add(Hair);
+            Add(Sprite);
+            Visible = false;
+            followBehindTime = 1.55f;
+            followBehindIndexDelay = 0.4f * index;
+            Add(new PlayerCollider(OnPlayer));
         }
 
         public BadelineOldsite(EntityData data, Vector2 offset, int index)
@@ -53,26 +53,26 @@ namespace Celeste
         public override void Added(Scene scene)
         {
             base.Added(scene);
-            Session session = this.SceneAs<Level>().Session;
+            Session session = SceneAs<Level>().Session;
             if (session.GetLevelFlag("11") && session.Area.Mode == AreaMode.Normal)
-                this.RemoveSelf();
+                RemoveSelf();
             else if (!session.GetLevelFlag("3") && session.Area.Mode == AreaMode.Normal)
-                this.RemoveSelf();
+                RemoveSelf();
             else if (!session.GetFlag("evil_maddy_intro") && session.Level == "3" && session.Area.Mode == AreaMode.Normal)
             {
-                this.Hovering = false;
-                this.Visible = true;
-                this.Hair.Visible = false;
-                this.Sprite.Play("pretendDead");
+                Hovering = false;
+                Visible = true;
+                Hair.Visible = false;
+                Sprite.Play("pretendDead");
                 if (session.Area.Mode == AreaMode.Normal)
                 {
-                    session.Audio.Music.Event = (string) null;
+                    session.Audio.Music.Event = null;
                     session.Audio.Apply();
                 }
-                this.Scene.Add((Entity) new CS02_BadelineIntro(this));
+                Scene.Add(new CS02_BadelineIntro(this));
             }
             else
-                this.Add((Component) new Coroutine(this.StartChasingRoutine(this.Scene as Level)));
+                Add(new Coroutine(StartChasingRoutine(Scene as Level)));
         }
 
         public IEnumerator StartChasingRoutine(Level level)
@@ -80,9 +80,9 @@ namespace Celeste
             BadelineOldsite badelineOldsite = this;
             badelineOldsite.Hovering = true;
             while ((badelineOldsite.player = badelineOldsite.Scene.Tracker.GetEntity<Player>()) == null || badelineOldsite.player.JustRespawned)
-                yield return (object) null;
+                yield return null;
             Vector2 to = badelineOldsite.player.Position;
-            yield return (object) badelineOldsite.followBehindIndexDelay;
+            yield return badelineOldsite.followBehindIndexDelay;
             if (!badelineOldsite.Visible)
                 badelineOldsite.PopIntoExistance(0.5f);
             badelineOldsite.Sprite.Play("fallSlow");
@@ -93,19 +93,19 @@ namespace Celeste
                 level.Session.Audio.Music.Event = "event:/music/lvl2/chase";
                 level.Session.Audio.Apply();
             }
-            yield return (object) badelineOldsite.TweenToPlayer(to);
+            yield return badelineOldsite.TweenToPlayer(to);
             badelineOldsite.Collidable = true;
             badelineOldsite.following = true;
-            badelineOldsite.Add((Component) (badelineOldsite.occlude = new LightOcclude()));
+            badelineOldsite.Add(badelineOldsite.occlude = new LightOcclude());
             if (level.Session.Level == "2")
-                badelineOldsite.Add((Component) new Coroutine(badelineOldsite.StopChasing()));
+                badelineOldsite.Add(new Coroutine(badelineOldsite.StopChasing()));
         }
 
         private IEnumerator TweenToPlayer(Vector2 to)
                 {
                         // ISSUE: reference to a compiler-generated field
                         BadelineOldsite badelineOldsite = this;
-                        Audio.Play("event:/char/badeline/level_entry", badelineOldsite.Position, "chaser_count", (float)badelineOldsite.index);
+                        Audio.Play("event:/char/badeline/level_entry", badelineOldsite.Position, "chaser_count", badelineOldsite.index);
                         Vector2 from = badelineOldsite.Position;
                         Tween tween = Tween.Create(Tween.TweenMode.Oneshot, Ease.CubeIn, badelineOldsite.followBehindTime - 0.1f, true);
                         tween.OnUpdate = delegate (Tween t)
@@ -113,13 +113,12 @@ namespace Celeste
                                 badelineOldsite.Position = Vector2.Lerp(from, to, t.Eased);
                                 if (to.X != from.X)
                                 {
-                                        badelineOldsite.Sprite.Scale.X = Math.Abs(badelineOldsite.Sprite.Scale.X) * (float)Math.Sign(to.X - from.X);
+                                        badelineOldsite.Sprite.Scale.X = Math.Abs(badelineOldsite.Sprite.Scale.X) * Math.Sign(to.X - from.X);
                                 }
                                 badelineOldsite.Trail();
                         };
-                        base.Add(tween);
+                        Add(tween);
                         yield return tween.Duration;
-                        yield break;
                 }
 
         private IEnumerator StopChasing()
@@ -128,19 +127,19 @@ namespace Celeste
             Level level = badelineOldsite.SceneAs<Level>();
             int boundsRight = level.Bounds.X + 148;
             int boundsBottom = level.Bounds.Y + 168 + 184;
-            while ((double) badelineOldsite.X != (double) boundsRight || (double) badelineOldsite.Y != (double) boundsBottom)
+            while (badelineOldsite.X != (double) boundsRight || badelineOldsite.Y != (double) boundsBottom)
             {
-                yield return (object) null;
-                if ((double) badelineOldsite.X > (double) boundsRight)
-                    badelineOldsite.X = (float) boundsRight;
-                if ((double) badelineOldsite.Y > (double) boundsBottom)
-                    badelineOldsite.Y = (float) boundsBottom;
+                yield return null;
+                if (badelineOldsite.X > (double) boundsRight)
+                    badelineOldsite.X = boundsRight;
+                if (badelineOldsite.Y > (double) boundsBottom)
+                    badelineOldsite.Y = boundsBottom;
             }
             badelineOldsite.following = false;
             badelineOldsite.ignorePlayerAnim = true;
             badelineOldsite.Sprite.Play("laugh");
             badelineOldsite.Sprite.Scale.X = 1f;
-            yield return (object) 1f;
+            yield return 1f;
             Audio.Play("event:/char/badeline/disappear", badelineOldsite.Position);
             level.Displacement.AddBurst(badelineOldsite.Center, 0.5f, 24f, 96f, 0.4f);
             level.Particles.Emit(BadelineOldsite.P_Vanish, 12, badelineOldsite.Center, Vector2.One * 6f);
@@ -149,106 +148,106 @@ namespace Celeste
 
         public override void Update()
         {
-            if (this.player != null && this.player.Dead)
+            if (player != null && player.Dead)
             {
-                this.Sprite.Play("laugh");
-                this.Sprite.X = (float) (Math.Sin((double) this.hoveringTimer) * 4.0);
-                this.Hovering = true;
-                this.hoveringTimer += Engine.DeltaTime * 2f;
-                this.Depth = -12500;
-                foreach (KeyValuePair<string, SoundSource> loopingSound in this.loopingSounds)
+                Sprite.Play("laugh");
+                Sprite.X = (float) (Math.Sin(hoveringTimer) * 4.0);
+                Hovering = true;
+                hoveringTimer += Engine.DeltaTime * 2f;
+                Depth = -12500;
+                foreach (KeyValuePair<string, SoundSource> loopingSound in loopingSounds)
                     loopingSound.Value.Stop();
-                this.Trail();
+                Trail();
             }
             else
             {
                 Player.ChaserState chaseState;
-                if (this.following && this.player.GetChasePosition(this.Scene.TimeActive, this.followBehindTime + this.followBehindIndexDelay, out chaseState))
+                if (following && player.GetChasePosition(Scene.TimeActive, followBehindTime + followBehindIndexDelay, out chaseState))
                 {
-                    this.Position = Calc.Approach(this.Position, chaseState.Position, 500f * Engine.DeltaTime);
-                    if (!this.ignorePlayerAnim && chaseState.Animation != this.Sprite.CurrentAnimationID && chaseState.Animation != null && this.Sprite.Has(chaseState.Animation))
-                        this.Sprite.Play(chaseState.Animation, true);
-                    if (!this.ignorePlayerAnim)
-                        this.Sprite.Scale.X = Math.Abs(this.Sprite.Scale.X) * (float) chaseState.Facing;
+                    Position = Calc.Approach(Position, chaseState.Position, 500f * Engine.DeltaTime);
+                    if (!ignorePlayerAnim && chaseState.Animation != Sprite.CurrentAnimationID && chaseState.Animation != null && Sprite.Has(chaseState.Animation))
+                        Sprite.Play(chaseState.Animation, true);
+                    if (!ignorePlayerAnim)
+                        Sprite.Scale.X = Math.Abs(Sprite.Scale.X) * (float) chaseState.Facing;
                     for (int index = 0; index < chaseState.Sounds; ++index)
                     {
                         if (chaseState[index].Action == Player.ChaserStateSound.Actions.Oneshot)
-                            Audio.Play(chaseState[index].Event, this.Position, chaseState[index].Parameter, chaseState[index].ParameterValue, "chaser_count", (float) this.index);
-                        else if (chaseState[index].Action == Player.ChaserStateSound.Actions.Loop && !this.loopingSounds.ContainsKey(chaseState[index].Event))
+                            Audio.Play(chaseState[index].Event, Position, chaseState[index].Parameter, chaseState[index].ParameterValue, "chaser_count", this.index);
+                        else if (chaseState[index].Action == Player.ChaserStateSound.Actions.Loop && !loopingSounds.ContainsKey(chaseState[index].Event))
                         {
                             SoundSource soundSource;
-                            if (this.inactiveLoopingSounds.Count > 0)
+                            if (inactiveLoopingSounds.Count > 0)
                             {
-                                soundSource = this.inactiveLoopingSounds[0];
-                                this.inactiveLoopingSounds.RemoveAt(0);
+                                soundSource = inactiveLoopingSounds[0];
+                                inactiveLoopingSounds.RemoveAt(0);
                             }
                             else
-                                this.Add((Component) (soundSource = new SoundSource()));
-                            soundSource.Play(chaseState[index].Event, "chaser_count", (float) this.index);
-                            this.loopingSounds.Add(chaseState[index].Event, soundSource);
+                                Add(soundSource = new SoundSource());
+                            soundSource.Play(chaseState[index].Event, "chaser_count", this.index);
+                            loopingSounds.Add(chaseState[index].Event, soundSource);
                         }
                         else if (chaseState[index].Action == Player.ChaserStateSound.Actions.Stop)
                         {
-                            SoundSource soundSource = (SoundSource) null;
-                            if (this.loopingSounds.TryGetValue(chaseState[index].Event, out soundSource))
+                            SoundSource soundSource = null;
+                            if (loopingSounds.TryGetValue(chaseState[index].Event, out soundSource))
                             {
                                 soundSource.Stop();
-                                this.loopingSounds.Remove(chaseState[index].Event);
-                                this.inactiveLoopingSounds.Add(soundSource);
+                                loopingSounds.Remove(chaseState[index].Event);
+                                inactiveLoopingSounds.Add(soundSource);
                             }
                         }
                     }
-                    this.Depth = chaseState.Depth;
-                    this.Trail();
+                    Depth = chaseState.Depth;
+                    Trail();
                 }
             }
-            if ((double) this.Sprite.Scale.X != 0.0)
-                this.Hair.Facing = (Facings) Math.Sign(this.Sprite.Scale.X);
-            if (this.Hovering)
+            if (Sprite.Scale.X != 0.0)
+                Hair.Facing = (Facings) Math.Sign(Sprite.Scale.X);
+            if (Hovering)
             {
-                this.hoveringTimer += Engine.DeltaTime;
-                this.Sprite.Y = (float) (Math.Sin((double) this.hoveringTimer * 2.0) * 4.0);
+                hoveringTimer += Engine.DeltaTime;
+                Sprite.Y = (float) (Math.Sin(hoveringTimer * 2.0) * 4.0);
             }
             else
-                this.Sprite.Y = Calc.Approach(this.Sprite.Y, 0.0f, Engine.DeltaTime * 4f);
-            if (this.occlude != null)
-                this.occlude.Visible = !this.CollideCheck<Solid>();
+                Sprite.Y = Calc.Approach(Sprite.Y, 0.0f, Engine.DeltaTime * 4f);
+            if (occlude != null)
+                occlude.Visible = !CollideCheck<Solid>();
             base.Update();
         }
 
         private void Trail()
         {
-            if (!this.Scene.OnInterval(0.1f))
+            if (!Scene.OnInterval(0.1f))
                 return;
-            TrailManager.Add((Entity) this, Player.NormalHairColor);
+            TrailManager.Add(this, Player.NormalHairColor);
         }
 
-        private void OnPlayer(Player player) => player.Die((player.Position - this.Position).SafeNormalize());
+        private void OnPlayer(Player player) => player.Die((player.Position - Position).SafeNormalize());
 
-        private void Die() => this.RemoveSelf();
+        private void Die() => RemoveSelf();
 
         private void PopIntoExistance(float duration)
         {
-            this.Visible = true;
-            this.Sprite.Scale = Vector2.Zero;
-            this.Sprite.Color = Color.Transparent;
-            this.Hair.Visible = true;
-            this.Hair.Alpha = 0.0f;
+            Visible = true;
+            Sprite.Scale = Vector2.Zero;
+            Sprite.Color = Color.Transparent;
+            Hair.Visible = true;
+            Hair.Alpha = 0.0f;
             Tween tween = Tween.Create(Tween.TweenMode.Oneshot, Ease.CubeIn, duration, true);
-            tween.OnUpdate = (Action<Tween>) (t =>
+            tween.OnUpdate = t =>
             {
-                this.Sprite.Scale = Vector2.One * t.Eased;
-                this.Sprite.Color = Color.White * t.Eased;
-                this.Hair.Alpha = t.Eased;
-            });
-            this.Add((Component) tween);
+                Sprite.Scale = Vector2.One * t.Eased;
+                Sprite.Color = Color.White * t.Eased;
+                Hair.Alpha = t.Eased;
+            };
+            Add(tween);
         }
 
         private bool OnGround(int dist = 1)
         {
             for (int y = 1; y <= dist; ++y)
             {
-                if (this.CollideCheck<Solid>(this.Position + new Vector2(0.0f, (float) y)))
+                if (CollideCheck<Solid>(Position + new Vector2(0.0f, y)))
                     return true;
             }
             return false;

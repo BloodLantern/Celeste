@@ -2,7 +2,7 @@
 
 namespace Celeste
 {
-    [Tracked(false)]
+    [Tracked()]
     public class MirrorReflection : Component
     {
         public bool IgnoreEntityVisible;

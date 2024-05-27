@@ -10,41 +10,41 @@ namespace Celeste
 {
     public class ObjModel : IDisposable
     {
-        public List<ObjModel.Mesh> Meshes = new List<ObjModel.Mesh>();
+        public List<Mesh> Meshes = new List<Mesh>();
         public VertexBuffer Vertices;
         private VertexPositionTexture[] verts;
 
         private bool ResetVertexBuffer()
         {
-            if (this.Vertices != null && !this.Vertices.IsDisposed && !this.Vertices.GraphicsDevice.IsDisposed)
+            if (Vertices != null && !Vertices.IsDisposed && !Vertices.GraphicsDevice.IsDisposed)
                 return false;
-            this.Vertices = new VertexBuffer(Engine.Graphics.GraphicsDevice, typeof (VertexPositionTexture), this.verts.Length, BufferUsage.None);
-            this.Vertices.SetData<VertexPositionTexture>(this.verts);
+            Vertices = new VertexBuffer(Engine.Graphics.GraphicsDevice, typeof (VertexPositionTexture), verts.Length, BufferUsage.None);
+            Vertices.SetData(verts);
             return true;
         }
 
         public void ReassignVertices()
         {
-            if (this.ResetVertexBuffer())
+            if (ResetVertexBuffer())
                 return;
-            this.Vertices.SetData<VertexPositionTexture>(this.verts);
+            Vertices.SetData(verts);
         }
 
         public void Draw(Effect effect)
         {
-            this.ResetVertexBuffer();
-            Engine.Graphics.GraphicsDevice.SetVertexBuffer(this.Vertices);
+            ResetVertexBuffer();
+            Engine.Graphics.GraphicsDevice.SetVertexBuffer(Vertices);
             foreach (EffectPass pass in effect.CurrentTechnique.Passes)
             {
                 pass.Apply();
-                Engine.Graphics.GraphicsDevice.DrawPrimitives(PrimitiveType.TriangleList, 0, this.Vertices.VertexCount / 3);
+                Engine.Graphics.GraphicsDevice.DrawPrimitives(PrimitiveType.TriangleList, 0, Vertices.VertexCount / 3);
             }
         }
 
         public void Dispose()
         {
-            this.Vertices.Dispose();
-            this.Meshes = (List<ObjModel.Mesh>) null;
+            Vertices.Dispose();
+            Meshes = null;
         }
 
         public static ObjModel Create(string filename)
@@ -54,17 +54,17 @@ namespace Celeste
             List<VertexPositionTexture> vertexPositionTextureList = new List<VertexPositionTexture>();
             List<Vector3> vector3List = new List<Vector3>();
             List<Vector2> vector2List = new List<Vector2>();
-            ObjModel.Mesh mesh = (ObjModel.Mesh) null;
+            Mesh mesh = null;
             if (File.Exists(filename + ".export"))
             {
-                using (BinaryReader binaryReader = new BinaryReader((Stream) File.OpenRead(filename + ".export")))
+                using (BinaryReader binaryReader = new BinaryReader(File.OpenRead(filename + ".export")))
                 {
                     int num1 = binaryReader.ReadInt32();
                     for (int index1 = 0; index1 < num1; ++index1)
                     {
                         if (mesh != null)
                             mesh.VertexCount = vertexPositionTextureList.Count - mesh.VertexStart;
-                        mesh = new ObjModel.Mesh();
+                        mesh = new Mesh();
                         mesh.Name = binaryReader.ReadString();
                         mesh.VertexStart = vertexPositionTextureList.Count;
                         objModel.Meshes.Add(mesh);
@@ -88,7 +88,7 @@ namespace Celeste
                         {
                             int index5 = binaryReader.ReadInt32() - 1;
                             int index6 = binaryReader.ReadInt32() - 1;
-                            vertexPositionTextureList.Add(new VertexPositionTexture()
+                            vertexPositionTextureList.Add(new VertexPositionTexture
                             {
                                 Position = vector3List[index5],
                                 TextureCoordinate = vector2List[index6]
@@ -112,7 +112,7 @@ namespace Celeste
                             {
                                 if (mesh != null)
                                     mesh.VertexCount = vertexPositionTextureList.Count - mesh.VertexStart;
-                                mesh = new ObjModel.Mesh();
+                                mesh = new Mesh();
                                 mesh.Name = strArray1[1];
                                 mesh.VertexStart = vertexPositionTextureList.Count;
                                 objModel.Meshes.Add(mesh);
@@ -151,7 +151,7 @@ namespace Celeste
             return objModel;
         }
 
-        private static float Float(string data) => float.Parse(data, (IFormatProvider) CultureInfo.InvariantCulture);
+        private static float Float(string data) => float.Parse(data, CultureInfo.InvariantCulture);
 
         public class Mesh
         {

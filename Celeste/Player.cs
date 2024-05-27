@@ -8,7 +8,7 @@ using System.Collections.Generic;
 
 namespace Celeste
 {
-    [Tracked(false)]
+    [Tracked]
     public class Player : Actor
     {
         public static ParticleType P_DashA;
@@ -380,35 +380,35 @@ namespace Celeste
             Add(sweatSprite);
             Collider = normalHitbox;
             hurtbox = normalHurtbox;
-            onCollideH = new Collision(OnCollideH);
-            onCollideV = new Collision(OnCollideV);
+            onCollideH = OnCollideH;
+            onCollideV = OnCollideV;
             StateMachine = new StateMachine(26);
-            StateMachine.SetCallbacks(0, new Func<int>(NormalUpdate), begin: new Action(NormalBegin), end: new Action(NormalEnd));
-            StateMachine.SetCallbacks(1, new Func<int>(ClimbUpdate), begin: new Action(ClimbBegin), end: new Action(ClimbEnd));
-            StateMachine.SetCallbacks(2, new Func<int>(DashUpdate), new Func<IEnumerator>(DashCoroutine), new Action(DashBegin), new Action(DashEnd));
-            StateMachine.SetCallbacks(3, new Func<int>(SwimUpdate), begin: new Action(SwimBegin));
-            StateMachine.SetCallbacks(4, new Func<int>(BoostUpdate), new Func<IEnumerator>(BoostCoroutine), new Action(BoostBegin), new Action(BoostEnd));
-            StateMachine.SetCallbacks(5, new Func<int>(RedDashUpdate), new Func<IEnumerator>(RedDashCoroutine), new Action(RedDashBegin), new Action(RedDashEnd));
-            StateMachine.SetCallbacks(6, new Func<int>(HitSquashUpdate), begin: new Action(HitSquashBegin));
-            StateMachine.SetCallbacks(7, new Func<int>(LaunchUpdate), begin: new Action(LaunchBegin));
-            StateMachine.SetCallbacks(8, null, new Func<IEnumerator>(PickupCoroutine));
-            StateMachine.SetCallbacks(9, new Func<int>(DreamDashUpdate), begin: new Action(DreamDashBegin), end: new Action(DreamDashEnd));
-            StateMachine.SetCallbacks(10, new Func<int>(SummitLaunchUpdate), begin: new Action(SummitLaunchBegin));
-            StateMachine.SetCallbacks(11, new Func<int>(DummyUpdate), begin: new Action(DummyBegin));
-            StateMachine.SetCallbacks(12, null, new Func<IEnumerator>(IntroWalkCoroutine));
-            StateMachine.SetCallbacks(13, null, new Func<IEnumerator>(IntroJumpCoroutine));
-            StateMachine.SetCallbacks(14, null, begin: new Action(IntroRespawnBegin), end: new Action(IntroRespawnEnd));
-            StateMachine.SetCallbacks(15, null, new Func<IEnumerator>(IntroWakeUpCoroutine));
-            StateMachine.SetCallbacks(20, new Func<int>(TempleFallUpdate), new Func<IEnumerator>(TempleFallCoroutine));
-            StateMachine.SetCallbacks(18, new Func<int>(ReflectionFallUpdate), new Func<IEnumerator>(ReflectionFallCoroutine), new Action(ReflectionFallBegin), new Action(ReflectionFallEnd));
-            StateMachine.SetCallbacks(16, new Func<int>(BirdDashTutorialUpdate), new Func<IEnumerator>(BirdDashTutorialCoroutine), new Action(BirdDashTutorialBegin));
-            StateMachine.SetCallbacks(17, new Func<int>(FrozenUpdate));
-            StateMachine.SetCallbacks(19, new Func<int>(StarFlyUpdate), new Func<IEnumerator>(StarFlyCoroutine), new Action(StarFlyBegin), new Action(StarFlyEnd));
-            StateMachine.SetCallbacks(21, new Func<int>(CassetteFlyUpdate), new Func<IEnumerator>(CassetteFlyCoroutine), new Action(CassetteFlyBegin), new Action(CassetteFlyEnd));
-            StateMachine.SetCallbacks(22, new Func<int>(AttractUpdate), begin: new Action(AttractBegin), end: new Action(AttractEnd));
-            StateMachine.SetCallbacks(23, null, new Func<IEnumerator>(IntroMoonJumpCoroutine));
-            StateMachine.SetCallbacks(24, new Func<int>(FlingBirdUpdate), new Func<IEnumerator>(FlingBirdCoroutine), new Action(FlingBirdBegin), new Action(FlingBirdEnd));
-            StateMachine.SetCallbacks(25, null, new Func<IEnumerator>(IntroThinkForABitCoroutine));
+            StateMachine.SetCallbacks(0, NormalUpdate, begin: NormalBegin, end: NormalEnd);
+            StateMachine.SetCallbacks(1, ClimbUpdate, begin: ClimbBegin, end: ClimbEnd);
+            StateMachine.SetCallbacks(2, DashUpdate, DashCoroutine, DashBegin, DashEnd);
+            StateMachine.SetCallbacks(3, SwimUpdate, begin: SwimBegin);
+            StateMachine.SetCallbacks(4, BoostUpdate, BoostCoroutine, BoostBegin, BoostEnd);
+            StateMachine.SetCallbacks(5, RedDashUpdate, RedDashCoroutine, RedDashBegin, RedDashEnd);
+            StateMachine.SetCallbacks(6, HitSquashUpdate, begin: HitSquashBegin);
+            StateMachine.SetCallbacks(7, LaunchUpdate, begin: LaunchBegin);
+            StateMachine.SetCallbacks(8, null, PickupCoroutine);
+            StateMachine.SetCallbacks(9, DreamDashUpdate, begin: DreamDashBegin, end: DreamDashEnd);
+            StateMachine.SetCallbacks(10, SummitLaunchUpdate, begin: SummitLaunchBegin);
+            StateMachine.SetCallbacks(11, DummyUpdate, begin: DummyBegin);
+            StateMachine.SetCallbacks(12, null, IntroWalkCoroutine);
+            StateMachine.SetCallbacks(13, null, IntroJumpCoroutine);
+            StateMachine.SetCallbacks(14, null, begin: IntroRespawnBegin, end: IntroRespawnEnd);
+            StateMachine.SetCallbacks(15, null, IntroWakeUpCoroutine);
+            StateMachine.SetCallbacks(20, TempleFallUpdate, TempleFallCoroutine);
+            StateMachine.SetCallbacks(18, ReflectionFallUpdate, ReflectionFallCoroutine, ReflectionFallBegin, ReflectionFallEnd);
+            StateMachine.SetCallbacks(16, BirdDashTutorialUpdate, BirdDashTutorialCoroutine, BirdDashTutorialBegin);
+            StateMachine.SetCallbacks(17, FrozenUpdate);
+            StateMachine.SetCallbacks(19, StarFlyUpdate, StarFlyCoroutine, StarFlyBegin, StarFlyEnd);
+            StateMachine.SetCallbacks(21, CassetteFlyUpdate, CassetteFlyCoroutine, CassetteFlyBegin, CassetteFlyEnd);
+            StateMachine.SetCallbacks(22, AttractUpdate, begin: AttractBegin, end: AttractEnd);
+            StateMachine.SetCallbacks(23, null, IntroMoonJumpCoroutine);
+            StateMachine.SetCallbacks(24, FlingBirdUpdate, FlingBirdCoroutine, FlingBirdBegin, FlingBirdEnd);
+            StateMachine.SetCallbacks(25, null, IntroThinkForABitCoroutine);
             Add(StateMachine);
             Add(Leader = new Leader(new Vector2(0.0f, -8f)));
             lastAim = Vector2.UnitX;
@@ -417,7 +417,7 @@ namespace Celeste
             triggersInside = new HashSet<Trigger>();
             Add(Light = new VertexLight(normalLightOffset, Color.White, 1f, 32, 64));
             Add(new WaterInteraction(() => StateMachine.State is 2 or 18));
-            Add(new WindMover(new Action<Vector2>(WindMove)));
+            Add(new WindMover(WindMove));
             Add(wallSlideSfx = new SoundSource());
             Add(swimSurfaceLoopSfx = new SoundSource());
             Sprite.OnFrameChange = anim =>
@@ -482,7 +482,7 @@ namespace Celeste
             Add(reflection = new MirrorReflection());
         }
 
-        public void ResetSpriteNextFrame(PlayerSpriteMode mode) => nextSpriteMode = new PlayerSpriteMode?(mode);
+        public void ResetSpriteNextFrame(PlayerSpriteMode mode) => nextSpriteMode = mode;
 
         public void ResetSprite(PlayerSpriteMode mode)
         {
@@ -580,7 +580,7 @@ namespace Celeste
 
         public override void Render()
         {
-            if (SaveData.Instance.Assists.InvisibleMotion && InControl && (!onGround && StateMachine.State != 1 && StateMachine.State != 3 || (double) Speed.LengthSquared() > 800.0))
+            if (SaveData.Instance.Assists.InvisibleMotion && InControl && (!onGround && StateMachine.State != 1 && StateMachine.State != 3 || Speed.LengthSquared() > 800.0))
                 return;
             Vector2 renderPosition = Sprite.RenderPosition;
             Sprite.RenderPosition = Sprite.RenderPosition.Floor();
@@ -829,7 +829,7 @@ namespace Celeste
             if (windTimeout > 0.0)
                 windTimeout -= Engine.DeltaTime;
             Vector2 vector2_1 = windDirection;
-            if ((double) ForceStrongWindHair.Length() > 0.0)
+            if (ForceStrongWindHair.Length() > 0.0)
                 vector2_1 = ForceStrongWindHair;
             if (windTimeout > 0.0 && vector2_1.X != 0.0)
             {
@@ -863,7 +863,7 @@ namespace Celeste
                 minHoldTimer -= Engine.DeltaTime;
             if (launched)
             {
-                if ((double) Speed.LengthSquared() < 19600.0)
+                if (Speed.LengthSquared() < 19600.0)
                 {
                     launched = false;
                 }
@@ -974,7 +974,7 @@ namespace Celeste
                     Vector2 position = level.Camera.Position;
                     Vector2 cameraTarget = CameraTarget;
                     float num = StateMachine.State == 20 ? 8f : 1f;
-                    level.Camera.Position = position + (cameraTarget - position) * (1f - (float) Math.Pow(0.0099999997764825821 / (double) num, (double) Engine.DeltaTime));
+                    level.Camera.Position = position + (cameraTarget - position) * (1f - (float) Math.Pow(0.0099999997764825821 / num, Engine.DeltaTime));
                 }
             }
             if (!Dead && StateMachine.State != 21)
@@ -1155,7 +1155,7 @@ namespace Celeste
                         fastJump = false;
                         if (Holding == null && moveX != 0 && CollideCheck<Solid>(Position + Vector2.UnitX * moveX) && !ClimbBlocker.EdgeCheck(level, this, moveX))
                             Sprite.Play("push");
-                        else if ((double) Math.Abs(Speed.X) <= 25.0 && moveX == 0)
+                        else if (Math.Abs(Speed.X) <= 25.0 && moveX == 0)
                         {
                             if (Holding != null)
                                 Sprite.Play("idle_carry");
@@ -1175,7 +1175,7 @@ namespace Celeste
                             Sprite.Play("runSlow_carry");
                         else if (Math.Sign(Speed.X) == -moveX && moveX != 0)
                         {
-                            if ((double) Math.Abs(Speed.X) > 90.0)
+                            if (Math.Abs(Speed.X) > 90.0)
                                 Sprite.Play("skid");
                             else if (Sprite.CurrentAnimationID != "skid")
                                 Sprite.Play("flip");
@@ -1184,7 +1184,7 @@ namespace Celeste
                             Sprite.Play("runWind");
                         else if (!Sprite.Running || Sprite.CurrentAnimationID == "runWind" || Sprite.CurrentAnimationID == "runSlow_carry" && Holding == null)
                         {
-                            if ((double) Math.Abs(Speed.X) < 45.0)
+                            if (Math.Abs(Speed.X) < 45.0)
                                 Sprite.Play("runSlow");
                             else
                                 Sprite.Play("runFast");
@@ -1196,7 +1196,7 @@ namespace Celeste
                     {
                         if (Holding != null)
                             Sprite.Play("jumpSlow_carry");
-                        else if (fastJump || (double) Math.Abs(Speed.X) > 90.0)
+                        else if (fastJump || Math.Abs(Speed.X) > 90.0)
                         {
                             fastJump = true;
                             Sprite.Play("jumpFast");
@@ -1248,7 +1248,7 @@ namespace Celeste
                     vector2.Y -= 64f;
                 else if (StateMachine.State == 18)
                     vector2.Y += 32f;
-                if ((double) CameraAnchorLerp.Length() > 0.0)
+                if (CameraAnchorLerp.Length() > 0.0)
                 {
                     if (CameraAnchorIgnoreX && !CameraAnchorIgnoreY)
                         vector2.Y = MathHelper.Lerp(vector2.Y, CameraAnchor.Y, CameraAnchorLerp.Y);
@@ -1274,7 +1274,7 @@ namespace Celeste
                     double top = bounds.Top;
                     bounds = level.Bounds;
                     double max = bounds.Bottom - 180;
-                    double num = (double) MathHelper.Clamp((float) y, (float) top, (float) max);
+                    double num = MathHelper.Clamp((float) y, (float) top, (float) max);
                     local.Y = (float) num;
                 }
                 else
@@ -1290,8 +1290,8 @@ namespace Celeste
                             ref Vector2 local = ref cameraTarget;
                             double x = cameraTarget.X;
                             bounds = level.Bounds;
-                            double val2 = (double) Math.Max(bounds.Left, component.Entity.X - component.MaxXOffset);
-                            double num = (double) Math.Min((float) x, (float) val2);
+                            double val2 = Math.Max(bounds.Left, component.Entity.X - component.MaxXOffset);
+                            double num = Math.Min((float) x, (float) val2);
                             local.X = (float) num;
                         }
                     }
@@ -1303,8 +1303,8 @@ namespace Celeste
                             ref Vector2 local = ref cameraTarget;
                             double y = cameraTarget.Y;
                             bounds = level.Bounds;
-                            double val2 = (double) Math.Max(bounds.Top, component.Entity.Y - component.MaxYOffset);
-                            double num = (double) Math.Min((float) y, (float) val2);
+                            double val2 = Math.Max(bounds.Top, component.Entity.Y - component.MaxYOffset);
+                            double num = Math.Min((float) y, (float) val2);
                             local.Y = (float) num;
                         }
                     }
@@ -1317,15 +1317,15 @@ namespace Celeste
                             ref Vector2 local = ref cameraTarget;
                             double y = cameraTarget.Y;
                             bounds = level.Bounds;
-                            double val2 = (double) Math.Min(bounds.Bottom - 180, component.Entity.Y - component.MaxYOffset);
-                            double num = (double) Math.Max((float) y, (float) val2);
+                            double val2 = Math.Min(bounds.Bottom - 180, component.Entity.Y - component.MaxYOffset);
+                            double num = Math.Max((float) y, (float) val2);
                             local.Y = (float) num;
                         }
                     }
                 }
                 foreach (Entity entity in Scene.Tracker.GetEntities<Killbox>())
                 {
-                    if (entity.Collidable && (double) Top < (double) entity.Bottom && (double) Right > (double) entity.Left && (double) Left < (double) entity.Right)
+                    if (entity.Collidable && Top < (double) entity.Bottom && Right > (double) entity.Left && Left < (double) entity.Right)
                         cameraTarget.Y = Math.Min(cameraTarget.Y, entity.Top - 180f);
                 }
                 return cameraTarget;
@@ -1340,9 +1340,9 @@ namespace Celeste
                 foreach (ChaserState chaserState in ChaserStates)
                 {
                     float num = sceneTime - chaserState.TimeStamp;
-                    if ((double) num <= (double) timeAgo)
+                    if (num <= (double) timeAgo)
                     {
-                        if (flag || (double) timeAgo - (double) num < 0.019999999552965164)
+                        if (flag || timeAgo - (double) num < 0.019999999552965164)
                         {
                             chaseState = chaserState;
                             return true;
@@ -1463,7 +1463,7 @@ namespace Celeste
 
         private bool LaunchedBoostCheck()
         {
-            if ((double) LiftBoost.LengthSquared() >= 10000.0 && (double) Speed.LengthSquared() >= 48400.0)
+            if (LiftBoost.LengthSquared() >= 10000.0 && Speed.LengthSquared() >= 48400.0)
             {
                 launched = true;
                 return true;
@@ -1756,7 +1756,7 @@ namespace Celeste
             }
             Collider collider = Collider;
             Collider = normalHitbox;
-            MoveVExact((int) ((double) fromY - (double) Bottom));
+            MoveVExact((int) (fromY - (double) Bottom));
             if (!Inventory.NoRefills)
                 RefillDash();
             RefillStamina();
@@ -1809,7 +1809,7 @@ namespace Celeste
 
         public bool SideBounce(int dir, float fromX, float fromY)
         {
-            if ((double) Math.Abs(Speed.X) > 240.0 && Math.Sign(Speed.X) == dir)
+            if (Math.Abs(Speed.X) > 240.0 && Math.Sign(Speed.X) == dir)
                 return false;
             Collider collider = Collider;
             Collider = normalHitbox;
@@ -1955,7 +1955,7 @@ namespace Celeste
             get
             {
                 Vector2 liftSpeed = LiftSpeed;
-                if ((double) Math.Abs(liftSpeed.X) > 250.0)
+                if (Math.Abs(liftSpeed.X) > 250.0)
                     liftSpeed.X = 250f * Math.Sign(liftSpeed.X);
                 if (liftSpeed.Y > 0.0)
                     liftSpeed.Y = 0.0f;
@@ -2095,7 +2095,7 @@ namespace Celeste
 
         public override bool IsRiding(JumpThru jumpThru) => StateMachine.State != 9 && StateMachine.State != 1 && Speed.Y >= 0.0 && base.IsRiding(jumpThru);
 
-        public bool BounceCheck(float y) => (double) Bottom <= (double) y + 3.0;
+        public bool BounceCheck(float y) => Bottom <= y + 3.0;
 
         public void PointBounce(Vector2 from)
         {
@@ -2110,7 +2110,7 @@ namespace Celeste
                 vector2.Y = -0.2f;
             Speed = vector2 * 220f;
             Speed.X *= 1.5f;
-            if ((double) Math.Abs(Speed.X) >= 100.0)
+            if (Math.Abs(Speed.X) >= 100.0)
                 return;
             if (Speed.X == 0.0)
                 Speed.X = -(int)Facing * 100f;
@@ -2340,7 +2340,7 @@ namespace Celeste
                         float amount = Math.Min(Speed.Y / 240f, 1f);
                         Sprite.Scale.X = MathHelper.Lerp(1f, 1.6f, amount);
                         Sprite.Scale.Y = MathHelper.Lerp(1f, 0.4f, amount);
-                        if (highestAirY < (double) Y - 50.0 && Speed.Y >= 160.0 && (double) Math.Abs(Speed.X) >= 90.0)
+                        if (highestAirY < Y - 50.0 && Speed.Y >= 160.0 && Math.Abs(Speed.X) >= 90.0)
                             Sprite.Play("runStumble");
                         Input.Rumble(RumbleStrength.Light, RumbleLength.Short);
                         Platform platformByPriority = SurfaceIndex.GetPlatformByPriority(CollideAll<Platform>(Position + new Vector2(0.0f, 1f), temp));
@@ -2364,7 +2364,7 @@ namespace Celeste
                     if (Speed.Y < 0.0)
                     {
                         int num = 4;
-                        if (DashAttacking && (double) Math.Abs(Speed.X) < 0.0099999997764825821)
+                        if (DashAttacking && Math.Abs(Speed.X) < 0.0099999997764825821)
                             num = 5;
                         if (Speed.X <= 0.0099999997764825821)
                         {
@@ -2372,7 +2372,7 @@ namespace Celeste
                             {
                                 if (!CollideCheck<Solid>(Position + new Vector2(-index, -1f)))
                                 {
-                                    Position = Position + new Vector2(-index, -1f);
+                                    Position += new Vector2(-index, -1f);
                                     return;
                                 }
                             }
@@ -2383,7 +2383,7 @@ namespace Celeste
                             {
                                 if (!CollideCheck<Solid>(Position + new Vector2(x, -1f)))
                                 {
-                                    Position = Position + new Vector2(x, -1f);
+                                    Position += new Vector2(x, -1f);
                                     return;
                                 }
                             }
@@ -2440,7 +2440,7 @@ namespace Celeste
                             {
                                 if (!CollideCheck<Solid, DreamBlock>(Position + dir + vector2 * index))
                                 {
-                                    Position = Position + vector2 * index;
+                                    Position += vector2 * index;
                                     this.dreamBlock = dreamBlock;
                                     return true;
                                 }
@@ -2452,7 +2452,7 @@ namespace Celeste
                             {
                                 if (!CollideCheck<Solid, DreamBlock>(Position + dir + vector2 * index))
                                 {
-                                    Position = Position + vector2 * index;
+                                    Position += vector2 * index;
                                     this.dreamBlock = dreamBlock;
                                     return true;
                                 }
@@ -2558,7 +2558,7 @@ namespace Celeste
                                 return 1;
                             ClimbTrigger((int) Facing);
                         }
-                        if (!SaveData.Instance.Assists.NoGrabbing && (double) (float) Input.MoveY < 1.0 && level.Wind.Y <= 0.0)
+                        if (!SaveData.Instance.Assists.NoGrabbing && (float) Input.MoveY < 1.0 && level.Wind.Y <= 0.0)
                         {
                             for (int index = 1; index <= 2; ++index)
                             {
@@ -2579,7 +2579,7 @@ namespace Celeste
                 }
                 if (Ducking)
                 {
-                    if (onGround && (double) (float) Input.MoveY != 1.0)
+                    if (onGround && (float) Input.MoveY != 1.0)
                     {
                         if (CanUnDuck)
                         {
@@ -2604,7 +2604,7 @@ namespace Celeste
                         }
                     }
                 }
-                else if (onGround && (double) (float) Input.MoveY == 1.0 && Speed.Y >= 0.0)
+                else if (onGround && (float) Input.MoveY == 1.0 && Speed.Y >= 0.0)
                 {
                     Ducking = true;
                     Sprite.Scale = new Vector2(1.4f, 0.6f);
@@ -2614,7 +2614,7 @@ namespace Celeste
             {
                 if (!Input.GrabCheck && minHoldTimer <= 0.0)
                     Throw();
-                if (!Ducking && onGround && (double) (float) Input.MoveY == 1.0 && Speed.Y >= 0.0 && !holdCannotDuck)
+                if (!Ducking && onGround && (float) Input.MoveY == 1.0 && Speed.Y >= 0.0 && !holdCannotDuck)
                 {
                     Drop();
                     Ducking = true;
@@ -2627,7 +2627,7 @@ namespace Celeste
                     else
                         Drop();
                 }
-                else if (onGround && (double) (float) Input.MoveY != 1.0 && holdCannotDuck)
+                else if (onGround && (float) Input.MoveY != 1.0 && holdCannotDuck)
                     holdCannotDuck = false;
             }
             if (Ducking && onGround)
@@ -2653,7 +2653,7 @@ namespace Celeste
                     num2 = 90f;
                 if (level.InSpace)
                     num2 *= 0.6f;
-                Speed.X = (double) Math.Abs(Speed.X) <= (double) num2 || Math.Sign(Speed.X) != moveX ? Calc.Approach(Speed.X, num2 * moveX, 1000f * num1 * Engine.DeltaTime) : Calc.Approach(Speed.X, num2 * moveX, 400f * num1 * Engine.DeltaTime);
+                Speed.X = Math.Abs(Speed.X) <= (double) num2 || Math.Sign(Speed.X) != moveX ? Calc.Approach(Speed.X, num2 * moveX, 1000f * num1 * Engine.DeltaTime) : Calc.Approach(Speed.X, num2 * moveX, 400f * num1 * Engine.DeltaTime);
             }
             float target1 = 160f;
             float target2 = 240f;
@@ -2663,14 +2663,14 @@ namespace Celeste
                 target2 *= 0.6f;
             }
             if (Holding != null && Holding.SlowFall && forceMoveXTimer <= 0.0)
-                maxFall = Calc.Approach(maxFall, (double) (float) Input.GliderMoveY != 1.0 ? (!windMovedUp || (double) (float) Input.GliderMoveY != -1.0 ? ((double) (float) Input.GliderMoveY != -1.0 ? (!windMovedUp ? 40f : 0.0f) : 24f) : -32f) : 120f, 300f * Engine.DeltaTime);
-            else if ((double) (float) Input.MoveY == 1.0 && Speed.Y >= (double) target1)
+                maxFall = Calc.Approach(maxFall, (float) Input.GliderMoveY != 1.0 ? (!windMovedUp || (float) Input.GliderMoveY != -1.0 ? ((float) Input.GliderMoveY != -1.0 ? (!windMovedUp ? 40f : 0.0f) : 24f) : -32f) : 120f, 300f * Engine.DeltaTime);
+            else if ((float) Input.MoveY == 1.0 && Speed.Y >= (double) target1)
             {
                 maxFall = Calc.Approach(maxFall, target2, 300f * Engine.DeltaTime);
-                float num = target1 + (float) (((double) target2 - (double) target1) * 0.5);
+                float num = target1 + (float) ((target2 - (double) target1) * 0.5);
                 if (Speed.Y >= (double) num)
                 {
-                    float amount = Math.Min(1f, (float) ((Speed.Y - (double) num) / ((double) target2 - (double) num)));
+                    float amount = Math.Min(1f, (float) ((Speed.Y - (double) num) / (target2 - (double) num)));
                     Sprite.Scale.X = MathHelper.Lerp(1f, 0.5f, amount);
                     Sprite.Scale.Y = MathHelper.Lerp(1f, 1.5f, amount);
                 }
@@ -2681,7 +2681,7 @@ namespace Celeste
             {
                 float target3 = maxFall;
                 if (Holding != null && Holding.SlowFall)
-                    holdCannotDuck = (double) (float) Input.MoveY == 1.0;
+                    holdCannotDuck = (float) Input.MoveY == 1.0;
                 if (((Facings) moveX == Facing || moveX == 0 && Input.GrabCheck) && Input.MoveY.Value != 1)
                 {
                     if (Speed.Y >= 0.0 && wallSlideTimer > 0.0 && Holding == null && ClimbBoundsCheck((int) Facing) && CollideCheck<Solid>(Position + Vector2.UnitX * (float) Facing) && !ClimbBlocker.EdgeCheck(level, this, (int) Facing) && CanUnDuck)
@@ -2700,7 +2700,7 @@ namespace Celeste
                             CreateWallSlideParticles(wallSlideDir);
                     }
                 }
-                float num = (double) Math.Abs(Speed.Y) >= 40.0 || !Input.Jump.Check && !AutoJump ? 1f : 0.5f;
+                float num = Math.Abs(Speed.Y) >= 40.0 || !Input.Jump.Check && !AutoJump ? 1f : 0.5f;
                 if (Holding != null && Holding.SlowFall && forceMoveXTimer <= 0.0)
                     num *= 0.5f;
                 if (level.InSpace)
@@ -2767,7 +2767,7 @@ namespace Celeste
             Dust.Burst(dir != 1 ? center + new Vector2(-x, 4f) : center + new Vector2(x, 4f), -1.57079637f, particleType: particleType);
         }
 
-        private bool IsTired => (double) CheckStamina < 20.0;
+        private bool IsTired => CheckStamina < 20.0;
 
         private float CheckStamina => wallBoostTimer > 0.0 ? Stamina + 27.5f : Stamina;
 
@@ -2790,7 +2790,7 @@ namespace Celeste
             lastClimbMove = 0;
             Input.Rumble(RumbleStrength.Medium, RumbleLength.Short);
             for (int index = 0; index < 2 && !CollideCheck<Solid>(Position + Vector2.UnitX * (float) Facing); ++index)
-                Position = Position + Vector2.UnitX * (float) Facing;
+                Position += Vector2.UnitX * (float) Facing;
             Platform platformByPriority = SurfaceIndex.GetPlatformByPriority(CollideAll<Solid>(Position + Vector2.UnitX * (float) Facing, temp));
             if (platformByPriority == null)
                 return;
@@ -3023,7 +3023,7 @@ namespace Celeste
         {
             Vector2 position = Position;
             Collider collider = Collider;
-            Position = Position + add;
+            Position += add;
             Collider = hurtbox;
             foreach (LedgeBlocker component in Scene.Tracker.GetComponents<LedgeBlocker>())
             {
@@ -3192,12 +3192,12 @@ namespace Celeste
                         return 8;
                 }
             }
-            if ((double) Math.Abs(DashDir.Y) < 0.10000000149011612)
+            if (Math.Abs(DashDir.Y) < 0.10000000149011612)
             {
                 foreach (JumpThru entity in Scene.Tracker.GetEntities<JumpThru>())
                 {
-                    if (CollideCheck(entity) && (double) Bottom - (double) entity.Top <= 6.0 && !DashCorrectCheck(Vector2.UnitY * (entity.Top - Bottom)))
-                        MoveVExact((int) ((double) entity.Top - (double) Bottom));
+                    if (CollideCheck(entity) && Bottom - (double) entity.Top <= 6.0 && !DashCorrectCheck(Vector2.UnitY * (entity.Top - Bottom)))
+                        MoveVExact((int) (entity.Top - (double) Bottom));
                 }
                 if (CanUnDuck && Input.Jump.Pressed && jumpGraceTimer > 0.0)
                 {
@@ -3245,16 +3245,16 @@ namespace Celeste
             return 2;
         }
 
-        private bool SuperWallJumpAngleCheck => (double) Math.Abs(DashDir.X) <= 0.20000000298023224 && DashDir.Y <= -0.75;
+        private bool SuperWallJumpAngleCheck => Math.Abs(DashDir.X) <= 0.20000000298023224 && DashDir.Y <= -0.75;
 
         private Vector2 CorrectDashPrecision(Vector2 dir)
         {
-            if (dir.X != 0.0 && (double) Math.Abs(dir.X) < 1.0 / 1000.0)
+            if (dir.X != 0.0 && Math.Abs(dir.X) < 1.0 / 1000.0)
             {
                 dir.X = 0.0f;
                 dir.Y = Math.Sign(dir.Y);
             }
-            else if (dir.Y != 0.0 && (double) Math.Abs(dir.Y) < 1.0 / 1000.0)
+            else if (dir.Y != 0.0 && Math.Abs(dir.Y) < 1.0 / 1000.0)
             {
                 dir.Y = 0.0f;
                 dir.X = Math.Sign(dir.X);
@@ -3274,7 +3274,7 @@ namespace Celeste
                 lastAim = player.OverrideDashDirection.Value;
             Vector2 vector2_1 = player.CorrectDashPrecision(lastAim);
             Vector2 vector2_2 = vector2_1 * 240f;
-            if (Math.Sign(player.beforeDashSpeed.X) == Math.Sign(vector2_2.X) && (double) Math.Abs(player.beforeDashSpeed.X) > (double) Math.Abs(vector2_2.X))
+            if (Math.Sign(player.beforeDashSpeed.X) == Math.Sign(vector2_2.X) && Math.Abs(player.beforeDashSpeed.X) > (double) Math.Abs(vector2_2.X))
                 vector2_2.X = player.beforeDashSpeed.X;
             player.Speed = vector2_2;
             if (player.CollideCheck<Water>())
@@ -3389,11 +3389,11 @@ namespace Celeste
             Vector2 vector2 = Input.Feather.Value.SafeNormalize();
             float num1 = flag ? 60f : 80f;
             float num2 = 80f;
-            Speed.X = (double) Math.Abs(Speed.X) <= 80.0 || Math.Sign(Speed.X) != Math.Sign(vector2.X) ? Calc.Approach(Speed.X, num1 * vector2.X, 600f * Engine.DeltaTime) : Calc.Approach(Speed.X, num1 * vector2.X, 400f * Engine.DeltaTime);
+            Speed.X = Math.Abs(Speed.X) <= 80.0 || Math.Sign(Speed.X) != Math.Sign(vector2.X) ? Calc.Approach(Speed.X, num1 * vector2.X, 600f * Engine.DeltaTime) : Calc.Approach(Speed.X, num1 * vector2.X, 400f * Engine.DeltaTime);
             if (vector2.Y == 0.0 && SwimRiseCheck())
                 Speed.Y = Calc.Approach(Speed.Y, -60f, 600f * Engine.DeltaTime);
             else if (vector2.Y >= 0.0 || SwimUnderwaterCheck())
-                Speed.Y = (double) Math.Abs(Speed.Y) <= 80.0 || Math.Sign(Speed.Y) != Math.Sign(vector2.Y) ? Calc.Approach(Speed.Y, num2 * vector2.Y, 600f * Engine.DeltaTime) : Calc.Approach(Speed.Y, num2 * vector2.Y, 400f * Engine.DeltaTime);
+                Speed.Y = Math.Abs(Speed.Y) <= 80.0 || Math.Sign(Speed.Y) != Math.Sign(vector2.Y) ? Calc.Approach(Speed.Y, num2 * vector2.Y, 600f * Engine.DeltaTime) : Calc.Approach(Speed.Y, num2 * vector2.Y, 400f * Engine.DeltaTime);
             if (!flag && moveX != 0 && CollideCheck<Solid>(Position + Vector2.UnitX * moveX) && !CollideCheck<Solid>(Position + new Vector2(moveX, -3f)))
                 ClimbHop();
             if (!Input.Jump.Pressed || !SwimJumpCheck())
@@ -3487,8 +3487,8 @@ namespace Celeste
             {
                 foreach (JumpThru entity in Scene.Tracker.GetEntities<JumpThru>())
                 {
-                    if (CollideCheck(entity) && (double) Bottom - (double) entity.Top <= 6.0)
-                        MoveVExact((int) ((double) entity.Top - (double) Bottom));
+                    if (CollideCheck(entity) && Bottom - (double) entity.Top <= 6.0)
+                        MoveVExact((int) (entity.Top - (double) Bottom));
                 }
                 if (CanUnDuck && Input.Jump.Pressed && jumpGraceTimer > 0.0 && !flag)
                 {
@@ -3594,7 +3594,7 @@ namespace Celeste
             launchApproachX = new float?();
             Vector2 vector2 = (Center - from).SafeNormalize(-Vector2.UnitY);
             float num = Vector2.Dot(vector2, Vector2.UnitY);
-            if (snapUp && (double) num <= -0.699999988079071)
+            if (snapUp && num <= -0.699999988079071)
             {
                 vector2.X = 0.0f;
                 vector2.Y = -1f;
@@ -3653,7 +3653,7 @@ namespace Celeste
 
         public void BadelineBoostLaunch(float atX)
         {
-            launchApproachX = new float?(atX);
+            launchApproachX = atX;
             Speed.X = 0.0f;
             Speed.Y = -330f;
             AutoJump = true;
@@ -3684,7 +3684,7 @@ namespace Celeste
             }
             Speed.Y = Speed.Y >= 0.0 ? Calc.Approach(Speed.Y, 160f, 225f * Engine.DeltaTime) : Calc.Approach(Speed.Y, 160f, 450f * Engine.DeltaTime);
             Speed.X = Calc.Approach(Speed.X, 0.0f, 200f * Engine.DeltaTime);
-            return (double) Speed.Length() < 220.0 ? 0 : 7;
+            return Speed.Length() < 220.0 ? 0 : 7;
         }
 
         public void SummitLaunch(float targetX)
@@ -3711,7 +3711,7 @@ namespace Celeste
             Speed = -Vector2.UnitY * 240f;
             if (level.OnInterval(0.2f))
                 level.Add(Engine.Pooler.Create<SpeedRing>().Init(Center, 1.57079637f, Color.White));
-            CrystalStaticSpinner crystalStaticSpinner = Scene.CollideFirst<CrystalStaticSpinner>(new Rectangle((int) ((double) X - 4.0), (int) ((double) Y - 40.0), 8, 12));
+            CrystalStaticSpinner crystalStaticSpinner = Scene.CollideFirst<CrystalStaticSpinner>(new Rectangle((int) (X - 4.0), (int) (Y - 40.0), 8, 12));
             if (crystalStaticSpinner != null)
             {
                 crystalStaticSpinner.Destroy();
@@ -3735,7 +3735,7 @@ namespace Celeste
             Player player = this;
             player.Play("event:/char/madeline/crystaltheo_lift");
             Input.Rumble(RumbleStrength.Medium, RumbleLength.Short);
-            if (player.Holding != null && player.Holding.SlowFall && (player.gliderBoostTimer - 0.15999999642372131 > 0.0 && player.gliderBoostDir.Y < 0.0 || (double) player.Speed.Length() > 180.0 && player.Speed.Y <= 0.0))
+            if (player.Holding != null && player.Holding.SlowFall && (player.gliderBoostTimer - 0.15999999642372131 > 0.0 && player.gliderBoostDir.Y < 0.0 || player.Speed.Length() > 180.0 && player.Speed.Y <= 0.0))
                 Audio.Play("event:/new_content/game/10_farewell/glider_platform_dissipate", player.Position);
             Vector2 oldSpeed = player.Speed;
             float varJump = player.varJumpTimer;
@@ -3763,7 +3763,7 @@ namespace Celeste
                 }
                 else if (player.Speed.Y < 0.0)
                     player.Speed.Y = Math.Min(player.Speed.Y, -105f);
-                if (player.onGround && (double) (float) Input.MoveY == 1.0)
+                if (player.onGround && (float) Input.MoveY == 1.0)
                     player.holdCannotDuck = true;
             }
         }
@@ -3890,7 +3890,7 @@ namespace Celeste
                             Vector2 vector2 = new(index1 * index2, index3 * index4);
                             if (!CollideCheck<Solid>(Position + vector2))
                             {
-                                Position = Position + vector2;
+                                Position += vector2;
                                 return false;
                             }
                         }
@@ -4031,7 +4031,7 @@ namespace Celeste
                     starFlySpeedLerp = 0.0f;
                     target = 91f;
                 }
-                else if (vector2 != Vector2.Zero && (double) Vector2.Dot(vector2, starFlyLastDir) >= 0.44999998807907104)
+                else if (vector2 != Vector2.Zero && Vector2.Dot(vector2, starFlyLastDir) >= 0.44999998807907104)
                 {
                     starFlySpeedLerp = Calc.Approach(starFlySpeedLerp, 1f, Engine.DeltaTime / 1f);
                     target = MathHelper.Lerp(140f, 190f, starFlySpeedLerp);
@@ -4105,7 +4105,7 @@ namespace Celeste
                     }
                     if (Speed.Y > 0.0)
                         Speed.Y = 0.0f;
-                    if ((double) Math.Abs(Speed.X) > 140.0)
+                    if (Math.Abs(Speed.X) > 140.0)
                         Speed.X = 140f * Math.Sign(Speed.X);
                     Input.Rumble(RumbleStrength.Medium, RumbleLength.Medium);
                     return 0;
@@ -4233,7 +4233,7 @@ namespace Celeste
 
         private int AttractUpdate()
         {
-            if ((double) Vector2.Distance(attractTo, ExactPosition) <= 1.5)
+            if (Vector2.Distance(attractTo, ExactPosition) <= 1.5)
             {
                 Position = attractTo;
                 ZeroRemainderX();
@@ -4263,7 +4263,7 @@ namespace Celeste
                 Ducking = false;
             if (!onGround && DummyGravity)
             {
-                float num = (double) Math.Abs(Speed.Y) >= 40.0 || !Input.Jump.Check && !AutoJump ? 1f : 0.5f;
+                float num = Math.Abs(Speed.Y) >= 40.0 || !Input.Jump.Check && !AutoJump ? 1f : 0.5f;
                 if (level.InSpace)
                     num *= 0.6f;
                 Speed.Y = Calc.Approach(Speed.Y, 160f, 900f * num * Engine.DeltaTime);
@@ -4277,7 +4277,7 @@ namespace Celeste
             }
             if (!DummyMoving)
             {
-                if ((double) Math.Abs(Speed.X) > 90.0 && DummyMaxspeed)
+                if (Math.Abs(Speed.X) > 90.0 && DummyMaxspeed)
                     Speed.X = Calc.Approach(Speed.X, 90f * Math.Sign(Speed.X), 2500f * Engine.DeltaTime);
                 if (DummyFriction)
                     Speed.X = Calc.Approach(Speed.X, 0.0f, 1000f * Engine.DeltaTime);
@@ -4307,7 +4307,7 @@ namespace Celeste
         {
             Player player = this;
             player.StateMachine.State = 11;
-            if ((double) Math.Abs(player.X - x) > 4.0 && !player.Dead)
+            if (Math.Abs(player.X - x) > 4.0 && !player.Dead)
             {
                 player.DummyMoving = true;
                 if (walkBackwards)
@@ -4317,7 +4317,7 @@ namespace Celeste
                 }
                 else
                     player.Facing = (Facings) Math.Sign(x - player.X);
-                while ((double) Math.Abs(x - player.X) > 4.0 && player.Scene != null && (keepWalkingIntoWalls || !player.CollideCheck<Solid>(player.Position + Vector2.UnitX * Math.Sign(x - player.X))))
+                while (Math.Abs(x - player.X) > 4.0 && player.Scene != null && (keepWalkingIntoWalls || !player.CollideCheck<Solid>(player.Position + Vector2.UnitX * Math.Sign(x - player.X))))
                 {
                     player.Speed.X = Calc.Approach(player.Speed.X, Math.Sign(x - player.X) * 64f * speedMultiplier, 1000f * Engine.DeltaTime);
                     yield return null;
@@ -4370,7 +4370,7 @@ namespace Celeste
         {
             Player player = this;
             player.StateMachine.State = 11;
-            if ((double) Math.Abs(player.X - x) > 4.0)
+            if (Math.Abs(player.X - x) > 4.0)
             {
                 player.DummyMoving = true;
                 if (fastAnim)
@@ -4378,7 +4378,7 @@ namespace Celeste
                 else if (!player.Sprite.LastAnimationID.StartsWith("run"))
                     player.Sprite.Play("runSlow");
                 player.Facing = (Facings) Math.Sign(x - player.X);
-                while ((double) Math.Abs(player.X - x) > 4.0)
+                while (Math.Abs(player.X - x) > 4.0)
                 {
                     player.Speed.X = Calc.Approach(player.Speed.X, Math.Sign(x - player.X) * 90f, 1000f * Engine.DeltaTime);
                     yield return null;
@@ -4396,7 +4396,7 @@ namespace Celeste
             if (!onGround)
             {
                 int num = level.Bounds.Left + 160;
-                Speed.X = Calc.Approach(Speed.X, 54.0000038f * ((double) Math.Abs(num - X) <= 4.0 ? 0.0f : Math.Sign(num - X)), 325f * Engine.DeltaTime);
+                Speed.X = Calc.Approach(Speed.X, 54.0000038f * (Math.Abs(num - X) <= 4.0 ? 0.0f : Math.Sign(num - X)), 325f * Engine.DeltaTime);
             }
             if (!onGround && DummyGravity)
                 Speed.Y = Calc.Approach(Speed.Y, 320f, 225f * Engine.DeltaTime);
@@ -4421,7 +4421,7 @@ namespace Celeste
             player.level.Particles.Emit(Player.P_SummitLandA, 12, player.BottomCenter, Vector2.UnitX * 3f, -1.57079637f);
             player.level.Particles.Emit(Player.P_SummitLandB, 8, player.BottomCenter - Vector2.UnitX * 2f, Vector2.UnitX * 2f, 3.403392f);
             player.level.Particles.Emit(Player.P_SummitLandB, 8, player.BottomCenter + Vector2.UnitX * 2f, Vector2.UnitX * 2f, -0.2617994f);
-            for (float p = 0.0f; (double) p < 1.0; p += Engine.DeltaTime)
+            for (float p = 0.0f; p < 1.0; p += Engine.DeltaTime)
                 yield return null;
             player.StateMachine.State = 0;
         }
@@ -4445,7 +4445,7 @@ namespace Celeste
             Speed.Y = !CollideCheck<Water>() ? Calc.Approach(Speed.Y, 320f, 225f * Engine.DeltaTime) : Calc.Approach(Speed.Y, -20f, 400f * Engine.DeltaTime);
             foreach (Entity entity in Scene.Tracker.GetEntities<FlyFeather>())
                 entity.RemoveSelf();
-            CrystalStaticSpinner crystalStaticSpinner = Scene.CollideFirst<CrystalStaticSpinner>(new Rectangle((int) ((double) X - 6.0), (int) ((double) Y - 6.0), 12, 12));
+            CrystalStaticSpinner crystalStaticSpinner = Scene.CollideFirst<CrystalStaticSpinner>(new Rectangle((int) (X - 6.0), (int) (Y - 6.0), 12, 12));
             if (crystalStaticSpinner != null)
             {
                 crystalStaticSpinner.Destroy();
@@ -4460,8 +4460,8 @@ namespace Celeste
         {
             Player player = this;
             player.Sprite.Play("bigFall");
-            player.level.StartCutscene(new Action<Level>(player.OnReflectionFallSkip));
-            for (float t = 0.0f; (double) t < 2.0; t += Engine.DeltaTime)
+            player.level.StartCutscene(player.OnReflectionFallSkip);
+            for (float t = 0.0f; t < 2.0; t += Engine.DeltaTime)
             {
                 player.Speed.Y = 0.0f;
                 yield return null;
@@ -4492,7 +4492,7 @@ namespace Celeste
             bounds = level.Bounds;
             double bottom = bounds.Bottom;
             Vector2 from = new((float)left, (float)bottom);
-            Vector2? nullable = new Vector2?(level1.GetSpawnPoint(from));
+            Vector2? nullable = level1.GetSpawnPoint(from);
             session.RespawnPoint = nullable;
             level.LoadLevel(IntroTypes.None);
             FallEffects.Show(false);
@@ -4516,7 +4516,7 @@ namespace Celeste
             }
             yield return 0.3f;
             player.Sprite.Play("runSlow");
-            while ((double) Math.Abs(player.X - start.X) > 2.0 && !player.CollideCheck<Solid>(player.Position + new Vector2((float) player.Facing, 0.0f)))
+            while (Math.Abs(player.X - start.X) > 2.0 && !player.CollideCheck<Solid>(player.Position + new Vector2((float) player.Facing, 0.0f)))
             {
                 player.MoveTowardsX(start.X, 64f * Engine.DeltaTime);
                 yield return null;
@@ -4542,16 +4542,16 @@ namespace Celeste
             else
             {
                 start.Y = player.level.Bounds.Bottom - 24;
-                player.MoveToX((int)Math.Round((double)player.X / 8.0) * 8);
+                player.MoveToX((int)Math.Round(player.X / 8.0) * 8);
             }
             if (!wasSummitJump)
                 player.Sprite.Play("jumpSlow");
-            while ((double) player.Y > start.Y - 8.0)
+            while (player.Y > start.Y - 8.0)
             {
                 player.Y += -120f * Engine.DeltaTime;
                 yield return null;
             }
-            player.Y = (float) Math.Round((double) player.Y);
+            player.Y = (float) Math.Round(player.Y);
             player.Speed.Y = -100f;
             while (player.Speed.Y < 0.0)
             {
@@ -4613,7 +4613,7 @@ namespace Celeste
             player.Speed = Vector2.Zero;
             player.Visible = true;
             player.Sprite.Play("jumpSlow");
-            while ((double) player.Y > groundPosition.Y - 8.0)
+            while (player.Y > groundPosition.Y - 8.0)
             {
                 player.MoveV(-200f * Engine.DeltaTime);
                 yield return null;
@@ -4658,7 +4658,7 @@ namespace Celeste
             double min1 = bounds1.Left + 40.0;
             bounds1 = level.Bounds;
             double max1 = bounds1.Right - 40.0;
-            double num1 = (double) MathHelper.Clamp((float) x, (float) min1, (float) max1);
+            double num1 = MathHelper.Clamp((float) x, (float) min1, (float) max1);
             local1.X = (float) num1;
             ref Vector2 local2 = ref from;
             double y = from.Y;
@@ -4666,7 +4666,7 @@ namespace Celeste
             double min2 = bounds2.Top + 40.0;
             bounds2 = level.Bounds;
             double max2 = bounds2.Bottom - 40.0;
-            double num2 = (double) MathHelper.Clamp((float) y, (float) min2, (float) max2);
+            double num2 = MathHelper.Clamp((float) y, (float) min2, (float) max2);
             local2.Y = (float) num2;
             deadOffset = from;
             from -= Position;
@@ -4701,7 +4701,7 @@ namespace Celeste
             yield return 0.1f;
             player.Sprite.Play("walk");
             float target = player.X + 8f;
-            while ((double) player.X < (double) target)
+            while (player.X < (double) target)
             {
                 player.MoveH(32f * Engine.DeltaTime);
                 yield return null;
@@ -4729,8 +4729,8 @@ namespace Celeste
             Player player = this;
             yield return null;
             player.CreateTrail();
-            player.Add(Alarm.Create(Alarm.AlarmMode.Oneshot, new Action(player.CreateTrail), 0.08f, true));
-            player.Add(Alarm.Create(Alarm.AlarmMode.Oneshot, new Action(player.CreateTrail), 0.15f, true));
+            player.Add(Alarm.Create(Alarm.AlarmMode.Oneshot, player.CreateTrail, 0.08f, true));
+            player.Add(Alarm.Create(Alarm.AlarmMode.Oneshot, player.CreateTrail, 0.15f, true));
             Vector2 vector2 = new Vector2(1f, -1f).SafeNormalize();
             player.Facing = Facings.Right;
             player.Speed = vector2 * 240f;
@@ -4738,7 +4738,7 @@ namespace Celeste
             player.SceneAs<Level>().DirectionalShake(player.DashDir, 0.2f);
             SlashFx.Burst(player.Center, player.DashDir.Angle());
             float time;
-            for (time = 0.0f; (double) time < 0.15000000596046448; time += Engine.DeltaTime)
+            for (time = 0.0f; time < 0.15000000596046448; time += Engine.DeltaTime)
             {
                 if (player.Speed != Vector2.Zero && player.level.OnInterval(0.02f))
                     player.level.ParticlesFG.Emit(Player.P_DashA, player.Center + Calc.Random.Range(Vector2.One * -2f, Vector2.One * 2f), player.DashDir.Angle());
@@ -4776,7 +4776,7 @@ namespace Celeste
                     player.Y += -45f * Engine.DeltaTime;
                     yield return null;
                 }
-                player.Y = (float) Math.Round((double) player.Y);
+                player.Y = (float) Math.Round(player.Y);
                 player.Play("event:/char/madeline/climb_ledge");
                 player.Sprite.Play("jumpFast");
                 player.Speed.Y = -105f;
@@ -4789,7 +4789,7 @@ namespace Celeste
                 player.Speed.X = 0.0f;
                 player.Speed.Y = 0.0f;
                 player.Sprite.Play("walk");
-                for (time = 0.0f; (double) time < 0.5; time += Engine.DeltaTime)
+                for (time = 0.0f; time < 0.5; time += Engine.DeltaTime)
                 {
                     player.X += 32f * Engine.DeltaTime;
                     yield return null;
@@ -4844,7 +4844,7 @@ namespace Celeste
             SFX.MadelineToBadelineSound.TryGetValue(sound, out string str);
             if (str == null)
                 return;
-            activeSounds.Add(new ChaserStateSound()
+            activeSounds.Add(new ChaserStateSound
             {
                 Event = str,
                 Parameter = param,
@@ -4874,7 +4874,7 @@ namespace Celeste
             public string Event;
             public string Parameter;
             public float ParameterValue;
-            public ChaserStateSound.Actions Action;
+            public Actions Action;
 
             public enum Actions
             {

@@ -3,7 +3,7 @@ using Monocle;
 
 namespace Celeste
 {
-    [Tracked(false)]
+    [Tracked]
     public class LightOcclude : Component
     {
         public float Alpha = 1f;
@@ -13,64 +13,64 @@ namespace Celeste
         private bool lastVisible;
         private float lastAlpha;
 
-        public int Left => this.bounds.HasValue ? (int) this.Entity.X + this.bounds.Value.Left : (int) this.Entity.Collider.AbsoluteLeft;
+        public int Left => bounds.HasValue ? (int) Entity.X + bounds.Value.Left : (int) Entity.Collider.AbsoluteLeft;
 
-        public int Width => this.bounds.HasValue ? this.bounds.Value.Width : (int) this.Entity.Collider.Width;
+        public int Width => bounds.HasValue ? bounds.Value.Width : (int) Entity.Collider.Width;
 
-        public int Top => this.bounds.HasValue ? (int) this.Entity.Y + this.bounds.Value.Top : (int) this.Entity.Collider.AbsoluteTop;
+        public int Top => bounds.HasValue ? (int) Entity.Y + bounds.Value.Top : (int) Entity.Collider.AbsoluteTop;
 
-        public int Height => this.bounds.HasValue ? this.bounds.Value.Height : (int) this.Entity.Collider.Height;
+        public int Height => bounds.HasValue ? bounds.Value.Height : (int) Entity.Collider.Height;
 
-        public int Right => this.Left + this.Width;
+        public int Right => Left + Width;
 
-        public int Bottom => this.Top + this.Height;
+        public int Bottom => Top + Height;
 
         public LightOcclude(float alpha = 1f)
             : base(true, true)
         {
-            this.Alpha = alpha;
+            Alpha = alpha;
         }
 
         public LightOcclude(Rectangle bounds, float alpha = 1f)
             : this(alpha)
         {
-            this.bounds = new Rectangle?(bounds);
+            this.bounds = bounds;
         }
 
         public override void Update()
         {
             base.Update();
-            bool flag = this.Visible && this.Entity.Visible;
-            Rectangle rectangle = new Rectangle(this.Left, this.Top, this.Width, this.Height);
-            if (!(this.lastSize != rectangle) && this.lastVisible == flag && (double) this.lastAlpha == (double) this.Alpha)
+            bool flag = Visible && Entity.Visible;
+            Rectangle rectangle = new Rectangle(Left, Top, Width, Height);
+            if (!(lastSize != rectangle) && lastVisible == flag && lastAlpha == (double) Alpha)
                 return;
-            this.MakeLightsDirty();
-            this.lastVisible = flag;
-            this.lastSize = rectangle;
-            this.lastAlpha = this.Alpha;
+            MakeLightsDirty();
+            lastVisible = flag;
+            lastSize = rectangle;
+            lastAlpha = Alpha;
         }
 
         public override void Removed(Entity entity)
         {
-            this.MakeLightsDirty();
+            MakeLightsDirty();
             base.Removed(entity);
         }
 
         public override void EntityRemoved(Scene scene)
         {
-            this.MakeLightsDirty();
+            MakeLightsDirty();
             base.EntityRemoved(scene);
         }
 
         private void MakeLightsDirty()
         {
-            Rectangle rectangle1 = new Rectangle(this.Left, this.Top, this.Width, this.Height);
-            foreach (VertexLight component in this.Entity.Scene.Tracker.GetComponents<VertexLight>())
+            Rectangle rectangle1 = new Rectangle(Left, Top, Width, Height);
+            foreach (VertexLight component in Entity.Scene.Tracker.GetComponents<VertexLight>())
             {
                 if (!component.Dirty)
                 {
-                    Rectangle rectangle2 = new Rectangle((int) ((double) component.Center.X - (double) component.EndRadius), (int) ((double) component.Center.Y - (double) component.EndRadius), (int) component.EndRadius * 2, (int) component.EndRadius * 2);
-                    if (rectangle1.Intersects(rectangle2) || this.lastSize.Intersects(rectangle2))
+                    Rectangle rectangle2 = new Rectangle((int) (component.Center.X - (double) component.EndRadius), (int) (component.Center.Y - (double) component.EndRadius), (int) component.EndRadius * 2, (int) component.EndRadius * 2);
+                    if (rectangle1.Intersects(rectangle2) || lastSize.Intersects(rectangle2))
                         component.Dirty = true;
                 }
             }

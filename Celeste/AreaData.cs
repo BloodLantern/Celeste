@@ -163,7 +163,7 @@ namespace Celeste
                             Path = "2-OldSite",
                             Checkpoints = new CheckpointData[2]
                             {
-                                new("3", "checkpoint_2_0", new PlayerInventory?(PlayerInventory.Default), true),
+                                new("3", "checkpoint_2_0", PlayerInventory.Default, true),
                                 new("end_3", "checkpoint_2_1")
                             },
                             Inventory = PlayerInventory.OldSite,
@@ -430,9 +430,9 @@ namespace Celeste
                                 new("04", "checkpoint_6_1"),
                                 new("b-00", "checkpoint_6_2"),
                                 new("boss-00", "checkpoint_6_3"),
-                                new("after-00", "checkpoint_6_4", new PlayerInventory?(PlayerInventory.CH6End))
+                                new("after-00", "checkpoint_6_4", PlayerInventory.CH6End)
                                 {
-                                    Flags = new HashSet<string>()
+                                    Flags = new HashSet<string>
                                     {
                                         "badeline_connection"
                                     },
@@ -600,7 +600,7 @@ namespace Celeste
                                 new CheckpointData("a-00", "checkpoint_8_0"),
                                 new CheckpointData("c-00", "checkpoint_8_1")
                                 {
-                                    CoreMode = new Session.CoreModes?(Session.CoreModes.Cold)
+                                    CoreMode = Session.CoreModes.Cold
                                 },
                                 new CheckpointData("d-00", "checkpoint_8_2")
                             },
@@ -725,7 +725,7 @@ namespace Celeste
 
         public static void ReloadMountainViews()
         {
-            foreach (XmlElement xml in (XmlNode) Calc.LoadXML(Path.Combine(Engine.ContentDirectory, "Overworld", "AreaViews.xml"))["Views"])
+            foreach (XmlElement xml in Calc.LoadXML(Path.Combine(Engine.ContentDirectory, "Overworld", "AreaViews.xml"))["Views"])
             {
                 int i = xml.AttrInt("id");
                 if (i >= 0 && i < Areas.Count)
@@ -819,7 +819,7 @@ namespace Celeste
         public void DoScreenWipe(Scene scene, bool wipeIn, Action onComplete = null)
         {
             if (Wipe == null)
-                (Wipe = new Action<Scene, bool, Action>((s, w, oc) => new CurtainWipe(s, w, oc)))(scene, wipeIn, onComplete);
+                (Wipe = (s, w, oc) => new CurtainWipe(s, w, oc))(scene, wipeIn, onComplete);
             else
                 Wipe(scene, wipeIn, onComplete);
         }

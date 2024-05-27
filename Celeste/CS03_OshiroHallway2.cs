@@ -11,13 +11,12 @@ namespace Celeste
         private NPC oshiro;
 
         public CS03_OshiroHallway2(Player player, NPC oshiro)
-            : base()
         {
             this.player = player;
             this.oshiro = oshiro;
         }
 
-        public override void OnBegin(Level level) => this.Add((Component) new Coroutine(this.Cutscene(level)));
+        public override void OnBegin(Level level) => Add(new Coroutine(Cutscene(level)));
 
         private IEnumerator Cutscene(Level level)
         {
@@ -27,10 +26,10 @@ namespace Celeste
             level.Session.Audio.Apply();
             cs03OshiroHallway2.player.StateMachine.State = 11;
             cs03OshiroHallway2.player.StateMachine.Locked = true;
-            yield return (object) Textbox.Say("CH3_OSHIRO_HALLWAY_B");
-            cs03OshiroHallway2.oshiro.MoveToAndRemove(new Vector2((float) (level.Bounds.Right + 64), cs03OshiroHallway2.oshiro.Y));
-            cs03OshiroHallway2.oshiro.Add((Component) new SoundSource("event:/char/oshiro/move_03_08a_exit"));
-            yield return (object) 1f;
+            yield return Textbox.Say("CH3_OSHIRO_HALLWAY_B");
+            cs03OshiroHallway2.oshiro.MoveToAndRemove(new Vector2(level.Bounds.Right + 64, cs03OshiroHallway2.oshiro.Y));
+            cs03OshiroHallway2.oshiro.Add(new SoundSource("event:/char/oshiro/move_03_08a_exit"));
+            yield return 1f;
             cs03OshiroHallway2.EndCutscene(level);
         }
 
@@ -39,12 +38,12 @@ namespace Celeste
             level.Session.Audio.Music.Layer(1, true);
             level.Session.Audio.Music.Layer(2, false);
             level.Session.Audio.Apply();
-            this.player.StateMachine.Locked = false;
-            this.player.StateMachine.State = 0;
+            player.StateMachine.Locked = false;
+            player.StateMachine.State = 0;
             level.Session.SetFlag("oshiro_resort_talked_3");
-            if (!this.WasSkipped)
+            if (!WasSkipped)
                 return;
-            level.Remove((Entity) this.oshiro);
+            level.Remove(oshiro);
         }
     }
 }

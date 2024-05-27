@@ -4,7 +4,7 @@ using System;
 
 namespace Celeste
 {
-    [Tracked(false)]
+    [Tracked]
     public class DustStaticSpinner : Entity
     {
         public static ParticleType P_Move;
@@ -15,22 +15,18 @@ namespace Celeste
         public DustStaticSpinner(Vector2 position, bool attachToSolid, bool ignoreSolids = false)
             : base(position)
         {
-            Collider = new ColliderList(new Collider[2]
-            {
-                 new Circle(6f),
-                 new Hitbox(16f, 4f, -8f, -3f)
-            });
-            Add(new PlayerCollider(new Action<Player>(OnPlayer)));
-            Add(new HoldableCollider(new Action<Holdable>(OnHoldable)));
+            Collider = new ColliderList(new Circle(6f), new Hitbox(16f, 4f, -8f, -3f));
+            Add(new PlayerCollider(OnPlayer));
+            Add(new HoldableCollider(OnHoldable));
             Add(new LedgeBlocker());
             Add(Sprite = new DustGraphic(ignoreSolids, true, true));
             Depth = -50;
             if (!attachToSolid)
                 return;
-            Add(new StaticMover()
+            Add(new StaticMover
             {
-                OnShake = new Action<Vector2>(OnShake),
-                SolidChecker = new Func<Solid, bool>(IsRiding)
+                OnShake = OnShake,
+                SolidChecker = IsRiding
             });
         }
 
@@ -49,7 +45,7 @@ namespace Celeste
             Player entity = Scene.Tracker.GetEntity<Player>();
             if (entity == null)
                 return;
-            Collidable = (double) Math.Abs(entity.X - X) < 128.0 && (double) Math.Abs(entity.Y - Y) < 128.0;
+            Collidable = Math.Abs(entity.X - X) < 128.0 && Math.Abs(entity.Y - Y) < 128.0;
         }
 
         private void OnShake(Vector2 pos) => Sprite.Position = pos;

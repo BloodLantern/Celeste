@@ -19,9 +19,9 @@ namespace Celeste
             VirtualRenderTarget output,
             float fade = 0.0f,
             bool clear = true,
-            GaussianBlur.Samples samples = GaussianBlur.Samples.Nine,
+            Samples samples = Samples.Nine,
             float sampleScale = 1f,
-            GaussianBlur.Direction direction = GaussianBlur.Direction.Both,
+            Direction direction = Direction.Both,
             float alpha = 1f)
         {
             Effect fxGaussianBlur = GFX.FxGaussianBlur;
@@ -30,21 +30,21 @@ namespace Celeste
                 return texture;
             fxGaussianBlur.CurrentTechnique = fxGaussianBlur.Techniques[technique];
             fxGaussianBlur.Parameters[nameof (fade)].SetValue(fade);
-            fxGaussianBlur.Parameters["pixel"].SetValue(new Vector2(1f / (float) temp.Width, 0.0f) * sampleScale);
-            Engine.Instance.GraphicsDevice.SetRenderTarget((RenderTarget2D) temp);
+            fxGaussianBlur.Parameters["pixel"].SetValue(new Vector2(1f / temp.Width, 0.0f) * sampleScale);
+            Engine.Instance.GraphicsDevice.SetRenderTarget(temp);
             if (clear)
                 Engine.Instance.GraphicsDevice.Clear(Color.Transparent);
-            Draw.SpriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, SamplerState.PointClamp, DepthStencilState.Default, RasterizerState.CullNone, direction != GaussianBlur.Direction.Vertical ? fxGaussianBlur : (Effect) null);
+            Draw.SpriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, SamplerState.PointClamp, DepthStencilState.Default, RasterizerState.CullNone, direction != Direction.Vertical ? fxGaussianBlur : null);
             Draw.SpriteBatch.Draw(texture, new Rectangle(0, 0, temp.Width, temp.Height), Color.White);
             Draw.SpriteBatch.End();
-            fxGaussianBlur.Parameters["pixel"].SetValue(new Vector2(0.0f, 1f / (float) output.Height) * sampleScale);
-            Engine.Instance.GraphicsDevice.SetRenderTarget((RenderTarget2D) output);
+            fxGaussianBlur.Parameters["pixel"].SetValue(new Vector2(0.0f, 1f / output.Height) * sampleScale);
+            Engine.Instance.GraphicsDevice.SetRenderTarget(output);
             if (clear)
                 Engine.Instance.GraphicsDevice.Clear(Color.Transparent);
-            Draw.SpriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, SamplerState.PointClamp, DepthStencilState.Default, RasterizerState.CullNone, direction != GaussianBlur.Direction.Horizontal ? fxGaussianBlur : (Effect) null);
-            Draw.SpriteBatch.Draw((Texture2D) (RenderTarget2D) temp, new Rectangle(0, 0, output.Width, output.Height), Color.White);
+            Draw.SpriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, SamplerState.PointClamp, DepthStencilState.Default, RasterizerState.CullNone, direction != Direction.Horizontal ? fxGaussianBlur : null);
+            Draw.SpriteBatch.Draw((RenderTarget2D) temp, new Rectangle(0, 0, output.Width, output.Height), Color.White);
             Draw.SpriteBatch.End();
-            return (Texture2D) (RenderTarget2D) output;
+            return (RenderTarget2D) output;
         }
 
         public enum Samples

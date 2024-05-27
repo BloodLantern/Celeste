@@ -6,7 +6,7 @@ using System.Linq;
 
 namespace Celeste
 {
-    [Tracked(false)]
+    [Tracked]
     public class CrystalStaticSpinner : Entity
     {
         public static ParticleType P_Move;
@@ -62,23 +62,23 @@ namespace Celeste
         {
             this.color = color;
             Tag = (int) Tags.TransitionUpdate;
-            Collider = new ColliderList(new Collider[2]
-            {
+            Collider = new ColliderList(
+            [
                  new Circle(6f),
                  new Hitbox(16f, 4f, -8f, -3f)
-            });
+            ]);
             Visible = false;
-            Add(new PlayerCollider(new Action<Player>(OnPlayer)));
-            Add(new HoldableCollider(new Action<Holdable>(OnHoldable)));
+            Add(new PlayerCollider(OnPlayer));
+            Add(new HoldableCollider(OnHoldable));
             Add(new LedgeBlocker());
             Depth = -8500;
             AttachToSolid = attachToSolid;
             if (attachToSolid)
-                Add(new StaticMover()
+                Add(new StaticMover
                 {
-                    OnShake = new Action<Vector2>(OnShake),
-                    SolidChecker = new Func<Solid, bool>(IsRiding),
-                    OnDestroy = new Action(RemoveSelf)
+                    OnShake = OnShake,
+                    SolidChecker = IsRiding,
+                    OnDestroy = RemoveSelf
                 });
             randomSeed = Calc.Random.Next();
         }
@@ -132,7 +132,7 @@ namespace Celeste
                 {
                     Player entity = Scene.Tracker.GetEntity<Player>();
                     if (entity != null)
-                        Collidable = (double) Math.Abs(entity.X - X) < 128.0 && (double) Math.Abs(entity.Y - Y) < 128.0;
+                        Collidable = Math.Abs(entity.X - X) < 128.0 && Math.Abs(entity.Y - Y) < 128.0;
                 }
             }
             if (filler == null)

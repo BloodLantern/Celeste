@@ -3,42 +3,42 @@ using Monocle;
 
 namespace Celeste
 {
-    [Tracked(false)]
+    [Tracked()]
     public class CameraAdvanceTargetTrigger : Trigger
     {
         public Vector2 Target;
         public Vector2 LerpStrength;
-        public Trigger.PositionModes PositionModeX;
-        public Trigger.PositionModes PositionModeY;
+        public PositionModes PositionModeX;
+        public PositionModes PositionModeY;
         public bool XOnly;
         public bool YOnly;
 
         public CameraAdvanceTargetTrigger(EntityData data, Vector2 offset)
             : base(data, offset)
         {
-            this.Target = data.Nodes[0] + offset - new Vector2(320f, 180f) * 0.5f;
-            this.LerpStrength.X = data.Float("lerpStrengthX");
-            this.LerpStrength.Y = data.Float("lerpStrengthY");
-            this.PositionModeX = data.Enum<Trigger.PositionModes>("positionModeX");
-            this.PositionModeY = data.Enum<Trigger.PositionModes>("positionModeY");
-            this.XOnly = data.Bool("xOnly");
-            this.YOnly = data.Bool("yOnly");
+            Target = data.Nodes[0] + offset - new Vector2(320f, 180f) * 0.5f;
+            LerpStrength.X = data.Float("lerpStrengthX");
+            LerpStrength.Y = data.Float("lerpStrengthY");
+            PositionModeX = data.Enum<PositionModes>("positionModeX");
+            PositionModeY = data.Enum<PositionModes>("positionModeY");
+            XOnly = data.Bool("xOnly");
+            YOnly = data.Bool("yOnly");
         }
 
         public override void OnStay(Player player)
         {
-            player.CameraAnchor = this.Target;
-            player.CameraAnchorLerp.X = MathHelper.Clamp(this.LerpStrength.X * this.GetPositionLerp(player, this.PositionModeX), 0.0f, 1f);
-            player.CameraAnchorLerp.Y = MathHelper.Clamp(this.LerpStrength.Y * this.GetPositionLerp(player, this.PositionModeY), 0.0f, 1f);
-            player.CameraAnchorIgnoreX = this.YOnly;
-            player.CameraAnchorIgnoreY = this.XOnly;
+            player.CameraAnchor = Target;
+            player.CameraAnchorLerp.X = MathHelper.Clamp(LerpStrength.X * GetPositionLerp(player, PositionModeX), 0.0f, 1f);
+            player.CameraAnchorLerp.Y = MathHelper.Clamp(LerpStrength.Y * GetPositionLerp(player, PositionModeY), 0.0f, 1f);
+            player.CameraAnchorIgnoreX = YOnly;
+            player.CameraAnchorIgnoreY = XOnly;
         }
 
         public override void OnLeave(Player player)
         {
             base.OnLeave(player);
             bool flag = false;
-            foreach (Trigger entity in this.Scene.Tracker.GetEntities<CameraTargetTrigger>())
+            foreach (Trigger entity in Scene.Tracker.GetEntities<CameraTargetTrigger>())
             {
                 if (entity.PlayerIsInside)
                 {
@@ -48,7 +48,7 @@ namespace Celeste
             }
             if (!flag)
             {
-                foreach (Trigger entity in this.Scene.Tracker.GetEntities<CameraAdvanceTargetTrigger>())
+                foreach (Trigger entity in Scene.Tracker.GetEntities<CameraAdvanceTargetTrigger>())
                 {
                     if (entity.PlayerIsInside)
                     {

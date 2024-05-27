@@ -32,21 +32,21 @@ namespace Celeste
         public HashSet<EntityID> Strawberries = new HashSet<EntityID>();
         public HashSet<string> Checkpoints = new HashSet<string>();
 
-        public AreaModeStats Clone() => new AreaModeStats()
+        public AreaModeStats Clone() => new AreaModeStats
         {
-            TotalStrawberries = this.TotalStrawberries,
-            Strawberries = new HashSet<EntityID>((IEnumerable<EntityID>) this.Strawberries),
-            Completed = this.Completed,
-            SingleRunCompleted = this.SingleRunCompleted,
-            FullClear = this.FullClear,
-            Deaths = this.Deaths,
-            TimePlayed = this.TimePlayed,
-            BestTime = this.BestTime,
-            BestFullClearTime = this.BestFullClearTime,
-            BestDashes = this.BestDashes,
-            BestDeaths = this.BestDeaths,
-            HeartGem = this.HeartGem,
-            Checkpoints = new HashSet<string>((IEnumerable<string>) this.Checkpoints)
+            TotalStrawberries = TotalStrawberries,
+            Strawberries = new HashSet<EntityID>(Strawberries),
+            Completed = Completed,
+            SingleRunCompleted = SingleRunCompleted,
+            FullClear = FullClear,
+            Deaths = Deaths,
+            TimePlayed = TimePlayed,
+            BestTime = BestTime,
+            BestFullClearTime = BestFullClearTime,
+            BestDashes = BestDashes,
+            BestDeaths = BestDeaths,
+            HeartGem = HeartGem,
+            Checkpoints = new HashSet<string>(Checkpoints)
         };
     }
 }

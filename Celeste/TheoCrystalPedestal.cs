@@ -5,32 +5,32 @@ namespace Celeste
 {
     public class TheoCrystalPedestal : Solid
     {
-        public Monocle.Image sprite;
+        public Image sprite;
         public bool DroppedTheo;
 
         public TheoCrystalPedestal(EntityData data, Vector2 offset)
             : base(data.Position + offset, 32f, 32f, false)
         {
-            this.Add((Component) (this.sprite = new Monocle.Image(GFX.Game["characters/theoCrystal/pedestal"])));
-            this.EnableAssistModeChecks = false;
-            this.sprite.JustifyOrigin(0.5f, 1f);
-            this.Depth = 8998;
-            this.Collider.Position = new Vector2(-16f, -64f);
-            this.Collidable = false;
-            this.OnDashCollide = (DashCollision) ((player, direction) =>
+            Add(sprite = new Image(GFX.Game["characters/theoCrystal/pedestal"]));
+            EnableAssistModeChecks = false;
+            sprite.JustifyOrigin(0.5f, 1f);
+            Depth = 8998;
+            Collider.Position = new Vector2(-16f, -64f);
+            Collidable = false;
+            OnDashCollide = (player, direction) =>
             {
-                TheoCrystal entity = this.Scene.Tracker.GetEntity<TheoCrystal>();
+                TheoCrystal entity = Scene.Tracker.GetEntity<TheoCrystal>();
                 entity.OnPedestal = false;
                 entity.Speed = new Vector2(0.0f, -300f);
-                this.DroppedTheo = true;
-                this.Collidable = false;
-                (this.Scene as Level).Flash(Color.White);
+                DroppedTheo = true;
+                Collidable = false;
+                (Scene as Level).Flash(Color.White);
                 Celeste.Freeze(0.1f);
                 Input.Rumble(RumbleStrength.Medium, RumbleLength.Short);
                 Audio.Play("event:/game/05_mirror_temple/crystaltheo_break_free", entity.Position);
                 return DashCollisionResults.Rebound;
-            });
-            this.Tag = (int) Tags.TransitionUpdate;
+            };
+            Tag = (int) Tags.TransitionUpdate;
         }
 
         public override void Awake(Scene scene)
@@ -38,23 +38,23 @@ namespace Celeste
             base.Awake(scene);
             if ((scene as Level).Session.GetFlag("foundTheoInCrystal"))
             {
-                this.DroppedTheo = true;
+                DroppedTheo = true;
             }
             else
             {
-                TheoCrystal first = this.Scene.Entities.FindFirst<TheoCrystal>();
+                TheoCrystal first = Scene.Entities.FindFirst<TheoCrystal>();
                 if (first == null)
                     return;
-                first.Depth = this.Depth + 1;
+                first.Depth = Depth + 1;
             }
         }
 
         public override void Update()
         {
-            TheoCrystal entity = this.Scene.Tracker.GetEntity<TheoCrystal>();
-            if (entity != null && !this.DroppedTheo)
+            TheoCrystal entity = Scene.Tracker.GetEntity<TheoCrystal>();
+            if (entity != null && !DroppedTheo)
             {
-                entity.Position = this.Position + new Vector2(0.0f, -32f);
+                entity.Position = Position + new Vector2(0.0f, -32f);
                 entity.OnPedestal = true;
             }
             base.Update();

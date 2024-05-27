@@ -4,7 +4,7 @@ using System;
 
 namespace Celeste
 {
-    [Tracked(false)]
+    [Tracked()]
     public class WindMover : Component
     {
         public Action<Vector2> Move;
@@ -12,7 +12,7 @@ namespace Celeste
         public WindMover(Action<Vector2> move)
             : base(false, false)
         {
-            this.Move = move;
+            Move = move;
         }
     }
 }

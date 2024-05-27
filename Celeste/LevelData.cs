@@ -59,7 +59,6 @@ namespace Celeste
                         if (string.IsNullOrEmpty(s1) || !int.TryParse(s1, out AmbienceProgress))
                         {
                             AmbienceProgress = -1;
-                            continue;
                         }
                         continue;
                     case "c":
@@ -88,7 +87,6 @@ namespace Celeste
                         if (Bounds.Height == 184)
                         {
                             Bounds.Height = 180;
-                            continue;
                         }
                         continue;
                     case "music":
@@ -111,7 +109,6 @@ namespace Celeste
                         if (string.IsNullOrEmpty(s2) || !int.TryParse(s2, out MusicProgress))
                         {
                             MusicProgress = -1;
-                            continue;
                         }
                         continue;
                     case "name":
@@ -180,7 +177,7 @@ namespace Celeste
                     if (child.Children != null)
                         foreach (BinaryPacker.Element decal in child.Children)
                             BgDecals.Add(
-                                new DecalData()
+                                new DecalData
                                 {
                                     Position = new Vector2(Convert.ToSingle(decal.Attributes["x"], CultureInfo.InvariantCulture), Convert.ToSingle(decal.Attributes["y"], CultureInfo.InvariantCulture)),
                                     Scale = new Vector2(Convert.ToSingle(decal.Attributes["scaleX"], CultureInfo.InvariantCulture), Convert.ToSingle(decal.Attributes["scaleY"], CultureInfo.InvariantCulture)),
@@ -193,7 +190,7 @@ namespace Celeste
                     if (child.Children != null)
                         foreach (BinaryPacker.Element decal in child.Children)
                             FgDecals.Add(
-                                new DecalData()
+                                new DecalData
                                 {
                                     Position = new Vector2(Convert.ToSingle(decal.Attributes["x"], CultureInfo.InvariantCulture), Convert.ToSingle(decal.Attributes["y"], CultureInfo.InvariantCulture)),
                                     Scale = new Vector2(Convert.ToSingle(decal.Attributes["scaleX"], CultureInfo.InvariantCulture), Convert.ToSingle(decal.Attributes["scaleY"], CultureInfo.InvariantCulture)),

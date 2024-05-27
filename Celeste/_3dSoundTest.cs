@@ -17,10 +17,10 @@ namespace Celeste
         public override void Render()
         {
             Draw.Rect(X - 8f, Y - 8f, 16f, 16f, Color.Yellow);
-            Camera camera = (Scene as Level).Camera;
+            Camera camera = (Scene as Level)!.Camera;
             Draw.HollowRect(X - 320f, camera.Y, 640f, 180f, Color.Red);
             Draw.HollowRect(X - 160f, camera.Y, 320f, 180f, Color.Yellow);
-            Draw.HollowRect((float) ((double) X - 160.0 - 320.0), camera.Y, 960f, 180f, Color.Yellow);
+            Draw.HollowRect(X - 160f - 320f, camera.Y, 960f, 180f, Color.Yellow);
         }
     }
 }

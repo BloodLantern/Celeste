@@ -20,11 +20,7 @@ namespace Monocle
         }
 
         public override void Render()
-        {
-            if (Texture == null)
-                return;
-            Texture.Draw(RenderPosition, Origin, Color, Scale, Rotation, Effects);
-        }
+            => Texture?.Draw(RenderPosition, Origin, Color, Scale, Rotation, Effects);
 
         public virtual float Width => Texture.Width;
 

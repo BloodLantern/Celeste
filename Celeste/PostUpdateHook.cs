@@ -3,7 +3,7 @@ using System;
 
 namespace Celeste
 {
-    [Tracked(false)]
+    [Tracked()]
     public class PostUpdateHook : Component
     {
         public Action OnPostUpdate;
@@ -11,7 +11,7 @@ namespace Celeste
         public PostUpdateHook(Action onPostUpdate)
             : base(false, false)
         {
-            this.OnPostUpdate = onPostUpdate;
+            OnPostUpdate = onPostUpdate;
         }
     }
 }

@@ -1,7 +1,6 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Monocle;
-using System;
 
 namespace Celeste
 {
@@ -13,7 +12,7 @@ namespace Celeste
         public DisconnectedControllerUI()
         {
             Celeste.DisconnectUI = this;
-            Engine.OverloadGameLoop = new Action(Update);
+            Engine.OverloadGameLoop = Update;
         }
 
         private void OnClose()

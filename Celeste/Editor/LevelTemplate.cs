@@ -17,7 +17,7 @@ namespace Celeste.Editor
         /// <summary>
         /// Whether the level is a normal level or a filler.
         /// </summary>
-        public LevelTemplateType Type;
+        public readonly LevelTemplateType Type;
 
         /// <summary>
         /// X position in tiles.
@@ -47,38 +47,38 @@ namespace Celeste.Editor
         /// <summary>
         /// The foreground tiles grid.
         /// </summary>
-        public Grid Grid;
+        public readonly Grid Grid;
         /// <summary>
         /// The background tiles grid.
         /// </summary>
-        public Grid Back;
+        public readonly Grid Back;
 
         /// <summary>
         /// List of player spawns.
         /// </summary>
-        public List<Vector2> Spawns;
+        public readonly List<Vector2> Spawns;
         /// <summary>
         /// List of strawberries.
         /// </summary>
-        public List<Vector2> Strawberries;
+        public readonly List<Vector2> Strawberries;
         /// <summary>
         /// List of strawberry metadatas in format:
         /// "&lt;checkpointIndex&gt;:&lt;indexInCheckpoint&gt;"
         /// </summary>
-        public List<string> StrawberryMetadata;
+        public readonly List<string> StrawberryMetadata;
         /// <summary>
         /// List of checkpoints.
         /// </summary>
-        public List<Vector2> Checkpoints;
+        public readonly List<Vector2> Checkpoints;
         /// <summary>
         /// List of jumpthrus.
         /// </summary>
-        public List<Rectangle> Jumpthrus;
+        public readonly List<Rectangle> Jumpthrus;
 
         /// <summary>
         /// A level is considered a dummy if it is not a filler and doesn't have any player spawns.
         /// </summary>
-        public bool Dummy;
+        public readonly bool Dummy;
         /// <summary>
         /// The color index in the <see cref="fgTilesColor"/> array.
         /// </summary>
@@ -94,16 +94,21 @@ namespace Celeste.Editor
         private Vector2 resizeAnchor;
 
         /// <summary>
-        /// List of foreground tiles stored as horizontal rectangles (the height will always be 1).
+        /// List of foreground tiles stored as horizontal rectangles. (the height will always be 1)
         /// </summary>
-        private readonly List<Rectangle> solids = new();
+        private readonly List<Rectangle> solids =
+        [
+        ];
         /// <summary>
-        /// List of background tiles stored as horizontal rectangles (the height will always be 1).
+        /// List of background tiles stored as horizontal rectangles. (the height will always be 1)
         /// </summary>
-        private readonly List<Rectangle> backs = new();
+        private readonly List<Rectangle> backs =
+        [
+        ];
 
         private static readonly Color bgTilesColor = Color.DarkSlateGray * 0.5f;
-        private static readonly Color[] fgTilesColor = new Color[7] {
+        private static readonly Color[] fgTilesColor =
+        [
             Color.White,                // Default white
             Calc.HexToColor("f6735e"),  // Orange
             Calc.HexToColor("85f65e"),  // Green
@@ -111,7 +116,7 @@ namespace Celeste.Editor
             Calc.HexToColor("376be3"),  // Blue
             Calc.HexToColor("c337e3"),  // Purple
             Calc.HexToColor("e33773")   // Pink
-        };
+        ];
         private static readonly Color inactiveBorderColor = Color.DarkSlateGray;
         private static readonly Color selectedBorderColor = Color.Red;
         private static readonly Color hoveredBorderColor = Color.Yellow;
@@ -174,14 +179,14 @@ namespace Celeste.Editor
                 }
             }
 
-            Spawns = new List<Vector2>();
+            Spawns = [];
             foreach (Vector2 spawn in data.Spawns)
                 Spawns.Add(spawn / 8f - new Vector2(X, Y));
 
-            Strawberries = new List<Vector2>();
-            StrawberryMetadata = new List<string>();
-            Checkpoints = new List<Vector2>();
-            Jumpthrus = new List<Rectangle>();
+            Strawberries = [];
+            StrawberryMetadata = [];
+            Checkpoints = [];
+            Jumpthrus = [];
 
             // Setup strawberries, checkpoints and jumpthrus
             foreach (EntityData entity in data.Entities)
@@ -189,7 +194,7 @@ namespace Celeste.Editor
                 if (entity.Name.Equals("strawberry") || entity.Name.Equals("snowberry"))
                 {
                     Strawberries.Add(entity.Position / 8f);
-                    StrawberryMetadata.Add(entity.Int("checkpointID").ToString() + ":" + entity.Int("order"));
+                    StrawberryMetadata.Add(entity.Int("checkpointID") + ":" + entity.Int("order"));
                 }
                 else if (entity.Name.Equals("checkpoint"))
                     Checkpoints.Add(entity.Position / 8f);

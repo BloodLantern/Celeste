@@ -4,7 +4,7 @@ using System.Collections.Generic;
 
 namespace Celeste
 {
-    [Tracked(false)]
+    [Tracked]
     public class SeekerBarrier : Solid
     {
         public float Flash;
@@ -18,13 +18,13 @@ namespace Celeste
         public SeekerBarrier(Vector2 position, float width, float height)
             : base(position, width, height, false)
         {
-            this.Collidable = false;
-            for (int index = 0; (double) index < (double) this.Width * (double) this.Height / 16.0; ++index)
-                this.particles.Add(new Vector2(Calc.Random.NextFloat(this.Width - 1f), Calc.Random.NextFloat(this.Height - 1f)));
+            Collidable = false;
+            for (int index = 0; index < Width * (double) Height / 16.0; ++index)
+                particles.Add(new Vector2(Calc.Random.NextFloat(Width - 1f), Calc.Random.NextFloat(Height - 1f)));
         }
 
         public SeekerBarrier(EntityData data, Vector2 offset)
-            : this(data.Position + offset, (float) data.Width, (float) data.Height)
+            : this(data.Position + offset, data.Width, data.Height)
         {
         }
 
@@ -42,52 +42,52 @@ namespace Celeste
 
         public override void Update()
         {
-            if (this.Flashing)
+            if (Flashing)
             {
-                this.Flash = Calc.Approach(this.Flash, 0.0f, Engine.DeltaTime * 4f);
-                if ((double) this.Flash <= 0.0)
-                    this.Flashing = false;
+                Flash = Calc.Approach(Flash, 0.0f, Engine.DeltaTime * 4f);
+                if (Flash <= 0.0)
+                    Flashing = false;
             }
-            else if ((double) this.solidifyDelay > 0.0)
-                this.solidifyDelay -= Engine.DeltaTime;
-            else if ((double) this.Solidify > 0.0)
-                this.Solidify = Calc.Approach(this.Solidify, 0.0f, Engine.DeltaTime);
-            int length = this.speeds.Length;
-            float height = this.Height;
+            else if (solidifyDelay > 0.0)
+                solidifyDelay -= Engine.DeltaTime;
+            else if (Solidify > 0.0)
+                Solidify = Calc.Approach(Solidify, 0.0f, Engine.DeltaTime);
+            int length = speeds.Length;
+            float height = Height;
             int index = 0;
-            for (int count = this.particles.Count; index < count; ++index)
+            for (int count = particles.Count; index < count; ++index)
             {
-                Vector2 vector2 = this.particles[index] + Vector2.UnitY * this.speeds[index % length] * Engine.DeltaTime;
+                Vector2 vector2 = particles[index] + Vector2.UnitY * speeds[index % length] * Engine.DeltaTime;
                 vector2.Y %= height - 1f;
-                this.particles[index] = vector2;
+                particles[index] = vector2;
             }
             base.Update();
         }
 
         public void OnReflectSeeker()
         {
-            this.Flash = 1f;
-            this.Solidify = 1f;
-            this.solidifyDelay = 1f;
-            this.Flashing = true;
-            this.Scene.CollideInto<SeekerBarrier>(new Rectangle((int) this.X, (int) this.Y - 2, (int) this.Width, (int) this.Height + 4), this.adjacent);
-            this.Scene.CollideInto<SeekerBarrier>(new Rectangle((int) this.X - 2, (int) this.Y, (int) this.Width + 4, (int) this.Height), this.adjacent);
-            foreach (SeekerBarrier seekerBarrier in this.adjacent)
+            Flash = 1f;
+            Solidify = 1f;
+            solidifyDelay = 1f;
+            Flashing = true;
+            Scene.CollideInto(new Rectangle((int) X, (int) Y - 2, (int) Width, (int) Height + 4), adjacent);
+            Scene.CollideInto(new Rectangle((int) X - 2, (int) Y, (int) Width + 4, (int) Height), adjacent);
+            foreach (SeekerBarrier seekerBarrier in adjacent)
             {
                 if (!seekerBarrier.Flashing)
                     seekerBarrier.OnReflectSeeker();
             }
-            this.adjacent.Clear();
+            adjacent.Clear();
         }
 
         public override void Render()
         {
             Color color = Color.White * 0.5f;
-            foreach (Vector2 particle in this.particles)
-                Draw.Pixel.Draw(this.Position + particle, Vector2.Zero, color);
-            if (!this.Flashing)
+            foreach (Vector2 particle in particles)
+                Draw.Pixel.Draw(Position + particle, Vector2.Zero, color);
+            if (!Flashing)
                 return;
-            Draw.Rect(this.Collider, Color.White * this.Flash * 0.5f);
+            Draw.Rect(Collider, Color.White * Flash * 0.5f);
         }
     }
 }

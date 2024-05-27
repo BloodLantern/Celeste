@@ -9,11 +9,11 @@ namespace Celeste
         public CameraOffsetTrigger(EntityData data, Vector2 offset)
             : base(data, offset)
         {
-            this.CameraOffset = new Vector2(data.Float("cameraX"), data.Float("cameraY"));
-            this.CameraOffset.X *= 48f;
-            this.CameraOffset.Y *= 32f;
+            CameraOffset = new Vector2(data.Float("cameraX"), data.Float("cameraY"));
+            CameraOffset.X *= 48f;
+            CameraOffset.Y *= 32f;
         }
 
-        public override void OnEnter(Player player) => this.SceneAs<Level>().CameraOffset = this.CameraOffset;
+        public override void OnEnter(Player player) => SceneAs<Level>().CameraOffset = CameraOffset;
     }
 }

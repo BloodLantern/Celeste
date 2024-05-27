@@ -29,7 +29,7 @@ namespace Celeste.Editor
         /// <summary>
         /// The save flash duration. For some reason this is 0.
         /// </summary>
-        private static float saveFlash = 0f;
+        private static float saveFlash;
 
         /// <summary>
         /// The map data of the current map.
@@ -38,7 +38,7 @@ namespace Celeste.Editor
         /// <summary>
         /// The level list.
         /// </summary>
-        private readonly List<LevelTemplate> levels = new();
+        private readonly List<LevelTemplate> levels = [];
 
         /// <summary>
         /// The current mouse position.
@@ -60,22 +60,22 @@ namespace Celeste.Editor
         /// <summary>
         /// The currently selected levels.
         /// </summary>
-        private readonly HashSet<LevelTemplate> selection = new();
+        private readonly HashSet<LevelTemplate> selection = [];
         /// <summary>
         /// The currently hovered levels.
         /// </summary>
-        private readonly HashSet<LevelTemplate> hovered = new();
+        private readonly HashSet<LevelTemplate> hovered = [];
 
         private readonly float fade;
 
         /// <summary>
         /// Stack of undo actions.
         /// </summary>
-        private readonly List<Vector2[]> undoStack = new();
+        private readonly List<Vector2[]> undoStack = [];
         /// <summary>
         /// Stack of redo actions.
         /// </summary>
-        private readonly List<Vector2[]> redoStack = new();
+        private readonly List<Vector2[]> redoStack = [];
 
         /// <summary>
         /// Constructs a map editor for an area.
@@ -421,8 +421,8 @@ namespace Celeste.Editor
             float height = Celeste.TargetHeight / Camera.Zoom;
 
             const int gridSquareSize = 5;
-            float x = (float) Math.Floor((double) (Camera.Left / gridSquareSize - 1f)) * gridSquareSize;
-            float y = (float) Math.Floor((double) (Camera.Top / gridSquareSize - 1f)) * gridSquareSize;
+            float x = (float) Math.Floor(MapEditor.Camera.Left / gridSquareSize - 1f) * gridSquareSize;
+            float y = (float) Math.Floor(MapEditor.Camera.Top / gridSquareSize - 1f) * gridSquareSize;
 
             // Draw the background grid
             for (float i = x; i <= x + width + gridSquareSize * 2; i += gridSquareSize)
@@ -501,26 +501,26 @@ namespace Celeste.Editor
             {
                 if (selection.Count > 0)
                 {
-                    ActiveFont.Draw(selection.Count.ToString() + " levels selected", topUILeft, Color.Red);
+                    ActiveFont.Draw(selection.Count + " levels selected", topUILeft, Color.Red);
                 }
                 else
                 {
                     ActiveFont.Draw(Dialog.Clean(mapData.Data.Name), topUILeft, Color.Aqua);
-                    ActiveFont.Draw(mapData.Area.Mode.ToString() + " MODE", topUIRight, Vector2.UnitX, Vector2.One, Color.Red);
+                    ActiveFont.Draw(mapData.Area.Mode + " MODE", topUIRight, Vector2.UnitX, Vector2.One, Color.Red);
                 }
             }
             else if (hovered.Count == 1)
             {
                 LevelTemplate levelTemplate = hovered.ElementAt(0);
 
-                string text = levelTemplate.ActualWidth.ToString() + "x" + levelTemplate.ActualHeight.ToString() + "   "
+                string text = levelTemplate.ActualWidth + "x" + levelTemplate.ActualHeight + "   "
                     + levelTemplate.X + "," + levelTemplate.Y + "   " + (levelTemplate.X * 8) + "," + (levelTemplate.Y * 8);
 
                 ActiveFont.Draw(levelTemplate.Name, topUILeft, Color.Yellow);
                 ActiveFont.Draw(text, topUIRight, Vector2.UnitX, Vector2.One, Color.Green);
             }
             else
-                ActiveFont.Draw(hovered.Count.ToString() + " levels", topUILeft, Color.Yellow);
+                ActiveFont.Draw(hovered.Count + " levels", topUILeft, Color.Yellow);
 
             Draw.SpriteBatch.End();
         }
@@ -541,7 +541,7 @@ namespace Celeste.Editor
                     Level = level.Name,
                     StartedFromBeginning = false
                 },
-                new Vector2?(at)
+                at
             );
         }
 

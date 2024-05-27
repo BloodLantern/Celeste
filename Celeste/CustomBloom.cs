@@ -3,7 +3,7 @@ using System;
 
 namespace Celeste
 {
-    [Tracked(false)]
+    [Tracked()]
     public class CustomBloom : Component
     {
         public Action OnRenderBloom;
@@ -11,7 +11,7 @@ namespace Celeste
         public CustomBloom(Action onRenderBloom)
             : base(false, true)
         {
-            this.OnRenderBloom = onRenderBloom;
+            OnRenderBloom = onRenderBloom;
         }
     }
 }

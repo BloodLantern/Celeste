@@ -8,7 +8,7 @@ namespace Celeste
         public static bool Enabled = true;
         private static MTexture from;
         private static MTexture to;
-        private static float percent = 0f;
+        private static float percent;
 
         public static Effect Effect => GFX.FxColorGrading;
 

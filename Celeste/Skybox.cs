@@ -11,8 +11,8 @@ namespace Celeste
 
         public Skybox(VirtualTexture texture, float size = 25f)
         {
-            this.Texture = texture;
-            this.Verts = new VertexPositionColorTexture[30];
+            Texture = texture;
+            Verts = new VertexPositionColorTexture[30];
             Vector3 vector3_1 = new Vector3(-size, size, -size);
             Vector3 vector3_2 = new Vector3(size, size, -size);
             Vector3 vector3_3 = new Vector3(size, size, size);
@@ -27,11 +27,11 @@ namespace Celeste
             MTexture subtexture3 = mtexture.GetSubtexture(2460, 0, 820, 820);
             MTexture subtexture4 = mtexture.GetSubtexture(1640, 0, 820, 820);
             MTexture subtexture5 = mtexture.GetSubtexture(3280, 0, 819, 820);
-            this.AddFace(this.Verts, 0, subtexture1, vector3_1, vector3_2, vector3_3, vector3_4);
-            this.AddFace(this.Verts, 1, subtexture3, vector3_2, vector3_1, vector3_5, vector3_6);
-            this.AddFace(this.Verts, 2, subtexture2, vector3_4, vector3_3, vector3_7, vector3_8);
-            this.AddFace(this.Verts, 3, subtexture5, vector3_3, vector3_2, vector3_6, vector3_7);
-            this.AddFace(this.Verts, 4, subtexture4, vector3_1, vector3_4, vector3_8, vector3_5);
+            AddFace(Verts, 0, subtexture1, vector3_1, vector3_2, vector3_3, vector3_4);
+            AddFace(Verts, 1, subtexture3, vector3_2, vector3_1, vector3_5, vector3_6);
+            AddFace(Verts, 2, subtexture2, vector3_4, vector3_3, vector3_7, vector3_8);
+            AddFace(Verts, 3, subtexture5, vector3_3, vector3_2, vector3_6, vector3_7);
+            AddFace(Verts, 4, subtexture4, vector3_1, vector3_4, vector3_8, vector3_5);
         }
 
         private void AddFace(
@@ -43,10 +43,10 @@ namespace Celeste
             Vector3 c,
             Vector3 d)
         {
-            float x1 = (float) (tex.ClipRect.Left + 1) / (float) tex.Texture.Width;
-            float y1 = (float) (tex.ClipRect.Top + 1) / (float) tex.Texture.Height;
-            float x2 = (float) (tex.ClipRect.Right - 1) / (float) tex.Texture.Width;
-            float y2 = (float) (tex.ClipRect.Bottom - 1) / (float) tex.Texture.Height;
+            float x1 = (tex.ClipRect.Left + 1) / (float) tex.Texture.Width;
+            float y1 = (tex.ClipRect.Top + 1) / (float) tex.Texture.Height;
+            float x2 = (tex.ClipRect.Right - 1) / (float) tex.Texture.Width;
+            float y2 = (tex.ClipRect.Bottom - 1) / (float) tex.Texture.Height;
             int num1 = face * 6;
             VertexPositionColorTexture[] positionColorTextureArray1 = verts;
             int index1 = num1;
@@ -85,14 +85,14 @@ namespace Celeste
             Engine.Graphics.GraphicsDevice.RasterizerState = MountainModel.CullNoneRasterizer;
             Engine.Graphics.GraphicsDevice.SamplerStates[0] = SamplerState.LinearClamp;
             Engine.Graphics.GraphicsDevice.BlendState = BlendState.AlphaBlend;
-            Engine.Graphics.GraphicsDevice.Textures[0] = (Microsoft.Xna.Framework.Graphics.Texture) this.Texture.Texture;
-            for (int index = 0; index < this.Verts.Length; ++index)
-                this.Verts[index].Color = color;
+            Engine.Graphics.GraphicsDevice.Textures[0] = Texture.Texture;
+            for (int index = 0; index < Verts.Length; ++index)
+                Verts[index].Color = color;
             GFX.FxTexture.Parameters["World"].SetValue(matrix);
             foreach (EffectPass pass in GFX.FxTexture.CurrentTechnique.Passes)
             {
                 pass.Apply();
-                Engine.Graphics.GraphicsDevice.DrawUserPrimitives<VertexPositionColorTexture>(PrimitiveType.TriangleList, this.Verts, 0, this.Verts.Length / 3);
+                Engine.Graphics.GraphicsDevice.DrawUserPrimitives(PrimitiveType.TriangleList, Verts, 0, Verts.Length / 3);
             }
         }
     }

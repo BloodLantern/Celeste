@@ -6,7 +6,7 @@ using System.Collections.Generic;
 
 namespace Celeste
 {
-    [Tracked(false)]
+    [Tracked]
     public class DustEdges : Entity
     {
         public static int DustGraphicEstabledCounter;
@@ -19,35 +19,35 @@ namespace Celeste
 
         public DustEdges()
         {
-            this.AddTag((int) Tags.Global | (int) Tags.TransitionUpdate);
-            this.Depth = -48;
-            this.Add((Component) new BeforeRenderHook(new Action(this.BeforeRender)));
+            AddTag((int) Tags.Global | (int) Tags.TransitionUpdate);
+            Depth = -48;
+            Add(new BeforeRenderHook(BeforeRender));
         }
 
         private void CreateTextures()
         {
-            this.DustNoiseFrom = VirtualContent.CreateTexture("dust-noise-a", 128, 72, Color.White);
-            this.DustNoiseTo = VirtualContent.CreateTexture("dust-noise-b", 128, 72, Color.White);
-            Color[] data = new Color[this.DustNoiseFrom.Width * this.DustNoiseTo.Height];
+            DustNoiseFrom = VirtualContent.CreateTexture("dust-noise-a", 128, 72, Color.White);
+            DustNoiseTo = VirtualContent.CreateTexture("dust-noise-b", 128, 72, Color.White);
+            Color[] data = new Color[DustNoiseFrom.Width * DustNoiseTo.Height];
             for (int index = 0; index < data.Length; ++index)
                 data[index] = new Color(Calc.Random.NextFloat(), 0.0f, 0.0f, 0.0f);
-            this.DustNoiseFrom.Texture.SetData<Color>(data);
+            DustNoiseFrom.Texture.SetData(data);
             for (int index = 0; index < data.Length; ++index)
                 data[index] = new Color(Calc.Random.NextFloat(), 0.0f, 0.0f, 0.0f);
-            this.DustNoiseTo.Texture.SetData<Color>(data);
+            DustNoiseTo.Texture.SetData(data);
         }
 
         public override void Update()
         {
-            this.noiseEase = Calc.Approach(this.noiseEase, 1f, Engine.DeltaTime);
-            if ((double) this.noiseEase == 1.0)
+            noiseEase = Calc.Approach(noiseEase, 1f, Engine.DeltaTime);
+            if (noiseEase == 1.0)
             {
-                VirtualTexture dustNoiseFrom = this.DustNoiseFrom;
-                this.DustNoiseFrom = this.DustNoiseTo;
-                this.DustNoiseTo = dustNoiseFrom;
-                this.noiseFromPos = this.noiseToPos;
-                this.noiseToPos = new Vector2(Calc.Random.NextFloat(), Calc.Random.NextFloat());
-                this.noiseEase = 0.0f;
+                VirtualTexture dustNoiseFrom = DustNoiseFrom;
+                DustNoiseFrom = DustNoiseTo;
+                DustNoiseTo = dustNoiseFrom;
+                noiseFromPos = noiseToPos;
+                noiseToPos = new Vector2(Calc.Random.NextFloat(), Calc.Random.NextFloat());
+                noiseEase = 0.0f;
             }
             DustEdges.DustGraphicEstabledCounter = 0;
         }
@@ -55,39 +55,39 @@ namespace Celeste
         public override void Removed(Scene scene)
         {
             base.Removed(scene);
-            this.Dispose();
+            Dispose();
         }
 
         public override void SceneEnd(Scene scene)
         {
             base.SceneEnd(scene);
-            this.Dispose();
+            Dispose();
         }
 
         public override void HandleGraphicsReset()
         {
             base.HandleGraphicsReset();
-            this.Dispose();
+            Dispose();
         }
 
         private void Dispose()
         {
-            if (this.DustNoiseFrom != null)
-                this.DustNoiseFrom.Dispose();
-            if (this.DustNoiseTo == null)
+            if (DustNoiseFrom != null)
+                DustNoiseFrom.Dispose();
+            if (DustNoiseTo == null)
                 return;
-            this.DustNoiseTo.Dispose();
+            DustNoiseTo.Dispose();
         }
 
         public void BeforeRender()
         {
-            List<Component> components = this.Scene.Tracker.GetComponents<DustEdge>();
-            this.hasDust = components.Count > 0;
-            if (!this.hasDust)
+            List<Component> components = Scene.Tracker.GetComponents<DustEdge>();
+            hasDust = components.Count > 0;
+            if (!hasDust)
                 return;
-            Engine.Graphics.GraphicsDevice.SetRenderTarget((RenderTarget2D) GameplayBuffers.TempA);
+            Engine.Graphics.GraphicsDevice.SetRenderTarget(GameplayBuffers.TempA);
             Engine.Graphics.GraphicsDevice.Clear(Color.Transparent);
-            Draw.SpriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, SamplerState.PointClamp, DepthStencilState.None, RasterizerState.CullNone, (Effect) null, (this.Scene as Level).Camera.Matrix);
+            Draw.SpriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, SamplerState.PointClamp, DepthStencilState.None, RasterizerState.CullNone, null, (Scene as Level).Camera.Matrix);
             foreach (Component component in components)
             {
                 DustEdge dustEdge = component as DustEdge;
@@ -95,36 +95,36 @@ namespace Celeste
                     dustEdge.RenderDust();
             }
             Draw.SpriteBatch.End();
-            if (this.DustNoiseFrom == null || this.DustNoiseFrom.IsDisposed)
-                this.CreateTextures();
-            Vector2 vector2 = this.FlooredCamera();
-            Engine.Graphics.GraphicsDevice.SetRenderTarget((RenderTarget2D) GameplayBuffers.ResortDust);
+            if (DustNoiseFrom == null || DustNoiseFrom.IsDisposed)
+                CreateTextures();
+            Vector2 vector2 = FlooredCamera();
+            Engine.Graphics.GraphicsDevice.SetRenderTarget(GameplayBuffers.ResortDust);
             Engine.Graphics.GraphicsDevice.Clear(Color.Transparent);
-            Engine.Graphics.GraphicsDevice.Textures[1] = (Texture) this.DustNoiseFrom.Texture;
-            Engine.Graphics.GraphicsDevice.Textures[2] = (Texture) this.DustNoiseTo.Texture;
-            GFX.FxDust.Parameters["colors"].SetValue(DustStyles.Get(this.Scene).EdgeColors);
-            GFX.FxDust.Parameters["noiseEase"].SetValue(this.noiseEase);
-            GFX.FxDust.Parameters["noiseFromPos"].SetValue(this.noiseFromPos + new Vector2(vector2.X / 320f, vector2.Y / 180f));
-            GFX.FxDust.Parameters["noiseToPos"].SetValue(this.noiseToPos + new Vector2(vector2.X / 320f, vector2.Y / 180f));
+            Engine.Graphics.GraphicsDevice.Textures[1] = DustNoiseFrom.Texture;
+            Engine.Graphics.GraphicsDevice.Textures[2] = DustNoiseTo.Texture;
+            GFX.FxDust.Parameters["colors"].SetValue(DustStyles.Get(Scene).EdgeColors);
+            GFX.FxDust.Parameters["noiseEase"].SetValue(noiseEase);
+            GFX.FxDust.Parameters["noiseFromPos"].SetValue(noiseFromPos + new Vector2(vector2.X / 320f, vector2.Y / 180f));
+            GFX.FxDust.Parameters["noiseToPos"].SetValue(noiseToPos + new Vector2(vector2.X / 320f, vector2.Y / 180f));
             GFX.FxDust.Parameters["pixel"].SetValue(new Vector2(1f / 320f, 0.00555555569f));
             Draw.SpriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, SamplerState.PointClamp, DepthStencilState.None, RasterizerState.CullNone, GFX.FxDust, Matrix.Identity);
-            Draw.SpriteBatch.Draw((Texture2D) (RenderTarget2D) GameplayBuffers.TempA, Vector2.Zero, Color.White);
+            Draw.SpriteBatch.Draw((RenderTarget2D) GameplayBuffers.TempA, Vector2.Zero, Color.White);
             Draw.SpriteBatch.End();
         }
 
         public override void Render()
         {
-            if (!this.hasDust)
+            if (!hasDust)
                 return;
-            Vector2 position = this.FlooredCamera();
-            Draw.SpriteBatch.Draw((Texture2D) (RenderTarget2D) GameplayBuffers.ResortDust, position, Color.White);
+            Vector2 position = FlooredCamera();
+            Draw.SpriteBatch.Draw((RenderTarget2D) GameplayBuffers.ResortDust, position, Color.White);
         }
 
         private Vector2 FlooredCamera()
         {
-            Vector2 position = (this.Scene as Level).Camera.Position;
-            position.X = (float) (int) Math.Floor((double) position.X);
-            position.Y = (float) (int) Math.Floor((double) position.Y);
+            Vector2 position = (Scene as Level).Camera.Position;
+            position.X = (int) Math.Floor(position.X);
+            position.Y = (int) Math.Floor(position.Y);
             return position;
         }
     }

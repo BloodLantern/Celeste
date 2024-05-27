@@ -14,7 +14,7 @@ namespace Celeste
             if (system == null)
                 system = (Engine.Scene as Level).ParticlesFG;
             for (int index = 0; index < count; ++index)
-                system.Emit(Calc.Random.Choose<ParticleType>(ParticleTypes.Chimney), position + Calc.Random.Range(-vector, vector), direction);
+                system.Emit(Calc.Random.Choose(ParticleTypes.Chimney), position + Calc.Random.Range(-vector, vector), direction);
         }
     }
 }

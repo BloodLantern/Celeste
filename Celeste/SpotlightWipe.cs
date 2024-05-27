@@ -9,7 +9,7 @@ namespace Celeste
     public class SpotlightWipe : ScreenWipe
     {
         public static Vector2 FocusPoint;
-        public static float Modifier = 0.0f;
+        public static float Modifier;
         public bool Linear;
         private const float SmallCircleRadius = 288f;
         private const float EaseDuration = 1.8f;
@@ -21,35 +21,35 @@ namespace Celeste
         public SpotlightWipe(Scene scene, bool wipeIn, Action onComplete = null)
             : base(scene, wipeIn, onComplete)
         {
-            this.Duration = 1.8f;
+            Duration = 1.8f;
             SpotlightWipe.Modifier = 0.0f;
             if (wipeIn)
-                this.sfx = Audio.Play("event:/game/general/spotlight_intro");
+                sfx = Audio.Play("event:/game/general/spotlight_intro");
             else
-                this.sfx = Audio.Play("event:/game/general/spotlight_outro");
+                sfx = Audio.Play("event:/game/general/spotlight_outro");
         }
 
         public override void Cancel()
         {
-            if ((HandleBase) this.sfx != (HandleBase) null)
+            if (sfx != null)
             {
-                int num1 = (int) this.sfx.stop(STOP_MODE.IMMEDIATE);
-                int num2 = (int) this.sfx.release();
-                this.sfx = (EventInstance) null;
+                int num1 = (int) sfx.stop(STOP_MODE.IMMEDIATE);
+                int num2 = (int) sfx.release();
+                sfx = null;
             }
             base.Cancel();
         }
 
         public override void Render(Scene scene)
         {
-            float t = this.WipeIn ? this.Percent : 1f - this.Percent;
+            float t = WipeIn ? Percent : 1f - Percent;
             Vector2 focusPoint = SpotlightWipe.FocusPoint;
             if (SaveData.Instance != null && SaveData.Instance.Assists.MirrorMode)
                 focusPoint.X = 320f - focusPoint.X;
             focusPoint.X *= 6f;
             focusPoint.Y *= 6f;
             float num = 288f + SpotlightWipe.Modifier;
-            float radius = this.Linear ? Ease.CubeInOut(t) * 1920f : ((double) t >= 0.20000000298023224 ? ((double) t >= 0.800000011920929 ? num + (float) (((double) t - 0.800000011920929) / 0.20000000298023224 * (1920.0 - (double) num)) : num) : Ease.CubeInOut(t / 0.2f) * num);
+            float radius = Linear ? Ease.CubeInOut(t) * 1920f : (t >= 0.20000000298023224 ? (t >= 0.800000011920929 ? num + (float) ((t - 0.800000011920929) / 0.20000000298023224 * (1920.0 - num)) : num) : Ease.CubeInOut(t / 0.2f) * num);
             SpotlightWipe.DrawSpotlight(focusPoint, radius, ScreenWipe.WipeColor);
         }
 
@@ -58,7 +58,7 @@ namespace Celeste
             Vector2 vector2 = new Vector2(1f, 0.0f);
             for (int index = 0; index < SpotlightWipe.vertexBuffer.Length; index += 12)
             {
-                Vector2 vector = Calc.AngleToVector((float) (((double) index + 12.0) / (double) SpotlightWipe.vertexBuffer.Length * 6.2831854820251465), 1f);
+                Vector2 vector = Calc.AngleToVector((float) ((index + 12.0) / SpotlightWipe.vertexBuffer.Length * 6.2831854820251465), 1f);
                 SpotlightWipe.vertexBuffer[index].Position = new Vector3(position + vector2 * 5000f, 0.0f);
                 SpotlightWipe.vertexBuffer[index].Color = color;
                 SpotlightWipe.vertexBuffer[index + 1].Position = new Vector3(position + vector2 * radius, 0.0f);

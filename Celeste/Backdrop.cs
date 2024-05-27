@@ -17,8 +17,8 @@ namespace Celeste
         public bool LoopY = true;
         public bool FlipX;
         public bool FlipY;
-        public Backdrop.Fader FadeX;
-        public Backdrop.Fader FadeY;
+        public Fader FadeX;
+        public Fader FadeY;
         public float FadeAlphaMultiplier = 1f;
         public float WindMultiplier;
         public HashSet<string> ExcludeFrom;
@@ -70,7 +70,7 @@ namespace Celeste
 
             public Fader Add(float posFrom, float posTo, float fadeFrom, float fadeTo)
             {
-                Segments.Add(new Segment()
+                Segments.Add(new Segment
                 {
                     PositionFrom = posFrom,
                     PositionTo = posTo,

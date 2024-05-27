@@ -427,9 +427,9 @@ namespace Celeste
                 backdrop.AlsoIfFlag = str5;
             bool? nullable = new bool?();
             if (child.HasAttr("dreaming"))
-                nullable = new bool?(child.AttrBool("dreaming"));
+                nullable = child.AttrBool("dreaming");
             else if (above != null && above.HasAttr("dreaming"))
-                nullable = new bool?(above.AttrBool("dreaming"));
+                nullable = above.AttrBool("dreaming");
             if (nullable.HasValue)
                 backdrop.Dreaming = nullable;
             if (child.HasAttr("instantIn"))
@@ -522,7 +522,7 @@ namespace Celeste
             char[] chArray = new char[1]{ ',' };
             foreach (string str2 in str1.Split(chArray))
             {
-                if (str2.Contains<char>('*'))
+                if (str2.Contains('*'))
                 {
                     string pattern = "^" + Regex.Escape(str2).Replace("\\*", ".*") + "$";
                     foreach (LevelData level in Levels)

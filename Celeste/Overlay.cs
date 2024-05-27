@@ -11,8 +11,8 @@ namespace Celeste
 
         public Overlay()
         {
-            this.Tag = (int) Tags.HUD;
-            this.Depth = -100000;
+            Tag = (int) Tags.HUD;
+            Depth = -100000;
         }
 
         public override void Added(Scene scene)
@@ -25,23 +25,23 @@ namespace Celeste
         public override void Removed(Scene scene)
         {
             if (scene is IOverlayHandler overlayHandler && overlayHandler.Overlay == this)
-                overlayHandler.Overlay = (Overlay) null;
+                overlayHandler.Overlay = null;
             base.Removed(scene);
         }
 
         public IEnumerator FadeIn()
         {
-            for (; (double) this.Fade < 1.0; this.Fade += Engine.DeltaTime * 4f)
-                yield return (object) null;
-            this.Fade = 1f;
+            for (; Fade < 1.0; Fade += Engine.DeltaTime * 4f)
+                yield return null;
+            Fade = 1f;
         }
 
         public IEnumerator FadeOut()
         {
-            for (; (double) this.Fade > 0.0; this.Fade -= Engine.DeltaTime * 4f)
-                yield return (object) null;
+            for (; Fade > 0.0; Fade -= Engine.DeltaTime * 4f)
+                yield return null;
         }
 
-        public void RenderFade() => Draw.Rect(-10f, -10f, 1940f, 1100f, Color.Black * Ease.CubeInOut(this.Fade) * 0.95f);
+        public void RenderFade() => Draw.Rect(-10f, -10f, 1940f, 1100f, Color.Black * Ease.CubeInOut(Fade) * 0.95f);
     }
 }

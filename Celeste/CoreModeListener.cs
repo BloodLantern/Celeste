@@ -3,7 +3,7 @@ using System;
 
 namespace Celeste
 {
-    [Tracked(false)]
+    [Tracked()]
     public class CoreModeListener : Component
     {
         public Action<Session.CoreModes> OnChange;
@@ -11,7 +11,7 @@ namespace Celeste
         public CoreModeListener(Action<Session.CoreModes> onChange)
             : base(false, false)
         {
-            this.OnChange = onChange;
+            OnChange = onChange;
         }
     }
 }

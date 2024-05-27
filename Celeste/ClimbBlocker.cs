@@ -3,7 +3,7 @@ using Monocle;
 
 namespace Celeste
 {
-    [Tracked(false)]
+    [Tracked()]
     public class ClimbBlocker : Component
     {
         public bool Blocking = true;
@@ -12,7 +12,7 @@ namespace Celeste
         public ClimbBlocker(bool edge)
             : base(false, false)
         {
-            this.Edge = edge;
+            Edge = edge;
         }
 
         public static bool Check(Scene scene, Entity entity, Vector2 at)
@@ -38,7 +38,7 @@ namespace Celeste
         {
             foreach (ClimbBlocker component in scene.Tracker.GetComponents<ClimbBlocker>())
             {
-                if (component.Blocking && component.Edge && entity.CollideCheck(component.Entity, entity.Position + Vector2.UnitX * (float) dir))
+                if (component.Blocking && component.Edge && entity.CollideCheck(component.Entity, entity.Position + Vector2.UnitX * dir))
                     return true;
             }
             return false;

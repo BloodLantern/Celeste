@@ -1,6 +1,5 @@
 ﻿using Microsoft.Xna.Framework;
 using Monocle;
-using System;
 using System.Collections.Generic;
 
 namespace Celeste
@@ -9,7 +8,7 @@ namespace Celeste
     {
         public float Alpha = 1f;
         private Vector2 origin;
-        private List<AreaCompleteTitle.Letter> letters = new List<AreaCompleteTitle.Letter>();
+        private List<Letter> letters = new List<Letter>();
         private float rectangleEase;
         private float scale;
 
@@ -29,39 +28,39 @@ namespace Celeste
                     ch = text[index1];
                     string str = ch.ToString();
                     Vector2 position = vector2_2 + Vector2.UnitX * vector2_3.X * 0.5f;
-                    AreaCompleteTitle.Letter letter = new AreaCompleteTitle.Letter(index2, str, position);
+                    Letter letter = new Letter(index2, str, position);
                     if (rainbow)
                     {
-                        float hue = (float) index1 / (float) text.Length;
+                        float hue = index1 / (float) text.Length;
                         letter.Color = Calc.HsvToColor(hue, 0.8f, 0.9f);
                         letter.Shadow = Color.Lerp(letter.Color, Color.Black, 0.7f);
                     }
-                    this.letters.Add(letter);
+                    letters.Add(letter);
                 }
                 vector2_2 += Vector2.UnitX * vector2_3.X;
             }
-            Alarm.Set((Entity) this, 2.6f, (Action) (() =>
+            Alarm.Set(this, 2.6f, () =>
             {
                 Tween tween = Tween.Create(Tween.TweenMode.Oneshot, Ease.SineOut, 0.5f, true);
-                tween.OnUpdate = (Action<Tween>) (t => this.rectangleEase = t.Eased);
-                this.Add((Component) tween);
-            }));
+                tween.OnUpdate = t => rectangleEase = t.Eased;
+                Add(tween);
+            });
         }
 
         public override void Update()
         {
             base.Update();
-            foreach (AreaCompleteTitle.Letter letter in this.letters)
+            foreach (Letter letter in letters)
                 letter.Update();
         }
 
-        public void DrawLineUI() => Draw.Rect(this.X, (float) ((double) this.Y + (double) this.origin.Y - 40.0), 1920f * this.rectangleEase, 80f, Color.Black * 0.65f);
+        public void DrawLineUI() => Draw.Rect(X, (float) (Y + (double) origin.Y - 40.0), 1920f * rectangleEase, 80f, Color.Black * 0.65f);
 
         public override void Render()
         {
             base.Render();
-            foreach (AreaCompleteTitle.Letter letter in this.letters)
-                letter.Render(this.Position, this.scale, this.Alpha);
+            foreach (Letter letter in letters)
+                letter.Render(Position, scale, Alpha);
         }
 
         public class Letter
@@ -77,48 +76,48 @@ namespace Celeste
 
             public Letter(int index, string value, Vector2 position)
             {
-                this.Value = value;
-                this.Position = position;
-                this.delay = (float) (0.20000000298023224 + (double) index * 0.019999999552965164);
-                this.curve = new SimpleCurve(position + Vector2.UnitY * 60f, position, position - Vector2.UnitY * 100f);
-                this.scale = new Vector2(0.75f, 1.5f);
+                Value = value;
+                Position = position;
+                delay = (float) (0.20000000298023224 + index * 0.019999999552965164);
+                curve = new SimpleCurve(position + Vector2.UnitY * 60f, position, position - Vector2.UnitY * 100f);
+                scale = new Vector2(0.75f, 1.5f);
             }
 
             public void Update()
             {
-                this.scale.X = Calc.Approach(this.scale.X, 1f, 3f * Engine.DeltaTime);
-                this.scale.Y = Calc.Approach(this.scale.Y, 1f, 3f * Engine.DeltaTime);
-                if ((double) this.delay > 0.0)
+                scale.X = Calc.Approach(scale.X, 1f, 3f * Engine.DeltaTime);
+                scale.Y = Calc.Approach(scale.Y, 1f, 3f * Engine.DeltaTime);
+                if (delay > 0.0)
                 {
-                    this.delay -= Engine.DeltaTime;
+                    delay -= Engine.DeltaTime;
                 }
                 else
                 {
-                    if ((double) this.ease >= 1.0)
+                    if (ease >= 1.0)
                         return;
-                    this.ease += 4f * Engine.DeltaTime;
-                    if ((double) this.ease < 1.0)
+                    ease += 4f * Engine.DeltaTime;
+                    if (ease < 1.0)
                         return;
-                    this.ease = 1f;
-                    this.scale = new Vector2(1.5f, 0.75f);
+                    ease = 1f;
+                    scale = new Vector2(1.5f, 0.75f);
                 }
             }
 
             public void Render(Vector2 offset, float scale, float alphaMultiplier)
             {
-                if ((double) this.ease <= 0.0)
+                if (ease <= 0.0)
                     return;
-                Vector2 position = offset + this.curve.GetPoint(this.ease);
-                float num = Calc.LerpClamp(0.0f, 1f, this.ease * 3f) * alphaMultiplier;
+                Vector2 position = offset + curve.GetPoint(ease);
+                float num = Calc.LerpClamp(0.0f, 1f, ease * 3f) * alphaMultiplier;
                 Vector2 scale1 = this.scale * scale;
-                if ((double) num < 1.0)
+                if (num < 1.0)
                 {
-                    ActiveFont.Draw(this.Value, position, new Vector2(0.5f, 1f), scale1, this.Color * num);
+                    ActiveFont.Draw(Value, position, new Vector2(0.5f, 1f), scale1, Color * num);
                 }
                 else
                 {
-                    ActiveFont.Draw(this.Value, position + Vector2.UnitY * 3.5f * scale, new Vector2(0.5f, 1f), scale1, this.Shadow);
-                    ActiveFont.DrawOutline(this.Value, position, new Vector2(0.5f, 1f), scale1, this.Color, 2f, this.Shadow);
+                    ActiveFont.Draw(Value, position + Vector2.UnitY * 3.5f * scale, new Vector2(0.5f, 1f), scale1, Shadow);
+                    ActiveFont.DrawOutline(Value, position, new Vector2(0.5f, 1f), scale1, Color, 2f, Shadow);
                 }
             }
         }

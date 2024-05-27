@@ -13,7 +13,7 @@ namespace Celeste
         private float startX;
         private float endX;
 
-        public TempleEndingMusicHandler() => this.Tag = (int) Tags.TransitionUpdate | (int) Tags.Global;
+        public TempleEndingMusicHandler() => Tag = (int) Tags.TransitionUpdate | (int) Tags.Global;
 
         public override void Awake(Scene scene)
         {
@@ -22,22 +22,22 @@ namespace Celeste
             foreach (LevelData level in (scene as Level).Session.MapData.Levels)
             {
                 if (level.Name.Equals("e-01"))
-                    this.startX = (float) level.Bounds.Left;
+                    startX = level.Bounds.Left;
                 else if (level.Name.Equals("e-09"))
-                    this.endX = (float) level.Bounds.Right;
+                    endX = level.Bounds.Right;
                 if (regex.IsMatch(level.Name))
-                    this.levels.Add(level.Name);
+                    levels.Add(level.Name);
             }
         }
 
         public override void Update()
         {
             base.Update();
-            Level scene = this.Scene as Level;
-            Player entity = this.Scene.Tracker.GetEntity<Player>();
-            if (entity == null || !this.levels.Contains(scene.Session.Level) || !(Audio.CurrentMusic == "event:/music/lvl5/mirror"))
+            Level scene = Scene as Level;
+            Player entity = Scene.Tracker.GetEntity<Player>();
+            if (entity == null || !levels.Contains(scene.Session.Level) || !(Audio.CurrentMusic == "event:/music/lvl5/mirror"))
                 return;
-            float num = Calc.Clamp((float) (((double) entity.X - (double) this.startX) / ((double) this.endX - (double) this.startX)), 0.0f, 1f);
+            float num = Calc.Clamp((float) ((entity.X - (double) startX) / (endX - (double) startX)), 0.0f, 1f);
             scene.Session.Audio.Music.Layer(1, 1f - num);
             scene.Session.Audio.Music.Layer(5, num);
             scene.Session.Audio.Apply();

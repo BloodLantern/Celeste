@@ -22,52 +22,52 @@ namespace Celeste
         public Leader(Vector2 position)
             : base(true, false)
         {
-            this.Position = position;
+            Position = position;
         }
 
         public void GainFollower(Follower follower)
         {
-            this.Followers.Add(follower);
+            Followers.Add(follower);
             follower.OnGainLeaderUtil(this);
         }
 
         public void LoseFollower(Follower follower)
         {
-            this.Followers.Remove(follower);
+            Followers.Remove(follower);
             follower.OnLoseLeaderUtil();
         }
 
         public void LoseFollowers()
         {
-            foreach (Follower follower in this.Followers)
+            foreach (Follower follower in Followers)
                 follower.OnLoseLeaderUtil();
-            this.Followers.Clear();
+            Followers.Clear();
         }
 
         public override void Update()
         {
-            Vector2 vector2 = this.Entity.Position + this.Position;
-            if (this.Scene.OnInterval(0.02f) && (this.PastPoints.Count == 0 || (double) (vector2 - this.PastPoints[0]).Length() >= 3.0))
+            Vector2 vector2 = Entity.Position + Position;
+            if (Scene.OnInterval(0.02f) && (PastPoints.Count == 0 || (vector2 - PastPoints[0]).Length() >= 3.0))
             {
-                this.PastPoints.Insert(0, vector2);
-                if (this.PastPoints.Count > 350)
-                    this.PastPoints.RemoveAt(this.PastPoints.Count - 1);
+                PastPoints.Insert(0, vector2);
+                if (PastPoints.Count > 350)
+                    PastPoints.RemoveAt(PastPoints.Count - 1);
             }
             int index = 5;
-            foreach (Follower follower in this.Followers)
+            foreach (Follower follower in Followers)
             {
-                if (index >= this.PastPoints.Count)
+                if (index >= PastPoints.Count)
                     break;
-                Vector2 pastPoint = this.PastPoints[index];
-                if ((double) follower.DelayTimer <= 0.0 && follower.MoveTowardsLeader)
-                    follower.Entity.Position = follower.Entity.Position + (pastPoint - follower.Entity.Position) * (1f - (float) Math.Pow(0.0099999997764825821, (double) Engine.DeltaTime));
+                Vector2 pastPoint = PastPoints[index];
+                if (follower.DelayTimer <= 0.0 && follower.MoveTowardsLeader)
+                    follower.Entity.Position += (pastPoint - follower.Entity.Position) * (1f - (float) Math.Pow(0.0099999997764825821, Engine.DeltaTime));
                 index += 5;
             }
         }
 
         public bool HasFollower<T>()
         {
-            foreach (Component follower in this.Followers)
+            foreach (Component follower in Followers)
             {
                 if (follower.Entity is T)
                     return true;
@@ -77,12 +77,12 @@ namespace Celeste
 
         public void TransferFollowers()
         {
-            for (int index = 0; index < this.Followers.Count; ++index)
+            for (int index = 0; index < Followers.Count; ++index)
             {
-                Follower follower = this.Followers[index];
+                Follower follower = Followers[index];
                 if (!follower.Entity.TagCheck((int) Tags.Persistent))
                 {
-                    this.LoseFollower(follower);
+                    LoseFollower(follower);
                     --index;
                 }
             }
@@ -103,7 +103,7 @@ namespace Celeste
             foreach (Strawberry storedBerry in Leader.storedBerries)
             {
                 leader.Followers.Remove(storedBerry.Follower);
-                storedBerry.Follower.Leader = (Leader) null;
+                storedBerry.Follower.Leader = null;
                 storedBerry.AddTag((int) Tags.Global);
             }
         }

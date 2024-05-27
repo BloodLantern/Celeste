@@ -3,7 +3,7 @@ using System;
 
 namespace Celeste
 {
-    [Tracked(false)]
+    [Tracked()]
     public class HoldableCollider : Component
     {
         private Collider collider;
@@ -13,16 +13,16 @@ namespace Celeste
             : base(false, false)
         {
             this.collider = collider;
-            this.OnCollide = onCollide;
+            OnCollide = onCollide;
         }
 
         public bool Check(Holdable holdable)
         {
-            Collider collider = this.Entity.Collider;
+            Collider collider = Entity.Collider;
             if (this.collider != null)
-                this.Entity.Collider = this.collider;
-            int num = holdable.Entity.CollideCheck(this.Entity) ? 1 : 0;
-            this.Entity.Collider = collider;
+                Entity.Collider = this.collider;
+            int num = holdable.Entity.CollideCheck(Entity) ? 1 : 0;
+            Entity.Collider = collider;
             return num != 0;
         }
     }

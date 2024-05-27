@@ -1,6 +1,5 @@
 ﻿using Microsoft.Xna.Framework;
 using Monocle;
-using System;
 
 namespace Celeste
 {
@@ -9,14 +8,14 @@ namespace Celeste
         public static SoundEmitter Play(string sfx)
         {
             SoundEmitter soundEmitter = new SoundEmitter(sfx);
-            Engine.Scene.Add((Entity) soundEmitter);
+            Engine.Scene.Add(soundEmitter);
             return soundEmitter;
         }
 
         public static SoundEmitter Play(string sfx, Entity follow, Vector2? offset = null)
         {
             SoundEmitter soundEmitter = new SoundEmitter(sfx, follow, offset.HasValue ? offset.Value : Vector2.Zero);
-            Engine.Scene.Add((Entity) soundEmitter);
+            Engine.Scene.Add(soundEmitter);
             return soundEmitter;
         }
 
@@ -24,31 +23,31 @@ namespace Celeste
 
         private SoundEmitter(string sfx)
         {
-            this.Add((Component) (this.Source = new SoundSource()));
-            this.Source.Play(sfx);
-            this.Source.DisposeOnTransition = false;
-            this.Tag = (int) Tags.Persistent | (int) Tags.TransitionUpdate;
-            this.Add((Component) new LevelEndingHook(new Action(this.OnLevelEnding)));
+            Add(Source = new SoundSource());
+            Source.Play(sfx);
+            Source.DisposeOnTransition = false;
+            Tag = (int) Tags.Persistent | (int) Tags.TransitionUpdate;
+            Add(new LevelEndingHook(OnLevelEnding));
         }
 
         private SoundEmitter(string sfx, Entity follow, Vector2 offset)
         {
-            this.Add((Component) (this.Source = new SoundSource()));
-            this.Position = follow.Position + offset;
-            this.Source.Play(sfx);
-            this.Source.DisposeOnTransition = false;
-            this.Tag = (int) Tags.Persistent | (int) Tags.TransitionUpdate;
-            this.Add((Component) new LevelEndingHook(new Action(this.OnLevelEnding)));
+            Add(Source = new SoundSource());
+            Position = follow.Position + offset;
+            Source.Play(sfx);
+            Source.DisposeOnTransition = false;
+            Tag = (int) Tags.Persistent | (int) Tags.TransitionUpdate;
+            Add(new LevelEndingHook(OnLevelEnding));
         }
 
         public override void Update()
         {
             base.Update();
-            if (this.Source.Playing)
+            if (Source.Playing)
                 return;
-            this.RemoveSelf();
+            RemoveSelf();
         }
 
-        private void OnLevelEnding() => this.Source.Stop();
+        private void OnLevelEnding() => Source.Stop();
     }
 }

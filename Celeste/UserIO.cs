@@ -53,7 +53,7 @@ namespace Celeste
             }
             catch (Exception ex)
             {
-                Console.WriteLine("ERROR: " + ex.ToString());
+                Console.WriteLine("ERROR: " + ex);
                 ErrorLog.Write(ex);
             }
             if (!flag)
@@ -82,7 +82,7 @@ namespace Celeste
             }
             catch (Exception ex)
             {
-                Console.WriteLine("ERROR: " + ex.ToString());
+                Console.WriteLine("ERROR: " + ex);
                 ErrorLog.Write(ex);
             }
             return obj;
@@ -146,13 +146,13 @@ namespace Celeste
                 if (savingFile)
                 {
                     SaveData.Instance.BeforeSave();
-                    savingFileData = Serialize<SaveData>(SaveData.Instance);
+                    savingFileData = Serialize(SaveData.Instance);
                 }
                 if (savingSettings)
-                    savingSettingsData = Serialize<Settings>(Settings.Instance);
+                    savingSettingsData = Serialize(Settings.Instance);
                 savingInternal = true;
                 SavingResult = false;
-                RunThread.Start(new Action(SaveThread), "USER_IO");
+                RunThread.Start(UserIO.SaveThread, "USER_IO");
                 SaveLoadIcon.Show(Engine.Scene);
                 while (savingInternal)
                     yield return null;

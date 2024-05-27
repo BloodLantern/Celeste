@@ -6,7 +6,7 @@ using System.Collections.Generic;
 
 namespace Celeste
 {
-    [Tracked(false)]
+    [Tracked]
     public class DustGraphic : Component
     {
         public Vector2 Position;
@@ -50,7 +50,7 @@ namespace Celeste
             {
                 Camera camera = (Scene as Level).Camera;
                 Vector2 position = Entity.Position;
-                return position.X + 16.0 >= (double) camera.Left && position.Y + 16.0 >= (double) camera.Top && position.X - 16.0 <= (double) camera.Right && position.Y - 16.0 <= (double) camera.Bottom;
+                return position.X + 16.0 >= camera.Left && position.Y + 16.0 >= camera.Top && position.X - 16.0 <= camera.Right && position.Y - 16.0 <= camera.Bottom;
             }
         }
 
@@ -77,11 +77,11 @@ namespace Celeste
         public override void Added(Entity entity)
         {
             base.Added(entity);
-            entity.Add(new TransitionListener()
+            entity.Add(new TransitionListener
             {
                 OnIn = f => AddDustNodesIfInCamera()
             });
-            entity.Add(new DustEdge(new Action(this.Render)));
+            entity.Add(new DustEdge(Render));
         }
 
         public override void Update()
@@ -109,7 +109,7 @@ namespace Celeste
                         float val = EyeDirection.Angle();
                         float target = EyeTargetDirection.Angle();
                         float angleRadians = Calc.AngleApproach(val, target, 8f * Engine.DeltaTime);
-                        EyeDirection = (double) angleRadians != (double) target ? Calc.AngleToVector(angleRadians, 1f) : EyeTargetDirection;
+                        EyeDirection = angleRadians != (double) target ? Calc.AngleToVector(angleRadians, 1f) : EyeTargetDirection;
                     }
                 }
                 if (eyesFollowPlayer & inView)
@@ -191,7 +191,7 @@ namespace Celeste
                     eyeLookRange += new Vector2(-1f, 1f).SafeNormalize();
                 if (nodes[3].Enabled)
                     eyeLookRange += new Vector2(1f, 1f).SafeNormalize();
-                if (num > 0 && (double) eyeLookRange.Length() > 0.0)
+                if (num > 0 && eyeLookRange.Length() > 0.0)
                 {
                     eyeLookRange /= num;
                     eyeLookRange = eyeLookRange.SafeNormalize();
@@ -220,15 +220,15 @@ namespace Celeste
                 int num1 = Math.Sign(angle.X);
                 int num2 = Math.Sign(angle.Y);
                 Entity.Collidable = false;
-                if (Scene.CollideCheck<Solid>(new Rectangle((int) ((double) Entity.X - 4.0 + num1 * 16), (int) ((double) Entity.Y - 4.0 + num2 * 4), 8, 8)) || Scene.CollideCheck<DustStaticSpinner>(new Rectangle((int) ((double) Entity.X - 4.0 + num1 * 16), (int) ((double) Entity.Y - 4.0 + num2 * 4), 8, 8)))
+                if (Scene.CollideCheck<Solid>(new Rectangle((int) (Entity.X - 4.0 + num1 * 16), (int) (Entity.Y - 4.0 + num2 * 4), 8, 8)) || Scene.CollideCheck<DustStaticSpinner>(new Rectangle((int) (Entity.X - 4.0 + num1 * 16), (int) (Entity.Y - 4.0 + num2 * 4), 8, 8)))
                     vector2.X = 5f;
-                if (Scene.CollideCheck<Solid>(new Rectangle((int) ((double) Entity.X - 4.0 + num1 * 4), (int) ((double) Entity.Y - 4.0 + num2 * 16), 8, 8)) || Scene.CollideCheck<DustStaticSpinner>(new Rectangle((int) ((double) Entity.X - 4.0 + num1 * 4), (int) ((double) Entity.Y - 4.0 + num2 * 16), 8, 8)))
+                if (Scene.CollideCheck<Solid>(new Rectangle((int) (Entity.X - 4.0 + num1 * 4), (int) (Entity.Y - 4.0 + num2 * 16), 8, 8)) || Scene.CollideCheck<DustStaticSpinner>(new Rectangle((int) (Entity.X - 4.0 + num1 * 4), (int) (Entity.Y - 4.0 + num2 * 16), 8, 8)))
                     vector2.Y = 5f;
                 Entity.Collidable = true;
             }
             Node node = new();
-            node.Base = Calc.Random.Choose<MTexture>(GFX.Game.GetAtlasSubtextures("danger/dustcreature/base"));
-            node.Overlay = Calc.Random.Choose<MTexture>(GFX.Game.GetAtlasSubtextures("danger/dustcreature/overlay"));
+            node.Base = Calc.Random.Choose(GFX.Game.GetAtlasSubtextures("danger/dustcreature/base"));
+            node.Overlay = Calc.Random.Choose(GFX.Game.GetAtlasSubtextures("danger/dustcreature/overlay"));
             node.Rotation = Calc.Random.NextFloat(6.28318548f);
             node.Angle = angle * vector2;
             node.Enabled = enabled;
@@ -247,9 +247,9 @@ namespace Celeste
         {
             while (true)
             {
-                yield return (float) (2.0 + (double) Calc.Random.NextFloat(1.5f));
+                yield return (float) (2.0 + Calc.Random.NextFloat(1.5f));
                 leftEyeVisible = false;
-                yield return (float) (0.019999999552965164 + (double) Calc.Random.NextFloat(0.05f));
+                yield return (float) (0.019999999552965164 + Calc.Random.NextFloat(0.05f));
                 rightEyeVisible = false;
                 yield return 0.25f;
                 leftEyeVisible = rightEyeVisible = true;

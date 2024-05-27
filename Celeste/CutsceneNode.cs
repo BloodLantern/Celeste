@@ -4,7 +4,7 @@ using System;
 
 namespace Celeste
 {
-    [Tracked(false)]
+    [Tracked()]
     public class CutsceneNode : Entity
     {
         public string Name;
@@ -12,7 +12,7 @@ namespace Celeste
         public CutsceneNode(EntityData data, Vector2 offset)
             : base(data.Position + offset)
         {
-            this.Name = data.Attr("nodeName");
+            Name = data.Attr("nodeName");
         }
 
         public static CutsceneNode Find(string name)
@@ -22,7 +22,7 @@ namespace Celeste
                 if (entity.Name != null && entity.Name.Equals(name, StringComparison.InvariantCultureIgnoreCase))
                     return entity;
             }
-            return (CutsceneNode) null;
+            return null;
         }
     }
 }

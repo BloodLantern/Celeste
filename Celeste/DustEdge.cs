@@ -3,7 +3,7 @@ using System;
 
 namespace Celeste
 {
-    [Tracked(false)]
+    [Tracked()]
     public class DustEdge : Component
     {
         public Action RenderDust;
@@ -11,7 +11,7 @@ namespace Celeste
         public DustEdge(Action onRenderDust)
             : base(false, true)
         {
-            this.RenderDust = onRenderDust;
+            RenderDust = onRenderDust;
         }
     }
 }

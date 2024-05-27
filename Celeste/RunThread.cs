@@ -11,7 +11,7 @@ namespace Celeste
 
         public static void Start(Action method, string name, bool highPriority = false)
         {
-            Thread thread = new Thread((ThreadStart) (() => RunThread.RunThreadWithLogging(method)));
+            Thread thread = new Thread(() => RunThread.RunThreadWithLogging(method));
             lock (RunThread.threads)
                 RunThread.threads.Add(thread);
             thread.Name = name;

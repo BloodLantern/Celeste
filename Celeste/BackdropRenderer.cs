@@ -5,7 +5,7 @@ using System.Collections.Generic;
 
 namespace Celeste
 {
-    public class BackdropRenderer : Monocle.Renderer
+    public class BackdropRenderer : Renderer
     {
         public Matrix Matrix = Matrix.Identity;
         public List<Backdrop> Backdrops = new();

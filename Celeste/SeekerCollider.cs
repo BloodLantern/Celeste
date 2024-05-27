@@ -3,7 +3,7 @@ using System;
 
 namespace Celeste
 {
-    [Tracked(false)]
+    [Tracked()]
     public class SeekerCollider : Component
     {
         public Action<Seeker> OnCollide;
@@ -12,20 +12,20 @@ namespace Celeste
         public SeekerCollider(Action<Seeker> onCollide, Collider collider = null)
             : base(false, false)
         {
-            this.OnCollide = onCollide;
-            this.Collider = (Collider) null;
+            OnCollide = onCollide;
+            Collider = null;
         }
 
         public void Check(Seeker seeker)
         {
-            if (this.OnCollide == null)
+            if (OnCollide == null)
                 return;
-            Collider collider = this.Entity.Collider;
-            if (this.Collider != null)
-                this.Entity.Collider = this.Collider;
-            if (seeker.CollideCheck(this.Entity))
-                this.OnCollide(seeker);
-            this.Entity.Collider = collider;
+            Collider collider = Entity.Collider;
+            if (Collider != null)
+                Entity.Collider = Collider;
+            if (seeker.CollideCheck(Entity))
+                OnCollide(seeker);
+            Entity.Collider = collider;
         }
     }
 }

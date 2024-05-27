@@ -3,13 +3,13 @@ using Monocle;
 
 namespace Celeste
 {
-    [Tracked(false)]
+    [Tracked]
     public class ChaserBarrier : Entity
     {
         public ChaserBarrier(Vector2 position, int width, int height)
             : base(position)
         {
-            this.Collider = (Collider) new Hitbox((float) width, (float) height);
+            Collider = new Hitbox(width, height);
         }
 
         public ChaserBarrier(EntityData data, Vector2 offset)
@@ -20,7 +20,7 @@ namespace Celeste
         public override void Render()
         {
             base.Render();
-            Draw.Rect(this.Collider, Color.Red * 0.3f);
+            Draw.Rect(Collider, Color.Red * 0.3f);
         }
     }
 }

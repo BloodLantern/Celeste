@@ -8,7 +8,7 @@ namespace Celeste
         public static float Width(string label, VirtualButton button)
         {
             MTexture mtexture = Input.GuiButton(button);
-            return ActiveFont.Measure(label).X + 8f + (float) mtexture.Width;
+            return ActiveFont.Measure(label).X + 8f + mtexture.Width;
         }
 
         public static void Render(
@@ -22,8 +22,8 @@ namespace Celeste
         {
             MTexture mtexture = Input.GuiButton(button);
             float num = ButtonUI.Width(label, button);
-            position.X -= (float) ((double) scale * (double) num * ((double) justifyX - 0.5));
-            mtexture.Draw(position, new Vector2((float) mtexture.Width - num / 2f, (float) mtexture.Height / 2f), Color.White * alpha, scale + wiggle);
+            position.X -= (float) (scale * (double) num * (justifyX - 0.5));
+            mtexture.Draw(position, new Vector2(mtexture.Width - num / 2f, mtexture.Height / 2f), Color.White * alpha, scale + wiggle);
             ButtonUI.DrawText(label, position, num / 2f, scale + wiggle, alpha);
         }
 

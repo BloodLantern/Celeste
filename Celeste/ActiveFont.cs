@@ -11,7 +11,7 @@ namespace Celeste
 
         public static float BaseSize => Dialog.Language.FontFaceSize;
 
-        public static float LineHeight => (float) ActiveFont.Font.Get(ActiveFont.BaseSize).LineHeight;
+        public static float LineHeight => ActiveFont.Font.Get(ActiveFont.BaseSize).LineHeight;
 
         public static Vector2 Measure(char text) => ActiveFont.Font.Get(ActiveFont.BaseSize).Measure(text);
 

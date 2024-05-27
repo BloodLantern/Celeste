@@ -6,18 +6,18 @@ namespace Celeste
 {
     public class Planets : Backdrop
     {
-        private Planets.Planet[] planets;
+        private Planet[] planets;
         public const int MapWidth = 640;
         public const int MapHeight = 360;
 
         public Planets(int count, string size)
         {
             List<MTexture> atlasSubtextures = GFX.Game.GetAtlasSubtextures("bgs/10/" + size);
-            this.planets = new Planets.Planet[count];
-            for (int index = 0; index < this.planets.Length; ++index)
+            planets = new Planet[count];
+            for (int index = 0; index < planets.Length; ++index)
             {
-                this.planets[index].Texture = Calc.Random.Choose<MTexture>(atlasSubtextures);
-                this.planets[index].Position = new Vector2()
+                planets[index].Texture = Calc.Random.Choose(atlasSubtextures);
+                planets[index].Position = new Vector2
                 {
                     X = Calc.Random.NextFloat(640f),
                     Y = Calc.Random.NextFloat(360f)
@@ -28,15 +28,15 @@ namespace Celeste
         public override void Render(Scene scene)
         {
             Vector2 position1 = (scene as Level).Camera.Position;
-            Color color = this.Color * this.FadeAlphaMultiplier;
-            for (int index = 0; index < this.planets.Length; ++index)
+            Color color = Color * FadeAlphaMultiplier;
+            for (int index = 0; index < planets.Length; ++index)
             {
-                Vector2 position2 = new Vector2()
+                Vector2 position2 = new Vector2
                 {
-                    X = this.Mod(this.planets[index].Position.X - position1.X * this.Scroll.X, 640f) - 32f,
-                    Y = this.Mod(this.planets[index].Position.Y - position1.Y * this.Scroll.Y, 360f) - 32f
+                    X = Mod(planets[index].Position.X - position1.X * Scroll.X, 640f) - 32f,
+                    Y = Mod(planets[index].Position.Y - position1.Y * Scroll.Y, 360f) - 32f
                 };
-                this.planets[index].Texture.DrawCentered(position2, color);
+                planets[index].Texture.DrawCentered(position2, color);
             }
         }
 

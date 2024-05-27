@@ -15,21 +15,9 @@ namespace Celeste
 
         public static void Load()
         {
-            Chooser<MTexture> chooser1 = new Chooser<MTexture>(new MTexture[4]
-            {
-                GFX.Game["particles/smoke0"],
-                GFX.Game["particles/smoke1"],
-                GFX.Game["particles/smoke2"],
-                GFX.Game["particles/smoke3"]
-            });
-            Chooser<MTexture> chooser2 = new Chooser<MTexture>(new MTexture[4]
-            {
-                GFX.Game["particles/zappysmoke00"],
-                GFX.Game["particles/zappysmoke01"],
-                GFX.Game["particles/zappysmoke02"],
-                GFX.Game["particles/zappysmoke03"]
-            });
-            ParticleTypes.Dust = new ParticleType()
+            Chooser<MTexture> chooser1 = new Chooser<MTexture>(GFX.Game["particles/smoke0"], GFX.Game["particles/smoke1"], GFX.Game["particles/smoke2"], GFX.Game["particles/smoke3"]);
+            Chooser<MTexture> chooser2 = new Chooser<MTexture>(GFX.Game["particles/zappysmoke00"], GFX.Game["particles/zappysmoke01"], GFX.Game["particles/zappysmoke02"], GFX.Game["particles/zappysmoke03"]);
+            ParticleTypes.Dust = new ParticleType
             {
                 SourceChooser = chooser1,
                 Color = Color.White,
@@ -53,7 +41,7 @@ namespace Celeste
                 Color2 = Calc.HexToColor("aafab6"),
                 ColorMode = ParticleType.ColorModes.Blink
             };
-            ParticleTypes.Chimney = new ParticleType()
+            ParticleTypes.Chimney = new ParticleType
             {
                 SourceChooser = chooser1,
                 Color = Color.White,
@@ -71,7 +59,7 @@ namespace Celeste
                 RotationMode = ParticleType.RotationModes.Random,
                 ScaleOut = true
             };
-            ParticleTypes.Steam = new ParticleType()
+            ParticleTypes.Steam = new ParticleType
             {
                 SourceChooser = chooser1,
                 Acceleration = new Vector2(0.0f, -4f),
@@ -88,7 +76,7 @@ namespace Celeste
                 Color = Color.White * 0.2f,
                 FadeMode = ParticleType.FadeModes.Late
             };
-            ParticleTypes.VentDust = new ParticleType()
+            ParticleTypes.VentDust = new ParticleType
             {
                 Color = Color.LightGray,
                 FadeMode = ParticleType.FadeModes.Linear,
@@ -102,7 +90,7 @@ namespace Celeste
                 LifeMin = 0.4f,
                 LifeMax = 0.8f
             };
-            Player.P_DashA = new ParticleType()
+            Player.P_DashA = new ParticleType
             {
                 Color = Calc.HexToColor("44B7FF"),
                 Color2 = Calc.HexToColor("75c9ff"),
@@ -126,7 +114,7 @@ namespace Celeste
                 Color = Calc.HexToColor("9B3FB5"),
                 Color2 = Calc.HexToColor("CC8EE2")
             };
-            Player.P_CassetteFly = new ParticleType()
+            Player.P_CassetteFly = new ParticleType
             {
                 Color = Color.White * 0.6f,
                 Source = GFX.Game["particles/bubble"],
@@ -140,7 +128,7 @@ namespace Celeste
                 Acceleration = new Vector2(0.0f, -24f),
                 DirectionRange = 6.28318548f
             };
-            Player.P_Split = new ParticleType()
+            Player.P_Split = new ParticleType
             {
                 Color = Player.TwoDashesHairColor,
                 Color2 = Calc.HexToColor("e256d3"),
@@ -162,7 +150,7 @@ namespace Celeste
                 LifeMin = 0.4f,
                 LifeMax = 0.8f
             };
-            Player.P_SummitLandB = new ParticleType()
+            Player.P_SummitLandB = new ParticleType
             {
                 SourceChooser = chooser1,
                 Color = Color.White,
@@ -178,7 +166,7 @@ namespace Celeste
                 LifeMax = 1.2f,
                 DirectionRange = 0.5235988f
             };
-            Player.P_SummitLandC = new ParticleType()
+            Player.P_SummitLandC = new ParticleType
             {
                 Size = 1f,
                 Color = Player.TwoDashesHairColor,
@@ -194,7 +182,7 @@ namespace Celeste
                 LifeMin = 0.8f,
                 LifeMax = 1.6f
             };
-            Torch.P_OnLight = new ParticleType()
+            Torch.P_OnLight = new ParticleType
             {
                 Color = Calc.HexToColor("6385FF"),
                 Color2 = Color.White,
@@ -208,7 +196,7 @@ namespace Celeste
                 SpeedMultiplier = 0.03f,
                 DirectionRange = 6.28318548f
             };
-            Cloud.P_Cloud = new ParticleType()
+            Cloud.P_Cloud = new ParticleType
             {
                 Source = GFX.Game["particles/cloud"],
                 Color = Calc.HexToColor("2c5fcc"),
@@ -227,7 +215,7 @@ namespace Celeste
             };
             Cloud.P_FragileCloud = new ParticleType(Cloud.P_Cloud);
             Cloud.P_FragileCloud.Color = Calc.HexToColor("5e22ae");
-            Booster.P_Burst = new ParticleType()
+            Booster.P_Burst = new ParticleType
             {
                 Source = GFX.Game["particles/blob"],
                 Color = Calc.HexToColor("2c956e"),
@@ -246,7 +234,7 @@ namespace Celeste
             };
             Booster.P_BurstRed = new ParticleType(Booster.P_Burst);
             Booster.P_BurstRed.Color = Calc.HexToColor("942c3e");
-            Booster.P_Appear = new ParticleType()
+            Booster.P_Appear = new ParticleType
             {
                 Size = 1f,
                 Color = Calc.HexToColor("4ACFC6"),
@@ -262,7 +250,7 @@ namespace Celeste
             {
                 Color = Calc.HexToColor("FF594A")
             };
-            TouchSwitch.P_Fire = new ParticleType()
+            TouchSwitch.P_Fire = new ParticleType
             {
                 Source = GFX.Game["particles/fire"],
                 Color = Calc.HexToColor("f141df"),
@@ -285,7 +273,7 @@ namespace Celeste
             {
                 Color = Color.White
             };
-            Water.P_Splash = new ParticleType()
+            Water.P_Splash = new ParticleType
             {
                 Source = GFX.Game["particles/feather"],
                 Color = Water.SurfaceColor,
@@ -303,7 +291,7 @@ namespace Celeste
                 LifeMin = 0.35f,
                 LifeMax = 0.2f
             };
-            Strawberry.P_Glow = new ParticleType()
+            Strawberry.P_Glow = new ParticleType
             {
                 Color = Calc.HexToColor("FF8563"),
                 Color2 = Calc.HexToColor("FFF4A8"),
@@ -331,7 +319,7 @@ namespace Celeste
                 Color = Calc.HexToColor("5CFF6F"),
                 Color2 = Calc.HexToColor("E1FF6B")
             };
-            Strawberry.P_WingsBurst = new ParticleType()
+            Strawberry.P_WingsBurst = new ParticleType
             {
                 Source = GFX.Game["particles/feather"],
                 Color = Color.White,
@@ -358,7 +346,7 @@ namespace Celeste
                 Color = Calc.HexToColor("639BFF"),
                 LifeMin = 2f
             };
-            Key.P_Shimmer = new ParticleType()
+            Key.P_Shimmer = new ParticleType
             {
                 Color = Calc.HexToColor("e2d926"),
                 Color2 = Calc.HexToColor("fffeef"),
@@ -378,7 +366,7 @@ namespace Celeste
                 SpeedMultiplier = 0.05f
             };
             Key.P_Collect = new ParticleType(Key.P_Insert);
-            Refill.P_Shatter = new ParticleType()
+            Refill.P_Shatter = new ParticleType
             {
                 Source = GFX.Game["particles/triangle"],
                 Color = Calc.HexToColor("d3ffd4"),
@@ -397,7 +385,7 @@ namespace Celeste
                 SpinMax = 4.712389f,
                 SpinFlippedChance = true
             };
-            Refill.P_Glow = new ParticleType()
+            Refill.P_Glow = new ParticleType
             {
                 LifeMin = 0.4f,
                 LifeMax = 0.6f,
@@ -435,7 +423,7 @@ namespace Celeste
                 Color = Calc.HexToColor("FFA5AA"),
                 Color2 = Calc.HexToColor("DD6CCA")
             };
-            DashSwitch.P_PressA = new ParticleType()
+            DashSwitch.P_PressA = new ParticleType
             {
                 Color = Calc.HexToColor("99e550"),
                 Color2 = Calc.HexToColor("d9ffb5"),
@@ -466,7 +454,7 @@ namespace Celeste
                 Color2 = Calc.HexToColor("fbffaf")
             };
             FallingBlock.P_FallDustA = ParticleTypes.Dust;
-            FallingBlock.P_FallDustB = new ParticleType()
+            FallingBlock.P_FallDustB = new ParticleType
             {
                 Color = Color.White,
                 FadeMode = ParticleType.FadeModes.Late,
@@ -490,7 +478,7 @@ namespace Celeste
                 Acceleration = Vector2.UnitY * -30f,
                 ScaleOut = true
             };
-            LockBlock.P_Appear = new ParticleType()
+            LockBlock.P_Appear = new ParticleType
             {
                 ColorMode = ParticleType.ColorModes.Blink,
                 Color = Calc.HexToColor("FF3D63"),
@@ -504,7 +492,7 @@ namespace Celeste
                 SpeedMultiplier = 0.6f,
                 DirectionRange = 5f * (float) Math.PI / 36f
             };
-            SwitchGate.P_Behind = new ParticleType()
+            SwitchGate.P_Behind = new ParticleType
             {
                 Color = Calc.HexToColor("ffeb6b"),
                 Color2 = Calc.HexToColor("d39332"),
@@ -525,7 +513,7 @@ namespace Celeste
                 SpeedMin = 2f,
                 SpeedMax = 4f
             };
-            CrumblePlatform.P_Crumble = new ParticleType()
+            CrumblePlatform.P_Crumble = new ParticleType
             {
                 Color = Calc.HexToColor("847E87"),
                 FadeMode = ParticleType.FadeModes.Late,
@@ -542,7 +530,7 @@ namespace Celeste
                 LifeMin = 0.3f,
                 LifeMax = 0.1f
             };
-            ZipMover.P_Sparks = new ParticleType()
+            ZipMover.P_Sparks = new ParticleType
             {
                 Color = Calc.HexToColor("fff538"),
                 Size = 1f,
@@ -555,7 +543,7 @@ namespace Celeste
                 FadeMode = ParticleType.FadeModes.None,
                 ColorMode = ParticleType.ColorModes.Static
             };
-            NPC01_Theo.P_YOLO = new ParticleType()
+            NPC01_Theo.P_YOLO = new ParticleType
             {
                 Color = Calc.HexToColor("8EED80"),
                 Color2 = Calc.HexToColor("37946E"),
@@ -569,7 +557,7 @@ namespace Celeste
                 LifeMin = 0.3f,
                 LifeMax = 0.6f
             };
-            ClutterSwitch.P_Pressed = new ParticleType()
+            ClutterSwitch.P_Pressed = new ParticleType
             {
                 Color = Color.White,
                 Color2 = Color.Aqua,
@@ -584,7 +572,7 @@ namespace Celeste
                 LifeMax = 1.2f,
                 SpeedMultiplier = 0.2f
             };
-            ClutterSwitch.P_ClutterFly = new ParticleType()
+            ClutterSwitch.P_ClutterFly = new ParticleType
             {
                 Color = Color.White,
                 Color2 = Color.Aqua,
@@ -599,7 +587,7 @@ namespace Celeste
                 LifeMax = 1.2f,
                 SpeedMultiplier = 0.1f
             };
-            BadelineOldsite.P_Vanish = new ParticleType()
+            BadelineOldsite.P_Vanish = new ParticleType
             {
                 Color = Calc.HexToColor("6f2399"),
                 Color2 = Calc.HexToColor("ec76f7"),
@@ -614,7 +602,7 @@ namespace Celeste
                 LifeMax = 1.2f,
                 SpeedMultiplier = 0.3f
             };
-            DreamMirror.P_Shatter = new ParticleType()
+            DreamMirror.P_Shatter = new ParticleType
             {
                 Source = GFX.Game["particles/triangle"],
                 Color = Calc.HexToColor("bdeff9"),
@@ -633,7 +621,7 @@ namespace Celeste
                 SpinMax = 4.712389f,
                 SpinFlippedChance = true
             };
-            NPC03_Oshiro_Lobby.P_AppearSpark = new ParticleType()
+            NPC03_Oshiro_Lobby.P_AppearSpark = new ParticleType
             {
                 Color = Calc.HexToColor("5FCDE4"),
                 Color2 = Color.White,
@@ -647,7 +635,7 @@ namespace Celeste
                 SpeedMultiplier = 0.1f,
                 Acceleration = new Vector2(0.0f, 10f)
             };
-            DustStaticSpinner.P_Move = new ParticleType()
+            DustStaticSpinner.P_Move = new ParticleType
             {
                 SourceChooser = chooser1,
                 RotationMode = ParticleType.RotationModes.Random,
@@ -664,7 +652,7 @@ namespace Celeste
                 SpeedMax = 10f,
                 DirectionRange = 6.28318548f
             };
-            ParticleType copyFrom = new ParticleType()
+            ParticleType copyFrom = new ParticleType
             {
                 Source = GFX.Game["particles/rect"],
                 Color = Calc.HexToColor("EA64B7"),
@@ -698,7 +686,7 @@ namespace Celeste
                     Color2 = Calc.HexToColor("33BDE8")
                 }
             };
-            BladeTrackSpinner.P_Trail = new ParticleType()
+            BladeTrackSpinner.P_Trail = new ParticleType
             {
                 Color = Calc.HexToColor("696A6A"),
                 Color2 = Calc.HexToColor("700808"),
@@ -712,7 +700,7 @@ namespace Celeste
                 SpeedMax = 8f,
                 SpeedMultiplier = 0.8f
             };
-            StrawberrySeed.P_Burst = new ParticleType()
+            StrawberrySeed.P_Burst = new ParticleType
             {
                 Source = GFX.Game["particles/shatter"],
                 Color = Color.White,
@@ -730,7 +718,7 @@ namespace Celeste
                 SpeedMultiplier = 1E-05f,
                 RotationMode = ParticleType.RotationModes.SameAsDirection
             };
-            SummitGem.P_Shatter = new ParticleType()
+            SummitGem.P_Shatter = new ParticleType
             {
                 Source = GFX.Game["particles/triangle"],
                 ColorMode = ParticleType.ColorModes.Static,
@@ -762,7 +750,7 @@ namespace Celeste
                 SpeedMin = 8f,
                 SpeedMax = 18f
             };
-            TempleMirrorPortal.P_CurtainDrop = new ParticleType()
+            TempleMirrorPortal.P_CurtainDrop = new ParticleType
             {
                 Color = Color.Red,
                 FadeMode = ParticleType.FadeModes.Late,
@@ -774,7 +762,7 @@ namespace Celeste
                 Direction = -1.57079637f,
                 DirectionRange = 0.7853982f
             };
-            LightBeam.P_Glow = new ParticleType()
+            LightBeam.P_Glow = new ParticleType
             {
                 Source = GFX.Game["particles/rect"],
                 Color = Calc.HexToColor("fcf8de") * 0.4f,
@@ -786,7 +774,7 @@ namespace Celeste
                 LifeMax = 2.8f,
                 RotationMode = ParticleType.RotationModes.SameAsDirection
             };
-            BadelineBoost.P_Move = new ParticleType()
+            BadelineBoost.P_Move = new ParticleType
             {
                 Source = GFX.Game["particles/shard"],
                 Color = Color.White,
@@ -803,7 +791,7 @@ namespace Celeste
                 LifeMax = 0.6f,
                 DirectionRange = 6.28318548f
             };
-            BadelineBoost.P_Ambience = new ParticleType()
+            BadelineBoost.P_Ambience = new ParticleType
             {
                 Color = Calc.HexToColor("f78ae7"),
                 Color2 = Calc.HexToColor("ffccf7"),
@@ -817,7 +805,7 @@ namespace Celeste
                 LifeMin = 0.6f,
                 LifeMax = 1f
             };
-            FlyFeather.P_Collect = new ParticleType()
+            FlyFeather.P_Collect = new ParticleType
             {
                 Source = GFX.Game["particles/feather"],
                 Color = Player.FlyPowerHairColor,
@@ -843,7 +831,7 @@ namespace Celeste
                 SpeedMax = 80f,
                 SpeedMultiplier = 0.2f
             };
-            FlyFeather.P_Flying = new ParticleType()
+            FlyFeather.P_Flying = new ParticleType
             {
                 Color = Player.FlyPowerHairColor,
                 Color2 = Calc.HexToColor("fff20f"),
@@ -871,7 +859,7 @@ namespace Celeste
                 Size = 1.2f,
                 SizeRange = 0.5f
             };
-            CrushBlock.P_Crushing = new ParticleType()
+            CrushBlock.P_Crushing = new ParticleType
             {
                 Source = GFX.Game["particles/rect"],
                 Color = Calc.HexToColor("ff66e2"),
@@ -889,7 +877,7 @@ namespace Celeste
                 SpeedMultiplier = 0.4f,
                 Acceleration = new Vector2(0.0f, 10f)
             };
-            CrushBlock.P_Activate = new ParticleType()
+            CrushBlock.P_Activate = new ParticleType
             {
                 Source = GFX.Game["particles/rect"],
                 Color = Calc.HexToColor("5fcde4"),
@@ -906,7 +894,7 @@ namespace Celeste
                 SpeedMax = 100f,
                 SpeedMultiplier = 0.2f
             };
-            Bumper.P_Ambience = new ParticleType()
+            Bumper.P_Ambience = new ParticleType
             {
                 Source = GFX.Game["particles/rect"],
                 Color = Calc.HexToColor("47b5cc"),
@@ -930,7 +918,7 @@ namespace Celeste
                 LifeMin = 0.3f,
                 LifeMax = 0.6f
             };
-            Bumper.P_Launch = new ParticleType()
+            Bumper.P_Launch = new ParticleType
             {
                 Source = GFX.Game["particles/rect"],
                 Color = Calc.HexToColor("47b5cc"),
@@ -959,7 +947,7 @@ namespace Celeste
                 LifeMin = 0.8f,
                 LifeMax = 1.6f
             };
-            SwapBlock.P_Move = new ParticleType()
+            SwapBlock.P_Move = new ParticleType
             {
                 Size = 1f,
                 Color = Calc.HexToColor("fbf236"),
@@ -972,7 +960,7 @@ namespace Celeste
                 LifeMin = 0.3f,
                 LifeMax = 0.5f
             };
-            MoveBlock.P_Activate = new ParticleType()
+            MoveBlock.P_Activate = new ParticleType
             {
                 Size = 1f,
                 Color = Color.Black,
@@ -986,7 +974,7 @@ namespace Celeste
             };
             MoveBlock.P_Break = new ParticleType(MoveBlock.P_Activate);
             MoveBlock.P_Move = new ParticleType(MoveBlock.P_Activate);
-            Seeker.P_BreakOut = new ParticleType()
+            Seeker.P_BreakOut = new ParticleType
             {
                 Size = 1f,
                 Color = Calc.HexToColor("643e73"),
@@ -999,7 +987,7 @@ namespace Celeste
                 SpeedMax = 30f,
                 DirectionRange = 1.39626336f
             };
-            Seeker.P_Attack = new ParticleType()
+            Seeker.P_Attack = new ParticleType
             {
                 Size = 1f,
                 Color = Calc.HexToColor("99e550"),
@@ -1017,7 +1005,7 @@ namespace Celeste
             {
                 Direction = -1.57079637f
             };
-            Seeker.P_HitWall = new ParticleType()
+            Seeker.P_HitWall = new ParticleType
             {
                 Size = 1f,
                 Color = Calc.HexToColor("99e550"),
@@ -1031,7 +1019,7 @@ namespace Celeste
                 SpeedMultiplier = 0.4f,
                 DirectionRange = 1.74532926f
             };
-            Seeker.P_Regen = new ParticleType()
+            Seeker.P_Regen = new ParticleType
             {
                 Color = Calc.HexToColor("cbdbfc"),
                 Color2 = Calc.HexToColor("575fd9"),
@@ -1045,7 +1033,7 @@ namespace Celeste
                 SpeedMultiplier = 0.4f,
                 DirectionRange = 1.04719758f
             };
-            WaterInteraction.P_Drip = new ParticleType()
+            WaterInteraction.P_Drip = new ParticleType
             {
                 Color = Water.SurfaceColor,
                 Color2 = Color.White,
@@ -1060,7 +1048,7 @@ namespace Celeste
                 Direction = 1.57079637f,
                 DirectionRange = 0.05f
             };
-            FireBarrier.P_Deactivate = new ParticleType()
+            FireBarrier.P_Deactivate = new ParticleType
             {
                 Color = RisingLava.Hot[0],
                 Color2 = RisingLava.Hot[2],
@@ -1080,7 +1068,7 @@ namespace Celeste
                 Color2 = RisingLava.Cold[2],
                 Acceleration = new Vector2(0.0f, 15f)
             };
-            BounceBlock.P_Reform = new ParticleType()
+            BounceBlock.P_Reform = new ParticleType
             {
                 Color = Color.White,
                 FadeMode = ParticleType.FadeModes.Late,
@@ -1124,7 +1112,7 @@ namespace Celeste
                 SpeedMax = 8f,
                 DirectionRange = 6.28318548f
             };
-            CrystalDebris.P_Dust = new ParticleType()
+            CrystalDebris.P_Dust = new ParticleType
             {
                 Color = Calc.HexToColor("FFFFFF"),
                 Color2 = Calc.HexToColor("ff77a8"),
@@ -1137,7 +1125,7 @@ namespace Celeste
                 SpeedMax = 8f,
                 DirectionRange = 6.28318548f
             };
-            FinalBossShot.P_Trail = new ParticleType()
+            FinalBossShot.P_Trail = new ParticleType
             {
                 Size = 1f,
                 Color = Calc.HexToColor("ffced5"),
@@ -1150,7 +1138,7 @@ namespace Celeste
                 LifeMin = 0.3f,
                 LifeMax = 0.6f
             };
-            FinalBossBeam.P_Dissipate = new ParticleType()
+            FinalBossBeam.P_Dissipate = new ParticleType
             {
                 Color = Calc.HexToColor("e60022"),
                 Size = 1f,
@@ -1161,7 +1149,7 @@ namespace Celeste
                 LifeMin = 0.3f,
                 LifeMax = 0.6f
             };
-            FinalBossMovingBlock.P_Stop = new ParticleType()
+            FinalBossMovingBlock.P_Stop = new ParticleType
             {
                 Color = Calc.HexToColor("ffe0d3"),
                 Size = 1f,
@@ -1173,7 +1161,7 @@ namespace Celeste
                 LifeMin = 0.5f,
                 LifeMax = 1.2f
             };
-            FinalBossMovingBlock.P_Break = new ParticleType()
+            FinalBossMovingBlock.P_Break = new ParticleType
             {
                 Color = Calc.HexToColor("ffe0d3"),
                 Size = 1f,
@@ -1185,7 +1173,7 @@ namespace Celeste
                 LifeMin = 0.4f,
                 LifeMax = 0.8f
             };
-            FinalBoss.P_Burst = new ParticleType()
+            FinalBoss.P_Burst = new ParticleType
             {
                 Color = Calc.HexToColor("ff00b0"),
                 Color2 = Calc.HexToColor("ff84d9"),
@@ -1199,7 +1187,7 @@ namespace Celeste
                 LifeMin = 0.4f,
                 LifeMax = 0.8f
             };
-            Cassette.P_Shine = new ParticleType()
+            Cassette.P_Shine = new ParticleType
             {
                 Size = 1f,
                 Color = Calc.HexToColor("49aaf0"),
@@ -1212,7 +1200,7 @@ namespace Celeste
                 LifeMin = 0.6f,
                 LifeMax = 1f
             };
-            TheoCrystal.P_Impact = new ParticleType()
+            TheoCrystal.P_Impact = new ParticleType
             {
                 Color = Calc.HexToColor("cbdbfc"),
                 Size = 1f,
@@ -1224,7 +1212,7 @@ namespace Celeste
                 LifeMin = 0.3f,
                 LifeMax = 0.8f
             };
-            HeartGem.P_BlueShine = new ParticleType()
+            HeartGem.P_BlueShine = new ParticleType
             {
                 Size = 1f,
                 Color = Calc.HexToColor("5caefa"),
@@ -1261,7 +1249,7 @@ namespace Celeste
                     Color = color.Value,
                     Color2 = Color.Lerp(color.Value, Color.White, 0.5f)
                 });
-            HeartGemDoor.P_Shimmer = new ParticleType()
+            HeartGemDoor.P_Shimmer = new ParticleType
             {
                 Size = 1f,
                 Color = Calc.HexToColor("baffff"),
@@ -1274,7 +1262,7 @@ namespace Celeste
                 LifeMin = 1.4f,
                 LifeMax = 2f
             };
-            HeartGemDoor.P_Slice = new ParticleType()
+            HeartGemDoor.P_Slice = new ParticleType
             {
                 Size = 1f,
                 Color = Color.White,
@@ -1289,7 +1277,7 @@ namespace Celeste
                 LifeMin = 0.4f,
                 LifeMax = 1.8f
             };
-            Lightning.P_Shatter = new ParticleType()
+            Lightning.P_Shatter = new ParticleType
             {
                 Size = 1f,
                 Color = Calc.HexToColor("B9FEFE"),
@@ -1304,7 +1292,7 @@ namespace Celeste
                 LifeMin = 0.8f,
                 LifeMax = 2f
             };
-            Glider.P_Glide = new ParticleType()
+            Glider.P_Glide = new ParticleType
             {
                 Acceleration = Vector2.UnitY * 60f,
                 SpeedMin = 30f,
@@ -1328,7 +1316,7 @@ namespace Celeste
                 SpeedMin = 50f,
                 SpeedMax = 60f
             };
-            Glider.P_Platform = new ParticleType()
+            Glider.P_Platform = new ParticleType
             {
                 Acceleration = Vector2.UnitY * 60f,
                 SpeedMin = 5f,
@@ -1339,7 +1327,7 @@ namespace Celeste
                 FadeMode = ParticleType.FadeModes.Late,
                 Size = 1f
             };
-            Glider.P_Glow = new ParticleType()
+            Glider.P_Glow = new ParticleType
             {
                 SpeedMin = 8f,
                 SpeedMax = 16f,
@@ -1361,7 +1349,7 @@ namespace Celeste
                 LifeMax = 1.2f,
                 DirectionRange = 2.3561945f
             };
-            LightningBreakerBox.P_Smash = new ParticleType()
+            LightningBreakerBox.P_Smash = new ParticleType
             {
                 Source = GFX.Game["particles/rect"],
                 Color = Calc.HexToColor("FFFC75"),
@@ -1378,7 +1366,7 @@ namespace Celeste
                 SpeedMax = 150f,
                 SpeedMultiplier = 0.2f
             };
-            LightningBreakerBox.P_Sparks = new ParticleType()
+            LightningBreakerBox.P_Sparks = new ParticleType
             {
                 Source = GFX.Game["particles/rect"],
                 Color = Calc.HexToColor("FFFC75"),

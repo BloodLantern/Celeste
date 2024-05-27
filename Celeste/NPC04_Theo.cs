@@ -1,5 +1,4 @@
 ﻿using Microsoft.Xna.Framework;
-using Monocle;
 
 namespace Celeste
 {
@@ -10,25 +9,25 @@ namespace Celeste
         public NPC04_Theo(Vector2 position)
             : base(position)
         {
-            this.Add((Component) (this.Sprite = GFX.SpriteBank.Create("theo")));
-            this.IdleAnim = "idle";
-            this.MoveAnim = "walk";
-            this.Visible = false;
-            this.Maxspeed = 48f;
-            this.SetupTheoSpriteSounds();
+            Add(Sprite = GFX.SpriteBank.Create("theo"));
+            IdleAnim = "idle";
+            MoveAnim = "walk";
+            Visible = false;
+            Maxspeed = 48f;
+            SetupTheoSpriteSounds();
         }
 
         public override void Update()
         {
             base.Update();
-            if (this.started)
+            if (started)
                 return;
-            Gondola first = this.Scene.Entities.FindFirst<Gondola>();
-            Player entity = this.Scene.Tracker.GetEntity<Player>();
-            if (first == null || entity == null || (double) entity.X <= (double) first.Left - 16.0)
+            Gondola first = Scene.Entities.FindFirst<Gondola>();
+            Player entity = Scene.Tracker.GetEntity<Player>();
+            if (first == null || entity == null || entity.X <= first.Left - 16.0)
                 return;
-            this.started = true;
-            this.Scene.Add((Entity) new CS04_Gondola((NPC) this, first, entity));
+            started = true;
+            Scene.Add(new CS04_Gondola(this, first, entity));
         }
     }
 }

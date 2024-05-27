@@ -4,7 +4,6 @@ using FMOD.Studio;
 using Microsoft.Xna.Framework;
 using Monocle;
 using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using System.Xml.Serialization;
@@ -20,7 +19,7 @@ namespace Celeste
         private static void CmdGlobalStats()
         {
             foreach (Stat stat in Enum.GetValues(typeof (Stat)))
-                Engine.Commands.Log((stat.ToString() + ": " + Stats.Global(stat)));
+                Engine.Commands.Log((stat + ": " + Stats.Global(stat)));
         }
 
         [Command("export_dialog", "export dialog files to binary format")]
@@ -124,7 +123,7 @@ namespace Celeste
                         }
                     }
                 }
-                Engine.Commands.Log((num2.ToString() + " / " + num1));
+                Engine.Commands.Log((num2 + " / " + num1));
             }
             else
             {
@@ -143,7 +142,7 @@ namespace Celeste
                     }
                 }
                 Engine.Commands.Log(string.Join(", ", values), Color.Red);
-                Engine.Commands.Log((num4.ToString() + " / " + num3));
+                Engine.Commands.Log((num4 + " / " + num3));
             }
         }
 
@@ -200,7 +199,7 @@ namespace Celeste
             foreach (KeyValuePair<string, Language> language in Dialog.Languages)
                 flag &= CmdCheckLangauge(language.Key, compareContent);
             Engine.Commands.Log("---------------------");
-            Engine.Commands.Log(("RESULT: " + flag.ToString()), flag ? Color.LawnGreen : Color.Red);
+            Engine.Commands.Log(("RESULT: " + flag), flag ? Color.LawnGreen : Color.Red);
         }
 
         [Command("check_language", "compares all langauges to english")]
@@ -216,7 +215,7 @@ namespace Celeste
             bool flag3 = Dialog.CompareLanguages("english", id, compareContent);
             if (num != 0)
                 Fonts.Unload(language1.FontFace);
-            Engine.Commands.Log((id + " [FONT: " + flag2.ToString() + ", MATCH: " + flag3.ToString() + "]"), flag2 & flag3 ? Color.White : Color.Red);
+            Engine.Commands.Log((id + " [FONT: " + flag2 + ", MATCH: " + flag3 + "]"), flag2 & flag3 ? Color.White : Color.Red);
             return flag1 & flag2 & flag3;
         }
 
@@ -238,7 +237,7 @@ namespace Celeste
                         {
                             int index2 = strawberry.Int("checkpointID");
                             int index3 = strawberry.Int("order");
-                            string str = index2.ToString() + ":" + index3;
+                            string str = index2 + ":" + index3;
                             if (stringSet.Contains(str))
                                 Engine.Commands.Log(("Conflicting Berry: Area[" + area.ID + "] Mode[" + index1 + "] Checkpoint[" + index2 + "] Order[" + index3 + "]"), Color.Red);
                             else
@@ -332,8 +331,8 @@ namespace Celeste
             SaveData.InitializeDebugMode();
             Session session = new(new AreaKey(6));
             session.Level = "04";
-            LevelLoader levelLoader = new(session, new Vector2?(session.GetSpawnPoint(new Vector2(session.LevelData.Bounds.Center.X, session.LevelData.Bounds.Top))));
-            levelLoader.PlayerIntroTypeOverride = new Player.IntroTypes?(Player.IntroTypes.Fall);
+            LevelLoader levelLoader = new(session, session.GetSpawnPoint(new Vector2(session.LevelData.Bounds.Center.X, session.LevelData.Bounds.Top)));
+            levelLoader.PlayerIntroTypeOverride = Player.IntroTypes.Fall;
             levelLoader.Level.Add(new BackgroundFadeIn(Color.Black, 2f, 30f));
             Engine.Scene = levelLoader;
         }
@@ -484,14 +483,14 @@ namespace Celeste
                 long ticks = timeSpan.Ticks;
                 areaModeStats.BestTime = ticks;
             }
-            else if ((double) beatBestTimeBy > 0.0)
+            else if (beatBestTimeBy > 0.0)
             {
                 AreaModeStats areaModeStats = mode1;
-                timeSpan = TimeSpan.FromSeconds(totalSeconds1 - (double) beatBestTimeBy);
+                timeSpan = TimeSpan.FromSeconds(totalSeconds1 - beatBestTimeBy);
                 long ticks = timeSpan.Ticks;
                 areaModeStats.BestTime = ticks;
             }
-            if ((double) beatBestFullClearTimeBy > 0.0)
+            if (beatBestFullClearTimeBy > 0.0)
             {
                 if (totalSeconds2 <= 0.0)
                 {
@@ -503,7 +502,7 @@ namespace Celeste
                 else
                 {
                     AreaModeStats areaModeStats = mode1;
-                    timeSpan = TimeSpan.FromSeconds(totalSeconds2 - (double) beatBestFullClearTimeBy);
+                    timeSpan = TimeSpan.FromSeconds(totalSeconds2 - beatBestFullClearTimeBy);
                     long ticks = timeSpan.Ticks;
                     areaModeStats.BestFullClearTime = ticks;
                 }
@@ -630,7 +629,7 @@ namespace Celeste
         }
 
         [Command("say", "initiate a dialog message")]
-        private static void CmdSay(string id) => Engine.Scene.Add(new Textbox(id, new Func<IEnumerator>[0]));
+        private static void CmdSay(string id) => Engine.Scene.Add(new Textbox(id));
 
         [Command("level_count", "print out total level count!")]
         private static void CmdTotalLevels(int areaID = -1, int mode = 0)

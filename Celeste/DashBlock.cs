@@ -3,7 +3,7 @@ using Monocle;
 
 namespace Celeste
 {
-    [Tracked(false)]
+    [Tracked]
     public class DashBlock : Solid
     {
         private bool permanent;
@@ -25,20 +25,20 @@ namespace Celeste
             EntityID id)
             : base(position, width, height, true)
         {
-            this.Depth = -12999;
+            Depth = -12999;
             this.id = id;
             this.permanent = permanent;
             this.width = width;
             this.height = height;
             this.blendIn = blendIn;
             this.canDash = canDash;
-            this.tileType = tiletype;
-            this.OnDashCollide = new DashCollision(this.OnDashed);
-            this.SurfaceSoundIndex = SurfaceIndex.TileToIndex[this.tileType];
+            tileType = tiletype;
+            OnDashCollide = OnDashed;
+            SurfaceSoundIndex = SurfaceIndex.TileToIndex[tileType];
         }
 
         public DashBlock(EntityData data, Vector2 offset, EntityID id)
-            : this(data.Position + offset, data.Char("tiletype", '3'), (float) data.Width, (float) data.Height, data.Bool("blendin"), data.Bool(nameof (permanent), true), data.Bool(nameof (canDash), true), id)
+            : this(data.Position + offset, data.Char("tiletype", '3'), data.Width, data.Height, data.Bool("blendin"), data.Bool(nameof (permanent), true), data.Bool(nameof (canDash), true), id)
         {
         }
 
@@ -46,29 +46,29 @@ namespace Celeste
         {
             base.Awake(scene);
             TileGrid tileGrid;
-            if (!this.blendIn)
+            if (!blendIn)
             {
-                tileGrid = GFX.FGAutotiler.GenerateBox(this.tileType, (int) this.width / 8, (int) this.height / 8).TileGrid;
-                this.Add((Component) new LightOcclude());
+                tileGrid = GFX.FGAutotiler.GenerateBox(tileType, (int) width / 8, (int) height / 8).TileGrid;
+                Add(new LightOcclude());
             }
             else
             {
-                Level level = this.SceneAs<Level>();
+                Level level = SceneAs<Level>();
                 Rectangle tileBounds = level.Session.MapData.TileBounds;
                 VirtualMap<char> solidsData = level.SolidsData;
-                int x = (int) ((double) this.X / 8.0) - tileBounds.Left;
-                int y = (int) ((double) this.Y / 8.0) - tileBounds.Top;
-                int tilesX = (int) this.Width / 8;
-                int tilesY = (int) this.Height / 8;
-                tileGrid = GFX.FGAutotiler.GenerateOverlay(this.tileType, x, y, tilesX, tilesY, solidsData).TileGrid;
-                this.Add((Component) new EffectCutout());
-                this.Depth = -10501;
+                int x = (int) (X / 8.0) - tileBounds.Left;
+                int y = (int) (Y / 8.0) - tileBounds.Top;
+                int tilesX = (int) Width / 8;
+                int tilesY = (int) Height / 8;
+                tileGrid = GFX.FGAutotiler.GenerateOverlay(tileType, x, y, tilesX, tilesY, solidsData).TileGrid;
+                Add(new EffectCutout());
+                Depth = -10501;
             }
-            this.Add((Component) tileGrid);
-            this.Add((Component) new TileInterceptor(tileGrid, true));
-            if (!this.CollideCheck<Player>())
+            Add(tileGrid);
+            Add(new TileInterceptor(tileGrid, true));
+            if (!CollideCheck<Player>())
                 return;
-            this.RemoveSelf();
+            RemoveSelf();
         }
 
         public override void Removed(Scene scene)
@@ -81,38 +81,38 @@ namespace Celeste
         {
             if (playSound)
             {
-                if (this.tileType == '1')
-                    Audio.Play("event:/game/general/wall_break_dirt", this.Position);
-                else if (this.tileType == '3')
-                    Audio.Play("event:/game/general/wall_break_ice", this.Position);
-                else if (this.tileType == '9')
-                    Audio.Play("event:/game/general/wall_break_wood", this.Position);
+                if (tileType == '1')
+                    Audio.Play("event:/game/general/wall_break_dirt", Position);
+                else if (tileType == '3')
+                    Audio.Play("event:/game/general/wall_break_ice", Position);
+                else if (tileType == '9')
+                    Audio.Play("event:/game/general/wall_break_wood", Position);
                 else
-                    Audio.Play("event:/game/general/wall_break_stone", this.Position);
+                    Audio.Play("event:/game/general/wall_break_stone", Position);
             }
-            for (int index1 = 0; (double) index1 < (double) this.Width / 8.0; ++index1)
+            for (int index1 = 0; index1 < Width / 8.0; ++index1)
             {
-                for (int index2 = 0; (double) index2 < (double) this.Height / 8.0; ++index2)
-                    this.Scene.Add((Entity) Engine.Pooler.Create<Debris>().Init(this.Position + new Vector2((float) (4 + index1 * 8), (float) (4 + index2 * 8)), this.tileType, playDebrisSound).BlastFrom(from));
+                for (int index2 = 0; index2 < Height / 8.0; ++index2)
+                    Scene.Add(Engine.Pooler.Create<Debris>().Init(Position + new Vector2(4 + index1 * 8, 4 + index2 * 8), tileType, playDebrisSound).BlastFrom(from));
             }
-            this.Collidable = false;
-            if (this.permanent)
-                this.RemoveAndFlagAsGone();
+            Collidable = false;
+            if (permanent)
+                RemoveAndFlagAsGone();
             else
-                this.RemoveSelf();
+                RemoveSelf();
         }
 
         public void RemoveAndFlagAsGone()
         {
-            this.RemoveSelf();
-            this.SceneAs<Level>().Session.DoNotLoad.Add(this.id);
+            RemoveSelf();
+            SceneAs<Level>().Session.DoNotLoad.Add(id);
         }
 
         private DashCollisionResults OnDashed(Player player, Vector2 direction)
         {
-            if (!this.canDash && player.StateMachine.State != 5 && player.StateMachine.State != 10)
+            if (!canDash && player.StateMachine.State != 5 && player.StateMachine.State != 10)
                 return DashCollisionResults.NormalCollision;
-            this.Break(player.Center, direction);
+            Break(player.Center, direction);
             return DashCollisionResults.Rebound;
         }
 

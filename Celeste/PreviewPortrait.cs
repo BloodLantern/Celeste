@@ -22,28 +22,28 @@ namespace Celeste
             foreach (KeyValuePair<string, SpriteData> keyValuePair in GFX.PortraitsSpriteBank.SpriteData)
             {
                 if (keyValuePair.Key.StartsWith("portrait"))
-                    this.options.Add(keyValuePair.Key);
+                    options.Add(keyValuePair.Key);
             }
-            this.topleft.Y = scroll;
+            topleft.Y = scroll;
         }
 
         public override void Update()
         {
-            if (this.animation != null)
+            if (animation != null)
             {
-                this.animation.Update();
+                animation.Update();
                 if (MInput.Mouse.PressedLeftButton)
                 {
-                    for (int index = 0; index < this.animations.Count; ++index)
+                    for (int index = 0; index < animations.Count; ++index)
                     {
-                        if (this.MouseOverOption(index))
+                        if (MouseOverOption(index))
                         {
                             if (index == 0)
                             {
-                                this.animation = (Sprite) null;
+                                animation = null;
                                 break;
                             }
-                            this.animation.Play(this.animations[index]);
+                            animation.Play(animations[index]);
                             break;
                         }
                     }
@@ -51,22 +51,22 @@ namespace Celeste
             }
             else if (MInput.Mouse.PressedLeftButton)
             {
-                for (int index = 0; index < this.options.Count; ++index)
+                for (int index = 0; index < options.Count; ++index)
                 {
-                    if (this.MouseOverOption(index))
+                    if (MouseOverOption(index))
                     {
-                        this.currentPortrait = this.options[index].Split('_')[1];
-                        this.animation = GFX.PortraitsSpriteBank.Create(this.options[index]);
-                        this.animations.Clear();
-                        this.animations.Add("<-BACK");
-                        XmlElement xml1 = GFX.PortraitsSpriteBank.SpriteData[this.options[index]].Sources[0].XML;
+                        currentPortrait = options[index].Split('_')[1];
+                        animation = GFX.PortraitsSpriteBank.Create(options[index]);
+                        animations.Clear();
+                        animations.Add("<-BACK");
+                        XmlElement xml1 = GFX.PortraitsSpriteBank.SpriteData[options[index]].Sources[0].XML;
                         foreach (XmlElement xml2 in xml1.GetElementsByTagName("Anim"))
-                            this.animations.Add(xml2.Attr("id"));
+                            animations.Add(xml2.Attr("id"));
                         IEnumerator enumerator = xml1.GetElementsByTagName("Loop").GetEnumerator();
                         try
                         {
                             while (enumerator.MoveNext())
-                                this.animations.Add(((XmlElement) enumerator.Current).Attr("id"));
+                                animations.Add(((XmlElement) enumerator.Current).Attr("id"));
                             break;
                         }
                         finally
@@ -77,18 +77,18 @@ namespace Celeste
                     }
                 }
             }
-            this.topleft.Y += (float) MInput.Mouse.WheelDelta * Engine.DeltaTime * ActiveFont.LineHeight;
+            topleft.Y += MInput.Mouse.WheelDelta * Engine.DeltaTime * ActiveFont.LineHeight;
             if (!MInput.Keyboard.Pressed(Keys.F1))
                 return;
             Celeste.ReloadPortraits();
-            Engine.Scene = (Scene) new PreviewPortrait(this.topleft.Y);
+            Engine.Scene = new PreviewPortrait(topleft.Y);
         }
 
-        public Vector2 Mouse => Vector2.Transform(new Vector2((float) MInput.Mouse.CurrentState.X, (float) MInput.Mouse.CurrentState.Y), Matrix.Invert(Engine.ScreenMatrix));
+        public Vector2 Mouse => Vector2.Transform(new Vector2(MInput.Mouse.CurrentState.X, MInput.Mouse.CurrentState.Y), Matrix.Invert(Engine.ScreenMatrix));
 
         public override void Render()
         {
-            Draw.SpriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, SamplerState.LinearClamp, (DepthStencilState) null, RasterizerState.CullNone, (Effect) null, Engine.ScreenMatrix);
+            Draw.SpriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, SamplerState.LinearClamp, null, RasterizerState.CullNone, null, Engine.ScreenMatrix);
             Draw.Rect(0.0f, 0.0f, 960f, 1080f, Color.DarkSlateGray * 0.25f);
             if (this.animation != null)
             {
@@ -96,37 +96,37 @@ namespace Celeste
                 this.animation.Position = new Vector2(1440f, 540f);
                 this.animation.Render();
                 int i = 0;
-                foreach (string animation in this.animations)
+                foreach (string animation in animations)
                 {
                     Color color = Color.Gray;
-                    if (this.MouseOverOption(i))
+                    if (MouseOverOption(i))
                         color = Color.White;
                     else if (this.animation.CurrentAnimationID == animation)
                         color = Color.Yellow;
-                    ActiveFont.Draw(animation, this.topleft + new Vector2(0.0f, (float) i * ActiveFont.LineHeight), color);
+                    ActiveFont.Draw(animation, topleft + new Vector2(0.0f, i * ActiveFont.LineHeight), color);
                     ++i;
                 }
                 if (!string.IsNullOrEmpty(this.animation.CurrentAnimationID))
                 {
-                    string[] strArray = this.animation.CurrentAnimationID.Split('_');
+                    string[] strArray = animation.CurrentAnimationID.Split('_');
                     if (strArray.Length > 1)
-                        ActiveFont.Draw(this.currentPortrait + " " + strArray[1], new Vector2(1440f, 1016f), new Vector2(0.5f, 1f), Vector2.One, Color.White);
+                        ActiveFont.Draw(currentPortrait + " " + strArray[1], new Vector2(1440f, 1016f), new Vector2(0.5f, 1f), Vector2.One, Color.White);
                 }
             }
             else
             {
                 int i = 0;
-                foreach (string option in this.options)
+                foreach (string option in options)
                 {
-                    ActiveFont.Draw(option, this.topleft + new Vector2(0.0f, (float) i * ActiveFont.LineHeight), this.MouseOverOption(i) ? Color.White : Color.Gray);
+                    ActiveFont.Draw(option, topleft + new Vector2(0.0f, i * ActiveFont.LineHeight), MouseOverOption(i) ? Color.White : Color.Gray);
                     ++i;
                 }
             }
-            Draw.Rect(this.Mouse.X - 12f, this.Mouse.Y - 4f, 24f, 8f, Color.Red);
-            Draw.Rect(this.Mouse.X - 4f, this.Mouse.Y - 12f, 8f, 24f, Color.Red);
+            Draw.Rect(Mouse.X - 12f, Mouse.Y - 4f, 24f, 8f, Color.Red);
+            Draw.Rect(Mouse.X - 4f, Mouse.Y - 12f, 8f, 24f, Color.Red);
             Draw.SpriteBatch.End();
         }
 
-        private bool MouseOverOption(int i) => (double) this.Mouse.X > (double) this.topleft.X && (double) this.Mouse.Y > (double) this.topleft.Y + (double) i * (double) ActiveFont.LineHeight && (double) MInput.Mouse.X < 960.0 && (double) this.Mouse.Y < (double) this.topleft.Y + (double) (i + 1) * (double) ActiveFont.LineHeight;
+        private bool MouseOverOption(int i) => Mouse.X > (double) topleft.X && Mouse.Y > topleft.Y + i * (double) ActiveFont.LineHeight && MInput.Mouse.X < 960.0 && Mouse.Y < topleft.Y + (i + 1) * (double) ActiveFont.LineHeight;
     }
 }

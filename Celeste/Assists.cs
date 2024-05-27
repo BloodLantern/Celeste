@@ -8,7 +8,7 @@ namespace Celeste
     {
         public int GameSpeed;
         public bool Invincible;
-        public Assists.DashModes DashMode;
+        public DashModes DashMode;
         public bool DashAssist;
         public bool InfiniteStamina;
         public bool MirrorMode;
@@ -20,22 +20,22 @@ namespace Celeste
         public bool Hiccups;
         public bool PlayAsBadeline;
 
-        public static Assists Default => new Assists()
+        public static Assists Default => new Assists
         {
             GameSpeed = 10
         };
 
         public void EnfornceAssistMode()
         {
-            this.GameSpeed = Calc.Clamp(this.GameSpeed, 5, 10);
-            this.MirrorMode = false;
-            this.ThreeSixtyDashing = false;
-            this.InvisibleMotion = false;
-            this.NoGrabbing = false;
-            this.LowFriction = false;
-            this.SuperDashing = false;
-            this.Hiccups = false;
-            this.PlayAsBadeline = false;
+            GameSpeed = Calc.Clamp(GameSpeed, 5, 10);
+            MirrorMode = false;
+            ThreeSixtyDashing = false;
+            InvisibleMotion = false;
+            NoGrabbing = false;
+            LowFriction = false;
+            SuperDashing = false;
+            Hiccups = false;
+            PlayAsBadeline = false;
         }
 
         public enum DashModes

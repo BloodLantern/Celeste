@@ -16,8 +16,8 @@ namespace Celeste
             Vector2 origin,
             List<MTexture> textures)
         {
-            Animation animation = new Animation()
-            {
+            Animation animation = new Animation
+                {
                 Name = name,
                 Delay = delay,
                 Offset = offset,

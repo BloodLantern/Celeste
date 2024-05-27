@@ -18,7 +18,7 @@ namespace Celeste
         public static void Unload()
         {
             OVR.Atlas.Dispose();
-            OVR.Atlas = (Atlas) null;
+            OVR.Atlas = null;
             OVR.Loaded = false;
         }
     }

@@ -1,6 +1,5 @@
 ﻿using Microsoft.Xna.Framework;
 using Monocle;
-using System;
 using System.Collections;
 
 namespace Celeste
@@ -24,39 +23,39 @@ namespace Celeste
 
         public UnlockedRemixDisplay()
         {
-            this.Tag = (int) Tags.HUD | (int) Tags.Global | (int) Tags.PauseUpdate | (int) Tags.TransitionUpdate;
-            this.bg = GFX.Gui["strawberryCountBG"];
-            this.icon = GFX.Gui["collectables/cassette"];
-            this.text = Dialog.Clean("ui_remix_unlocked");
-            this.Visible = false;
-            this.Y = 96f;
+            Tag = (int) Tags.HUD | (int) Tags.Global | (int) Tags.PauseUpdate | (int) Tags.TransitionUpdate;
+            bg = GFX.Gui["strawberryCountBG"];
+            icon = GFX.Gui["collectables/cassette"];
+            text = Dialog.Clean("ui_remix_unlocked");
+            Visible = false;
+            Y = 96f;
         }
 
         public override void Added(Scene scene)
         {
             base.Added(scene);
-            this.hasCassetteAlready = SaveData.Instance.Areas[AreaData.Get(this.Scene).ID].Cassette;
-            this.unlockedRemix = (scene as Level).Session.Cassette;
+            hasCassetteAlready = SaveData.Instance.Areas[AreaData.Get(Scene).ID].Cassette;
+            unlockedRemix = (scene as Level).Session.Cassette;
         }
 
         public override void Update()
         {
             base.Update();
-            if (!this.unlockedRemix && (this.Scene as Level).Session.Cassette)
+            if (!unlockedRemix && (Scene as Level).Session.Cassette)
             {
-                this.unlockedRemix = true;
-                this.Add((Component) new Coroutine(this.DisplayRoutine()));
+                unlockedRemix = true;
+                Add(new Coroutine(DisplayRoutine()));
             }
-            if (!this.Visible)
+            if (!Visible)
                 return;
             float target = 96f;
             if (Settings.Instance.SpeedrunClock == SpeedrunType.Chapter)
                 target += 58f;
             else if (Settings.Instance.SpeedrunClock == SpeedrunType.File)
                 target += 78f;
-            if (this.strawberries.Visible)
+            if (strawberries.Visible)
                 target += 96f;
-            this.Y = Calc.Approach(this.Y, target, Engine.DeltaTime * 800f);
+            Y = Calc.Approach(Y, target, Engine.DeltaTime * 800f);
         }
 
         private IEnumerator DisplayRoutine()
@@ -64,32 +63,32 @@ namespace Celeste
             UnlockedRemixDisplay unlockedRemixDisplay = this;
             unlockedRemixDisplay.strawberries = unlockedRemixDisplay.Scene.Entities.FindFirst<TotalStrawberriesDisplay>();
             unlockedRemixDisplay.Visible = true;
-            while ((double) (unlockedRemixDisplay.drawLerp += Engine.DeltaTime * 1.2f) < 1.0)
-                yield return (object) null;
+            while ((unlockedRemixDisplay.drawLerp += Engine.DeltaTime * 1.2f) < 1.0)
+                yield return null;
             // ISSUE: reference to a compiler-generated method
-            unlockedRemixDisplay.Add(this.wiggler = Wiggler.Create(0.8f, 4f, delegate (float f)
+            unlockedRemixDisplay.Add(wiggler = Wiggler.Create(0.8f, 4f, delegate (float f)
             {
-                    this.rotation = f * 0.1f;
-            }, true, false));
+                    rotation = f * 0.1f;
+            }, true));
             unlockedRemixDisplay.drawLerp = 1f;
-            yield return (object) 4f;
-            while ((double) (unlockedRemixDisplay.drawLerp -= Engine.DeltaTime * 2f) > 0.0)
-                yield return (object) null;
+            yield return 4f;
+            while ((unlockedRemixDisplay.drawLerp -= Engine.DeltaTime * 2f) > 0.0)
+                yield return null;
             unlockedRemixDisplay.Visible = false;
             unlockedRemixDisplay.RemoveSelf();
         }
 
         public override void Render()
         {
-            float x = !this.hasCassetteAlready ? (float) ((double) ActiveFont.Measure(this.text).X + 128.0 + 80.0) : 188f;
-            Vector2 vector2 = Vector2.Lerp(new Vector2(-x, this.Y), new Vector2(0.0f, this.Y), Ease.CubeOut(this.drawLerp));
-            this.bg.DrawJustified(vector2 + new Vector2(x, 0.0f), new Vector2(1f, 0.5f));
-            Draw.Rect(vector2.X, vector2.Y - (float) (this.bg.Height / 2), (float) ((double) x - (double) this.bg.Width + 1.0), (float) this.bg.Height, Color.Black);
-            float scale = 128f / (float) this.icon.Width;
-            this.icon.DrawJustified(vector2 + new Vector2((float) (20.0 + (double) this.icon.Width * (double) scale * 0.5), 0.0f), new Vector2(0.5f, 0.5f), Color.White, scale, this.rotation);
-            if (this.hasCassetteAlready)
+            float x = !hasCassetteAlready ? (float) (ActiveFont.Measure(text).X + 128.0 + 80.0) : 188f;
+            Vector2 vector2 = Vector2.Lerp(new Vector2(-x, Y), new Vector2(0.0f, Y), Ease.CubeOut(drawLerp));
+            bg.DrawJustified(vector2 + new Vector2(x, 0.0f), new Vector2(1f, 0.5f));
+            Draw.Rect(vector2.X, vector2.Y - bg.Height / 2, (float) (x - (double) bg.Width + 1.0), bg.Height, Color.Black);
+            float scale = 128f / icon.Width;
+            icon.DrawJustified(vector2 + new Vector2((float) (20.0 + icon.Width * (double) scale * 0.5), 0.0f), new Vector2(0.5f, 0.5f), Color.White, scale, rotation);
+            if (hasCassetteAlready)
                 return;
-            ActiveFont.DrawOutline(this.text, vector2 + new Vector2(168f, 0.0f), new Vector2(0.0f, 0.6f), Vector2.One, Color.White, 2f, Color.Black);
+            ActiveFont.DrawOutline(text, vector2 + new Vector2(168f, 0.0f), new Vector2(0.0f, 0.6f), Vector2.One, Color.White, 2f, Color.Black);
         }
     }
 }

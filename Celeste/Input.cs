@@ -8,7 +8,7 @@ namespace Celeste
 {
     public static class Input
     {
-        private static int gamepad = 0;
+        private static int gamepad;
         public static readonly int MaxBindings = 8;
         public static VirtualButton ESC;
         public static VirtualButton Pause;
@@ -33,7 +33,7 @@ namespace Celeste
         public static VirtualButton CrouchDash;
         private static bool grabToggle;
         public static Vector2 LastAim;
-        public static string OverrideInputPrefix = (string) null;
+        public static string OverrideInputPrefix = null;
         private static Dictionary<Keys, string> keyNameLookup = new Dictionary<Keys, string>();
         private static Dictionary<Buttons, string> buttonNameLookup = new Dictionary<Buttons, string>();
         private static Dictionary<string, Dictionary<string, string>> guiPathLookup = new Dictionary<string, Dictionary<string, string>>();
@@ -269,8 +269,8 @@ namespace Celeste
             else
             {
                 float radiansA = vector2.Angle();
-                float num = (float) (0.39269909262657166 - ((double) radiansA < 0.0 ? 1.0 : 0.0) * 0.0872664600610733);
-                LastAim = (double) Calc.AbsAngleDiff(radiansA, 0.0f) >= (double) num ? ((double) Calc.AbsAngleDiff(radiansA, 3.14159274f) >= (double) num ? ((double) Calc.AbsAngleDiff(radiansA, -1.57079637f) >= (double) num ? ((double) Calc.AbsAngleDiff(radiansA, 1.57079637f) >= (double) num ? new Vector2((float) Math.Sign(vector2.X), (float) Math.Sign(vector2.Y)).SafeNormalize() : new Vector2(0.0f, 1f)) : new Vector2(0.0f, -1f)) : new Vector2(-1f, 0.0f)) : new Vector2(1f, 0.0f);
+                float num = (float) (0.39269909262657166 - (radiansA < 0.0 ? 1.0 : 0.0) * 0.0872664600610733);
+                LastAim = Calc.AbsAngleDiff(radiansA, 0.0f) >= (double) num ? (Calc.AbsAngleDiff(radiansA, 3.14159274f) >= (double) num ? (Calc.AbsAngleDiff(radiansA, -1.57079637f) >= (double) num ? (Calc.AbsAngleDiff(radiansA, 1.57079637f) >= (double) num ? new Vector2(Math.Sign(vector2.X), Math.Sign(vector2.Y)).SafeNormalize() : new Vector2(0.0f, 1f)) : new Vector2(0.0f, -1f)) : new Vector2(-1f, 0.0f)) : new Vector2(1f, 0.0f);
             }
             return LastAim;
         }
@@ -356,7 +356,7 @@ namespace Celeste
             return Keys.None;
         }
 
-        public static MTexture GuiDirection(Vector2 direction) => GuiTexture("directions", Math.Sign(direction.X).ToString() + "x" + (object) Math.Sign(direction.Y));
+        public static MTexture GuiDirection(Vector2 direction) => GuiTexture("directions", Math.Sign(direction.X) + "x" + Math.Sign(direction.Y));
 
         private static MTexture GuiTexture(string prefix, string input)
         {
@@ -368,7 +368,7 @@ namespace Celeste
                 dictionary.Add(input, id = "controls/" + prefix + "/" + input);
             if (GFX.Gui.Has(id))
                 return GFX.Gui[id];
-            return prefix != "fallback" ? GuiTexture("fallback", input) : (MTexture) null;
+            return prefix != "fallback" ? GuiTexture("fallback", input) : null;
         }
 
         public static void SetLightbarColor(Color color)

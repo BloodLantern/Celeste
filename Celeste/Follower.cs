@@ -14,52 +14,52 @@ namespace Celeste
         public float DelayTimer;
         public bool MoveTowardsLeader = true;
 
-        public bool HasLeader => this.Leader != null;
+        public bool HasLeader => Leader != null;
 
         public Follower(Action onGainLeader = null, Action onLoseLeader = null)
             : base(true, false)
         {
-            this.OnGainLeader = onGainLeader;
-            this.OnLoseLeader = onLoseLeader;
+            OnGainLeader = onGainLeader;
+            OnLoseLeader = onLoseLeader;
         }
 
         public Follower(EntityID entityID, Action onGainLeader = null, Action onLoseLeader = null)
             : base(true, false)
         {
-            this.ParentEntityID = entityID;
-            this.OnGainLeader = onGainLeader;
-            this.OnLoseLeader = onLoseLeader;
+            ParentEntityID = entityID;
+            OnGainLeader = onGainLeader;
+            OnLoseLeader = onLoseLeader;
         }
 
         public override void Update()
         {
             base.Update();
-            if ((double) this.DelayTimer <= 0.0)
+            if (DelayTimer <= 0.0)
                 return;
-            this.DelayTimer -= Engine.DeltaTime;
+            DelayTimer -= Engine.DeltaTime;
         }
 
         public void OnLoseLeaderUtil()
         {
-            if (this.PersistentFollow)
-                this.Entity.RemoveTag((int) Tags.Persistent);
-            this.Leader = (Leader) null;
-            if (this.OnLoseLeader == null)
+            if (PersistentFollow)
+                Entity.RemoveTag((int) Tags.Persistent);
+            Leader = null;
+            if (OnLoseLeader == null)
                 return;
-            this.OnLoseLeader();
+            OnLoseLeader();
         }
 
         public void OnGainLeaderUtil(Leader leader)
         {
-            if (this.PersistentFollow)
-                this.Entity.AddTag((int) Tags.Persistent);
-            this.Leader = leader;
-            this.DelayTimer = this.FollowDelay;
-            if (this.OnGainLeader == null)
+            if (PersistentFollow)
+                Entity.AddTag((int) Tags.Persistent);
+            Leader = leader;
+            DelayTimer = FollowDelay;
+            if (OnGainLeader == null)
                 return;
-            this.OnGainLeader();
+            OnGainLeader();
         }
 
-        public int FollowIndex => this.Leader == null ? -1 : this.Leader.Followers.IndexOf(this);
+        public int FollowIndex => Leader == null ? -1 : Leader.Followers.IndexOf(this);
     }
 }

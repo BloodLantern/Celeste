@@ -3,7 +3,7 @@ using Monocle;
 
 namespace Celeste
 {
-    [Tracked(false)]
+    [Tracked]
     public class SpawnFacingTrigger : Entity
     {
         public Facings Facing;
@@ -11,9 +11,9 @@ namespace Celeste
         public SpawnFacingTrigger(EntityData data, Vector2 offset)
             : base(data.Position + offset)
         {
-            this.Collider = (Collider) new Hitbox((float) data.Width, (float) data.Height);
-            this.Facing = data.Enum<Facings>("facing");
-            this.Visible = this.Active = false;
+            Collider = new Hitbox(data.Width, data.Height);
+            Facing = data.Enum<Facings>("facing");
+            Visible = Active = false;
         }
     }
 }

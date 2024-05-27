@@ -1,13 +1,20 @@
 ﻿using Microsoft.Xna.Framework;
 using Monocle;
-using System;
 using System.Collections.Generic;
 
 namespace Celeste
 {
-    [Tracked(false)]
+    [Tracked]
     public class Spikes : Entity
     {
+        public enum Directions
+        {
+            Up,
+            Down,
+            Left,
+            Right,
+        }
+
         public const string TentacleType = "tentacles";
         public Directions Direction;
         private readonly PlayerCollider pc;
@@ -44,14 +51,14 @@ namespace Celeste
                     Add(new LedgeBlocker());
                     break;
             }
-            Add(pc = new PlayerCollider(new Action<Player>(OnCollide)));
-            Add(new StaticMover()
+            Add(pc = new PlayerCollider(OnCollide));
+            Add(new StaticMover
             {
-                OnShake = new Action<Vector2>(OnShake),
-                SolidChecker = new Func<Solid, bool>(IsRiding),
-                JumpThruChecker = new Func<JumpThru, bool>(IsRiding),
-                OnEnable = new Action(OnEnable),
-                OnDisable = new Action(OnDisable)
+                OnShake = OnShake,
+                SolidChecker = IsRiding,
+                JumpThruChecker = IsRiding,
+                OnEnable = OnEnable,
+                OnDisable = OnDisable
             });
         }
 
@@ -97,7 +104,7 @@ namespace Celeste
                             image.Position = Vector2.UnitX * (i + 0.5f) * 8f + Vector2.UnitY;
                             break;
                         case Directions.Down:
-                            image.JustifyOrigin(0.5f, 0.0f);
+                            image.JustifyOrigin(0.5f, 0f);
                             image.Position = Vector2.UnitX * (i + 0.5f) * 8f - Vector2.UnitY;
                             break;
                         case Directions.Left:
@@ -105,7 +112,7 @@ namespace Celeste
                             image.Position = Vector2.UnitY * (i + 0.5f) * 8f + Vector2.UnitX;
                             break;
                         case Directions.Right:
-                            image.JustifyOrigin(0.0f, 0.5f);
+                            image.JustifyOrigin(0f, 0.5f);
                             image.Position = Vector2.UnitY * (i + 0.5f) * 8f - Vector2.UnitX;
                             break;
                     }
@@ -119,7 +126,7 @@ namespace Celeste
             Sprite sprite = GFX.SpriteBank.Create(TentacleType);
             sprite.Play(Calc.Random.Next(3).ToString(), true, true);
             sprite.Position = (Direction is Directions.Up or Directions.Down ? Vector2.UnitX : Vector2.UnitY) * (i + 0.5f) * 16f;
-            sprite.Scale.X = Calc.Random.Choose<int>(-1, 1);
+            sprite.Scale.X = Calc.Random.Choose(-1, 1);
             sprite.SetAnimationFrame(Calc.Random.Next(sprite.CurrentAnimationTotalFrames));
             if (Direction == Directions.Up)
             {
@@ -171,7 +178,7 @@ namespace Celeste
         public override void Render()
         {
             Vector2 position = Position;
-            Position = Position + imageOffset;
+            Position += imageOffset;
             base.Render();
             Position = position;
         }
@@ -194,7 +201,7 @@ namespace Celeste
             switch (Direction)
             {
                 case Directions.Up:
-                    if (player.Speed.Y < 0.0 || (double) player.Bottom > (double) Bottom)
+                    if (player.Speed.Y < 0.0 || player.Bottom > (double) Bottom)
                         break;
                     player.Die(new Vector2(0.0f, -1f));
                     break;
@@ -242,13 +249,5 @@ namespace Celeste
         }
 
         private bool IsRiding(JumpThru jumpThru) => Direction == Directions.Up && CollideCheck(jumpThru, Position + Vector2.UnitY);
-
-        public enum Directions
-        {
-            Up,
-            Down,
-            Left,
-            Right,
-        }
     }
 }

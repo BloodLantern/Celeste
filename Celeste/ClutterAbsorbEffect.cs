@@ -13,39 +13,39 @@ namespace Celeste
 
         public ClutterAbsorbEffect()
         {
-            this.Position = Vector2.Zero;
-            this.Tag = (int) Tags.TransitionUpdate;
-            this.Depth = -10001;
+            Position = Vector2.Zero;
+            Tag = (int) Tags.TransitionUpdate;
+            Depth = -10001;
         }
 
         public override void Added(Scene scene)
         {
             base.Added(scene);
-            this.level = this.SceneAs<Level>();
-            foreach (Entity entity in this.level.Tracker.GetEntities<ClutterCabinet>())
-                this.cabinets.Add(entity as ClutterCabinet);
+            level = SceneAs<Level>();
+            foreach (Entity entity in level.Tracker.GetEntities<ClutterCabinet>())
+                cabinets.Add(entity as ClutterCabinet);
         }
 
         public void FlyClutter(Vector2 position, MTexture texture, bool shake, float delay)
         {
-            Monocle.Image img = new Monocle.Image(texture);
-            img.Position = position - this.Position;
+            Image img = new Image(texture);
+            img.Position = position - Position;
             img.CenterOrigin();
-            this.Add((Component) img);
-            this.Add((Component) new Coroutine(this.FlyClutterRoutine(img, shake, delay))
+            Add(img);
+            Add(new Coroutine(FlyClutterRoutine(img, shake, delay))
             {
                 RemoveOnComplete = true
             });
         }
 
-        private IEnumerator FlyClutterRoutine(Monocle.Image img, bool shake, float delay)
+        private IEnumerator FlyClutterRoutine(Image img, bool shake, float delay)
         {
             ClutterAbsorbEffect clutterAbsorbEffect = this;
-            yield return (object) delay;
-            ClutterCabinet cabinet = Calc.Random.Choose<ClutterCabinet>(clutterAbsorbEffect.cabinets);
+            yield return delay;
+            ClutterCabinet cabinet = Calc.Random.Choose(clutterAbsorbEffect.cabinets);
             Vector2 vector2_1 = cabinet.Position + new Vector2(8f);
             Vector2 from = img.Position;
-            Vector2 vector2_2 = new Vector2((float) (Calc.Random.Next(16) - 8), (float) (Calc.Random.Next(4) - 2));
+            Vector2 vector2_2 = new Vector2(Calc.Random.Next(16) - 8, Calc.Random.Next(4) - 2);
             Vector2 end = vector2_1 + vector2_2;
             Vector2 vector2_3 = (end - from).SafeNormalize();
             float num = (end - from).Length();
@@ -54,37 +54,37 @@ namespace Celeste
             float time;
             if (shake)
             {
-                for (time = 0.25f; (double) time > 0.0; time -= Engine.DeltaTime)
+                for (time = 0.25f; time > 0.0; time -= Engine.DeltaTime)
                 {
-                    img.X = (float) ((double) from.X + (double) Calc.Random.Next(3) - 1.0);
-                    img.Y = (float) ((double) from.Y + (double) Calc.Random.Next(3) - 1.0);
-                    yield return (object) null;
+                    img.X = (float) (from.X + (double) Calc.Random.Next(3) - 1.0);
+                    img.Y = (float) (from.Y + (double) Calc.Random.Next(3) - 1.0);
+                    yield return null;
                 }
             }
-            for (time = 0.0f; (double) time < 1.0; time += Engine.DeltaTime)
+            for (time = 0.0f; time < 1.0; time += Engine.DeltaTime)
             {
                 img.Position = curve.GetPoint(Ease.CubeInOut(time));
-                img.Scale = Vector2.One * Ease.CubeInOut((float) (1.0 - (double) time * 0.5));
-                if ((double) time > 0.5 && !cabinet.Opened)
+                img.Scale = Vector2.One * Ease.CubeInOut((float) (1.0 - time * 0.5));
+                if (time > 0.5 && !cabinet.Opened)
                     cabinet.Open();
                 if (clutterAbsorbEffect.level.OnInterval(0.25f))
                     clutterAbsorbEffect.level.ParticlesFG.Emit(ClutterSwitch.P_ClutterFly, img.Position);
-                yield return (object) null;
+                yield return null;
             }
-            clutterAbsorbEffect.Remove((Component) img);
+            clutterAbsorbEffect.Remove(img);
         }
 
-        public void CloseCabinets() => this.Add((Component) new Coroutine(this.CloseCabinetsRoutine()));
+        public void CloseCabinets() => Add(new Coroutine(CloseCabinetsRoutine()));
 
         private IEnumerator CloseCabinetsRoutine()
         {
-            this.cabinets.Sort((Comparison<ClutterCabinet>) ((a, b) => (double) Math.Abs(a.Y - b.Y) < 24.0 ? Math.Sign(a.X - b.X) : Math.Sign(a.Y - b.Y)));
+            cabinets.Sort((a, b) => Math.Abs(a.Y - b.Y) < 24.0 ? Math.Sign(a.X - b.X) : Math.Sign(a.Y - b.Y));
             int i = 0;
-            foreach (ClutterCabinet cabinet in this.cabinets)
+            foreach (ClutterCabinet cabinet in cabinets)
             {
                 cabinet.Close();
                 if (i++ % 3 == 0)
-                    yield return (object) 0.1f;
+                    yield return 0.1f;
             }
         }
     }

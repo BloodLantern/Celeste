@@ -6,7 +6,7 @@ using System;
 
 namespace Celeste
 {
-    public class MountainRenderer : Monocle.Renderer
+    public class MountainRenderer : Renderer
     {
         public bool ForceNearFog;
         public Action OnEaseEnd;
@@ -49,7 +49,7 @@ namespace Celeste
         {
             timer += Engine.DeltaTime;
             Model.Update();
-            userOffset += ((AllowUserRotation ? -Input.MountainAim.Value * 0.8f : Vector2.Zero) - userOffset) * (1f - (float) Math.Pow(0.0099999997764825821, (double) Engine.DeltaTime));
+            userOffset += ((AllowUserRotation ? -Input.MountainAim.Value * 0.8f : Vector2.Zero) - userOffset) * (1f - (float) Math.Pow(0.0099999997764825821, Engine.DeltaTime));
             if (!rotateAroundCenter)
             {
                 if (Area == 8)
@@ -62,7 +62,7 @@ namespace Celeste
                 if (rotateAroundCenter)
                 {
                     rotateTimer -= Engine.DeltaTime * 0.1f;
-                    Model.Camera.Position += (new Vector3((float) Math.Cos(rotateTimer) * 15f, 3f, (float) Math.Sin(rotateTimer) * 15f) - Model.Camera.Position) * (1f - (float) Math.Pow(0.10000000149011612, (double) Engine.DeltaTime));
+                    Model.Camera.Position += (new Vector3((float) Math.Cos(rotateTimer) * 15f, 3f, (float) Math.Sin(rotateTimer) * 15f) - Model.Camera.Position) * (1f - (float) Math.Pow(0.10000000149011612, Engine.DeltaTime));
                     Model.Camera.Target = MountainRenderer.RotateLookAt + Vector3.Up * userOffset.Y;
                     Model.Camera.Rotation = Quaternion.Slerp(Model.Camera.Rotation, new Quaternion().LookAt(Model.Camera.Position, Model.Camera.Target, Vector3.Up), Engine.DeltaTime * 4f);
                     UntiltedCamera = Camera;
@@ -93,7 +93,7 @@ namespace Celeste
                     {
                         rotateTimer -= Engine.DeltaTime * 0.1f;
                         float num = (new Vector2(easeCameraTo.Target.X, easeCameraTo.Target.Z) - new Vector2(easeCameraTo.Position.X, easeCameraTo.Position.Z)).Length();
-                        Model.Camera.Position += (new Vector3(easeCameraTo.Target.X + (float) Math.Cos(rotateTimer) * num, easeCameraTo.Position.Y, easeCameraTo.Target.Z + (float) Math.Sin(rotateTimer) * num) - Model.Camera.Position) * (1f - (float) Math.Pow(0.10000000149011612, (double) Engine.DeltaTime));
+                        Model.Camera.Position += (new Vector3(easeCameraTo.Target.X + (float) Math.Cos(rotateTimer) * num, easeCameraTo.Position.Y, easeCameraTo.Target.Z + (float) Math.Sin(rotateTimer) * num) - Model.Camera.Position) * (1f - (float) Math.Pow(0.10000000149011612, Engine.DeltaTime));
                         Model.Camera.Target = easeCameraTo.Target + Vector3.Up * userOffset.Y * 2f + Vector3.Left * userOffset.X * 2f;
                         Model.Camera.Rotation = Quaternion.Slerp(Model.Camera.Rotation, new Quaternion().LookAt(Model.Camera.Position, Model.Camera.Target, Vector3.Up), Engine.DeltaTime * 4f);
                         UntiltedCamera = Camera;
@@ -183,12 +183,12 @@ namespace Celeste
         {
             Vector2 from1 = new(from.X, from.Z);
             Vector2 from2 = new(to.X, to.Z);
-            double angleRadians = (double) Calc.AngleLerp(Calc.Angle(from1, Vector2.Zero), Calc.Angle(from2, Vector2.Zero), ease);
+            double angleRadians = Calc.AngleLerp(Calc.Angle(from1, Vector2.Zero), Calc.Angle(from2, Vector2.Zero), ease);
             float num1 = from1.Length();
             float num2 = from2.Length();
             float num3 = num1 + (num2 - num1) * ease;
             float y = from.Y + (to.Y - from.Y) * ease;
-            double length = (double) num3;
+            double length = num3;
             Vector2 vector2 = -Calc.AngleToVector((float) angleRadians, (float) length);
             return new Vector3(vector2.X, y, vector2.Y);
         }
@@ -246,7 +246,7 @@ namespace Celeste
             Vector3 between = GetBetween(easeCameraFrom.Position, easeCameraTo.Position, 0.5f);
             Vector2 vector1 = Calc.AngleToVector(MathHelper.Lerp(radiansA, radiansA + num1, 0.5f), 1f);
             Vector2 vector2 = Calc.AngleToVector(MathHelper.Lerp(radiansA, radiansA + num2, 0.5f), 1f);
-            easeCameraRotationAngleTo = (double) (between + new Vector3(vector1.X, 0.0f, vector1.Y)).Length() >= (double) (between + new Vector3(vector2.X, 0.0f, vector2.Y)).Length() ? radiansA + num2 : radiansA + num1;
+            easeCameraRotationAngleTo = (between + new Vector3(vector1.X, 0.0f, vector1.Y)).Length() >= (double) (between + new Vector3(vector2.X, 0.0f, vector2.Y)).Length() ? radiansA + num2 : radiansA + num1;
             this.duration = duration.HasValue ? duration.Value : GetDuration(easeCameraFrom, easeCameraTo);
             return this.duration;
         }
@@ -264,9 +264,9 @@ namespace Celeste
 
         private float GetDuration(MountainCamera from, MountainCamera to)
         {
-            double num = (double) Calc.AngleDiff(Calc.Angle(new Vector2(from.Position.X, from.Position.Z), new Vector2(from.Target.X, from.Target.Z)), Calc.Angle(new Vector2(to.Position.X, to.Position.Z), new Vector2(to.Target.X, to.Target.Z)));
-            double val2 = Math.Sqrt((double) (from.Position - to.Position).Length()) / 3.0;
-            return Calc.Clamp((float) (Math.Max((double) Math.Abs((float) num) * 0.5, val2) * 0.699999988079071), 0.3f, 1.1f);
+            double num = Calc.AngleDiff(Calc.Angle(new Vector2(from.Position.X, from.Position.Z), new Vector2(from.Target.X, from.Target.Z)), Calc.Angle(new Vector2(to.Position.X, to.Position.Z), new Vector2(to.Target.X, to.Target.Z)));
+            double val2 = Math.Sqrt((from.Position - to.Position).Length()) / 3.0;
+            return Calc.Clamp((float) (Math.Max(Math.Abs((float) num) * 0.5, val2) * 0.699999988079071), 0.3f, 1.1f);
         }
 
         private void PlayWhoosh(int from, int to)

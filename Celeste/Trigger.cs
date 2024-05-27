@@ -7,6 +7,17 @@ namespace Celeste
     [Tracked(true)]
     public abstract class Trigger : Entity
     {
+        public enum PositionModes
+        {
+            NoEffect,
+            HorizontalCenter,
+            VerticalCenter,
+            TopToBottom,
+            BottomToTop,
+            LeftToRight,
+            RightToLeft,
+        }
+
         public bool Triggered;
 
         public bool PlayerIsInside { get; private set; }
@@ -38,17 +49,6 @@ namespace Celeste
                 PositionModes.RightToLeft => Calc.ClampedMap(player.CenterX, Right, Left),
                 _ => 1f,
             };
-        }
-
-        public enum PositionModes
-        {
-            NoEffect,
-            HorizontalCenter,
-            VerticalCenter,
-            TopToBottom,
-            BottomToTop,
-            LeftToRight,
-            RightToLeft,
         }
     }
 }

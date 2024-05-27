@@ -8,15 +8,15 @@ namespace Celeste
     {
         private MTexture checkpoint;
 
-        public ReturnMapHint() => this.Tag = (int) Tags.HUD;
+        public ReturnMapHint() => Tag = (int) Tags.HUD;
 
         public override void Added(Scene scene)
         {
             base.Added(scene);
-            Session session = (this.Scene as Level).Session;
+            Session session = (Scene as Level).Session;
             AreaKey area = session.Area;
             HashSet<string> checkpoints = SaveData.Instance.GetCheckpoints(area);
-            CheckpointData checkpointData = (CheckpointData) null;
+            CheckpointData checkpointData = null;
             ModeProperties modeProperties = AreaData.Areas[area.ID].Mode[(int) area.Mode];
             if (modeProperties.Checkpoints != null)
             {
@@ -34,12 +34,12 @@ namespace Celeste
             this.checkpoint = MTN.Checkpoints[id];
         }
 
-        public static string GetCheckpointPreviewName(AreaKey area, string level) => level == null ? area.ToString() : area.ToString() + "_" + level;
+        public static string GetCheckpointPreviewName(AreaKey area, string level) => level == null ? area.ToString() : area + "_" + level;
 
         private MTexture GetCheckpointPreview(AreaKey area, string level)
         {
             string checkpointPreviewName = ReturnMapHint.GetCheckpointPreviewName(area, level);
-            return MTN.Checkpoints.Has(checkpointPreviewName) ? MTN.Checkpoints[checkpointPreviewName] : (MTexture) null;
+            return MTN.Checkpoints.Has(checkpointPreviewName) ? MTN.Checkpoints[checkpointPreviewName] : null;
         }
 
         public override void Render()
@@ -50,19 +50,19 @@ namespace Celeste
             float num1 = ActiveFont.Measure(text).X * 0.75f;
             if (this.checkpoint != null)
             {
-                float num2 = (float) checkpoint.Width * 0.25f;
-                Vector2 vector2 = new Vector2((float) ((1920.0 - (double) num1 - (double) num2 - 64.0) / 2.0), 730f);
-                float num3 = 720f / (float) this.checkpoint.ClipRect.Width;
+                float num2 = checkpoint.Width * 0.25f;
+                Vector2 vector2 = new Vector2((float) ((1920.0 - num1 - num2 - 64.0) / 2.0), 730f);
+                float num3 = 720f / this.checkpoint.ClipRect.Width;
                 ActiveFont.DrawOutline(text, vector2 + new Vector2(num1 / 2f, 0.0f), new Vector2(0.5f, 0.5f), Vector2.One * 0.75f, Color.LightGray, 2f, Color.Black);
                 vector2.X += num1 + 64f;
                 checkpoint.DrawCentered(vector2 + new Vector2(num2 / 2f, 0.0f), Color.White, 0.25f, 0.1f);
                 this.checkpoint.DrawCentered(vector2 + new Vector2(num2 / 2f, 0.0f), Color.White, 0.25f * num3, 0.1f);
-                mtexture.DrawCentered(vector2 + new Vector2(num2 * 0.8f, (float) ((double) checkpoint.Height * 0.25 * 0.5 * 0.800000011920929)), Color.White, 0.75f);
+                mtexture.DrawCentered(vector2 + new Vector2(num2 * 0.8f, (float) (checkpoint.Height * 0.25 * 0.5 * 0.800000011920929)), Color.White, 0.75f);
             }
             else
             {
-                float num4 = (float) mtexture.Width * 0.75f;
-                Vector2 vector2 = new Vector2((float) ((1920.0 - (double) num1 - (double) num4 - 64.0) / 2.0), 730f);
+                float num4 = mtexture.Width * 0.75f;
+                Vector2 vector2 = new Vector2((float) ((1920.0 - num1 - num4 - 64.0) / 2.0), 730f);
                 ActiveFont.DrawOutline(text, vector2 + new Vector2(num1 / 2f, 0.0f), new Vector2(0.5f, 0.5f), Vector2.One * 0.75f, Color.LightGray, 2f, Color.Black);
                 vector2.X += num1 + 64f;
                 mtexture.DrawCentered(vector2 + new Vector2(num4 * 0.5f, 0.0f), Color.White, 0.75f);

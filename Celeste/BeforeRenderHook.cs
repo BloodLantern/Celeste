@@ -3,7 +3,7 @@ using System;
 
 namespace Celeste
 {
-    [Tracked(false)]
+    [Tracked()]
     public class BeforeRenderHook : Component
     {
         public Action Callback;
@@ -11,7 +11,7 @@ namespace Celeste
         public BeforeRenderHook(Action callback)
             : base(false, true)
         {
-            this.Callback = callback;
+            Callback = callback;
         }
     }
 }

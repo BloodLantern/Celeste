@@ -4,7 +4,7 @@ using System;
 
 namespace Celeste
 {
-    [Tracked(false)]
+    [Tracked()]
     public class LedgeBlocker : Component
     {
         public bool Blocking = true;
@@ -13,28 +13,28 @@ namespace Celeste
         public LedgeBlocker(Func<Player, bool> blockChecker = null)
             : base(false, false)
         {
-            this.BlockChecker = blockChecker;
+            BlockChecker = blockChecker;
         }
 
         public bool HopBlockCheck(Player player)
         {
-            if (!this.Blocking || !player.CollideCheck(this.Entity, player.Position + Vector2.UnitX * (float) player.Facing * 8f))
+            if (!Blocking || !player.CollideCheck(Entity, player.Position + Vector2.UnitX * (float) player.Facing * 8f))
                 return false;
-            return this.BlockChecker == null || this.BlockChecker(player);
+            return BlockChecker == null || BlockChecker(player);
         }
 
         public bool JumpThruBoostCheck(Player player)
         {
-            if (!this.Blocking || !player.CollideCheck(this.Entity, player.Position - Vector2.UnitY * 2f))
+            if (!Blocking || !player.CollideCheck(Entity, player.Position - Vector2.UnitY * 2f))
                 return false;
-            return this.BlockChecker == null || this.BlockChecker(player);
+            return BlockChecker == null || BlockChecker(player);
         }
 
         public bool DashCorrectCheck(Player player)
         {
-            if (!this.Blocking || !player.CollideCheck(this.Entity, player.Position))
+            if (!Blocking || !player.CollideCheck(Entity, player.Position))
                 return false;
-            return this.BlockChecker == null || this.BlockChecker(player);
+            return BlockChecker == null || BlockChecker(player);
         }
     }
 }

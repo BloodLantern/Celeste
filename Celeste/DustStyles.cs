@@ -6,11 +6,11 @@ namespace Celeste
 {
     public static class DustStyles
     {
-        public static Dictionary<int, DustStyles.DustStyle> Styles = new Dictionary<int, DustStyles.DustStyle>()
+        public static Dictionary<int, DustStyle> Styles = new Dictionary<int, DustStyle>
         {
             {
                 3,
-                new DustStyles.DustStyle()
+                new DustStyle
                 {
                     EdgeColors = new Vector3[3]
                     {
@@ -24,7 +24,7 @@ namespace Celeste
             },
             {
                 5,
-                new DustStyles.DustStyle()
+                new DustStyle
                 {
                     EdgeColors = new Vector3[3]
                     {
@@ -38,9 +38,9 @@ namespace Celeste
             }
         };
 
-        public static DustStyles.DustStyle Get(Session session) => !DustStyles.Styles.ContainsKey(session.Area.ID) ? DustStyles.Styles[3] : DustStyles.Styles[session.Area.ID];
+        public static DustStyle Get(Session session) => !DustStyles.Styles.ContainsKey(session.Area.ID) ? DustStyles.Styles[3] : DustStyles.Styles[session.Area.ID];
 
-        public static DustStyles.DustStyle Get(Scene scene) => DustStyles.Get((scene as Level).Session);
+        public static DustStyle Get(Scene scene) => DustStyles.Get((scene as Level).Session);
 
         public struct DustStyle
         {

@@ -4,7 +4,7 @@ using System;
 
 namespace Celeste
 {
-    [Tracked(false)]
+    [Tracked()]
     public class DashListener : Component
     {
         public Action<Vector2> OnDash;

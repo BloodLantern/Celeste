@@ -1,18 +1,17 @@
 ﻿using Microsoft.Xna.Framework;
 using Monocle;
-using System;
 
 namespace Celeste
 {
-    [Tracked(false)]
+    [Tracked]
     public class Killbox : Entity
     {
         public Killbox(EntityData data, Vector2 offset)
             : base(data.Position + offset)
         {
-            this.Collider = (Collider) new Hitbox((float) data.Width, 32f);
-            this.Collidable = false;
-            this.Add((Component) new PlayerCollider(new Action<Player>(this.OnPlayer)));
+            Collider = new Hitbox(data.Width, 32f);
+            Collidable = false;
+            Add(new PlayerCollider(OnPlayer));
         }
 
         private void OnPlayer(Player player)
@@ -20,7 +19,7 @@ namespace Celeste
             if (SaveData.Instance.Assists.Invincible)
             {
                 player.Play("event:/game/general/assist_screenbottom");
-                player.Bounce(this.Top);
+                player.Bounce(Top);
             }
             else
                 player.Die(Vector2.Zero);
@@ -28,17 +27,17 @@ namespace Celeste
 
         public override void Update()
         {
-            if (!this.Collidable)
+            if (!Collidable)
             {
-                Player entity = this.Scene.Tracker.GetEntity<Player>();
-                if (entity != null && (double) entity.Bottom < (double) this.Top - 32.0)
-                    this.Collidable = true;
+                Player entity = Scene.Tracker.GetEntity<Player>();
+                if (entity != null && entity.Bottom < Top - 32.0)
+                    Collidable = true;
             }
             else
             {
-                Player entity = this.Scene.Tracker.GetEntity<Player>();
-                if (entity != null && (double) entity.Top > (double) this.Bottom + 32.0)
-                    this.Collidable = false;
+                Player entity = Scene.Tracker.GetEntity<Player>();
+                if (entity != null && entity.Top > Bottom + 32.0)
+                    Collidable = false;
             }
             base.Update();
         }

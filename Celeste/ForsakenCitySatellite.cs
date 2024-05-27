@@ -10,7 +10,7 @@ namespace Celeste
     public class ForsakenCitySatellite : Entity
     {
         private const string UnlockedFlag = "unlocked_satellite";
-        public static readonly Dictionary<string, Color> Colors = new Dictionary<string, Color>()
+        public static readonly Dictionary<string, Color> Colors = new Dictionary<string, Color>
         {
             {
                 "U",
@@ -33,7 +33,7 @@ namespace Celeste
                 Calc.HexToColor("ffcd37")
             }
         };
-        public static readonly Dictionary<string, string> Sounds = new Dictionary<string, string>()
+        public static readonly Dictionary<string, string> Sounds = new Dictionary<string, string>
         {
             {
                 "U",
@@ -69,15 +69,15 @@ namespace Celeste
         private static List<string> uniqueCodes = new List<string>();
         private bool enabled;
         private List<string> currentInputs = new List<string>();
-        private List<ForsakenCitySatellite.CodeBird> birds = new List<ForsakenCitySatellite.CodeBird>();
+        private List<CodeBird> birds = new List<CodeBird>();
         private Vector2 gemSpawnPosition;
         private Vector2 birdFlyPosition;
-        private Monocle.Image sprite;
-        private Monocle.Image pulse;
-        private Monocle.Image computer;
-        private Monocle.Image computerScreen;
+        private Image sprite;
+        private Image pulse;
+        private Image computer;
+        private Image computerScreen;
         private Sprite computerScreenNoise;
-        private Monocle.Image computerScreenShine;
+        private Image computerScreenShine;
         private BloomPoint pulseBloom;
         private BloomPoint screenBloom;
         private Level level;
@@ -90,91 +90,91 @@ namespace Celeste
         public ForsakenCitySatellite(EntityData data, Vector2 offset)
             : base(data.Position + offset)
         {
-            this.Add((Component) (this.sprite = new Monocle.Image(GFX.Game["objects/citysatellite/dish"])));
-            this.Add((Component) (this.pulse = new Monocle.Image(GFX.Game["objects/citysatellite/light"])));
-            this.Add((Component) (this.computer = new Monocle.Image(GFX.Game["objects/citysatellite/computer"])));
-            this.Add((Component) (this.computerScreen = new Monocle.Image(GFX.Game["objects/citysatellite/computerscreen"])));
-            this.Add((Component) (this.computerScreenNoise = new Sprite(GFX.Game, "objects/citysatellite/computerScreenNoise")));
-            this.Add((Component) (this.computerScreenShine = new Monocle.Image(GFX.Game["objects/citysatellite/computerscreenShine"])));
-            this.sprite.JustifyOrigin(0.5f, 1f);
-            this.pulse.JustifyOrigin(0.5f, 1f);
-            this.Add((Component) new Coroutine(this.PulseRoutine()));
-            this.Add((Component) (this.pulseBloom = new BloomPoint(new Vector2(-12f, -44f), 1f, 8f)));
-            this.Add((Component) (this.screenBloom = new BloomPoint(new Vector2(32f, 20f), 1f, 8f)));
-            this.computerScreenNoise.AddLoop("static", "", 0.05f);
-            this.computerScreenNoise.Play("static");
-            this.computer.Position = this.computerScreen.Position = this.computerScreenShine.Position = this.computerScreenNoise.Position = new Vector2(8f, 8f);
-            this.birdFlyPosition = offset + data.Nodes[0];
-            this.gemSpawnPosition = offset + data.Nodes[1];
-            this.Add((Component) (this.dashListener = new DashListener()));
-            this.dashListener.OnDash = (Action<Vector2>) (dir =>
+            Add(sprite = new Image(GFX.Game["objects/citysatellite/dish"]));
+            Add(pulse = new Image(GFX.Game["objects/citysatellite/light"]));
+            Add(computer = new Image(GFX.Game["objects/citysatellite/computer"]));
+            Add(computerScreen = new Image(GFX.Game["objects/citysatellite/computerscreen"]));
+            Add(computerScreenNoise = new Sprite(GFX.Game, "objects/citysatellite/computerScreenNoise"));
+            Add(computerScreenShine = new Image(GFX.Game["objects/citysatellite/computerscreenShine"]));
+            sprite.JustifyOrigin(0.5f, 1f);
+            pulse.JustifyOrigin(0.5f, 1f);
+            Add(new Coroutine(PulseRoutine()));
+            Add(pulseBloom = new BloomPoint(new Vector2(-12f, -44f), 1f, 8f));
+            Add(screenBloom = new BloomPoint(new Vector2(32f, 20f), 1f, 8f));
+            computerScreenNoise.AddLoop("static", "", 0.05f);
+            computerScreenNoise.Play("static");
+            computer.Position = computerScreen.Position = computerScreenShine.Position = computerScreenNoise.Position = new Vector2(8f, 8f);
+            birdFlyPosition = offset + data.Nodes[0];
+            gemSpawnPosition = offset + data.Nodes[1];
+            Add(dashListener = new DashListener());
+            dashListener.OnDash = dir =>
             {
                 string str = "";
-                if ((double) dir.Y < 0.0)
+                if (dir.Y < 0.0)
                     str = "U";
-                else if ((double) dir.Y > 0.0)
+                else if (dir.Y > 0.0)
                     str = "D";
-                if ((double) dir.X < 0.0)
+                if (dir.X < 0.0)
                     str += "L";
-                else if ((double) dir.X > 0.0)
+                else if (dir.X > 0.0)
                     str += "R";
-                this.currentInputs.Add(str);
-                if (this.currentInputs.Count > ForsakenCitySatellite.Code.Length)
-                    this.currentInputs.RemoveAt(0);
-                if (this.currentInputs.Count != ForsakenCitySatellite.Code.Length)
+                currentInputs.Add(str);
+                if (currentInputs.Count > ForsakenCitySatellite.Code.Length)
+                    currentInputs.RemoveAt(0);
+                if (currentInputs.Count != ForsakenCitySatellite.Code.Length)
                     return;
                 bool flag = true;
                 for (int index = 0; index < ForsakenCitySatellite.Code.Length; ++index)
                 {
-                    if (!this.currentInputs[index].Equals(ForsakenCitySatellite.Code[index]))
+                    if (!currentInputs[index].Equals(ForsakenCitySatellite.Code[index]))
                         flag = false;
                 }
-                if (!flag || (double) this.level.Camera.Left + 32.0 >= (double) this.gemSpawnPosition.X || !this.enabled)
+                if (!flag || level.Camera.Left + 32.0 >= gemSpawnPosition.X || !enabled)
                     return;
-                this.Add((Component) new Coroutine(this.UnlockGem()));
-            });
+                Add(new Coroutine(UnlockGem()));
+            };
             foreach (string str in ForsakenCitySatellite.Code)
             {
                 if (!ForsakenCitySatellite.uniqueCodes.Contains(str))
                     ForsakenCitySatellite.uniqueCodes.Add(str);
             }
-            this.Depth = 8999;
-            this.Add((Component) (this.staticLoopSfx = new SoundSource()));
-            this.staticLoopSfx.Position = this.computer.Position;
+            Depth = 8999;
+            Add(staticLoopSfx = new SoundSource());
+            staticLoopSfx.Position = computer.Position;
         }
 
         public override void Added(Scene scene)
         {
             base.Added(scene);
-            this.level = scene as Level;
-            this.enabled = !this.level.Session.HeartGem && !this.level.Session.GetFlag("unlocked_satellite");
-            if (this.enabled)
+            level = scene as Level;
+            enabled = !level.Session.HeartGem && !level.Session.GetFlag("unlocked_satellite");
+            if (enabled)
             {
                 foreach (string uniqueCode in ForsakenCitySatellite.uniqueCodes)
                 {
-                    ForsakenCitySatellite.CodeBird codeBird = new ForsakenCitySatellite.CodeBird(this.birdFlyPosition, uniqueCode);
-                    this.birds.Add(codeBird);
-                    this.level.Add((Entity) codeBird);
+                    CodeBird codeBird = new CodeBird(birdFlyPosition, uniqueCode);
+                    birds.Add(codeBird);
+                    level.Add(codeBird);
                 }
-                this.Add((Component) (this.birdFlyingSfx = new SoundSource()));
-                this.Add((Component) (this.birdFinishSfx = new SoundSource()));
-                this.Add((Component) (this.birdThrustSfx = new SoundSource()));
-                this.birdFlyingSfx.Position = this.birdFlyPosition - this.Position;
-                this.birdFlyingSfx.Play("event:/game/01_forsaken_city/birdbros_fly_loop");
+                Add(birdFlyingSfx = new SoundSource());
+                Add(birdFinishSfx = new SoundSource());
+                Add(birdThrustSfx = new SoundSource());
+                birdFlyingSfx.Position = birdFlyPosition - Position;
+                birdFlyingSfx.Play("event:/game/01_forsaken_city/birdbros_fly_loop");
             }
             else
-                this.staticLoopSfx.Play("event:/game/01_forsaken_city/console_static_loop");
-            if (this.level.Session.HeartGem || !this.level.Session.GetFlag("unlocked_satellite"))
+                staticLoopSfx.Play("event:/game/01_forsaken_city/console_static_loop");
+            if (level.Session.HeartGem || !level.Session.GetFlag("unlocked_satellite"))
                 return;
-            this.level.Add((Entity) new HeartGem(this.gemSpawnPosition));
+            level.Add(new HeartGem(gemSpawnPosition));
         }
 
         public override void Update()
         {
             base.Update();
-            this.computerScreenNoise.Visible = !this.pulse.Visible;
-            this.computerScreen.Visible = this.pulse.Visible;
-            this.screenBloom.Visible = this.pulseBloom.Visible;
+            computerScreenNoise.Visible = !pulse.Visible;
+            computerScreen.Visible = pulse.Visible;
+            screenBloom.Visible = pulseBloom.Visible;
         }
 
         private IEnumerator PulseRoutine()
@@ -183,33 +183,33 @@ namespace Celeste
             forsakenCitySatellite.pulseBloom.Visible = forsakenCitySatellite.pulse.Visible = false;
             while (forsakenCitySatellite.enabled)
             {
-                yield return (object) 2f;
+                yield return 2f;
                 for (int i = 0; i < ForsakenCitySatellite.Code.Length && forsakenCitySatellite.enabled; ++i)
                 {
                     forsakenCitySatellite.pulse.Color = forsakenCitySatellite.computerScreen.Color = ForsakenCitySatellite.Colors[ForsakenCitySatellite.Code[i]];
                     forsakenCitySatellite.pulseBloom.Visible = forsakenCitySatellite.pulse.Visible = true;
                     Audio.Play(ForsakenCitySatellite.Sounds[ForsakenCitySatellite.Code[i]], forsakenCitySatellite.Position + forsakenCitySatellite.computer.Position);
-                    yield return (object) 0.5f;
+                    yield return 0.5f;
                     forsakenCitySatellite.pulseBloom.Visible = forsakenCitySatellite.pulse.Visible = false;
                     Audio.Play(i < ForsakenCitySatellite.Code.Length - 1 ? "event:/game/01_forsaken_city/console_static_short" : "event:/game/01_forsaken_city/console_static_long", forsakenCitySatellite.Position + forsakenCitySatellite.computer.Position);
-                    yield return (object) 0.2f;
+                    yield return 0.2f;
                 }
                 // ISSUE: reference to a compiler-generated method
                 forsakenCitySatellite.Add(Alarm.Create(Alarm.AlarmMode.Oneshot, delegate
                 {
-                        if (this.enabled)
+                        if (enabled)
                         {
-                                this.birdThrustSfx.Position = this.birdFlyPosition - this.Position;
-                                this.birdThrustSfx.Play("event:/game/01_forsaken_city/birdbros_thrust", null, 0f);
+                                birdThrustSfx.Position = birdFlyPosition - Position;
+                                birdThrustSfx.Play("event:/game/01_forsaken_city/birdbros_thrust");
                         }
                 }, 1.1f, true));
-                forsakenCitySatellite.birds.Shuffle<ForsakenCitySatellite.CodeBird>();
-                foreach (ForsakenCitySatellite.CodeBird bird in forsakenCitySatellite.birds)
+                forsakenCitySatellite.birds.Shuffle();
+                foreach (CodeBird bird in forsakenCitySatellite.birds)
                 {
                     if (forsakenCitySatellite.enabled)
                     {
                         bird.Dash();
-                        yield return (object) 0.02f;
+                        yield return 0.02f;
                     }
                 }
             }
@@ -224,43 +224,43 @@ namespace Celeste
             forsakenCitySatellite.birdFinishSfx.Play("event:/game/01_forsaken_city/birdbros_finish");
             forsakenCitySatellite.staticLoopSfx.Play("event:/game/01_forsaken_city/console_static_loop");
             forsakenCitySatellite.enabled = false;
-            yield return (object) 0.25f;
+            yield return 0.25f;
             forsakenCitySatellite.level.Displacement.Clear();
-            yield return (object) null;
+            yield return null;
             forsakenCitySatellite.birdFlyingSfx.Stop();
             forsakenCitySatellite.level.Frozen = true;
             forsakenCitySatellite.Tag = (int) Tags.FrozenUpdate;
             BloomPoint bloom = new BloomPoint(forsakenCitySatellite.birdFlyPosition - forsakenCitySatellite.Position, 0.0f, 32f);
-            forsakenCitySatellite.Add((Component) bloom);
-            foreach (ForsakenCitySatellite.CodeBird bird in forsakenCitySatellite.birds)
+            forsakenCitySatellite.Add(bloom);
+            foreach (CodeBird bird in forsakenCitySatellite.birds)
                 bird.Transform(3f);
-            while ((double) bloom.Alpha < 1.0)
+            while (bloom.Alpha < 1.0)
             {
                 bloom.Alpha += Engine.DeltaTime / 3f;
-                yield return (object) null;
+                yield return null;
             }
-            yield return (object) 0.25f;
+            yield return 0.25f;
             foreach (Entity bird in forsakenCitySatellite.birds)
                 bird.RemoveSelf();
             ParticleSystem particles = new ParticleSystem(-10000, 100);
             particles.Tag = (int) Tags.FrozenUpdate;
             particles.Emit(BirdNPC.P_Feather, 24, forsakenCitySatellite.birdFlyPosition, new Vector2(4f, 4f));
-            forsakenCitySatellite.level.Add((Entity) particles);
+            forsakenCitySatellite.level.Add(particles);
             HeartGem gem = new HeartGem(forsakenCitySatellite.birdFlyPosition);
             gem.Tag = (int) Tags.FrozenUpdate;
-            forsakenCitySatellite.level.Add((Entity) gem);
-            yield return (object) null;
+            forsakenCitySatellite.level.Add(gem);
+            yield return null;
             gem.ScaleWiggler.Start();
-            yield return (object) 0.85f;
+            yield return 0.85f;
             SimpleCurve curve = new SimpleCurve(gem.Position, forsakenCitySatellite.gemSpawnPosition, (gem.Position + forsakenCitySatellite.gemSpawnPosition) / 2f + new Vector2(0.0f, -64f));
-            for (float t = 0.0f; (double) t < 1.0; t += Engine.DeltaTime)
+            for (float t = 0.0f; t < 1.0; t += Engine.DeltaTime)
             {
-                yield return (object) null;
+                yield return null;
                 gem.Position = curve.GetPoint(Ease.CubeInOut(t));
             }
-            yield return (object) 0.5f;
+            yield return 0.5f;
             particles.RemoveSelf();
-            forsakenCitySatellite.Remove((Component) bloom);
+            forsakenCitySatellite.Remove(bloom);
             forsakenCitySatellite.level.Frozen = false;
         }
 
@@ -270,7 +270,7 @@ namespace Celeste
             private Coroutine routine;
             private float timer = Calc.Random.NextFloat();
             private Vector2 speed;
-            private Monocle.Image heartImage;
+            private Image heartImage;
             private readonly string code;
             private readonly Vector2 origin;
             private readonly Vector2 dash;
@@ -280,53 +280,53 @@ namespace Celeste
             {
                 this.code = code;
                 this.origin = origin;
-                this.Add((Component) (this.sprite = new Sprite(GFX.Game, "scenery/flutterbird/")));
-                this.sprite.AddLoop("fly", "flap", 0.08f);
-                this.sprite.Play("fly");
-                this.sprite.CenterOrigin();
-                this.sprite.Color = ForsakenCitySatellite.Colors[code];
-                this.dash = (Vector2.Zero with
+                Add(sprite = new Sprite(GFX.Game, "scenery/flutterbird/"));
+                sprite.AddLoop("fly", "flap", 0.08f);
+                sprite.Play("fly");
+                sprite.CenterOrigin();
+                sprite.Color = ForsakenCitySatellite.Colors[code];
+                dash = (Vector2.Zero with
                 {
-                    X = (code.Contains<char>('L') ? -1f : (code.Contains<char>('R') ? 1f : 0.0f)),
-                    Y = (code.Contains<char>('U') ? -1f : (code.Contains<char>('D') ? 1f : 0.0f))
+                    X = (code.Contains('L') ? -1f : (code.Contains('R') ? 1f : 0.0f)),
+                    Y = (code.Contains('U') ? -1f : (code.Contains('D') ? 1f : 0.0f))
                 }).SafeNormalize();
-                this.Add((Component) (this.routine = new Coroutine(this.AimlessFlightRoutine())));
+                Add(routine = new Coroutine(AimlessFlightRoutine()));
             }
 
             public override void Update()
             {
-                this.timer += Engine.DeltaTime;
-                this.sprite.Y = (float) Math.Sin((double) this.timer * 2.0);
+                timer += Engine.DeltaTime;
+                sprite.Y = (float) Math.Sin(timer * 2.0);
                 base.Update();
             }
 
-            public void Dash() => this.routine.Replace(this.DashRoutine());
+            public void Dash() => routine.Replace(DashRoutine());
 
             public void Transform(float duration)
             {
-                this.Tag = (int) Tags.FrozenUpdate;
-                this.routine.Replace(this.TransformRoutine(duration));
+                Tag = (int) Tags.FrozenUpdate;
+                routine.Replace(TransformRoutine(duration));
             }
 
             private IEnumerator AimlessFlightRoutine()
             {
-                ForsakenCitySatellite.CodeBird codeBird = this;
+                CodeBird codeBird = this;
                 codeBird.speed = Vector2.Zero;
                 while (true)
                 {
                     Vector2 target = codeBird.origin + Calc.AngleToVector(Calc.Random.NextFloat(6.28318548f), 16f + Calc.Random.NextFloat(40f));
                     float reset = 0.0f;
-                    while ((double) reset < 1.0 && (double) (target - codeBird.Position).Length() > 8.0)
+                    while (reset < 1.0 && (target - codeBird.Position).Length() > 8.0)
                     {
                         Vector2 vector2 = (target - codeBird.Position).SafeNormalize();
                         codeBird.speed += vector2 * 420f * Engine.DeltaTime;
-                        if ((double) codeBird.speed.Length() > 90.0)
+                        if (codeBird.speed.Length() > 90.0)
                             codeBird.speed = codeBird.speed.SafeNormalize(90f);
-                        codeBird.Position = codeBird.Position + codeBird.speed * Engine.DeltaTime;
+                        codeBird.Position += codeBird.speed * Engine.DeltaTime;
                         reset += Engine.DeltaTime;
                         if (Math.Sign(vector2.X) != 0)
-                            codeBird.sprite.Scale.X = (float) Math.Sign(vector2.X);
-                        yield return (object) null;
+                            codeBird.sprite.Scale.X = Math.Sign(vector2.X);
+                        yield return null;
                     }
                     target = new Vector2();
                 }
@@ -334,67 +334,67 @@ namespace Celeste
 
             private IEnumerator DashRoutine()
             {
-                ForsakenCitySatellite.CodeBird codeBird = this;
+                CodeBird codeBird = this;
                 float t;
-                for (t = 0.25f; (double) t > 0.0; t -= Engine.DeltaTime)
+                for (t = 0.25f; t > 0.0; t -= Engine.DeltaTime)
                 {
                     codeBird.speed = Calc.Approach(codeBird.speed, Vector2.Zero, 200f * Engine.DeltaTime);
-                    codeBird.Position = codeBird.Position + codeBird.speed * Engine.DeltaTime;
-                    yield return (object) null;
+                    codeBird.Position += codeBird.speed * Engine.DeltaTime;
+                    yield return null;
                 }
                 Vector2 from = codeBird.Position;
                 Vector2 to = codeBird.origin + codeBird.dash * 8f;
                 if (Math.Sign(to.X - from.X) != 0)
-                    codeBird.sprite.Scale.X = (float) Math.Sign(to.X - from.X);
-                for (t = 0.0f; (double) t < 1.0; t += Engine.DeltaTime * 1.5f)
+                    codeBird.sprite.Scale.X = Math.Sign(to.X - from.X);
+                for (t = 0.0f; t < 1.0; t += Engine.DeltaTime * 1.5f)
                 {
                     codeBird.Position = from + (to - from) * Ease.CubeInOut(t);
-                    yield return (object) null;
+                    yield return null;
                 }
                 codeBird.Position = to;
-                yield return (object) 0.2f;
+                yield return 0.2f;
                 from = new Vector2();
                 to = new Vector2();
-                if ((double) codeBird.dash.X != 0.0)
-                    codeBird.sprite.Scale.X = (float) Math.Sign(codeBird.dash.X);
+                if (codeBird.dash.X != 0.0)
+                    codeBird.sprite.Scale.X = Math.Sign(codeBird.dash.X);
                 (codeBird.Scene as Level).Displacement.AddBurst(codeBird.Position, 0.25f, 4f, 24f, 0.4f);
                 codeBird.speed = codeBird.dash * 300f;
-                for (t = 0.4f; (double) t > 0.0; t -= Engine.DeltaTime)
+                for (t = 0.4f; t > 0.0; t -= Engine.DeltaTime)
                 {
-                    if ((double) t > 0.10000000149011612 && codeBird.Scene.OnInterval(0.02f))
+                    if (t > 0.10000000149011612 && codeBird.Scene.OnInterval(0.02f))
                         codeBird.SceneAs<Level>().ParticlesBG.Emit(ForsakenCitySatellite.Particles[codeBird.code], 1, codeBird.Position, Vector2.One * 2f, codeBird.dash.Angle());
                     codeBird.speed = Calc.Approach(codeBird.speed, Vector2.Zero, 800f * Engine.DeltaTime);
-                    codeBird.Position = codeBird.Position + codeBird.speed * Engine.DeltaTime;
-                    yield return (object) null;
+                    codeBird.Position += codeBird.speed * Engine.DeltaTime;
+                    yield return null;
                 }
-                yield return (object) 0.4f;
+                yield return 0.4f;
                 codeBird.routine.Replace(codeBird.AimlessFlightRoutine());
             }
 
             private IEnumerator TransformRoutine(float duration)
             {
-                ForsakenCitySatellite.CodeBird codeBird = this;
+                CodeBird codeBird = this;
                 Color colorFrom = codeBird.sprite.Color;
                 Color colorTo = Color.White;
                 Vector2 target = codeBird.origin;
-                codeBird.Add((Component) (codeBird.heartImage = new Monocle.Image(GFX.Game["collectables/heartGem/shape"])));
+                codeBird.Add(codeBird.heartImage = new Image(GFX.Game["collectables/heartGem/shape"]));
                 codeBird.heartImage.CenterOrigin();
                 codeBird.heartImage.Scale = Vector2.Zero;
-                for (float t = 0.0f; (double) t < 1.0; t += Engine.DeltaTime / duration)
+                for (float t = 0.0f; t < 1.0; t += Engine.DeltaTime / duration)
                 {
                     Vector2 vector2 = (target - codeBird.Position).SafeNormalize();
                     codeBird.speed += 400f * vector2 * Engine.DeltaTime;
-                    float length = Math.Max(20f, (float) ((1.0 - (double) t) * 200.0));
-                    if ((double) codeBird.speed.Length() > (double) length)
+                    float length = Math.Max(20f, (float) ((1.0 - t) * 200.0));
+                    if (codeBird.speed.Length() > (double) length)
                         codeBird.speed = codeBird.speed.SafeNormalize(length);
-                    codeBird.Position = codeBird.Position + codeBird.speed * Engine.DeltaTime;
+                    codeBird.Position += codeBird.speed * Engine.DeltaTime;
                     codeBird.sprite.Color = Color.Lerp(colorFrom, colorTo, t);
-                    codeBird.heartImage.Scale = Vector2.One * Math.Max(0.0f, (float) (((double) t - 0.75) * 4.0));
-                    if ((double) vector2.X != 0.0)
-                        codeBird.sprite.Scale.X = Math.Abs(codeBird.sprite.Scale.X) * (float) Math.Sign(vector2.X);
-                    codeBird.sprite.Scale.X = (float) Math.Sign(codeBird.sprite.Scale.X) * (1f - codeBird.heartImage.Scale.X);
+                    codeBird.heartImage.Scale = Vector2.One * Math.Max(0.0f, (float) ((t - 0.75) * 4.0));
+                    if (vector2.X != 0.0)
+                        codeBird.sprite.Scale.X = Math.Abs(codeBird.sprite.Scale.X) * Math.Sign(vector2.X);
+                    codeBird.sprite.Scale.X = Math.Sign(codeBird.sprite.Scale.X) * (1f - codeBird.heartImage.Scale.X);
                     codeBird.sprite.Scale.Y = 1f - codeBird.heartImage.Scale.X;
-                    yield return (object) null;
+                    yield return null;
                 }
             }
         }

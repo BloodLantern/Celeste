@@ -1,6 +1,5 @@
 ﻿using Microsoft.Xna.Framework;
 using Monocle;
-using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
@@ -20,7 +19,7 @@ namespace Celeste
         };
         private const string FlagPrefix = "heartTorch_";
         private List<string> currentInputs = new List<string>();
-        private List<ReflectionHeartStatue.Torch> torches = new List<ReflectionHeartStatue.Torch>();
+        private List<Torch> torches = new List<Torch>();
         private Vector2 offset;
         private Vector2[] nodes;
         private DashListener dashListener;
@@ -30,85 +29,85 @@ namespace Celeste
             : base(data.Position + offset)
         {
             this.offset = offset;
-            this.nodes = data.Nodes;
-            this.Depth = 8999;
+            nodes = data.Nodes;
+            Depth = 8999;
         }
 
         public override void Added(Scene scene)
         {
             base.Added(scene);
-            Session session = (this.Scene as Level).Session;
-            Monocle.Image image1 = new Monocle.Image(GFX.Game["objects/reflectionHeart/statue"]);
+            Session session = (Scene as Level).Session;
+            Image image1 = new Image(GFX.Game["objects/reflectionHeart/statue"]);
             image1.JustifyOrigin(0.5f, 1f);
             --image1.Origin.Y;
-            this.Add((Component) image1);
+            Add(image1);
             List<string[]> strArrayList = new List<string[]>();
             strArrayList.Add(ReflectionHeartStatue.Code);
-            strArrayList.Add(this.FlipCode(true, false));
-            strArrayList.Add(this.FlipCode(false, true));
-            strArrayList.Add(this.FlipCode(true, true));
+            strArrayList.Add(FlipCode(true, false));
+            strArrayList.Add(FlipCode(false, true));
+            strArrayList.Add(FlipCode(true, true));
             for (int index = 0; index < 4; ++index)
             {
-                ReflectionHeartStatue.Torch torch = new ReflectionHeartStatue.Torch(session, this.offset + this.nodes[index], index, strArrayList[index]);
-                this.Scene.Add((Entity) torch);
-                this.torches.Add(torch);
+                Torch torch = new Torch(session, offset + nodes[index], index, strArrayList[index]);
+                Scene.Add(torch);
+                torches.Add(torch);
             }
             int length = ReflectionHeartStatue.Code.Length;
-            Vector2 vector2 = this.nodes[4] + this.offset - this.Position;
+            Vector2 vector2 = nodes[4] + offset - Position;
             for (int index = 0; index < length; ++index)
             {
-                Monocle.Image image2 = new Monocle.Image(GFX.Game["objects/reflectionHeart/gem"]);
+                Image image2 = new Image(GFX.Game["objects/reflectionHeart/gem"]);
                 image2.CenterOrigin();
                 image2.Color = ForsakenCitySatellite.Colors[ReflectionHeartStatue.Code[index]];
-                image2.Position = vector2 + new Vector2((float) (((double) index - (double) (length - 1) / 2.0) * 24.0), 0.0f);
-                this.Add((Component) image2);
-                this.Add((Component) new BloomPoint(image2.Position, 0.3f, 12f));
+                image2.Position = vector2 + new Vector2((float) ((index - (length - 1) / 2.0) * 24.0), 0.0f);
+                Add(image2);
+                Add(new BloomPoint(image2.Position, 0.3f, 12f));
             }
-            this.enabled = !session.HeartGem;
-            if (!this.enabled)
+            enabled = !session.HeartGem;
+            if (!enabled)
                 return;
-            this.Add((Component) (this.dashListener = new DashListener()));
-            this.dashListener.OnDash = (Action<Vector2>) (dir =>
+            Add(dashListener = new DashListener());
+            dashListener.OnDash = dir =>
             {
                 string str = "";
-                if ((double) dir.Y < 0.0)
+                if (dir.Y < 0.0)
                     str = "U";
-                else if ((double) dir.Y > 0.0)
+                else if (dir.Y > 0.0)
                     str = "D";
-                if ((double) dir.X < 0.0)
+                if (dir.X < 0.0)
                     str += "L";
-                else if ((double) dir.X > 0.0)
+                else if (dir.X > 0.0)
                     str += "R";
                 int num = 0;
-                if ((double) dir.X < 0.0 && (double) dir.Y == 0.0)
+                if (dir.X < 0.0 && dir.Y == 0.0)
                     num = 1;
-                else if ((double) dir.X < 0.0 && (double) dir.Y < 0.0)
+                else if (dir.X < 0.0 && dir.Y < 0.0)
                     num = 2;
-                else if ((double) dir.X == 0.0 && (double) dir.Y < 0.0)
+                else if (dir.X == 0.0 && dir.Y < 0.0)
                     num = 3;
-                else if ((double) dir.X > 0.0 && (double) dir.Y < 0.0)
+                else if (dir.X > 0.0 && dir.Y < 0.0)
                     num = 4;
-                else if ((double) dir.X > 0.0 && (double) dir.Y == 0.0)
+                else if (dir.X > 0.0 && dir.Y == 0.0)
                     num = 5;
-                else if ((double) dir.X > 0.0 && (double) dir.Y > 0.0)
+                else if (dir.X > 0.0 && dir.Y > 0.0)
                     num = 6;
-                else if ((double) dir.X == 0.0 && (double) dir.Y > 0.0)
+                else if (dir.X == 0.0 && dir.Y > 0.0)
                     num = 7;
-                else if ((double) dir.X < 0.0 && (double) dir.Y > 0.0)
+                else if (dir.X < 0.0 && dir.Y > 0.0)
                     num = 8;
-                Player entity = this.Scene.Tracker.GetEntity<Player>();
-                Audio.Play("event:/game/06_reflection/supersecret_dashflavour", entity != null ? entity.Position : Vector2.Zero, "dash_direction", (float) num);
-                this.currentInputs.Add(str);
-                if (this.currentInputs.Count > ReflectionHeartStatue.Code.Length)
-                    this.currentInputs.RemoveAt(0);
-                foreach (ReflectionHeartStatue.Torch torch in this.torches)
+                Player entity = Scene.Tracker.GetEntity<Player>();
+                Audio.Play("event:/game/06_reflection/supersecret_dashflavour", entity != null ? entity.Position : Vector2.Zero, "dash_direction", num);
+                currentInputs.Add(str);
+                if (currentInputs.Count > ReflectionHeartStatue.Code.Length)
+                    currentInputs.RemoveAt(0);
+                foreach (Torch torch in torches)
                 {
-                    if (!torch.Activated && this.CheckCode(torch.Code))
+                    if (!torch.Activated && CheckCode(torch.Code))
                         torch.Activate();
                 }
-                this.CheckIfAllActivated();
-            });
-            this.CheckIfAllActivated(true);
+                CheckIfAllActivated();
+            };
+            CheckIfAllActivated(true);
         }
 
         private string[] FlipCode(bool h, bool v)
@@ -118,9 +117,9 @@ namespace Celeste
             {
                 string source = ReflectionHeartStatue.Code[index];
                 if (h)
-                    source = source.Contains<char>('L') ? source.Replace('L', 'R') : source.Replace('R', 'L');
+                    source = source.Contains('L') ? source.Replace('L', 'R') : source.Replace('R', 'L');
                 if (v)
-                    source = source.Contains<char>('U') ? source.Replace('U', 'D') : source.Replace('D', 'U');
+                    source = source.Contains('U') ? source.Replace('U', 'D') : source.Replace('D', 'U');
                 strArray[index] = source;
             }
             return strArray;
@@ -128,11 +127,11 @@ namespace Celeste
 
         private bool CheckCode(string[] code)
         {
-            if (this.currentInputs.Count < code.Length)
+            if (currentInputs.Count < code.Length)
                 return false;
             for (int index = 0; index < code.Length; ++index)
             {
-                if (!this.currentInputs[index].Equals(code[index]))
+                if (!currentInputs[index].Equals(code[index]))
                     return false;
             }
             return true;
@@ -140,72 +139,72 @@ namespace Celeste
 
         private void CheckIfAllActivated(bool skipActivateRoutine = false)
         {
-            if (!this.enabled)
+            if (!enabled)
                 return;
             bool flag = true;
-            foreach (ReflectionHeartStatue.Torch torch in this.torches)
+            foreach (Torch torch in torches)
             {
                 if (!torch.Activated)
                     flag = false;
             }
             if (!flag)
                 return;
-            this.Activate(skipActivateRoutine);
+            Activate(skipActivateRoutine);
         }
 
         public void Activate(bool skipActivateRoutine)
         {
-            this.enabled = false;
+            enabled = false;
             if (skipActivateRoutine)
-                this.Scene.Add((Entity) new HeartGem(this.Position + new Vector2(0.0f, -52f)));
+                Scene.Add(new HeartGem(Position + new Vector2(0.0f, -52f)));
             else
-                this.Add((Component) new Coroutine(this.ActivateRoutine()));
+                Add(new Coroutine(ActivateRoutine()));
         }
 
         private IEnumerator ActivateRoutine()
         {
             ReflectionHeartStatue reflectionHeartStatue = this;
-            yield return (object) 0.533f;
+            yield return 0.533f;
             Audio.Play("event:/game/06_reflection/supersecret_heartappear");
             Entity dummy = new Entity(reflectionHeartStatue.Position + new Vector2(0.0f, -52f));
             dummy.Depth = 1;
             reflectionHeartStatue.Scene.Add(dummy);
-            Monocle.Image white = new Monocle.Image(GFX.Game["collectables/heartgem/white00"]);
+            Image white = new Image(GFX.Game["collectables/heartgem/white00"]);
             white.CenterOrigin();
             white.Scale = Vector2.Zero;
-            dummy.Add((Component) white);
+            dummy.Add(white);
             BloomPoint glow = new BloomPoint(0.0f, 16f);
-            dummy.Add((Component) glow);
+            dummy.Add(glow);
             List<Entity> absorbs = new List<Entity>();
             for (int i = 0; i < 20; ++i)
             {
                 AbsorbOrb absorbOrb = new AbsorbOrb(reflectionHeartStatue.Position + new Vector2(0.0f, -20f), dummy);
-                reflectionHeartStatue.Scene.Add((Entity) absorbOrb);
-                absorbs.Add((Entity) absorbOrb);
-                yield return (object) null;
+                reflectionHeartStatue.Scene.Add(absorbOrb);
+                absorbs.Add(absorbOrb);
+                yield return null;
             }
-            yield return (object) 0.8f;
+            yield return 0.8f;
             float duration = 0.6f;
-            for (float p = 0.0f; (double) p < 1.0; p += Engine.DeltaTime / duration)
+            for (float p = 0.0f; p < 1.0; p += Engine.DeltaTime / duration)
             {
                 white.Scale = Vector2.One * p;
                 glow.Alpha = p;
                 (reflectionHeartStatue.Scene as Level).Shake();
-                yield return (object) null;
+                yield return null;
             }
             foreach (Entity entity in absorbs)
                 entity.RemoveSelf();
             (reflectionHeartStatue.Scene as Level).Flash(Color.White);
             reflectionHeartStatue.Scene.Remove(dummy);
-            reflectionHeartStatue.Scene.Add((Entity) new HeartGem(reflectionHeartStatue.Position + new Vector2(0.0f, -52f)));
+            reflectionHeartStatue.Scene.Add(new HeartGem(reflectionHeartStatue.Position + new Vector2(0.0f, -52f)));
         }
 
         public override void Update()
         {
-            if (this.dashListener != null && !this.enabled)
+            if (dashListener != null && !enabled)
             {
-                this.Remove((Component) this.dashListener);
-                this.dashListener = (DashListener) null;
+                Remove(dashListener);
+                dashListener = null;
             }
             base.Update();
         }
@@ -216,54 +215,54 @@ namespace Celeste
             private Sprite sprite;
             private Session session;
 
-            public string Flag => "heartTorch_" + (object) this.Index;
+            public string Flag => "heartTorch_" + Index;
 
-            public bool Activated => this.session.GetFlag(this.Flag);
+            public bool Activated => session.GetFlag(Flag);
 
             public int Index { get; private set; }
 
             public Torch(Session session, Vector2 position, int index, string[] code)
                 : base(position)
             {
-                this.Index = index;
-                this.Code = code;
-                this.Depth = 8999;
+                Index = index;
+                Code = code;
+                Depth = 8999;
                 this.session = session;
-                Monocle.Image image = new Monocle.Image(GFX.Game.GetAtlasSubtextures("objects/reflectionHeart/hint")[index]);
+                Image image = new Image(GFX.Game.GetAtlasSubtextures("objects/reflectionHeart/hint")[index]);
                 image.CenterOrigin();
                 image.Position = new Vector2(0.0f, 28f);
-                this.Add((Component) image);
-                this.Add((Component) (this.sprite = new Sprite(GFX.Game, "objects/reflectionHeart/torch")));
-                this.sprite.AddLoop("idle", "", 0.0f, new int[1]);
-                this.sprite.AddLoop("lit", "", 0.08f, 1, 2, 3, 4, 5, 6);
-                this.sprite.Play("idle");
-                this.sprite.Origin = new Vector2(32f, 64f);
+                Add(image);
+                Add(sprite = new Sprite(GFX.Game, "objects/reflectionHeart/torch"));
+                sprite.AddLoop("idle", "", 0.0f, new int[1]);
+                sprite.AddLoop("lit", "", 0.08f, 1, 2, 3, 4, 5, 6);
+                sprite.Play("idle");
+                sprite.Origin = new Vector2(32f, 64f);
             }
 
             public override void Added(Scene scene)
             {
                 base.Added(scene);
-                if (!this.Activated)
+                if (!Activated)
                     return;
-                this.PlayLit();
+                PlayLit();
             }
 
             public void Activate()
             {
-                this.session.SetFlag(this.Flag);
-                Alarm.Set((Entity) this, 0.2f, (Action) (() =>
+                session.SetFlag(Flag);
+                Alarm.Set(this, 0.2f, () =>
                 {
-                    Audio.Play("event:/game/06_reflection/supersecret_torch_" + (object) (this.Index + 1), this.Position);
-                    this.PlayLit();
-                }));
+                    Audio.Play("event:/game/06_reflection/supersecret_torch_" + (Index + 1), Position);
+                    PlayLit();
+                });
             }
 
             private void PlayLit()
             {
-                this.sprite.Play("lit");
-                this.sprite.SetAnimationFrame(Calc.Random.Next(this.sprite.CurrentAnimationTotalFrames));
-                this.Add((Component) new VertexLight(Color.LightSeaGreen, 1f, 24, 48));
-                this.Add((Component) new BloomPoint(0.6f, 16f));
+                sprite.Play("lit");
+                sprite.SetAnimationFrame(Calc.Random.Next(sprite.CurrentAnimationTotalFrames));
+                Add(new VertexLight(Color.LightSeaGreen, 1f, 24, 48));
+                Add(new BloomPoint(0.6f, 16f));
             }
         }
     }

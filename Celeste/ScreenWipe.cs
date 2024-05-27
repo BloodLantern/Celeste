@@ -73,6 +73,6 @@ namespace Celeste
             (Scene as Level).Wipe = null;
         }
 
-        public static void DrawPrimitives(VertexPositionColor[] vertices) => GFX.DrawVertices<VertexPositionColor>(Matrix.CreateScale(Engine.Graphics.GraphicsDevice.Viewport.Width / 1920f), vertices, vertices.Length);
+        public static void DrawPrimitives(VertexPositionColor[] vertices) => GFX.DrawVertices(Matrix.CreateScale(Engine.Graphics.GraphicsDevice.Viewport.Width / 1920f), vertices, vertices.Length);
     }
 }

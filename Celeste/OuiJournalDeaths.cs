@@ -5,15 +5,15 @@ namespace Celeste
 {
     public class OuiJournalDeaths : OuiJournalPage
     {
-        private OuiJournalPage.Table table;
+        private Table table;
 
         public OuiJournalDeaths(OuiJournal journal)
             : base(journal)
         {
-            this.PageTexture = "page";
-            this.table = new OuiJournalPage.Table().AddColumn((OuiJournalPage.Cell) new OuiJournalPage.TextCell(Dialog.Clean("journal_deaths"), new Vector2(1f, 0.5f), 0.7f, this.TextColor, 300f));
+            PageTexture = "page";
+            table = new Table().AddColumn(new TextCell(Dialog.Clean("journal_deaths"), new Vector2(1f, 0.5f), 0.7f, TextColor, 300f));
             for (int index = 0; index < SaveData.Instance.UnlockedModes; ++index)
-                this.table.AddColumn((OuiJournalPage.Cell) new OuiJournalPage.TextCell(Dialog.Clean("journal_mode_" + (object) (AreaMode) index), this.TextJustify, 0.6f, this.TextColor, 240f));
+                table.AddColumn(new TextCell(Dialog.Clean("journal_mode_" + (AreaMode) index), TextJustify, 0.6f, TextColor, 240f));
             bool[] flagArray = new bool[3]
             {
                 true,
@@ -31,8 +31,8 @@ namespace Celeste
                         flagArray[0] = flagArray[1] = flagArray[2] = false;
                         break;
                     }
-                    OuiJournalPage.Row row = this.table.AddRow();
-                    row.Add((OuiJournalPage.Cell) new OuiJournalPage.TextCell(Dialog.Clean(areaData.Name), new Vector2(1f, 0.5f), 0.6f, this.TextColor));
+                    Row row = table.AddRow();
+                    row.Add(new TextCell(Dialog.Clean(areaData.Name), new Vector2(1f, 0.5f), 0.6f, TextColor));
                     for (int mode = 0; mode < SaveData.Instance.UnlockedModes; ++mode)
                     {
                         if (areaData.HasMode((AreaMode) mode))
@@ -49,28 +49,28 @@ namespace Celeste
                                             deaths = 0;
                                     }
                                 }
-                                row.Add((OuiJournalPage.Cell) new OuiJournalPage.TextCell(Dialog.Deaths(deaths), this.TextJustify, 0.5f, this.TextColor));
+                                row.Add(new TextCell(Dialog.Deaths(deaths), TextJustify, 0.5f, TextColor));
                                 numArray[mode] += deaths;
                             }
                             else
                             {
-                                row.Add((OuiJournalPage.Cell) new OuiJournalPage.IconCell("dot"));
+                                row.Add(new IconCell("dot"));
                                 flagArray[mode] = false;
                             }
                         }
                         else
-                            row.Add((OuiJournalPage.Cell) new OuiJournalPage.TextCell("-", this.TextJustify, 0.5f, this.TextColor));
+                            row.Add(new TextCell("-", TextJustify, 0.5f, TextColor));
                     }
                 }
             }
             if (flagArray[0] || flagArray[1] || flagArray[2])
             {
-                this.table.AddRow();
-                OuiJournalPage.Row row = this.table.AddRow();
-                row.Add((OuiJournalPage.Cell) new OuiJournalPage.TextCell(Dialog.Clean("journal_totals"), new Vector2(1f, 0.5f), 0.7f, this.TextColor));
+                table.AddRow();
+                Row row = table.AddRow();
+                row.Add(new TextCell(Dialog.Clean("journal_totals"), new Vector2(1f, 0.5f), 0.7f, TextColor));
                 for (int index = 0; index < SaveData.Instance.UnlockedModes; ++index)
-                    row.Add((OuiJournalPage.Cell) new OuiJournalPage.TextCell(Dialog.Deaths(numArray[index]), this.TextJustify, 0.6f, this.TextColor));
-                this.table.AddRow();
+                    row.Add(new TextCell(Dialog.Deaths(numArray[index]), TextJustify, 0.6f, TextColor));
+                table.AddRow();
             }
             int num = 0;
             foreach (AreaStats area in SaveData.Instance.Areas)
@@ -80,8 +80,8 @@ namespace Celeste
                 {
                     if (areaData.ID <= SaveData.Instance.UnlockedAreas)
                     {
-                        OuiJournalPage.Row row = this.table.AddRow();
-                        row.Add((OuiJournalPage.Cell) new OuiJournalPage.TextCell(Dialog.Clean(areaData.Name), new Vector2(1f, 0.5f), 0.6f, this.TextColor));
+                        Row row = table.AddRow();
+                        row.Add(new TextCell(Dialog.Clean(areaData.Name), new Vector2(1f, 0.5f), 0.6f, TextColor));
                         if (area.Modes[0].SingleRunCompleted)
                         {
                             int deaths = area.Modes[0].BestDeaths;
@@ -94,13 +94,13 @@ namespace Celeste
                                         deaths = 0;
                                 }
                             }
-                            OuiJournalPage.TextCell entry = new OuiJournalPage.TextCell(Dialog.Deaths(deaths), this.TextJustify, 0.5f, this.TextColor);
-                            row.Add((OuiJournalPage.Cell) entry);
+                            TextCell entry = new TextCell(Dialog.Deaths(deaths), TextJustify, 0.5f, TextColor);
+                            row.Add(entry);
                             num += deaths;
                         }
                         else
-                            row.Add((OuiJournalPage.Cell) new OuiJournalPage.IconCell("dot"));
-                        this.table.AddRow();
+                            row.Add(new IconCell("dot"));
+                        table.AddRow();
                     }
                     else
                         break;
@@ -108,16 +108,16 @@ namespace Celeste
             }
             if (!flagArray[0] || !flagArray[1] || !flagArray[2])
                 return;
-            OuiJournalPage.TextCell entry1 = new OuiJournalPage.TextCell(Dialog.Deaths(numArray[0] + numArray[1] + numArray[2] + num), this.TextJustify, 0.6f, this.TextColor);
+            TextCell entry1 = new TextCell(Dialog.Deaths(numArray[0] + numArray[1] + numArray[2] + num), TextJustify, 0.6f, TextColor);
             entry1.SpreadOverColumns = 3;
-            this.table.AddRow().Add((OuiJournalPage.Cell) new OuiJournalPage.TextCell(Dialog.Clean("journal_grandtotal"), new Vector2(1f, 0.5f), 0.7f, this.TextColor)).Add((OuiJournalPage.Cell) entry1);
+            table.AddRow().Add(new TextCell(Dialog.Clean("journal_grandtotal"), new Vector2(1f, 0.5f), 0.7f, TextColor)).Add(entry1);
         }
 
         public override void Redraw(VirtualRenderTarget buffer)
         {
             base.Redraw(buffer);
             Draw.SpriteBatch.Begin();
-            this.table.Render(new Vector2(60f, 20f));
+            table.Render(new Vector2(60f, 20f));
             Draw.SpriteBatch.End();
         }
     }

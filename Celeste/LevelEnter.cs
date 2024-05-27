@@ -30,7 +30,7 @@ namespace Celeste
         {
             this.session = session;
             this.fromSaveData = fromSaveData;
-            Add(new Entity()
+            Add(new Entity
             {
                  new Coroutine(Routine())
             });
@@ -144,9 +144,9 @@ namespace Celeste
 
             private IEnumerator FadeTo(int index, float target, float duration)
             {
-                while ((double) (fade[index] = Calc.Approach(fade[index], target, Engine.DeltaTime / duration)) != (double) target)
+                while ((fade[index] = Calc.Approach(fade[index], target, Engine.DeltaTime / duration)) != (double) target)
                 {
-                    offsets[index] = (double) target != 0.0 ? (float) (-(double) Ease.CubeIn(1f - fade[index]) * 32.0) : Ease.CubeIn(1f - fade[index]) * 32f;
+                    offsets[index] = target != 0.0 ? (float) (-(double) Ease.CubeIn(1f - fade[index]) * 32.0) : Ease.CubeIn(1f - fade[index]) * 32f;
                     yield return null;
                 }
             }

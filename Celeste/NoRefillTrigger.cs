@@ -9,13 +9,13 @@ namespace Celeste
         public NoRefillTrigger(EntityData data, Vector2 offset)
             : base(data, offset)
         {
-            this.State = data.Bool("state");
+            State = data.Bool("state");
         }
 
         public override void OnEnter(Player player)
         {
             base.OnEnter(player);
-            this.SceneAs<Level>().Session.Inventory.NoRefills = this.State;
+            SceneAs<Level>().Session.Inventory.NoRefills = State;
         }
     }
 }

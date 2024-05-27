@@ -1,10 +1,9 @@
 ﻿using Microsoft.Xna.Framework;
 using Monocle;
-using System;
 
 namespace Celeste
 {
-    [Tracked(false)]
+    [Tracked]
     public class ExitBlock : Solid
     {
         private TileGrid tiles;
@@ -20,8 +19,8 @@ namespace Celeste
             this.tileType = tileType;
             tl = new TransitionListener
             {
-                OnOutBegin = new Action(OnTransitionOutBegin),
-                OnInBegin = new Action(OnTransitionInBegin)
+                OnOutBegin = OnTransitionOutBegin,
+                OnInBegin = OnTransitionInBegin
             };
             Add(tl);
             Add(cutout = new EffectCutout());
@@ -38,7 +37,7 @@ namespace Celeste
         {
             if (!Collide.CheckRect(this, SceneAs<Level>().Bounds))
                 return;
-            tl.OnOut = new Action<float>(OnTransitionOut);
+            tl.OnOut = OnTransitionOut;
             startAlpha = tiles.Alpha;
         }
 
@@ -54,7 +53,7 @@ namespace Celeste
                 return;
             cutout.Alpha = 0.0f;
             tiles.Alpha = 0.0f;
-            tl.OnIn = new Action<float>(OnTransitionIn);
+            tl.OnIn = OnTransitionIn;
         }
 
         private void OnTransitionIn(float percent)
@@ -69,8 +68,8 @@ namespace Celeste
             Level level = SceneAs<Level>();
             Rectangle tileBounds = level.Session.MapData.TileBounds;
             VirtualMap<char> solidsData = level.SolidsData;
-            int x = (int) ((double) X / 8.0) - tileBounds.Left;
-            int y = (int) ((double) Y / 8.0) - tileBounds.Top;
+            int x = (int) (X / 8.0) - tileBounds.Left;
+            int y = (int) (Y / 8.0) - tileBounds.Top;
             int tilesX = (int) Width / 8;
             int tilesY = (int) Height / 8;
             tiles = GFX.FGAutotiler.GenerateOverlay(tileType, x, y, tilesX, tilesY, solidsData).TileGrid;
@@ -113,12 +112,12 @@ namespace Celeste
                 Rectangle bounds;
                 if (scene.ShakeVector.X > 0.0)
                 {
-                    double num1 = (double) scene.Camera.X + 320.0;
+                    double num1 = scene.Camera.X + 320.0;
                     bounds = scene.Bounds;
                     double right1 = bounds.Right;
                     if (num1 >= right1)
                     {
-                        double num2 = (double) X + (double) Width;
+                        double num2 = X + (double) Width;
                         bounds = scene.Bounds;
                         double right2 = bounds.Right;
                         if (num2 >= right2)
@@ -127,12 +126,12 @@ namespace Celeste
                 }
                 if (scene.ShakeVector.Y < 0.0)
                 {
-                    double y1 = (double) scene.Camera.Y;
+                    double y1 = scene.Camera.Y;
                     bounds = scene.Bounds;
                     double top1 = bounds.Top;
                     if (y1 <= top1)
                     {
-                        double y2 = (double) Y;
+                        double y2 = Y;
                         bounds = scene.Bounds;
                         double top2 = bounds.Top;
                         if (y2 <= top2)
@@ -141,12 +140,12 @@ namespace Celeste
                 }
                 if (scene.ShakeVector.Y > 0.0)
                 {
-                    double num3 = (double) scene.Camera.Y + 180.0;
+                    double num3 = scene.Camera.Y + 180.0;
                     bounds = scene.Bounds;
                     double bottom1 = bounds.Bottom;
                     if (num3 >= bottom1)
                     {
-                        double num4 = (double) Y + (double) Height;
+                        double num4 = Y + (double) Height;
                         bounds = scene.Bounds;
                         double bottom2 = bounds.Bottom;
                         if (num4 >= bottom2)

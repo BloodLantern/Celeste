@@ -8,8 +8,8 @@ namespace Celeste
     {
         private const float minPadding = 0.0f;
         private const float maxPadding = 128f;
-        private readonly float originalPadding = (float) Engine.ViewPadding;
-        private float viewPadding = (float) Engine.ViewPadding;
+        private readonly float originalPadding = Engine.ViewPadding;
+        private float viewPadding = Engine.ViewPadding;
         private float inputDelay;
         private bool closing;
         private bool canceling;
@@ -23,8 +23,8 @@ namespace Celeste
 
         public ViewportAdjustmentUI()
         {
-            this.Open = true;
-            this.Tag = (int) Tags.HUD | (int) Tags.PauseUpdate;
+            Open = true;
+            Tag = (int) Tags.HUD | (int) Tags.PauseUpdate;
         }
 
         public override void Added(Scene scene)
@@ -45,65 +45,65 @@ namespace Celeste
         public override void Update()
         {
             base.Update();
-            if (!this.closing)
+            if (!closing)
             {
-                this.inputDelay += Engine.RawDeltaTime;
-                if ((double) this.inputDelay > 0.25)
+                inputDelay += Engine.RawDeltaTime;
+                if (inputDelay > 0.25)
                 {
                     if ((Input.MenuCancel.Pressed ? 1 : (Input.ESC.Pressed ? 1 : 0)) != 0)
-                        this.closing = this.canceling = true;
+                        closing = canceling = true;
                     else if (Input.MenuConfirm.Pressed)
-                        this.closing = true;
+                        closing = true;
                 }
             }
-            else if ((double) this.Alpha <= 0.0)
+            else if (Alpha <= 0.0)
             {
-                if (this.canceling)
-                    Engine.ViewPadding = (int) this.originalPadding;
+                if (canceling)
+                    Engine.ViewPadding = (int) originalPadding;
                 else
-                    Settings.Instance.ViewportPadding = (int) this.viewPadding;
+                    Settings.Instance.ViewportPadding = (int) viewPadding;
                 Settings.Instance.SetViewportOnce = true;
-                this.Open = false;
-                this.RemoveSelf();
-                if (this.OnClose == null)
+                Open = false;
+                RemoveSelf();
+                if (OnClose == null)
                     return;
-                this.OnClose();
+                OnClose();
                 return;
             }
-            this.Alpha = Calc.Approach(this.Alpha, this.closing ? 0.0f : 1f, Engine.RawDeltaTime * 4f);
-            this.viewPadding -= Input.Aim.Value.X * 48f * Engine.RawDeltaTime;
-            this.viewPadding = Calc.Clamp(this.viewPadding, 0.0f, 128f);
-            this.leftAlpha = Calc.Approach(this.leftAlpha, (double) this.viewPadding < 128.0 ? 1f : 0.25f, Engine.DeltaTime * 4f);
-            this.rightAlpha = Calc.Approach(this.rightAlpha, (double) this.viewPadding > 0.0 ? 1f : 0.25f, Engine.DeltaTime * 4f);
-            Engine.ViewPadding = (int) this.viewPadding;
+            Alpha = Calc.Approach(Alpha, closing ? 0.0f : 1f, Engine.RawDeltaTime * 4f);
+            viewPadding -= Input.Aim.Value.X * 48f * Engine.RawDeltaTime;
+            viewPadding = Calc.Clamp(viewPadding, 0.0f, 128f);
+            leftAlpha = Calc.Approach(leftAlpha, viewPadding < 128.0 ? 1f : 0.25f, Engine.DeltaTime * 4f);
+            rightAlpha = Calc.Approach(rightAlpha, viewPadding > 0.0 ? 1f : 0.25f, Engine.DeltaTime * 4f);
+            Engine.ViewPadding = (int) viewPadding;
         }
 
         public override void Render()
         {
-            float alpha = Ease.SineInOut(this.Alpha);
+            float alpha = Ease.SineInOut(Alpha);
             Color color1 = Color.Black * 0.75f * alpha;
             Color color2 = Color.White * alpha;
-            if (!(this.Scene is Level))
-                Draw.Rect(-1f, -1f, (float) (Engine.Width + 2), (float) (Engine.Height + 2), color1);
-            Draw.Rect(0.0f, 0.0f, (float) Engine.Width, 16f, color2);
-            Draw.Rect(0.0f, 16f, 16f, (float) (Engine.Height - 32), color2);
-            Draw.Rect((float) (Engine.Width - 16), 16f, 16f, (float) (Engine.Height - 32), color2);
-            Draw.Rect(0.0f, (float) (Engine.Height - 16), (float) Engine.Width, 16f, color2);
+            if (!(Scene is Level))
+                Draw.Rect(-1f, -1f, Engine.Width + 2, Engine.Height + 2, color1);
+            Draw.Rect(0.0f, 0.0f, Engine.Width, 16f, color2);
+            Draw.Rect(0.0f, 16f, 16f, Engine.Height - 32, color2);
+            Draw.Rect(Engine.Width - 16, 16f, 16f, Engine.Height - 32, color2);
+            Draw.Rect(0.0f, Engine.Height - 16, Engine.Width, 16f, color2);
             Draw.LineAngle(new Vector2(8f, 8f), 0.7853982f, 128f, color2, 16f);
-            Draw.LineAngle(new Vector2((float) (Engine.Width - 8), 8f), 2.3561945f, 128f, color2, 16f);
-            Draw.LineAngle(new Vector2(8f, (float) (Engine.Height - 8)), -0.7853982f, 128f, color2, 16f);
-            Draw.LineAngle(new Vector2((float) (Engine.Width - 8), (float) (Engine.Height - 8)), -2.3561945f, 128f, color2, 16f);
+            Draw.LineAngle(new Vector2(Engine.Width - 8, 8f), 2.3561945f, 128f, color2, 16f);
+            Draw.LineAngle(new Vector2(8f, Engine.Height - 8), -0.7853982f, 128f, color2, 16f);
+            Draw.LineAngle(new Vector2(Engine.Width - 8, Engine.Height - 8), -2.3561945f, 128f, color2, 16f);
             string text = Dialog.Clean("OPTIONS_VIEWPORT_PC");
             ActiveFont.Measure(text);
-            float num1 = (float) Math.Sin((double) this.Scene.RawTimeActive * 2.0) * 16f;
-            Vector2 vector2_1 = new Vector2((float) Engine.Width, (float) Engine.Height) * 0.5f;
+            float num1 = (float) Math.Sin(Scene.RawTimeActive * 2.0) * 16f;
+            Vector2 vector2_1 = new Vector2(Engine.Width, Engine.Height) * 0.5f;
             ActiveFont.Draw(text, vector2_1 + new Vector2(0.0f, -60f), new Vector2(0.5f, 0.5f), Vector2.One * 1.2f, color2);
             float num2 = ButtonUI.Width(Dialog.Clean("ui_confirm"), Input.MenuConfirm) * 0.8f;
             ButtonUI.Render(vector2_1 + new Vector2(0.0f, 60f), Dialog.Clean("ui_confirm"), Input.MenuConfirm, 0.8f, alpha: alpha);
-            Vector2 vector2_2 = vector2_1 + new Vector2((float) ((double) num2 * 0.60000002384185791 + 80.0) + num1, 60f);
-            GFX.Gui["adjustarrowright"].DrawCentered(vector2_2 + new Vector2(8f, 4f), color2 * this.rightAlpha, Vector2.One);
-            Vector2 vector2_3 = vector2_1 + new Vector2((float) -((double) num2 * 0.60000002384185791 + 80.0 + (double) num1), 60f);
-            GFX.Gui["adjustarrowleft"].DrawCentered(vector2_3 + new Vector2(-8f, 4f), color2 * this.leftAlpha, Vector2.One);
+            Vector2 vector2_2 = vector2_1 + new Vector2((float) (num2 * 0.60000002384185791 + 80.0) + num1, 60f);
+            GFX.Gui["adjustarrowright"].DrawCentered(vector2_2 + new Vector2(8f, 4f), color2 * rightAlpha, Vector2.One);
+            Vector2 vector2_3 = vector2_1 + new Vector2((float) -(num2 * 0.60000002384185791 + 80.0 + num1), 60f);
+            GFX.Gui["adjustarrowleft"].DrawCentered(vector2_3 + new Vector2(-8f, 4f), color2 * leftAlpha, Vector2.One);
         }
     }
 }

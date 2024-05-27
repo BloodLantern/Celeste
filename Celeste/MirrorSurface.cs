@@ -4,7 +4,7 @@ using System;
 
 namespace Celeste
 {
-    [Tracked(false)]
+    [Tracked]
     public class MirrorSurface : Component
     {
         public Action OnRender;
@@ -12,11 +12,11 @@ namespace Celeste
 
         public Vector2 ReflectionOffset
         {
-            get => this.reflectionOffset;
+            get => reflectionOffset;
             set
             {
-                this.reflectionOffset = value;
-                this.ReflectionColor = new Color((float) (0.5 + (double) Calc.Clamp(this.reflectionOffset.X / 32f, -1f, 1f) * 0.5), (float) (0.5 + (double) Calc.Clamp(this.reflectionOffset.Y / 32f, -1f, 1f) * 0.5), 0.0f, 1f);
+                reflectionOffset = value;
+                ReflectionColor = new Color((float) (0.5 + Calc.Clamp(reflectionOffset.X / 32f, -1f, 1f) * 0.5), (float) (0.5 + Calc.Clamp(reflectionOffset.Y / 32f, -1f, 1f) * 0.5), 0.0f, 1f);
             }
         }
 
@@ -25,7 +25,7 @@ namespace Celeste
         public MirrorSurface(Action onRender = null)
             : base(false, true)
         {
-            this.OnRender = onRender;
+            OnRender = onRender;
         }
     }
 }

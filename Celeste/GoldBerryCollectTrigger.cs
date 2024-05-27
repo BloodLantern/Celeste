@@ -3,7 +3,7 @@ using Monocle;
 
 namespace Celeste
 {
-    [Tracked(false)]
+    [Tracked()]
     public class GoldBerryCollectTrigger : Trigger
     {
         public GoldBerryCollectTrigger(EntityData e, Vector2 offset)

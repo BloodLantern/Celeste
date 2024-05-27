@@ -5,7 +5,7 @@ using System.Collections;
 
 namespace Celeste
 {
-    [Tracked(false)]
+    [Tracked]
     public class AngryOshiro : Entity
     {
         private const int StChase = 0;
@@ -55,50 +55,50 @@ namespace Celeste
         public AngryOshiro(Vector2 position, bool fromCutscene)
             : base(position)
         {
-            this.Add((Component) (this.Sprite = GFX.SpriteBank.Create("oshiro_boss")));
-            this.Sprite.Play("idle");
-            this.Add((Component) (this.lightning = GFX.SpriteBank.Create("oshiro_boss_lightning")));
-            this.lightning.Visible = false;
-            this.lightning.OnFinish = (Action<string>) (s => this.lightningVisible = false);
-            this.Collider = (Collider) new Monocle.Circle(14f);
-            this.Collider.Position = this.colliderTargetPosition = new Vector2(3f, 4f);
-            this.Add((Component) (this.sine = new SineWave(0.5f)));
-            this.Add((Component) (this.bounceCollider = new PlayerCollider(new Action<Player>(this.OnPlayerBounce), (Collider) new Hitbox(28f, 6f, -11f, -11f))));
-            this.Add((Component) new PlayerCollider(new Action<Player>(this.OnPlayer)));
-            this.Depth = -12500;
-            this.Visible = false;
-            this.Add((Component) (this.light = new VertexLight(Color.White, 1f, 32, 64)));
-            this.Add((Component) (this.shaker = new Shaker(false)));
-            this.state = new StateMachine();
-            this.state.SetCallbacks(0, new Func<int>(this.ChaseUpdate), new Func<IEnumerator>(this.ChaseCoroutine), new Action(this.ChaseBegin));
-            this.state.SetCallbacks(1, new Func<int>(this.ChargeUpUpdate), new Func<IEnumerator>(this.ChargeUpCoroutine), end: new Action(this.ChargeUpEnd));
-            this.state.SetCallbacks(2, new Func<int>(this.AttackUpdate), new Func<IEnumerator>(this.AttackCoroutine), new Action(this.AttackBegin), new Action(this.AttackEnd));
-            this.state.SetCallbacks(3, (Func<int>) null);
-            this.state.SetCallbacks(4, new Func<int>(this.WaitingUpdate));
-            this.state.SetCallbacks(5, new Func<int>(this.HurtUpdate), begin: new Action(this.HurtBegin));
-            this.Add((Component) this.state);
+            Add(Sprite = GFX.SpriteBank.Create("oshiro_boss"));
+            Sprite.Play("idle");
+            Add(lightning = GFX.SpriteBank.Create("oshiro_boss_lightning"));
+            lightning.Visible = false;
+            lightning.OnFinish = s => lightningVisible = false;
+            Collider = new Circle(14f);
+            Collider.Position = colliderTargetPosition = new Vector2(3f, 4f);
+            Add(sine = new SineWave(0.5f));
+            Add(bounceCollider = new PlayerCollider(OnPlayerBounce, new Hitbox(28f, 6f, -11f, -11f)));
+            Add(new PlayerCollider(OnPlayer));
+            Depth = -12500;
+            Visible = false;
+            Add(light = new VertexLight(Color.White, 1f, 32, 64));
+            Add(shaker = new Shaker(false));
+            state = new StateMachine();
+            state.SetCallbacks(0, ChaseUpdate, ChaseCoroutine, ChaseBegin);
+            state.SetCallbacks(1, ChargeUpUpdate, ChargeUpCoroutine, end: ChargeUpEnd);
+            state.SetCallbacks(2, AttackUpdate, AttackCoroutine, AttackBegin, AttackEnd);
+            state.SetCallbacks(3, null);
+            state.SetCallbacks(4, WaitingUpdate);
+            state.SetCallbacks(5, HurtUpdate, begin: HurtBegin);
+            Add(state);
             if (fromCutscene)
-                this.yApproachSpeed = 0.0f;
+                yApproachSpeed = 0.0f;
             this.fromCutscene = fromCutscene;
-            this.Add((Component) new TransitionListener()
+            Add(new TransitionListener
             {
-                OnOutBegin = (Action) (() =>
+                OnOutBegin = () =>
                 {
-                    if ((double) this.X > (double) this.level.Bounds.Left + (double) this.Sprite.Width / 2.0)
-                        this.Visible = false;
+                    if (X > level.Bounds.Left + Sprite.Width / 2.0)
+                        Visible = false;
                     else
-                        this.easeBackFromRightEdge = true;
-                }),
-                OnOut = (Action<float>) (f =>
+                        easeBackFromRightEdge = true;
+                },
+                OnOut = f =>
                 {
-                    this.lightning.Update();
-                    if (!this.easeBackFromRightEdge)
+                    lightning.Update();
+                    if (!easeBackFromRightEdge)
                         return;
-                    this.X -= 128f * Engine.RawDeltaTime;
-                })
+                    X -= 128f * Engine.RawDeltaTime;
+                }
             });
-            this.Add((Component) (this.prechargeSfx = new SoundSource()));
-            this.Add((Component) (this.chargeSfx = new SoundSource()));
+            Add(prechargeSfx = new SoundSource());
+            Add(chargeSfx = new SoundSource());
             Distort.AnxietyOrigin = new Vector2(1f, 0.5f);
         }
 
@@ -110,74 +110,74 @@ namespace Celeste
         public override void Added(Scene scene)
         {
             base.Added(scene);
-            this.level = this.SceneAs<Level>();
-            if (this.level.Session.GetFlag("oshiroEnding") || !this.level.Session.GetFlag("oshiro_resort_roof") && this.level.Session.Level.Equals("roof00"))
-                this.RemoveSelf();
-            if (this.state.State != 3 && !this.fromCutscene)
-                this.state.State = 4;
-            if (!this.fromCutscene)
+            level = SceneAs<Level>();
+            if (level.Session.GetFlag("oshiroEnding") || !level.Session.GetFlag("oshiro_resort_roof") && level.Session.Level.Equals("roof00"))
+                RemoveSelf();
+            if (state.State != 3 && !fromCutscene)
+                state.State = 4;
+            if (!fromCutscene)
             {
-                this.Y = this.TargetY;
-                this.cameraXOffset = -48f;
+                Y = TargetY;
+                cameraXOffset = -48f;
             }
             else
-                this.cameraXOffset = this.X - this.level.Camera.Left;
+                cameraXOffset = X - level.Camera.Left;
         }
 
         private float TargetY
         {
             get
             {
-                Player entity = this.level.Tracker.GetEntity<Player>();
+                Player entity = level.Tracker.GetEntity<Player>();
                 if (entity == null)
-                    return this.Y;
-                double centerY = (double) entity.CenterY;
-                Rectangle bounds = this.level.Bounds;
-                double min = (double) (bounds.Top + 8);
-                bounds = this.level.Bounds;
-                double max = (double) (bounds.Bottom - 8);
+                    return Y;
+                double centerY = entity.CenterY;
+                Rectangle bounds = level.Bounds;
+                double min = bounds.Top + 8;
+                bounds = level.Bounds;
+                double max = bounds.Bottom - 8;
                 return MathHelper.Clamp((float) centerY, (float) min, (float) max);
             }
         }
 
         private void OnPlayer(Player player)
         {
-            if (this.state.State == 5 || (double) this.CenterX >= (double) player.CenterX + 4.0 && !(this.Sprite.CurrentAnimationID != "respawn"))
+            if (state.State == 5 || CenterX >= player.CenterX + 4.0 && !(Sprite.CurrentAnimationID != "respawn"))
                 return;
-            player.Die((player.Center - this.Center).SafeNormalize(Vector2.UnitX));
+            player.Die((player.Center - Center).SafeNormalize(Vector2.UnitX));
         }
 
         private void OnPlayerBounce(Player player)
         {
-            if (this.state.State != 2 || (double) player.Bottom > (double) this.Top + 6.0)
+            if (state.State != 2 || player.Bottom > Top + 6.0)
                 return;
-            Audio.Play("event:/game/general/thing_booped", this.Position);
+            Audio.Play("event:/game/general/thing_booped", Position);
             Celeste.Freeze(0.2f);
-            player.Bounce(this.Top + 2f);
-            this.state.State = 5;
-            this.prechargeSfx.Stop();
-            this.chargeSfx.Stop();
+            player.Bounce(Top + 2f);
+            state.State = 5;
+            prechargeSfx.Stop();
+            chargeSfx.Stop();
         }
 
         public override void Update()
         {
             base.Update();
-            this.Sprite.Scale.X = Calc.Approach(this.Sprite.Scale.X, 1f, 0.6f * Engine.DeltaTime);
-            this.Sprite.Scale.Y = Calc.Approach(this.Sprite.Scale.Y, 1f, 0.6f * Engine.DeltaTime);
-            if (!this.doRespawnAnim)
-                this.Visible = (double) this.X > (double) this.level.Bounds.Left - (double) this.Width / 2.0;
-            this.yApproachSpeed = Calc.Approach(this.yApproachSpeed, 100f, 300f * Engine.DeltaTime);
-            if (this.state.State != 3 && this.canControlTimeRate)
+            Sprite.Scale.X = Calc.Approach(Sprite.Scale.X, 1f, 0.6f * Engine.DeltaTime);
+            Sprite.Scale.Y = Calc.Approach(Sprite.Scale.Y, 1f, 0.6f * Engine.DeltaTime);
+            if (!doRespawnAnim)
+                Visible = X > level.Bounds.Left - Width / 2.0;
+            yApproachSpeed = Calc.Approach(yApproachSpeed, 100f, 300f * Engine.DeltaTime);
+            if (state.State != 3 && canControlTimeRate)
             {
-                if (this.state.State == 2 && (double) this.attackSpeed > 200.0)
+                if (state.State == 2 && attackSpeed > 200.0)
                 {
-                    Player entity = this.Scene.Tracker.GetEntity<Player>();
-                    Engine.TimeRate = entity == null || entity.Dead || (double) this.CenterX >= (double) entity.CenterX + 4.0 ? 1f : MathHelper.Lerp(Calc.ClampedMap(entity.CenterX - this.CenterX, 30f, 80f, 0.5f), 1f, Calc.ClampedMap(Math.Abs(entity.CenterY - this.CenterY), 32f, 48f));
+                    Player entity = Scene.Tracker.GetEntity<Player>();
+                    Engine.TimeRate = entity == null || entity.Dead || CenterX >= entity.CenterX + 4.0 ? 1f : MathHelper.Lerp(Calc.ClampedMap(entity.CenterX - CenterX, 30f, 80f, 0.5f), 1f, Calc.ClampedMap(Math.Abs(entity.CenterY - CenterY), 32f, 48f));
                 }
                 else
                     Engine.TimeRate = 1f;
                 Distort.GameRate = Calc.Approach(Distort.GameRate, Calc.Map(Engine.TimeRate, 0.5f, 1f), Engine.DeltaTime * 8f);
-                Distort.Anxiety = Calc.Approach(Distort.Anxiety, this.targetAnxiety, this.anxietySpeed * Engine.DeltaTime);
+                Distort.Anxiety = Calc.Approach(Distort.Anxiety, targetAnxiety, anxietySpeed * Engine.DeltaTime);
             }
             else
             {
@@ -186,51 +186,51 @@ namespace Celeste
             }
         }
 
-        public void StopControllingTime() => this.canControlTimeRate = false;
+        public void StopControllingTime() => canControlTimeRate = false;
 
         public override void Render()
         {
-            if (this.lightningVisible)
+            if (lightningVisible)
             {
-                this.lightning.RenderPosition = new Vector2(this.level.Camera.Left - 2f, this.Top + 16f);
-                this.lightning.Render();
+                lightning.RenderPosition = new Vector2(level.Camera.Left - 2f, Top + 16f);
+                lightning.Render();
             }
-            this.Sprite.Position = this.shaker.Value * 2f;
+            Sprite.Position = shaker.Value * 2f;
             base.Render();
         }
 
-        public void Leave() => this.leaving = true;
+        public void Leave() => leaving = true;
 
         public void Squish()
         {
-            this.Sprite.Scale = new Vector2(1.3f, 0.5f);
-            this.shaker.ShakeFor(0.5f, false);
+            Sprite.Scale = new Vector2(1.3f, 0.5f);
+            shaker.ShakeFor(0.5f, false);
         }
 
-        private void ChaseBegin() => this.Sprite.Play("idle");
+        private void ChaseBegin() => Sprite.Play("idle");
 
         private int ChaseUpdate()
         {
-            if (!this.hasEnteredSfx && (double) this.cameraXOffset >= -16.0 && !this.doRespawnAnim)
+            if (!hasEnteredSfx && cameraXOffset >= -16.0 && !doRespawnAnim)
             {
-                Audio.Play("event:/char/oshiro/boss_enter_screen", this.Position);
-                this.hasEnteredSfx = true;
+                Audio.Play("event:/char/oshiro/boss_enter_screen", Position);
+                hasEnteredSfx = true;
             }
-            if (this.doRespawnAnim && (double) this.cameraXOffset >= 0.0)
+            if (doRespawnAnim && cameraXOffset >= 0.0)
             {
-                this.Collider.Position.X = -48f;
-                this.Visible = true;
-                this.Sprite.Play("respawn");
-                this.doRespawnAnim = false;
-                if (this.Scene.Tracker.GetEntity<Player>() != null)
-                    Audio.Play("event:/char/oshiro/boss_reform", this.Position);
+                Collider.Position.X = -48f;
+                Visible = true;
+                Sprite.Play("respawn");
+                doRespawnAnim = false;
+                if (Scene.Tracker.GetEntity<Player>() != null)
+                    Audio.Play("event:/char/oshiro/boss_reform", Position);
             }
-            this.cameraXOffset = Calc.Approach(this.cameraXOffset, 20f, 80f * Engine.DeltaTime);
-            this.X = this.level.Camera.Left + this.cameraXOffset;
-            this.Collider.Position.X = Calc.Approach(this.Collider.Position.X, this.colliderTargetPosition.X, Engine.DeltaTime * 128f);
-            this.Collidable = this.Visible;
-            if (this.level.Tracker.GetEntity<Player>() != null && this.Sprite.CurrentAnimationID != "respawn")
-                this.CenterY = Calc.Approach(this.CenterY, this.TargetY, this.yApproachSpeed * Engine.DeltaTime);
+            cameraXOffset = Calc.Approach(cameraXOffset, 20f, 80f * Engine.DeltaTime);
+            X = level.Camera.Left + cameraXOffset;
+            Collider.Position.X = Calc.Approach(Collider.Position.X, colliderTargetPosition.X, Engine.DeltaTime * 128f);
+            Collidable = Visible;
+            if (level.Tracker.GetEntity<Player>() != null && Sprite.CurrentAnimationID != "respawn")
+                CenterY = Calc.Approach(CenterY, TargetY, yApproachSpeed * Engine.DeltaTime);
             return 0;
         }
 
@@ -239,23 +239,23 @@ namespace Celeste
             AngryOshiro angryOshiro = this;
             if (angryOshiro.level.Session.Area.Mode != AreaMode.Normal)
             {
-                yield return (object) 1f;
+                yield return 1f;
             }
             else
             {
-                yield return (object) AngryOshiro.ChaseWaitTimes[angryOshiro.attackIndex];
+                yield return AngryOshiro.ChaseWaitTimes[angryOshiro.attackIndex];
                 ++angryOshiro.attackIndex;
                 angryOshiro.attackIndex %= AngryOshiro.ChaseWaitTimes.Length;
             }
             angryOshiro.prechargeSfx.Play("event:/char/oshiro/boss_precharge");
             angryOshiro.Sprite.Play("charge");
-            yield return (object) 0.7f;
+            yield return 0.7f;
             if (angryOshiro.Scene.Tracker.GetEntity<Player>() != null)
             {
                 // ISSUE: reference to a compiler-generated method
-                Alarm.Set((Entity) angryOshiro, 0.216f, delegate
+                Alarm.Set(angryOshiro, 0.216f, delegate
                 {
-                    angryOshiro.chargeSfx.Play("event:/char/oshiro/boss_charge", null, 0f);
+                    angryOshiro.chargeSfx.Play("event:/char/oshiro/boss_charge");
                 });
                 angryOshiro.state.State = 1;
             }
@@ -265,27 +265,27 @@ namespace Celeste
 
         private int ChargeUpUpdate()
         {
-            if (this.level.OnInterval(0.05f))
-                this.Sprite.Position = Calc.Random.ShakeVector();
-            this.cameraXOffset = Calc.Approach(this.cameraXOffset, 0.0f, 40f * Engine.DeltaTime);
-            this.X = this.level.Camera.Left + this.cameraXOffset;
-            Player entity = this.level.Tracker.GetEntity<Player>();
+            if (level.OnInterval(0.05f))
+                Sprite.Position = Calc.Random.ShakeVector();
+            cameraXOffset = Calc.Approach(cameraXOffset, 0.0f, 40f * Engine.DeltaTime);
+            X = level.Camera.Left + cameraXOffset;
+            Player entity = level.Tracker.GetEntity<Player>();
             if (entity != null)
             {
-                double centerY1 = (double) this.CenterY;
-                double centerY2 = (double) entity.CenterY;
-                Rectangle bounds = this.level.Bounds;
-                double min = (double) (bounds.Top + 8);
-                bounds = this.level.Bounds;
-                double max = (double) (bounds.Bottom - 8);
-                double target = (double) MathHelper.Clamp((float) centerY2, (float) min, (float) max);
-                double maxMove = 30.0 * (double) Engine.DeltaTime;
-                this.CenterY = Calc.Approach((float) centerY1, (float) target, (float) maxMove);
+                double centerY1 = CenterY;
+                double centerY2 = entity.CenterY;
+                Rectangle bounds = level.Bounds;
+                double min = bounds.Top + 8;
+                bounds = level.Bounds;
+                double max = bounds.Bottom - 8;
+                double target = MathHelper.Clamp((float) centerY2, (float) min, (float) max);
+                double maxMove = 30.0 * Engine.DeltaTime;
+                CenterY = Calc.Approach((float) centerY1, (float) target, (float) maxMove);
             }
             return 1;
         }
 
-        private void ChargeUpEnd() => this.Sprite.Position = Vector2.Zero;
+        private void ChargeUpEnd() => Sprite.Position = Vector2.Zero;
 
         private IEnumerator ChargeUpCoroutine()
         {
@@ -295,83 +295,83 @@ namespace Celeste
             Input.Rumble(RumbleStrength.Strong, RumbleLength.Medium);
             angryOshiro.lightningVisible = true;
             angryOshiro.lightning.Play("once", true);
-            yield return (object) 0.3f;
+            yield return 0.3f;
             angryOshiro.state.State = angryOshiro.Scene.Tracker.GetEntity<Player>() == null ? 0 : 2;
         }
 
         private void AttackBegin()
         {
-            this.attackSpeed = 0.0f;
-            this.targetAnxiety = 0.3f;
-            this.anxietySpeed = 4f;
-            this.level.DirectionalShake(Vector2.UnitX);
+            attackSpeed = 0.0f;
+            targetAnxiety = 0.3f;
+            anxietySpeed = 4f;
+            level.DirectionalShake(Vector2.UnitX);
         }
 
         private void AttackEnd()
         {
-            this.targetAnxiety = 0.0f;
-            this.anxietySpeed = 0.5f;
+            targetAnxiety = 0.0f;
+            anxietySpeed = 0.5f;
         }
 
         private int AttackUpdate()
         {
-            this.X += this.attackSpeed * Engine.DeltaTime;
-            this.attackSpeed = Calc.Approach(this.attackSpeed, 500f, 2000f * Engine.DeltaTime);
-            if ((double) this.X >= (double) this.level.Camera.Right + 48.0)
+            X += attackSpeed * Engine.DeltaTime;
+            attackSpeed = Calc.Approach(attackSpeed, 500f, 2000f * Engine.DeltaTime);
+            if (X >= level.Camera.Right + 48.0)
             {
-                if (this.leaving)
+                if (leaving)
                 {
-                    this.RemoveSelf();
+                    RemoveSelf();
                     return 2;
                 }
-                this.X = this.level.Camera.Left - 48f;
-                this.cameraXOffset = -48f;
-                this.doRespawnAnim = true;
-                this.Visible = false;
+                X = level.Camera.Left - 48f;
+                cameraXOffset = -48f;
+                doRespawnAnim = true;
+                Visible = false;
                 return 0;
             }
             Input.Rumble(RumbleStrength.Light, RumbleLength.Short);
-            if (this.Scene.OnInterval(0.05f))
-                TrailManager.Add((Entity) this, Color.Red * 0.6f, 0.5f);
+            if (Scene.OnInterval(0.05f))
+                TrailManager.Add(this, Color.Red * 0.6f, 0.5f);
             return 2;
         }
 
         private IEnumerator AttackCoroutine()
         {
-            yield return (object) 0.1f;
-            this.targetAnxiety = 0.0f;
-            this.anxietySpeed = 0.5f;
+            yield return 0.1f;
+            targetAnxiety = 0.0f;
+            anxietySpeed = 0.5f;
         }
 
-        public bool DummyMode => this.state.State == 3;
+        public bool DummyMode => state.State == 3;
 
-        public void EnterDummyMode() => this.state.State = 3;
+        public void EnterDummyMode() => state.State = 3;
 
-        public void LeaveDummyMode() => this.state.State = 0;
+        public void LeaveDummyMode() => state.State = 0;
 
         private int WaitingUpdate()
         {
-            Player entity = this.Scene.Tracker.GetEntity<Player>();
-            return entity != null && entity.Speed != Vector2.Zero && (double) entity.X > (double) (this.level.Bounds.Left + 48) ? 0 : 4;
+            Player entity = Scene.Tracker.GetEntity<Player>();
+            return entity != null && entity.Speed != Vector2.Zero && entity.X > (double) (level.Bounds.Left + 48) ? 0 : 4;
         }
 
-        private void HurtBegin() => this.Sprite.Play("hurt", true);
+        private void HurtBegin() => Sprite.Play("hurt", true);
 
         private int HurtUpdate()
         {
-            this.X += 100f * Engine.DeltaTime;
-            this.Y += 200f * Engine.DeltaTime;
-            if ((double) this.Top <= (double) (this.level.Bounds.Bottom + 20))
+            X += 100f * Engine.DeltaTime;
+            Y += 200f * Engine.DeltaTime;
+            if (Top <= (double) (level.Bounds.Bottom + 20))
                 return 5;
-            if (this.leaving)
+            if (leaving)
             {
-                this.RemoveSelf();
+                RemoveSelf();
                 return 5;
             }
-            this.X = this.level.Camera.Left - 48f;
-            this.cameraXOffset = -48f;
-            this.doRespawnAnim = true;
-            this.Visible = false;
+            X = level.Camera.Left - 48f;
+            cameraXOffset = -48f;
+            doRespawnAnim = true;
+            Visible = false;
             return 0;
         }
     }

@@ -88,7 +88,7 @@ namespace Celeste
 
         private void ReadInto(TerrainType data, Tileset tileset, XmlElement xml)
         {
-            foreach (object obj in (XmlNode) xml)
+            foreach (object obj in xml)
             {
                 if (obj is not XmlComment)
                 {
@@ -256,7 +256,7 @@ namespace Celeste
                 }
             }
 
-            return new Generated()
+            return new Generated
             {
                 TileGrid = tileGrid,
                 SpriteOverlay = animatedTiles

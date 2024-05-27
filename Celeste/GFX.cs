@@ -111,7 +111,7 @@ namespace Celeste
                 PlayerSprite.CreateFramesMetadata("player_playback");
                 CompleteScreensXml = Calc.LoadContentXML(Path.Combine("Graphics", "CompleteScreens.xml"));
                 AnimatedTilesBank = new AnimatedTilesBank();
-                foreach (XmlElement xml in (XmlNode) Calc.LoadContentXML(Path.Combine("Graphics", "AnimatedTiles.xml"))["Data"])
+                foreach (XmlElement xml in Calc.LoadContentXML(Path.Combine("Graphics", "AnimatedTiles.xml"))["Data"])
                 {
                     if (xml != null)
                         AnimatedTilesBank.Add(xml.Attr("name"), xml.AttrFloat("delay", 0.0f), xml.AttrVector2("posX", "posY", Vector2.Zero), xml.AttrVector2("origX", "origY", Vector2.Zero), Game.GetAtlasSubtextures(xml.Attr("path")));
@@ -200,7 +200,7 @@ namespace Celeste
             foreach (EffectPass pass in effect1.CurrentTechnique.Passes)
             {
                 pass.Apply();
-                Engine.Instance.GraphicsDevice.DrawUserPrimitives<T>(PrimitiveType.TriangleList, vertices, 0, vertexCount / 3);
+                Engine.Instance.GraphicsDevice.DrawUserPrimitives(PrimitiveType.TriangleList, vertices, 0, vertexCount / 3);
             }
         }
 
@@ -229,7 +229,7 @@ namespace Celeste
             foreach (EffectPass pass in effect1.CurrentTechnique.Passes)
             {
                 pass.Apply();
-                Engine.Instance.GraphicsDevice.DrawUserIndexedPrimitives<T>(PrimitiveType.TriangleList, vertices, 0, vertexCount, indices, 0, primitiveCount);
+                Engine.Instance.GraphicsDevice.DrawUserIndexedPrimitives(PrimitiveType.TriangleList, vertices, 0, vertexCount, indices, 0, primitiveCount);
             }
         }
     }
