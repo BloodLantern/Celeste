@@ -303,9 +303,9 @@ namespace Monocle
             else
             {
                 int num1 = (int) Math.Max(0.0f, (camera.Left - AbsoluteLeft) / CellWidth);
-                int num2 = (int) Math.Min(CellsX - 1, Math.Ceiling(((double) camera.Right - (double) AbsoluteLeft) / (double) CellWidth));
+                int num2 = (int) Math.Min(CellsX - 1, Math.Ceiling((camera.Right - (double) AbsoluteLeft) / CellWidth));
                 int num3 = (int) Math.Max(0.0f, (camera.Top - AbsoluteTop) / CellHeight);
-                int num4 = (int) Math.Min(CellsY - 1, Math.Ceiling(((double) camera.Bottom - (double) AbsoluteTop) / (double) CellHeight));
+                int num4 = (int) Math.Min(CellsY - 1, Math.Ceiling((camera.Bottom - (double) AbsoluteTop) / CellHeight));
                 for (int x = num1; x <= num2; ++x)
                 {
                     for (int y = num3; y <= num4; ++y)
@@ -317,16 +317,16 @@ namespace Monocle
             }
         }
 
-        public override bool Collide(Vector2 point) => point.X >= (double) AbsoluteLeft && point.Y >= (double) AbsoluteTop && point.X < (double) AbsoluteRight && point.Y < (double) AbsoluteBottom && Data[(int) ((point.X - (double) AbsoluteLeft) / (double) CellWidth), (int) ((point.Y - (double) AbsoluteTop) / (double) CellHeight)];
+        public override bool Collide(Vector2 point) => point.X >= (double) AbsoluteLeft && point.Y >= (double) AbsoluteTop && point.X < (double) AbsoluteRight && point.Y < (double) AbsoluteBottom && Data[(int) ((point.X - (double) AbsoluteLeft) / CellWidth), (int) ((point.Y - (double) AbsoluteTop) / CellHeight)];
 
         public override bool Collide(Rectangle rect)
         {
             if (!rect.Intersects(Bounds))
                 return false;
-            int x = (int) ((rect.Left - (double) AbsoluteLeft) / (double) CellWidth);
-            int y = (int) ((rect.Top - (double) AbsoluteTop) / (double) CellHeight);
-            int width = (int) ((rect.Right - (double) AbsoluteLeft - 1.0) / (double) CellWidth) - x + 1;
-            int height = (int) ((rect.Bottom - (double) AbsoluteTop - 1.0) / (double) CellHeight) - y + 1;
+            int x = (int) ((rect.Left - (double) AbsoluteLeft) / CellWidth);
+            int y = (int) ((rect.Top - (double) AbsoluteTop) / CellHeight);
+            int width = (int) ((rect.Right - (double) AbsoluteLeft - 1.0) / CellWidth) - x + 1;
+            int height = (int) ((rect.Bottom - (double) AbsoluteTop - 1.0) / CellHeight) - y + 1;
             return CheckRect(x, y, width, height);
         }
 
@@ -336,7 +336,7 @@ namespace Monocle
             to -= AbsolutePosition;
             from /= new Vector2(CellWidth, CellHeight);
             to /= new Vector2(CellWidth, CellHeight);
-            bool flag = (double) Math.Abs(to.Y - from.Y) > (double) Math.Abs(to.X - from.X);
+            bool flag = Math.Abs(to.Y - from.Y) > (double) Math.Abs(to.X - from.X);
             if (flag)
             {
                 float x1 = from.X;
@@ -367,7 +367,7 @@ namespace Monocle
                 else if (this[x4, y])
                     return true;
                 num1 += num2;
-                if ((double) num1 >= 0.5)
+                if (num1 >= 0.5)
                 {
                     y += num3;
                     --num1;

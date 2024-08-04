@@ -8,14 +8,14 @@ namespace Monocle
         public Action OnComplete;
         private static Stack<Alarm> cached = new Stack<Alarm>();
 
-        public Alarm.AlarmMode Mode { get; private set; }
+        public AlarmMode Mode { get; private set; }
 
         public float Duration { get; private set; }
 
         public float TimeLeft { get; private set; }
 
         public static Alarm Create(
-            Alarm.AlarmMode mode,
+            AlarmMode mode,
             Action onComplete,
             float duration = 1f,
             bool start = false)
@@ -29,10 +29,10 @@ namespace Monocle
             Entity entity,
             float duration,
             Action onComplete,
-            Alarm.AlarmMode alarmMode = Alarm.AlarmMode.Oneshot)
+            AlarmMode alarmMode = AlarmMode.Oneshot)
         {
             Alarm alarm = Alarm.Create(alarmMode, onComplete, duration, true);
-            entity.Add((Component) alarm);
+            entity.Add(alarm);
             return alarm;
         }
 
@@ -41,37 +41,37 @@ namespace Monocle
         {
         }
 
-        private void Init(Alarm.AlarmMode mode, Action onComplete, float duration = 1f, bool start = false)
+        private void Init(AlarmMode mode, Action onComplete, float duration = 1f, bool start = false)
         {
-            this.Mode = mode;
-            this.Duration = duration;
-            this.OnComplete = onComplete;
-            this.Active = false;
-            this.TimeLeft = 0.0f;
+            Mode = mode;
+            Duration = duration;
+            OnComplete = onComplete;
+            Active = false;
+            TimeLeft = 0.0f;
             if (!start)
                 return;
-            this.Start();
+            Start();
         }
 
         public override void Update()
         {
-            this.TimeLeft -= Engine.DeltaTime;
-            if ((double) this.TimeLeft > 0.0)
+            TimeLeft -= Engine.DeltaTime;
+            if (TimeLeft > 0.0)
                 return;
-            this.TimeLeft = 0.0f;
-            if (this.OnComplete != null)
-                this.OnComplete();
-            if (this.Mode == Alarm.AlarmMode.Looping)
-                this.Start();
-            else if (this.Mode == Alarm.AlarmMode.Oneshot)
+            TimeLeft = 0.0f;
+            if (OnComplete != null)
+                OnComplete();
+            if (Mode == AlarmMode.Looping)
+                Start();
+            else if (Mode == AlarmMode.Oneshot)
             {
-                this.RemoveSelf();
+                RemoveSelf();
             }
             else
             {
-                if ((double) this.TimeLeft > 0.0)
+                if (TimeLeft > 0.0)
                     return;
-                this.Active = false;
+                Active = false;
             }
         }
 
@@ -83,17 +83,17 @@ namespace Monocle
 
         public void Start()
         {
-            this.Active = true;
-            this.TimeLeft = this.Duration;
+            Active = true;
+            TimeLeft = Duration;
         }
 
         public void Start(float duration)
         {
-            this.Duration = duration;
-            this.Start();
+            Duration = duration;
+            Start();
         }
 
-        public void Stop() => this.Active = false;
+        public void Stop() => Active = false;
 
         public enum AlarmMode
         {

@@ -1,6 +1,4 @@
-﻿using Celeste;
-using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Graphics;
+﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Input;
 using System;
 using System.Collections.Generic;
@@ -142,7 +140,7 @@ namespace Monocle
                 Keys keys = key;
                 if (!(repeatKey.GetValueOrDefault() == keys & repeatKey.HasValue))
                 {
-                    this.repeatKey = new Keys?(key);
+                    this.repeatKey = key;
                     repeatCounter = 0.0f;
                 }
             }
@@ -225,10 +223,7 @@ namespace Monocle
                         if (seekIndex >= commandHistory.Count - 1)
                             return;
                         ++seekIndex;
-                        currentText = string.Join(" ", new string[1]
-                        {
-                            commandHistory[seekIndex]
-                        });
+                        currentText = string.Join(" ", commandHistory[seekIndex]);
                         return;
                     case Keys.Back:
                         if (seekIndex <= -1)
@@ -239,10 +234,7 @@ namespace Monocle
                             currentText = "";
                             return;
                         }
-                        currentText = string.Join(" ", new string[1]
-                        {
-                            commandHistory[seekIndex]
-                        });
+                        currentText = string.Join(" ", commandHistory[seekIndex]);
                         return;
                     case (Keys) 14:
                         currentText = "";

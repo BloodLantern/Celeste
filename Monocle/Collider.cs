@@ -19,10 +19,10 @@ namespace Monocle
         {
             return collider switch
             {
-                Hitbox _ => Collide(collider as Hitbox),
-                Grid _ => Collide(collider as Grid),
-                ColliderList _ => Collide(collider as ColliderList),
-                Circle _ => Collide(collider as Circle),
+                Hitbox hitbox => Collide(hitbox),
+                Grid grid => Collide(grid),
+                ColliderList colliderList => Collide(colliderList),
+                Circle circle => Collide(circle),
                 _ => throw new Exception("Collisions against the collider type are not implemented!"),
             };
         }

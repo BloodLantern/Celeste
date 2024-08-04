@@ -120,7 +120,7 @@ namespace Monocle
             foreach (T obj in entities)
             {
                 float num2 = Vector2.DistanceSquared(nearestTo, obj.Position);
-                if (nearestEntity == null || (double) num2 < (double) num1)
+                if (nearestEntity == null || num2 < (double) num1)
                 {
                     nearestEntity = obj;
                     num1 = num2;
@@ -155,7 +155,7 @@ namespace Monocle
             foreach (T obj in components)
             {
                 float num2 = Vector2.DistanceSquared(nearestTo, obj.Entity.Position);
-                if (nearestComponent == null || (double) num2 < (double) num1)
+                if (nearestComponent == null || num2 < (double) num1)
                 {
                     nearestComponent = obj;
                     num1 = num2;

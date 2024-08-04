@@ -5,9 +5,9 @@ namespace Monocle
 {
     public class BitTag
     {
-        internal static int TotalTags = 0;
+        internal static int TotalTags;
         internal static BitTag[] byID = new BitTag[32];
-        private static Dictionary<string, BitTag> byName = new Dictionary<string, BitTag>((IEqualityComparer<string>) StringComparer.OrdinalIgnoreCase);
+        private static Dictionary<string, BitTag> byName = new Dictionary<string, BitTag>(StringComparer.OrdinalIgnoreCase);
         public int ID;
         public int Value;
         public string Name;
@@ -16,10 +16,10 @@ namespace Monocle
 
         public BitTag(string name)
         {
-            this.ID = BitTag.TotalTags;
-            this.Value = 1 << BitTag.TotalTags;
-            this.Name = name;
-            BitTag.byID[this.ID] = this;
+            ID = BitTag.TotalTags;
+            Value = 1 << BitTag.TotalTags;
+            Name = name;
+            BitTag.byID[ID] = this;
             BitTag.byName[name] = this;
             ++BitTag.TotalTags;
         }

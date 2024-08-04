@@ -207,7 +207,7 @@ namespace Monocle
             float rotation,
             Rectangle clip)
         {
-            Monocle.Draw.SpriteBatch.Draw(Texture.Texture, position, new Rectangle?(GetRelativeRect(clip)), color, rotation, origin - DrawOffset, scale, SpriteEffects.None, 0f);
+            Monocle.Draw.SpriteBatch.Draw(Texture.Texture, position, GetRelativeRect(clip), color, rotation, origin - DrawOffset, scale, SpriteEffects.None, 0f);
         }
 
         public void DrawCentered(Vector2 position)

@@ -10,8 +10,8 @@ namespace Monocle
         internal static List<VirtualInput> VirtualInputs;
         public static bool Active = true;
         public static bool Disabled = false;
-        public static bool ControllerHasFocus = false;
-        public static bool IsControllerFocused = false;
+        public static bool ControllerHasFocus;
+        public static bool IsControllerFocused;
 
         public static KeyboardData Keyboard { get; private set; }
 
@@ -94,7 +94,7 @@ namespace Monocle
 
         public static int Axis(bool negative, bool positive, int bothValue) => negative ? (positive ? bothValue : -1) : (positive ? 1 : 0);
 
-        public static int Axis(float axisValue, float deadzone) => (double) Math.Abs(axisValue) >= (double) deadzone ? Math.Sign(axisValue) : 0;
+        public static int Axis(float axisValue, float deadzone) => Math.Abs(axisValue) >= (double) deadzone ? Math.Sign(axisValue) : 0;
 
         public static int Axis(
             bool negative,
@@ -240,13 +240,13 @@ namespace Monocle
 
             public bool HasAnyInput()
             {
-                if (!PreviousState.IsConnected && CurrentState.IsConnected || PreviousState.Buttons != CurrentState.Buttons || PreviousState.DPad != CurrentState.DPad || (double) CurrentState.Triggers.Left > 0.0099999997764825821 || (double) CurrentState.Triggers.Right > 0.0099999997764825821)
+                if (!PreviousState.IsConnected && CurrentState.IsConnected || PreviousState.Buttons != CurrentState.Buttons || PreviousState.DPad != CurrentState.DPad || CurrentState.Triggers.Left > 0.0099999997764825821 || CurrentState.Triggers.Right > 0.0099999997764825821)
                     return true;
                 Vector2 vector2 = CurrentState.ThumbSticks.Left;
-                if ((double) vector2.Length() <= 0.0099999997764825821)
+                if (vector2.Length() <= 0.0099999997764825821)
                 {
                     vector2 = CurrentState.ThumbSticks.Right;
-                    if ((double) vector2.Length() <= 0.0099999997764825821)
+                    if (vector2.Length() <= 0.0099999997764825821)
                         return false;
                 }
                 return true;
@@ -320,7 +320,7 @@ namespace Monocle
             public Vector2 GetLeftStick(float deadzone)
             {
                 Vector2 leftStick = CurrentState.ThumbSticks.Left;
-                if ((double) leftStick.LengthSquared() < (double) deadzone * (double) deadzone)
+                if (leftStick.LengthSquared() < deadzone * (double) deadzone)
                     leftStick = Vector2.Zero;
                 else
                     leftStick.Y = -leftStick.Y;
@@ -337,7 +337,7 @@ namespace Monocle
             public Vector2 GetRightStick(float deadzone)
             {
                 Vector2 rightStick = CurrentState.ThumbSticks.Right;
-                if ((double) rightStick.LengthSquared() < (double) deadzone * (double) deadzone)
+                if (rightStick.LengthSquared() < deadzone * (double) deadzone)
                     rightStick = Vector2.Zero;
                 else
                     rightStick.Y = -rightStick.Y;
@@ -371,13 +371,13 @@ namespace Monocle
             public float LeftStickHorizontal(float deadzone)
             {
                 float x = CurrentState.ThumbSticks.Left.X;
-                return (double) Math.Abs(x) < (double) deadzone ? 0.0f : x;
+                return Math.Abs(x) < (double) deadzone ? 0.0f : x;
             }
 
             public float LeftStickVertical(float deadzone)
             {
                 float y = CurrentState.ThumbSticks.Left.Y;
-                return (double) Math.Abs(y) < (double) deadzone ? 0.0f : -y;
+                return Math.Abs(y) < (double) deadzone ? 0.0f : -y;
             }
 
             public bool RightStickLeftCheck(float deadzone) => CurrentState.ThumbSticks.Right.X <= -(double) deadzone;
@@ -407,13 +407,13 @@ namespace Monocle
             public float RightStickHorizontal(float deadzone)
             {
                 float x = CurrentState.ThumbSticks.Right.X;
-                return (double) Math.Abs(x) < (double) deadzone ? 0.0f : x;
+                return Math.Abs(x) < (double) deadzone ? 0.0f : x;
             }
 
             public float RightStickVertical(float deadzone)
             {
                 float y = CurrentState.ThumbSticks.Right.Y;
-                return (double) Math.Abs(y) < (double) deadzone ? 0.0f : -y;
+                return Math.Abs(y) < (double) deadzone ? 0.0f : -y;
             }
 
             public int DPadHorizontal
@@ -462,17 +462,17 @@ namespace Monocle
 
             public bool DPadDownReleased => CurrentState.DPad.Down == ButtonState.Released && PreviousState.DPad.Down == ButtonState.Pressed;
 
-            public bool LeftTriggerCheck(float threshold) => !Disabled && (double) CurrentState.Triggers.Left >= (double) threshold;
+            public bool LeftTriggerCheck(float threshold) => !Disabled && CurrentState.Triggers.Left >= (double) threshold;
 
-            public bool LeftTriggerPressed(float threshold) => !Disabled && (double) CurrentState.Triggers.Left >= (double) threshold && (double) PreviousState.Triggers.Left < (double) threshold;
+            public bool LeftTriggerPressed(float threshold) => !Disabled && CurrentState.Triggers.Left >= (double) threshold && PreviousState.Triggers.Left < (double) threshold;
 
-            public bool LeftTriggerReleased(float threshold) => !Disabled && (double) CurrentState.Triggers.Left < (double) threshold && (double) PreviousState.Triggers.Left >= (double) threshold;
+            public bool LeftTriggerReleased(float threshold) => !Disabled && CurrentState.Triggers.Left < (double) threshold && PreviousState.Triggers.Left >= (double) threshold;
 
-            public bool RightTriggerCheck(float threshold) => !Disabled && (double) CurrentState.Triggers.Right >= (double) threshold;
+            public bool RightTriggerCheck(float threshold) => !Disabled && CurrentState.Triggers.Right >= (double) threshold;
 
-            public bool RightTriggerPressed(float threshold) => !Disabled && (double) CurrentState.Triggers.Right >= (double) threshold && (double) PreviousState.Triggers.Right < (double) threshold;
+            public bool RightTriggerPressed(float threshold) => !Disabled && CurrentState.Triggers.Right >= (double) threshold && PreviousState.Triggers.Right < (double) threshold;
 
-            public bool RightTriggerReleased(float threshold) => !Disabled && (double) CurrentState.Triggers.Right < (double) threshold && (double) PreviousState.Triggers.Right >= (double) threshold;
+            public bool RightTriggerReleased(float threshold) => !Disabled && CurrentState.Triggers.Right < (double) threshold && PreviousState.Triggers.Right >= (double) threshold;
 
             public float Axis(Buttons button, float threshold)
             {
@@ -502,11 +502,11 @@ namespace Monocle
                             return -CurrentState.ThumbSticks.Left.X;
                         break;
                     case Buttons.RightTrigger:
-                        if ((double) CurrentState.Triggers.Right >= (double) threshold)
+                        if (CurrentState.Triggers.Right >= (double) threshold)
                             return CurrentState.Triggers.Right;
                         break;
                     case Buttons.LeftTrigger:
-                        if ((double) CurrentState.Triggers.Left >= (double) threshold)
+                        if (CurrentState.Triggers.Left >= (double) threshold)
                             return CurrentState.Triggers.Left;
                         break;
                     case Buttons.RightThumbstickUp:

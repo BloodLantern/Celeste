@@ -11,16 +11,16 @@ namespace Monocle
         public Action<T> OnFinish;
         public Action<T> OnLoop;
         public Action<T> OnAnimate;
-        private Dictionary<T, Spritesheet<T>.Animation> animations;
-        private Spritesheet<T>.Animation currentAnimation;
+        private Dictionary<T, Animation> animations;
+        private Animation currentAnimation;
         private float animationTimer;
         private bool played;
 
         public Spritesheet(MTexture texture, int frameWidth, int frameHeight, int frameSep = 0)
             : base(texture, true)
         {
-            this.SetFrames(texture, frameWidth, frameHeight, frameSep);
-            this.animations = new Dictionary<T, Spritesheet<T>.Animation>();
+            SetFrames(texture, frameWidth, frameHeight, frameSep);
+            animations = new Dictionary<T, Animation>();
         }
 
         public void SetFrames(MTexture texture, int frameWidth, int frameHeight, int frameSep = 0)
@@ -35,103 +35,103 @@ namespace Monocle
                 y += frameHeight + frameSep;
                 x = 0;
             }
-            this.Frames = mtextureList.ToArray();
+            Frames = mtextureList.ToArray();
         }
 
         public override void Update()
         {
-            if (!this.Animating || (double) this.currentAnimation.Delay <= 0.0)
+            if (!Animating || currentAnimation.Delay <= 0.0)
                 return;
-            if (this.UseRawDeltaTime)
-                this.animationTimer += Engine.RawDeltaTime * this.Rate;
+            if (UseRawDeltaTime)
+                animationTimer += Engine.RawDeltaTime * Rate;
             else
-                this.animationTimer += Engine.DeltaTime * this.Rate;
-            if ((double) Math.Abs(this.animationTimer) < (double) this.currentAnimation.Delay)
+                animationTimer += Engine.DeltaTime * Rate;
+            if (Math.Abs(animationTimer) < (double) currentAnimation.Delay)
                 return;
-            this.CurrentAnimationFrame += Math.Sign(this.animationTimer);
-            this.animationTimer -= (float) Math.Sign(this.animationTimer) * this.currentAnimation.Delay;
-            if (this.CurrentAnimationFrame < 0 || this.CurrentAnimationFrame >= this.currentAnimation.Frames.Length)
+            CurrentAnimationFrame += Math.Sign(animationTimer);
+            animationTimer -= Math.Sign(animationTimer) * currentAnimation.Delay;
+            if (CurrentAnimationFrame < 0 || CurrentAnimationFrame >= currentAnimation.Frames.Length)
             {
-                if (this.currentAnimation.Loop)
+                if (currentAnimation.Loop)
                 {
-                    this.CurrentAnimationFrame -= Math.Sign(this.CurrentAnimationFrame) * this.currentAnimation.Frames.Length;
-                    this.CurrentFrame = this.currentAnimation.Frames[this.CurrentAnimationFrame];
-                    if (this.OnAnimate != null)
-                        this.OnAnimate(this.CurrentAnimationID);
-                    if (this.OnLoop == null)
+                    CurrentAnimationFrame -= Math.Sign(CurrentAnimationFrame) * currentAnimation.Frames.Length;
+                    CurrentFrame = currentAnimation.Frames[CurrentAnimationFrame];
+                    if (OnAnimate != null)
+                        OnAnimate(CurrentAnimationID);
+                    if (OnLoop == null)
                         return;
-                    this.OnLoop(this.CurrentAnimationID);
+                    OnLoop(CurrentAnimationID);
                 }
                 else
                 {
-                    this.CurrentAnimationFrame = this.CurrentAnimationFrame >= 0 ? this.currentAnimation.Frames.Length - 1 : 0;
-                    this.Animating = false;
-                    this.animationTimer = 0.0f;
-                    if (this.OnFinish == null)
+                    CurrentAnimationFrame = CurrentAnimationFrame >= 0 ? currentAnimation.Frames.Length - 1 : 0;
+                    Animating = false;
+                    animationTimer = 0.0f;
+                    if (OnFinish == null)
                         return;
-                    this.OnFinish(this.CurrentAnimationID);
+                    OnFinish(CurrentAnimationID);
                 }
             }
             else
             {
-                this.CurrentFrame = this.currentAnimation.Frames[this.CurrentAnimationFrame];
-                if (this.OnAnimate == null)
+                CurrentFrame = currentAnimation.Frames[CurrentAnimationFrame];
+                if (OnAnimate == null)
                     return;
-                this.OnAnimate(this.CurrentAnimationID);
+                OnAnimate(CurrentAnimationID);
             }
         }
 
         public override void Render()
         {
-            this.Texture = this.Frames[this.CurrentFrame];
+            Texture = Frames[CurrentFrame];
             base.Render();
         }
 
-        public void Add(T id, bool loop, float delay, params int[] frames) => this.animations[id] = new Spritesheet<T>.Animation()
+        public void Add(T id, bool loop, float delay, params int[] frames) => animations[id] = new Animation
         {
             Delay = delay,
             Frames = frames,
             Loop = loop
         };
 
-        public void Add(T id, float delay, params int[] frames) => this.Add(id, true, delay, frames);
+        public void Add(T id, float delay, params int[] frames) => Add(id, true, delay, frames);
 
-        public void Add(T id, int frame) => this.Add(id, false, 0.0f, frame);
+        public void Add(T id, int frame) => Add(id, false, 0.0f, frame);
 
-        public void ClearAnimations() => this.animations.Clear();
+        public void ClearAnimations() => animations.Clear();
 
         public bool IsPlaying(T id)
         {
-            if (!this.played)
+            if (!played)
                 return false;
-            return (object) this.CurrentAnimationID == null ? (object) id == null : this.CurrentAnimationID.Equals((object) id);
+            return CurrentAnimationID == null ? id == null : CurrentAnimationID.Equals(id);
         }
 
         public void Play(T id, bool restart = false)
         {
-            if (!(!this.IsPlaying(id) | restart))
+            if (!(!IsPlaying(id) | restart))
                 return;
-            this.CurrentAnimationID = id;
-            this.currentAnimation = this.animations[id];
-            this.animationTimer = 0.0f;
-            this.CurrentAnimationFrame = 0;
-            this.played = true;
-            this.Animating = this.currentAnimation.Frames.Length > 1;
-            this.CurrentFrame = this.currentAnimation.Frames[0];
+            CurrentAnimationID = id;
+            currentAnimation = animations[id];
+            animationTimer = 0.0f;
+            CurrentAnimationFrame = 0;
+            played = true;
+            Animating = currentAnimation.Frames.Length > 1;
+            CurrentFrame = currentAnimation.Frames[0];
         }
 
         public void Reverse(T id, bool restart = false)
         {
-            this.Play(id, restart);
-            if ((double) this.Rate <= 0.0)
+            Play(id, restart);
+            if (Rate <= 0.0)
                 return;
-            this.Rate *= -1f;
+            Rate *= -1f;
         }
 
         public void Stop()
         {
-            this.Animating = false;
-            this.played = false;
+            Animating = false;
+            played = false;
         }
 
         public MTexture[] Frames { get; private set; }
@@ -142,9 +142,9 @@ namespace Monocle
 
         public int CurrentAnimationFrame { get; private set; }
 
-        public override float Width => this.Frames.Length != 0 ? (float) this.Frames[0].Width : 0.0f;
+        public override float Width => Frames.Length != 0 ? Frames[0].Width : 0.0f;
 
-        public override float Height => this.Frames.Length != 0 ? (float) this.Frames[0].Height : 0.0f;
+        public override float Height => Frames.Length != 0 ? Frames[0].Height : 0.0f;
 
         private struct Animation
         {

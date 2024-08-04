@@ -383,32 +383,32 @@ namespace Celeste
             onCollideH = OnCollideH;
             onCollideV = OnCollideV;
             StateMachine = new StateMachine(26);
-            StateMachine.SetCallbacks(0, NormalUpdate, begin: NormalBegin, end: NormalEnd);
-            StateMachine.SetCallbacks(1, ClimbUpdate, begin: ClimbBegin, end: ClimbEnd);
-            StateMachine.SetCallbacks(2, DashUpdate, DashCoroutine, DashBegin, DashEnd);
-            StateMachine.SetCallbacks(3, SwimUpdate, begin: SwimBegin);
-            StateMachine.SetCallbacks(4, BoostUpdate, BoostCoroutine, BoostBegin, BoostEnd);
-            StateMachine.SetCallbacks(5, RedDashUpdate, RedDashCoroutine, RedDashBegin, RedDashEnd);
-            StateMachine.SetCallbacks(6, HitSquashUpdate, begin: HitSquashBegin);
-            StateMachine.SetCallbacks(7, LaunchUpdate, begin: LaunchBegin);
-            StateMachine.SetCallbacks(8, null, PickupCoroutine);
-            StateMachine.SetCallbacks(9, DreamDashUpdate, begin: DreamDashBegin, end: DreamDashEnd);
-            StateMachine.SetCallbacks(10, SummitLaunchUpdate, begin: SummitLaunchBegin);
-            StateMachine.SetCallbacks(11, DummyUpdate, begin: DummyBegin);
-            StateMachine.SetCallbacks(12, null, IntroWalkCoroutine);
-            StateMachine.SetCallbacks(13, null, IntroJumpCoroutine);
-            StateMachine.SetCallbacks(14, null, begin: IntroRespawnBegin, end: IntroRespawnEnd);
-            StateMachine.SetCallbacks(15, null, IntroWakeUpCoroutine);
-            StateMachine.SetCallbacks(20, TempleFallUpdate, TempleFallCoroutine);
-            StateMachine.SetCallbacks(18, ReflectionFallUpdate, ReflectionFallCoroutine, ReflectionFallBegin, ReflectionFallEnd);
-            StateMachine.SetCallbacks(16, BirdDashTutorialUpdate, BirdDashTutorialCoroutine, BirdDashTutorialBegin);
-            StateMachine.SetCallbacks(17, FrozenUpdate);
-            StateMachine.SetCallbacks(19, StarFlyUpdate, StarFlyCoroutine, StarFlyBegin, StarFlyEnd);
-            StateMachine.SetCallbacks(21, CassetteFlyUpdate, CassetteFlyCoroutine, CassetteFlyBegin, CassetteFlyEnd);
-            StateMachine.SetCallbacks(22, AttractUpdate, begin: AttractBegin, end: AttractEnd);
-            StateMachine.SetCallbacks(23, null, IntroMoonJumpCoroutine);
-            StateMachine.SetCallbacks(24, FlingBirdUpdate, FlingBirdCoroutine, FlingBirdBegin, FlingBirdEnd);
-            StateMachine.SetCallbacks(25, null, IntroThinkForABitCoroutine);
+            StateMachine.SetCallbacks(Player.StNormal, NormalUpdate, begin: NormalBegin, end: NormalEnd);
+            StateMachine.SetCallbacks(Player.StClimb, ClimbUpdate, begin: ClimbBegin, end: ClimbEnd);
+            StateMachine.SetCallbacks(Player.StDash, DashUpdate, DashCoroutine, DashBegin, DashEnd);
+            StateMachine.SetCallbacks(Player.StSwim, SwimUpdate, begin: SwimBegin);
+            StateMachine.SetCallbacks(Player.StBoost, BoostUpdate, BoostCoroutine, BoostBegin, BoostEnd);
+            StateMachine.SetCallbacks(Player.StRedDash, RedDashUpdate, RedDashCoroutine, RedDashBegin, RedDashEnd);
+            StateMachine.SetCallbacks(Player.StHitSquash, HitSquashUpdate, begin: HitSquashBegin);
+            StateMachine.SetCallbacks(Player.StLaunch, LaunchUpdate, begin: LaunchBegin);
+            StateMachine.SetCallbacks(Player.StPickup, null, PickupCoroutine);
+            StateMachine.SetCallbacks(Player.StDreamDash, DreamDashUpdate, begin: DreamDashBegin, end: DreamDashEnd);
+            StateMachine.SetCallbacks(Player.StSummitLaunch, SummitLaunchUpdate, begin: SummitLaunchBegin);
+            StateMachine.SetCallbacks(Player.StDummy, DummyUpdate, begin: DummyBegin);
+            StateMachine.SetCallbacks(Player.StIntroWalk, null, IntroWalkCoroutine);
+            StateMachine.SetCallbacks(Player.StIntroJump, null, IntroJumpCoroutine);
+            StateMachine.SetCallbacks(Player.StIntroRespawn, null, begin: IntroRespawnBegin, end: IntroRespawnEnd);
+            StateMachine.SetCallbacks(Player.StIntroWakeUp, null, IntroWakeUpCoroutine);
+            StateMachine.SetCallbacks(Player.StTempleFall, TempleFallUpdate, TempleFallCoroutine);
+            StateMachine.SetCallbacks(Player.StReflectionFall, ReflectionFallUpdate, ReflectionFallCoroutine, ReflectionFallBegin, ReflectionFallEnd);
+            StateMachine.SetCallbacks(Player.StBirdDashTutorial, BirdDashTutorialUpdate, BirdDashTutorialCoroutine, BirdDashTutorialBegin);
+            StateMachine.SetCallbacks(Player.StFrozen, FrozenUpdate);
+            StateMachine.SetCallbacks(Player.StStarFly, StarFlyUpdate, StarFlyCoroutine, StarFlyBegin, StarFlyEnd);
+            StateMachine.SetCallbacks(Player.StCassetteFly, CassetteFlyUpdate, CassetteFlyCoroutine, CassetteFlyBegin, CassetteFlyEnd);
+            StateMachine.SetCallbacks(Player.StAttract, AttractUpdate, begin: AttractBegin, end: AttractEnd);
+            StateMachine.SetCallbacks(Player.StIntroMoonJump, null, IntroMoonJumpCoroutine);
+            StateMachine.SetCallbacks(Player.StFlingBird, FlingBirdUpdate, FlingBirdCoroutine, FlingBirdBegin, FlingBirdEnd);
+            StateMachine.SetCallbacks(Player.StIntroThinkForABit, null, IntroThinkForABitCoroutine);
             Add(StateMachine);
             Add(Leader = new Leader(new Vector2(0.0f, -8f)));
             lastAim = Vector2.UnitX;
@@ -898,13 +898,13 @@ namespace Celeste
                 MoveVExact(3);
             if (Speed.Y > 0.0 && CanUnDuck && Collider != starFlyHitbox && !onGround && jumpGraceTimer <= 0.0)
                 Ducking = false;
-            if (StateMachine.State is not 9 and not 22)
+            if (StateMachine.State is not Player.StDreamDash and not Player.StAttract)
                 MoveH(Speed.X * Engine.DeltaTime, onCollideH);
-            if (StateMachine.State is not 9 and not 22)
+            if (StateMachine.State is not Player.StDreamDash and not Player.StAttract)
                 MoveV(Speed.Y * Engine.DeltaTime, onCollideV);
             if (StateMachine.State == 3)
             {
-                if ((double) Speed.Y is < 0.0 and >= (-60.0))
+                if ((double) Speed.Y is < 0f and >= (-60f))
                 {
                     while (!SwimCheck())
                     {
@@ -1476,7 +1476,7 @@ namespace Celeste
         {
             switch (StateMachine.State)
             {
-                case 1:
+                case Player.StClimb:
                     StateMachine.State = 0;
                     varJumpSpeed = Speed.Y = -60f;
                     varJumpTimer = 0.15f;
@@ -1485,13 +1485,13 @@ namespace Celeste
                     AutoJumpTimer = 0.0f;
                     sweatSprite.Play("jump", true);
                     break;
-                case 4:
-                case 7:
-                case 22:
+                case Player.StBoost:
+                case Player.StLaunch:
+                case Player.StAttract:
                     sweatSprite.Play("jump", true);
                     break;
-                case 5:
-                case 9:
+                case Player.StRedDash:
+                case Player.StDreamDash:
                     Speed = Speed.X < 0.0 || Speed.X == 0.0 && Speed.Y < 0.0 ? Speed.Rotate(0.17453292f) : Speed.Rotate(-0.17453292f);
                     break;
                 case 10:
@@ -1512,7 +1512,7 @@ namespace Celeste
                     return;
                 case 18:
                     return;
-                case 19:
+                case Player.StStarFly:
                     Speed = Speed.X <= 0.0 ? Speed.Rotate(-0.6981317f) : Speed.Rotate(0.6981317f);
                     break;
                 case 21:
@@ -2154,9 +2154,9 @@ namespace Celeste
         private void OnCollideH(CollisionData data)
         {
             canCurveDash = false;
-            if (StateMachine.State == 19)
+            if (StateMachine.State == Player.StStarFly)
             {
-                if (starFlyTimer < 0.20000000298023224)
+                if (starFlyTimer < 0.2f)
                 {
                     Speed.X = 0.0f;
                 }
@@ -2169,7 +2169,7 @@ namespace Celeste
             }
             else
             {
-                if (StateMachine.State == 9)
+                if (StateMachine.State == Player.StDreamDash)
                     return;
                 if (DashAttacking && data.Hit != null && data.Hit.OnDashCollide != null && data.Direction.X == (double) Math.Sign(DashDir.X))
                 {
@@ -2190,7 +2190,7 @@ namespace Celeste
                             return;
                     }
                 }
-                if (StateMachine.State is 2 or 5)
+                if (StateMachine.State is Player.StDash or Player.StRedDash)
                 {
                     if (onGround && DuckFreeAt(Position + Vector2.UnitX * Math.Sign(Speed.X)))
                     {
@@ -2217,7 +2217,7 @@ namespace Celeste
                 }
                 if (DreamDashCheck(Vector2.UnitX * Math.Sign(Speed.X)))
                 {
-                    StateMachine.State = 9;
+                    StateMachine.State = Player.StDreamDash;
                     dashAttackTimer = 0.0f;
                     gliderBoostTimer = 0.0f;
                 }
@@ -2233,11 +2233,11 @@ namespace Celeste
                     Speed.X = 0.0f;
                     dashAttackTimer = 0.0f;
                     gliderBoostTimer = 0.0f;
-                    if (StateMachine.State != 5)
+                    if (StateMachine.State != Player.StRedDash)
                         return;
                     Input.Rumble(RumbleStrength.Medium, RumbleLength.Short);
                     level.Displacement.AddBurst(Center, 0.5f, 8f, 48f, 0.4f, Ease.QuadOut, Ease.QuadOut);
-                    StateMachine.State = 6;
+                    StateMachine.State = Player.StHitSquash;
                 }
             }
         }
@@ -2245,9 +2245,9 @@ namespace Celeste
         private void OnCollideV(CollisionData data)
         {
             canCurveDash = false;
-            if (StateMachine.State == 19)
+            if (StateMachine.State == Player.StStarFly)
             {
-                if (starFlyTimer < 0.20000000298023224)
+                if (starFlyTimer < 0.2f)
                 {
                     Speed.Y = 0.0f;
                 }
@@ -2258,13 +2258,13 @@ namespace Celeste
                     Speed.Y *= -0.5f;
                 }
             }
-            else if (StateMachine.State == 3)
+            else if (StateMachine.State == Player.StSwim)
             {
                 Speed.Y = 0.0f;
             }
             else
             {
-                if (StateMachine.State == 9)
+                if (StateMachine.State == Player.StDreamDash)
                     return;
                 if (data.Hit != null && data.Hit.OnDashCollide != null)
                 {
@@ -2285,7 +2285,7 @@ namespace Celeste
                                 return;
                         }
                     }
-                    else if (StateMachine.State == 10)
+                    else if (StateMachine.State == Player.StSummitLaunch)
                     {
                         int num = (int) data.Hit.OnDashCollide(this, data.Direction);
                         return;
@@ -2293,9 +2293,9 @@ namespace Celeste
                 }
                 if (Speed.Y > 0.0)
                 {
-                    if ((StateMachine.State == 2 || StateMachine.State == 5) && !dashStartedOnGround)
+                    if ((StateMachine.State == Player.StDash || StateMachine.State == Player.StRedDash) && !dashStartedOnGround)
                     {
-                        if (Speed.X <= 0.0099999997764825821)
+                        if (Speed.X <= 0.01f)
                         {
                             for (int index = -1; index >= -4; --index)
                             {
@@ -2307,7 +2307,7 @@ namespace Celeste
                                 }
                             }
                         }
-                        if (Speed.X >= -0.0099999997764825821)
+                        if (Speed.X >= -0.01f)
                         {
                             for (int index = 1; index <= 4; ++index)
                             {
@@ -2335,7 +2335,7 @@ namespace Celeste
                         Speed.X *= 1.2f;
                         Ducking = true;
                     }
-                    if (StateMachine.State != 1)
+                    if (StateMachine.State != Player.StClimb)
                     {
                         float amount = Math.Min(Speed.Y / 240f, 1f);
                         Sprite.Scale.X = MathHelper.Lerp(1f, 1.6f, amount);
@@ -2364,9 +2364,9 @@ namespace Celeste
                     if (Speed.Y < 0.0)
                     {
                         int num = 4;
-                        if (DashAttacking && Math.Abs(Speed.X) < 0.0099999997764825821)
+                        if (DashAttacking && Math.Abs(Speed.X) < 0.01f)
                             num = 5;
-                        if (Speed.X <= 0.0099999997764825821)
+                        if (Speed.X <= 0.01f)
                         {
                             for (int index = 1; index <= num; ++index)
                             {
@@ -2377,7 +2377,7 @@ namespace Celeste
                                 }
                             }
                         }
-                        if (Speed.X >= -0.0099999997764825821)
+                        if (Speed.X >= -0.01f)
                         {
                             for (int x = 1; x <= num; ++x)
                             {
@@ -2388,12 +2388,12 @@ namespace Celeste
                                 }
                             }
                         }
-                        if (varJumpTimer < 0.15000000596046448)
+                        if (varJumpTimer < 0.15f)
                             varJumpTimer = 0.0f;
                     }
                     if (DreamDashCheck(Vector2.UnitY * Math.Sign(Speed.Y)))
                     {
-                        StateMachine.State = 9;
+                        StateMachine.State = Player.StDreamDash;
                         dashAttackTimer = 0.0f;
                         gliderBoostTimer = 0.0f;
                         return;
@@ -2404,11 +2404,11 @@ namespace Celeste
                 dashAttackTimer = 0.0f;
                 gliderBoostTimer = 0.0f;
                 Speed.Y = 0.0f;
-                if (StateMachine.State != 5)
+                if (StateMachine.State != Player.StRedDash)
                     return;
                 Input.Rumble(RumbleStrength.Medium, RumbleLength.Short);
                 level.Displacement.AddBurst(Center, 0.5f, 8f, 48f, 0.4f, Ease.QuadOut, Ease.QuadOut);
-                StateMachine.State = 6;
+                StateMachine.State = Player.StHitSquash;
             }
         }
 
@@ -2636,24 +2636,24 @@ namespace Celeste
             }
             else
             {
-                float num1 = onGround ? 1f : 0.65f;
+                float groundFriction = onGround ? 1f : 0.65f;
                 if (onGround && level.CoreMode == Session.CoreModes.Cold)
-                    num1 *= 0.3f;
+                    groundFriction *= 0.3f;
                 if (SaveData.Instance.Assists.LowFriction && lowFrictionStopTimer <= 0.0)
-                    num1 *= onGround ? 0.35f : 0.5f;
-                float num2;
+                    groundFriction *= onGround ? 0.35f : 0.5f;
+                float targetSpeed;
                 if (Holding != null && Holding.SlowRun)
-                    num2 = 70f;
+                    targetSpeed = 70f;
                 else if (Holding != null && Holding.SlowFall && !onGround)
                 {
-                    num2 = 108.000008f;
-                    num1 *= 0.5f;
+                    targetSpeed = 108.000008f;
+                    groundFriction *= 0.5f;
                 }
                 else
-                    num2 = 90f;
+                    targetSpeed = 90f;
                 if (level.InSpace)
-                    num2 *= 0.6f;
-                Speed.X = Math.Abs(Speed.X) <= (double) num2 || Math.Sign(Speed.X) != moveX ? Calc.Approach(Speed.X, num2 * moveX, 1000f * num1 * Engine.DeltaTime) : Calc.Approach(Speed.X, num2 * moveX, 400f * num1 * Engine.DeltaTime);
+                    targetSpeed *= 0.6f;
+                Speed.X = Math.Abs(Speed.X) <= (double) targetSpeed || Math.Sign(Speed.X) != moveX ? Calc.Approach(Speed.X, targetSpeed * moveX, 1000f * groundFriction * Engine.DeltaTime) : Calc.Approach(Speed.X, targetSpeed * moveX, 400f * groundFriction * Engine.DeltaTime);
             }
             float target1 = 160f;
             float target2 = 240f;

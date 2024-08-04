@@ -11,8 +11,8 @@
 
         public Pnt(int x, int y)
         {
-            this.X = x;
-            this.Y = y;
+            X = x;
+            Y = y;
         }
 
         public static bool operator ==(Pnt a, Pnt b) => a.X == b.X && a.Y == b.Y;
@@ -45,8 +45,8 @@
 
         public override bool Equals(object obj) => false;
 
-        public override int GetHashCode() => this.X * 10000 + this.Y;
+        public override int GetHashCode() => X * 10000 + Y;
 
-        public override string ToString() => "{ X: " + (object) this.X + ", Y: " + (object) this.Y + " }";
+        public override string ToString() => "{ X: " + X + ", Y: " + Y + " }";
     }
 }

@@ -286,9 +286,9 @@ namespace Monocle
 
         public static Vector2 Range(this Random random, Vector2 min, Vector2 max) => min + new Vector2(random.NextFloat(max.X - min.X), random.NextFloat(max.Y - min.Y));
 
-        public static int Facing(this Random random) => (double) random.NextFloat() >= 0.5 ? 1 : -1;
+        public static int Facing(this Random random) => random.NextFloat() >= 0.5 ? 1 : -1;
 
-        public static bool Chance(this Random random, float chance) => (double) random.NextFloat() < (double) chance;
+        public static bool Chance(this Random random, float chance) => random.NextFloat() < (double) chance;
 
         public static float NextFloat(this Random random) => (float) random.NextDouble();
 
@@ -296,7 +296,7 @@ namespace Monocle
 
         public static float NextAngle(this Random random) => random.NextFloat() * 6.28318548f;
 
-        public static Vector2 ShakeVector(this Random random) => new(random.Choose<int>(shakeVectorOffsets), random.Choose<int>(shakeVectorOffsets));
+        public static Vector2 ShakeVector(this Random random) => new(random.Choose(shakeVectorOffsets), random.Choose(shakeVectorOffsets));
 
         public static Vector2 ClosestTo(this List<Vector2> list, Vector2 to)
         {
@@ -305,7 +305,7 @@ namespace Monocle
             for (int index = 1; index < list.Count; ++index)
             {
                 float num2 = Vector2.DistanceSquared(list[index], to);
-                if ((double) num2 < (double) num1)
+                if (num2 < (double) num1)
                 {
                     num1 = num2;
                     vector2 = list[index];
@@ -321,7 +321,7 @@ namespace Monocle
             for (int index = 1; index < list.Length; ++index)
             {
                 float num2 = Vector2.DistanceSquared(list[index], to);
-                if ((double) num2 < (double) num1)
+                if (num2 < (double) num1)
                 {
                     num1 = num2;
                     vector2 = list[index];
@@ -338,7 +338,7 @@ namespace Monocle
             for (int index1 = 1; index1 < list.Length; ++index1)
             {
                 float num2 = Vector2.DistanceSquared(list[index1], to);
-                if ((double) num2 < (double) num1)
+                if (num2 < (double) num1)
                 {
                     index = index1;
                     num1 = num2;
@@ -360,7 +360,7 @@ namespace Monocle
             }
         }
 
-        public static void Shuffle<T>(this List<T> list) => list.Shuffle<T>(Random);
+        public static void Shuffle<T>(this List<T> list) => list.Shuffle(Random);
 
         public static void ShuffleSetFirst<T>(this List<T> list, Random random, T first)
         {
@@ -370,12 +370,12 @@ namespace Monocle
                 list.Remove(first);
                 ++num;
             }
-            list.Shuffle<T>(random);
+            list.Shuffle(random);
             for (int index = 0; index < num; ++index)
                 list.Insert(0, first);
         }
 
-        public static void ShuffleSetFirst<T>(this List<T> list, T first) => list.ShuffleSetFirst<T>(Random, first);
+        public static void ShuffleSetFirst<T>(this List<T> list, T first) => list.ShuffleSetFirst(Random, first);
 
         public static void ShuffleNotFirst<T>(this List<T> list, Random random, T notFirst)
         {
@@ -385,12 +385,12 @@ namespace Monocle
                 list.Remove(notFirst);
                 ++num;
             }
-            list.Shuffle<T>(random);
+            list.Shuffle(random);
             for (int index = 0; index < num; ++index)
                 list.Insert(random.Next(list.Count - 1) + 1, notFirst);
         }
 
-        public static void ShuffleNotFirst<T>(this List<T> list, T notFirst) => list.ShuffleNotFirst<T>(Random, notFirst);
+        public static void ShuffleNotFirst<T>(this List<T> list, T notFirst) => list.ShuffleNotFirst(Random, notFirst);
 
         public static Color Invert(this Color color) => new(byte.MaxValue - color.R, byte.MaxValue - color.G, byte.MaxValue - color.B, color.A);
 
@@ -404,8 +404,8 @@ namespace Monocle
                 double r =  (HexToByte(hex[num1]) * 16 + HexToByte(hex[num1 + 1])) / (double) byte.MaxValue;
                 float num2 =  (HexToByte(hex[num1 + 2]) * 16 + HexToByte(hex[num1 + 3])) / (float) byte.MaxValue;
                 float num3 =  (HexToByte(hex[num1 + 4]) * 16 + HexToByte(hex[num1 + 5])) / (float) byte.MaxValue;
-                double g = (double) num2;
-                double b = (double) num3;
+                double g = num2;
+                double b = num3;
                 return new Color((float) r, (float) g, (float) b);
             }
             return int.TryParse(hex.Substring(num1), out int result) ? HexToColor(result) : Color.White;
@@ -421,7 +421,7 @@ namespace Monocle
 
         public static Color HsvToColor(float hue, float s, float v)
         {
-            int num1 = (int) ((double) hue * 360.0);
+            int num1 = (int) (hue * 360.0);
             float num2 = s * v;
             float num3 = num2 * (1f - Math.Abs((float) (num1 / 60.0 % 2.0 - 1.0)));
             float num4 = v - num2;
@@ -436,7 +436,7 @@ namespace Monocle
             return num1 < 300 ? new Color(num4 + num3, num4, num4 + num2) : new Color(num4 + num2, num4, num4 + num3);
         }
 
-        public static string ShortGameplayFormat(this TimeSpan time) => time.TotalHours >= 1.0 ? ((int) time.TotalHours).ToString() + ":" + time.ToString("mm\\:ss\\.fff") : time.ToString("m\\:ss\\.fff");
+        public static string ShortGameplayFormat(this TimeSpan time) => time.TotalHours >= 1.0 ? ((int) time.TotalHours) + ":" + time.ToString("mm\\:ss\\.fff") : time.ToString("m\\:ss\\.fff");
 
         public static string LongGameplayFormat(this TimeSpan time)
         {
@@ -463,9 +463,9 @@ namespace Monocle
 
         public static byte HexToByte(char c) => (byte) Hex.IndexOf(char.ToUpper(c));
 
-        public static float Percent(float num, float zeroAt, float oneAt) => MathHelper.Clamp((float) (((double) num - (double) zeroAt) / ((double) oneAt - (double) zeroAt)), 0.0f, 1f);
+        public static float Percent(float num, float zeroAt, float oneAt) => MathHelper.Clamp((float) ((num - (double) zeroAt) / (oneAt - (double) zeroAt)), 0.0f, 1f);
 
-        public static float SignThreshold(float value, float threshold) => (double) Math.Abs(value) >= (double) threshold ? Math.Sign(value) : 0.0f;
+        public static float SignThreshold(float value, float threshold) => Math.Abs(value) >= (double) threshold ? Math.Sign(value) : 0.0f;
 
         public static float Min(params float[] values)
         {
@@ -495,18 +495,18 @@ namespace Monocle
 
         public static float Clamp(float value, float min, float max) => Math.Min(Math.Max(value, min), max);
 
-        public static float YoYo(float value) => (double) value <= 0.5 ? value * 2f : (float) (1.0 - ((double) value - 0.5) * 2.0);
+        public static float YoYo(float value) => value <= 0.5 ? value * 2f : (float) (1.0 - (value - 0.5) * 2.0);
 
-        public static float Map(float val, float min, float max, float newMin = 0.0f, float newMax = 1f) => (float) (((double) val - (double) min) / ((double) max - (double) min) * ((double) newMax - (double) newMin)) + newMin;
+        public static float Map(float val, float min, float max, float newMin = 0.0f, float newMax = 1f) => (float) ((val - (double) min) / (max - (double) min) * (newMax - (double) newMin)) + newMin;
 
-        public static float SineMap(float counter, float newMin, float newMax) => Map((float) Math.Sin((double) counter), -1f, 1f, newMin, newMax);
+        public static float SineMap(float counter, float newMin, float newMax) => Map((float) Math.Sin(counter), -1f, 1f, newMin, newMax);
 
-        public static float ClampedMap(float val, float min, float max, float newMin = 0.0f, float newMax = 1f) => MathHelper.Clamp((float) (((double) val - (double) min) / ((double) max - (double) min)), 0.0f, 1f) * (newMax - newMin) + newMin;
+        public static float ClampedMap(float val, float min, float max, float newMin = 0.0f, float newMax = 1f) => MathHelper.Clamp((float) ((val - (double) min) / (max - (double) min)), 0.0f, 1f) * (newMax - newMin) + newMin;
 
         public static float LerpSnap(float value1, float value2, float amount, float snapThreshold = 0.1f)
         {
             float num = MathHelper.Lerp(value1, value2, amount);
-            return (double) Math.Abs(num - value2) < (double) snapThreshold ? value2 : num;
+            return Math.Abs(num - value2) < (double) snapThreshold ? value2 : num;
         }
 
         public static float LerpClamp(float value1, float value2, float lerp) => MathHelper.Lerp(value1, value2, MathHelper.Clamp(lerp, 0.0f, 1f));
@@ -518,7 +518,7 @@ namespace Monocle
             float snapThresholdSq = 0.1f)
         {
             Vector2 vector2 = Vector2.Lerp(value1, value2, amount);
-            return (double) (vector2 - value2).LengthSquared() < (double) snapThresholdSq ? value2 : vector2;
+            return (vector2 - value2).LengthSquared() < (double) snapThresholdSq ? value2 : vector2;
         }
 
         public static Vector2 Sign(this Vector2 vec) => new(Math.Sign(vec.X), Math.Sign(vec.Y));
@@ -545,7 +545,7 @@ namespace Monocle
 
         public static Vector2 TurnRight(this Vector2 vec) => new(-vec.Y, vec.X);
 
-        public static float ReflectAngle(float angle, float axis = 0.0f) => (float) -((double) angle + (double) axis) - axis;
+        public static float ReflectAngle(float angle, float axis = 0.0f) => (float) -(angle + (double) axis) - axis;
 
         public static float ReflectAngle(float angleRadians, Vector2 axis) => ReflectAngle(angleRadians, axis.Angle());
 
@@ -561,32 +561,32 @@ namespace Monocle
 
         public static Vector2 Round(this Vector2 vec) => new((float) Math.Round(vec.X), (float) Math.Round(vec.Y));
 
-        public static float Snap(float value, float increment) => (float) Math.Round((double) value / (double) increment) * increment;
+        public static float Snap(float value, float increment) => (float) Math.Round(value / (double) increment) * increment;
 
-        public static float Snap(float value, float increment, float offset) => (float) Math.Round(((double) value - (double) offset) / (double) increment) * increment + offset;
+        public static float Snap(float value, float increment, float offset) => (float) Math.Round((value - (double) offset) / increment) * increment + offset;
 
         public static float WrapAngleDeg(float angleDegrees) => (float) (((double) angleDegrees * Math.Sign(angleDegrees) + 180.0) % 360.0 - 180.0) * Math.Sign(angleDegrees);
 
         public static float WrapAngle(float angleRadians) => (float) (((double) angleRadians * Math.Sign(angleRadians) + 3.1415927410125732) % 6.2831854820251465 - 3.1415927410125732) * Math.Sign(angleRadians);
 
-        public static Vector2 AngleToVector(float angleRadians, float length) => new((float) Math.Cos((double) angleRadians) * length, (float) Math.Sin((double) angleRadians) * length);
+        public static Vector2 AngleToVector(float angleRadians, float length) => new((float) Math.Cos(angleRadians) * length, (float) Math.Sin(angleRadians) * length);
 
         public static float AngleApproach(float val, float target, float maxMove)
         {
             float num = AngleDiff(val, target);
-            return (double) Math.Abs(num) < (double) maxMove ? target : val + MathHelper.Clamp(num, -maxMove, maxMove);
+            return Math.Abs(num) < (double) maxMove ? target : val + MathHelper.Clamp(num, -maxMove, maxMove);
         }
 
         public static float AngleLerp(float startAngle, float endAngle, float percent) => startAngle + AngleDiff(startAngle, endAngle) * percent;
 
-        public static float Approach(float val, float target, float maxMove) => (double) val <= (double) target ? Math.Min(val + maxMove, target) : Math.Max(val - maxMove, target);
+        public static float Approach(float val, float target, float maxMove) => val <= (double) target ? Math.Min(val + maxMove, target) : Math.Max(val - maxMove, target);
 
         public static float AngleDiff(float radiansA, float radiansB)
         {
             float num = radiansB - radiansA;
-            while ((double) num > 3.1415927410125732)
+            while (num > 3.1415927410125732)
                 num -= 6.28318548f;
-            while ((double) num <= -3.1415927410125732)
+            while (num <= -3.1415927410125732)
                 num += 6.28318548f;
             return num;
         }
@@ -599,7 +599,7 @@ namespace Monocle
 
         public static Color ToggleColors(Color current, Color a, Color b) => current == a ? b : a;
 
-        public static float ShorterAngleDifference(float currentAngle, float angleA, float angleB) => (double) Math.Abs(AngleDiff(currentAngle, angleA)) < (double) Math.Abs(AngleDiff(currentAngle, angleB)) ? angleA : angleB;
+        public static float ShorterAngleDifference(float currentAngle, float angleA, float angleB) => Math.Abs(Calc.AngleDiff(currentAngle, angleA)) < (double) Math.Abs(AngleDiff(currentAngle, angleB)) ? angleA : angleB;
 
         public static float ShorterAngleDifference(
             float currentAngle,
@@ -607,7 +607,7 @@ namespace Monocle
             float angleB,
             float angleC)
         {
-            return (double) Math.Abs(AngleDiff(currentAngle, angleA)) < (double) Math.Abs(AngleDiff(currentAngle, angleB)) ? ShorterAngleDifference(currentAngle, angleA, angleC) : ShorterAngleDifference(currentAngle, angleB, angleC);
+            return Math.Abs(Calc.AngleDiff(currentAngle, angleA)) < (double) Math.Abs(AngleDiff(currentAngle, angleB)) ? ShorterAngleDifference(currentAngle, angleA, angleC) : ShorterAngleDifference(currentAngle, angleB, angleC);
         }
 
         public static bool IsInRange<T>(this T[] array, int index) => index >= 0 && index < array.Length;
@@ -632,7 +632,7 @@ namespace Monocle
         {
             array = array.VerifyLength(length0);
             for (int index = 0; index < array.Length; ++index)
-                array[index] = array[index].VerifyLength<T>(length1);
+                array[index] = array[index].VerifyLength(length1);
             return array;
         }
 
@@ -666,10 +666,10 @@ namespace Monocle
 
         public static Vector2 Approach(Vector2 val, Vector2 target, float maxMove)
         {
-            if ((double) maxMove == 0.0 || val == target)
+            if (maxMove == 0.0 || val == target)
                 return val;
             Vector2 vector2 = target - val;
-            if ((double) vector2.Length() < (double) maxMove)
+            if (vector2.Length() < (double) maxMove)
                 return target;
             vector2.Normalize();
             return val + vector2 * maxMove;
@@ -679,9 +679,9 @@ namespace Monocle
         {
             if (vec == Vector2.Zero)
                 return Vector2.Zero;
-            vec = AngleToVector((float) Math.Floor(((double) vec.Angle() + 0.78539818525314331) / 1.5707963705062866) * 1.57079637f, 1f);
-            vec.X = (double) Math.Abs(vec.X) >= 0.5 ? Math.Sign(vec.X) : 0.0f;
-            vec.Y = (double) Math.Abs(vec.Y) >= 0.5 ? Math.Sign(vec.Y) : 0.0f;
+            vec = AngleToVector((float) Math.Floor((vec.Angle() + 0.78539818525314331) / 1.5707963705062866) * 1.57079637f, 1f);
+            vec.X = Math.Abs(vec.X) >= 0.5 ? Math.Sign(vec.X) : 0.0f;
+            vec.Y = Math.Abs(vec.Y) >= 0.5 ? Math.Sign(vec.Y) : 0.0f;
             return vec;
         }
 
@@ -689,10 +689,10 @@ namespace Monocle
         {
             if (vec == Vector2.Zero)
                 return Vector2.Zero;
-            vec = AngleToVector((float) Math.Floor(((double) vec.Angle() + 0.39269909262657166) / 0.78539818525314331) * 0.7853982f, 1f);
-            if ((double) Math.Abs(vec.X) < 0.5)
+            vec = AngleToVector((float) Math.Floor((vec.Angle() + 0.39269909262657166) / 0.78539818525314331) * 0.7853982f, 1f);
+            if (Math.Abs(vec.X) < 0.5)
                 vec.X = 0.0f;
-            else if ((double) Math.Abs(vec.Y) < 0.5)
+            else if (Math.Abs(vec.Y) < 0.5)
                 vec.Y = 0.0f;
             return vec;
         }
@@ -700,13 +700,13 @@ namespace Monocle
         public static Vector2 SnappedNormal(this Vector2 vec, float slices)
         {
             float num = 6.28318548f / slices;
-            return AngleToVector((float) Math.Floor(((double) vec.Angle() + (double) num / 2.0) / (double) num) * num, 1f);
+            return AngleToVector((float) Math.Floor((vec.Angle() + num / 2.0) / num) * num, 1f);
         }
 
         public static Vector2 Snapped(this Vector2 vec, float slices)
         {
             float num = 6.28318548f / slices;
-            return AngleToVector((float) Math.Floor(((double) vec.Angle() + (double) num / 2.0) / (double) num) * num, vec.Length());
+            return AngleToVector((float) Math.Floor((vec.Angle() + num / 2.0) / num) * num, vec.Length());
         }
 
         public static Vector2 XComp(this Vector2 vec) => Vector2.UnitX * vec.X;
@@ -741,11 +741,11 @@ namespace Monocle
             float maxRotationRadians)
         {
             Vector3 vector3 = Vector3.Cross(from, target);
-            double num1 = (double) from.Length();
+            double num1 = from.Length();
             float num2 = target.Length();
-            float w = (float) Math.Sqrt(num1 * num1 * ((double) num2 * (double) num2)) + Vector3.Dot(from, target);
+            float w = (float) Math.Sqrt(num1 * num1 * (num2 * (double) num2)) + Vector3.Dot(from, target);
             Quaternion quaternion = new(vector3.X, vector3.Y, vector3.Z, w);
-            if ((double) quaternion.Length() <= (double) maxRotationRadians)
+            if (quaternion.Length() <= (double) maxRotationRadians)
                 return target;
             quaternion.Normalize();
             Quaternion rotation = quaternion * maxRotationRadians;
@@ -754,12 +754,12 @@ namespace Monocle
 
         public static Vector2 XZ(this Vector3 vector) => new(vector.X, vector.Z);
 
-        public static Vector3 Approach(this Vector3 v, Vector3 target, float amount) => (double) amount > (double) (target - v).Length() ? target : v + (target - v).SafeNormalize() * amount;
+        public static Vector3 Approach(this Vector3 v, Vector3 target, float amount) => amount > (double) (target - v).Length() ? target : v + (target - v).SafeNormalize() * amount;
 
         public static Vector3 SafeNormalize(this Vector3 v)
         {
             float num = v.Length();
-            return (double) num > 0.0 ? v / num : Vector3.Zero;
+            return num > 0.0 ? v / num : Vector3.Zero;
         }
 
         public static int[,] ReadCSVIntGrid(string csv, int width, int height)
@@ -861,7 +861,7 @@ namespace Monocle
                 }
                 if (values.Count > 0)
                 {
-                    stringBuilder.Append(string.Join<int>(",", values));
+                    stringBuilder.Append(string.Join(",", values));
                     values.Clear();
                 }
                 ++num1;
@@ -879,7 +879,7 @@ namespace Monocle
                 else if (data[index] == rowSep)
                     break;
             }
-            int length2 = data.Count<char>(c => c == '\n') + 1;
+            int length2 = data.Count(c => c == '\n') + 1;
             bool[,] bitData = new bool[length1, length2];
             int index1 = 0;
             int index2 = 0;
@@ -1180,9 +1180,9 @@ namespace Monocle
 
         public static Vector2 FirstNode(this XmlElement xml) => xml["node"] == null ? Vector2.Zero : new Vector2((int)xml["node"].AttrFloat("x"), (int)xml["node"].AttrFloat("y"));
 
-        public static Vector2? FirstNodeNullable(this XmlElement xml) => xml["node"] == null ? new Vector2?() : new Vector2?(new Vector2((int)xml["node"].AttrFloat("x"), (int)xml["node"].AttrFloat("y")));
+        public static Vector2? FirstNodeNullable(this XmlElement xml) => xml["node"] == null ? new Vector2?() : new Vector2((int)xml["node"].AttrFloat("x"), (int)xml["node"].AttrFloat("y"));
 
-        public static Vector2? FirstNodeNullable(this XmlElement xml, Vector2 offset) => xml["node"] == null ? new Vector2?() : new Vector2?(new Vector2((int)xml["node"].AttrFloat("x"), (int)xml["node"].AttrFloat("y")) + offset);
+        public static Vector2? FirstNodeNullable(this XmlElement xml, Vector2 offset) => xml["node"] == null ? new Vector2?() : new Vector2((int)xml["node"].AttrFloat("x"), (int)xml["node"].AttrFloat("y")) + offset;
 
         public static Vector2[] Nodes(this XmlElement xml, bool includePosition = false)
         {
@@ -1220,7 +1220,7 @@ namespace Monocle
 
         public static Vector2 GetNode(this XmlElement xml, int nodeNum) => xml.Nodes()[nodeNum];
 
-        public static Vector2? GetNodeNullable(this XmlElement xml, int nodeNum) => xml.Nodes().Length > nodeNum ? new Vector2?(xml.Nodes()[nodeNum]) : new Vector2?();
+        public static Vector2? GetNodeNullable(this XmlElement xml, int nodeNum) => xml.Nodes().Length > nodeNum ? xml.Nodes()[nodeNum] : new Vector2?();
 
         public static void SetAttr(this XmlElement xml, string attributeName, object setTo)
         {
@@ -1266,13 +1266,13 @@ namespace Monocle
             return element;
         }
 
-        public static int SortLeftToRight(Entity a, Entity b) => (int) (((double) a.X - (double) b.X) * 100.0);
+        public static int SortLeftToRight(Entity a, Entity b) => (int) ((a.X - (double) b.X) * 100.0);
 
-        public static int SortRightToLeft(Entity a, Entity b) => (int) (((double) b.X - (double) a.X) * 100.0);
+        public static int SortRightToLeft(Entity a, Entity b) => (int) ((b.X - (double) a.X) * 100.0);
 
-        public static int SortTopToBottom(Entity a, Entity b) => (int) (((double) a.Y - (double) b.Y) * 100.0);
+        public static int SortTopToBottom(Entity a, Entity b) => (int) ((a.Y - (double) b.Y) * 100.0);
 
-        public static int SortBottomToTop(Entity a, Entity b) => (int) (((double) b.Y - (double) a.Y) * 100.0);
+        public static int SortBottomToTop(Entity a, Entity b) => (int) ((b.Y - (double) a.Y) * 100.0);
 
         public static int SortByDepth(Entity a, Entity b) => a.Depth - b.Depth;
 

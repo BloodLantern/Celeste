@@ -10,33 +10,33 @@ namespace Monocle
 
         internal TagLists()
         {
-            this.lists = new List<Entity>[BitTag.TotalTags];
-            this.unsorted = new bool[BitTag.TotalTags];
-            for (int index = 0; index < this.lists.Length; ++index)
-                this.lists[index] = new List<Entity>();
+            lists = new List<Entity>[BitTag.TotalTags];
+            unsorted = new bool[BitTag.TotalTags];
+            for (int index = 0; index < lists.Length; ++index)
+                lists[index] = new List<Entity>();
         }
 
-        public List<Entity> this[int index] => this.lists[index];
+        public List<Entity> this[int index] => lists[index];
 
         internal void MarkUnsorted(int index)
         {
-            this.areAnyUnsorted = true;
-            this.unsorted[index] = true;
+            areAnyUnsorted = true;
+            unsorted[index] = true;
         }
 
         internal void UpdateLists()
         {
-            if (!this.areAnyUnsorted)
+            if (!areAnyUnsorted)
                 return;
-            for (int index = 0; index < this.lists.Length; ++index)
+            for (int index = 0; index < lists.Length; ++index)
             {
-                if (this.unsorted[index])
+                if (unsorted[index])
                 {
-                    this.lists[index].Sort(EntityList.CompareDepth);
-                    this.unsorted[index] = false;
+                    lists[index].Sort(EntityList.CompareDepth);
+                    unsorted[index] = false;
                 }
             }
-            this.areAnyUnsorted = false;
+            areAnyUnsorted = false;
         }
 
         internal void EntityAdded(Entity entity)
@@ -46,8 +46,8 @@ namespace Monocle
                 if (entity.TagCheck(1 << index))
                 {
                     this[index].Add(entity);
-                    this.areAnyUnsorted = true;
-                    this.unsorted[index] = true;
+                    areAnyUnsorted = true;
+                    unsorted[index] = true;
                 }
             }
         }
@@ -57,7 +57,7 @@ namespace Monocle
             for (int index = 0; index < BitTag.TotalTags; ++index)
             {
                 if (entity.TagCheck(1 << index))
-                    this.lists[index].Remove(entity);
+                    lists[index].Remove(entity);
             }
         }
     }

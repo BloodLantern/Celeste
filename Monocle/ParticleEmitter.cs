@@ -23,12 +23,12 @@ namespace Monocle
             float interval)
             : base(true, false)
         {
-            this.System = system;
-            this.Type = type;
-            this.Position = position;
-            this.Range = range;
-            this.Amount = amount;
-            this.Interval = interval;
+            System = system;
+            Type = type;
+            Position = position;
+            Range = range;
+            Amount = amount;
+            Interval = interval;
         }
 
         public ParticleEmitter(
@@ -41,7 +41,7 @@ namespace Monocle
             float interval)
             : this(system, type, position, range, amount, interval)
         {
-            this.Direction = new float?(direction);
+            Direction = direction;
         }
 
         public ParticleEmitter(
@@ -55,47 +55,47 @@ namespace Monocle
             float interval)
             : this(system, type, position, range, amount, interval)
         {
-            this.Direction = new float?(direction);
-            this.Track = track;
+            Direction = direction;
+            Track = track;
         }
 
-        public void SimulateCycle() => this.Simulate(this.Type.LifeMax);
+        public void SimulateCycle() => Simulate(Type.LifeMax);
 
         public void Simulate(float duration)
         {
-            float num = duration / this.Interval;
-            for (int index1 = 0; (double) index1 < (double) num; ++index1)
+            float num = duration / Interval;
+            for (int index1 = 0; index1 < (double) num; ++index1)
             {
-                for (int index2 = 0; index2 < this.Amount; ++index2)
+                for (int index2 = 0; index2 < Amount; ++index2)
                 {
                     Particle particle = new Particle();
-                    Vector2 position = this.Entity.Position + this.Position + Calc.Random.Range(-this.Range, this.Range);
-                    particle = (!this.Direction.HasValue ? this.Type.Create(ref particle, position) : this.Type.Create(ref particle, position, this.Direction.Value)) with
+                    Vector2 position = Entity.Position + Position + Calc.Random.Range(-Range, Range);
+                    particle = (!Direction.HasValue ? Type.Create(ref particle, position) : Type.Create(ref particle, position, Direction.Value)) with
                     {
-                        Track = this.Track
+                        Track = Track
                     };
-                    float duration1 = duration - this.Interval * (float) index1;
+                    float duration1 = duration - Interval * index1;
                     if (particle.SimulateFor(duration1))
-                        this.System.Add(particle);
+                        System.Add(particle);
                 }
             }
         }
 
         public void Emit()
         {
-            if (this.Direction.HasValue)
-                this.System.Emit(this.Type, this.Amount, this.Entity.Position + this.Position, this.Range, this.Direction.Value);
+            if (Direction.HasValue)
+                System.Emit(Type, Amount, Entity.Position + Position, Range, Direction.Value);
             else
-                this.System.Emit(this.Type, this.Amount, this.Entity.Position + this.Position, this.Range);
+                System.Emit(Type, Amount, Entity.Position + Position, Range);
         }
 
         public override void Update()
         {
-            this.timer -= Engine.DeltaTime;
-            if ((double) this.timer > 0.0)
+            timer -= Engine.DeltaTime;
+            if (timer > 0.0)
                 return;
-            this.timer = this.Interval;
-            this.Emit();
+            timer = Interval;
+            Emit();
         }
     }
 }

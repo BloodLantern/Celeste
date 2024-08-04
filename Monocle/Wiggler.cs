@@ -112,14 +112,14 @@ namespace Monocle
                 sineCounter += sineAdd * Engine.DeltaTime;
                 Counter -= increment * Engine.DeltaTime;
             }
-            if ((double)Counter <= 0.0)
+            if (Counter <= 0.0)
             {
                 Counter = 0.0f;
                 Active = false;
                 if (removeSelfOnFinish)
                     RemoveSelf();
             }
-            Value = (float)Math.Cos((double)sineCounter) * Counter;
+            Value = (float)Math.Cos(sineCounter) * Counter;
             if (onChange == null)
                 return;
             onChange(Value);

@@ -7,8 +7,8 @@ namespace Monocle
     {
         private SpriteFont font;
         private string text;
-        private Text.HorizontalAlign horizontalOrigin;
-        private Text.VerticalAlign verticalOrigin;
+        private HorizontalAlign horizontalOrigin;
+        private VerticalAlign verticalOrigin;
         private Vector2 size;
 
         public Text(
@@ -16,97 +16,97 @@ namespace Monocle
             string text,
             Vector2 position,
             Color color,
-            Text.HorizontalAlign horizontalAlign = Text.HorizontalAlign.Center,
-            Text.VerticalAlign verticalAlign = Text.VerticalAlign.Center)
+            HorizontalAlign horizontalAlign = HorizontalAlign.Center,
+            VerticalAlign verticalAlign = VerticalAlign.Center)
             : base(false)
         {
             this.font = font;
             this.text = text;
-            this.Position = position;
-            this.Color = color;
-            this.horizontalOrigin = horizontalAlign;
-            this.verticalOrigin = verticalAlign;
-            this.UpdateSize();
+            Position = position;
+            Color = color;
+            horizontalOrigin = horizontalAlign;
+            verticalOrigin = verticalAlign;
+            UpdateSize();
         }
 
         public Text(
             SpriteFont font,
             string text,
             Vector2 position,
-            Text.HorizontalAlign horizontalAlign = Text.HorizontalAlign.Center,
-            Text.VerticalAlign verticalAlign = Text.VerticalAlign.Center)
+            HorizontalAlign horizontalAlign = HorizontalAlign.Center,
+            VerticalAlign verticalAlign = VerticalAlign.Center)
             : this(font, text, position, Color.White, horizontalAlign, verticalAlign)
         {
         }
 
         public SpriteFont Font
         {
-            get => this.font;
+            get => font;
             set
             {
-                this.font = value;
-                this.UpdateSize();
+                font = value;
+                UpdateSize();
             }
         }
 
         public string DrawText
         {
-            get => this.text;
+            get => text;
             set
             {
-                this.text = value;
-                this.UpdateSize();
+                text = value;
+                UpdateSize();
             }
         }
 
-        public Text.HorizontalAlign HorizontalOrigin
+        public HorizontalAlign HorizontalOrigin
         {
-            get => this.horizontalOrigin;
+            get => horizontalOrigin;
             set
             {
-                this.horizontalOrigin = value;
-                this.UpdateCentering();
+                horizontalOrigin = value;
+                UpdateCentering();
             }
         }
 
-        public Text.VerticalAlign VerticalOrigin
+        public VerticalAlign VerticalOrigin
         {
-            get => this.verticalOrigin;
+            get => verticalOrigin;
             set
             {
-                this.verticalOrigin = value;
-                this.UpdateCentering();
+                verticalOrigin = value;
+                UpdateCentering();
             }
         }
 
-        public float Width => this.size.X;
+        public float Width => size.X;
 
-        public float Height => this.size.Y;
+        public float Height => size.Y;
 
         private void UpdateSize()
         {
-            this.size = this.font.MeasureString(this.text);
-            this.UpdateCentering();
+            size = font.MeasureString(text);
+            UpdateCentering();
         }
 
         private void UpdateCentering()
         {
-            if (this.horizontalOrigin == Text.HorizontalAlign.Left)
-                this.Origin.X = 0.0f;
-            else if (this.horizontalOrigin == Text.HorizontalAlign.Center)
-                this.Origin.X = this.size.X / 2f;
+            if (horizontalOrigin == HorizontalAlign.Left)
+                Origin.X = 0.0f;
+            else if (horizontalOrigin == HorizontalAlign.Center)
+                Origin.X = size.X / 2f;
             else
-                this.Origin.X = this.size.X;
-            if (this.verticalOrigin == Text.VerticalAlign.Top)
-                this.Origin.Y = 0.0f;
-            else if (this.verticalOrigin == Text.VerticalAlign.Center)
-                this.Origin.Y = this.size.Y / 2f;
+                Origin.X = size.X;
+            if (verticalOrigin == VerticalAlign.Top)
+                Origin.Y = 0.0f;
+            else if (verticalOrigin == VerticalAlign.Center)
+                Origin.Y = size.Y / 2f;
             else
-                this.Origin.Y = this.size.Y;
-            this.Origin = this.Origin.Floor();
+                Origin.Y = size.Y;
+            Origin = Origin.Floor();
         }
 
-        public override void Render() => Draw.SpriteBatch.DrawString(this.font, this.text, this.RenderPosition, this.Color, this.Rotation, this.Origin, this.Scale, this.Effects, 0.0f);
+        public override void Render() => Draw.SpriteBatch.DrawString(font, text, RenderPosition, Color, Rotation, Origin, Scale, Effects, 0.0f);
 
         public enum HorizontalAlign
         {

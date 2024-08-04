@@ -112,7 +112,9 @@ namespace Monocle
                     currentCoroutine.Replace(coroutines[state]());
                 }
                 else
+                {
                     currentCoroutine.Cancel();
+                }
             }
         }
 

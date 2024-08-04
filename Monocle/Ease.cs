@@ -85,7 +85,7 @@ namespace Monocle
 
         public static Easer Invert(Easer easer) => t => 1f - easer(1f - t);
 
-        public static Easer Follow(Easer first, Easer second) => t => t > 0.5f ? (float) (second((float) (t * 2f - 1f)) / 2f + 0.5f) : first(t * 2f) / 2f;
+        public static Easer Follow(Easer first, Easer second) => t => t > 0.5f ? second(t * 2f - 1f) / 2f + 0.5f : first(t * 2f) / 2f;
 
         public static float UpDown(float eased) => eased <= 0.5f ? eased * 2f : (float) (1f - (eased - 0.5) * 2f);
 

@@ -9,100 +9,100 @@ namespace Monocle
         private const float DELTA_TIME = 0.0166666675f;
         private SpriteFont font;
         private int frames;
-        private TimerText.TimerModes timerMode;
+        private TimerModes timerMode;
         private Vector2 justify;
         public Action OnComplete;
-        public TimerText.CountModes CountMode;
+        public CountModes CountMode;
 
         public string Text { get; private set; }
 
         public TimerText(
             SpriteFont font,
-            TimerText.TimerModes mode,
-            TimerText.CountModes countMode,
+            TimerModes mode,
+            CountModes countMode,
             int frames,
             Vector2 justify,
             Action onComplete = null)
             : base(true)
         {
             this.font = font;
-            this.timerMode = mode;
-            this.CountMode = countMode;
+            timerMode = mode;
+            CountMode = countMode;
             this.frames = frames;
             this.justify = justify;
-            this.OnComplete = onComplete;
-            this.UpdateText();
-            this.CalculateOrigin();
+            OnComplete = onComplete;
+            UpdateText();
+            CalculateOrigin();
         }
 
         private void UpdateText()
         {
-            if (this.timerMode != TimerText.TimerModes.SecondsMilliseconds)
+            if (timerMode != TimerModes.SecondsMilliseconds)
                 return;
-            this.Text = ((float) (this.frames / 60) + (float) (this.frames % 60) * 0.0166666675f).ToString("0.00");
+            Text = (frames / 60 + frames % 60 * 0.0166666675f).ToString("0.00");
         }
 
-        private void CalculateOrigin() => this.Origin = (this.font.MeasureString(this.Text) * this.justify).Floor();
+        private void CalculateOrigin() => Origin = (font.MeasureString(Text) * justify).Floor();
 
         public override void Update()
         {
             base.Update();
-            if (this.CountMode == TimerText.CountModes.Down)
+            if (CountMode == CountModes.Down)
             {
-                if (this.frames <= 0)
+                if (frames <= 0)
                     return;
-                --this.frames;
-                if (this.frames == 0 && this.OnComplete != null)
-                    this.OnComplete();
-                this.UpdateText();
-                this.CalculateOrigin();
+                --frames;
+                if (frames == 0 && OnComplete != null)
+                    OnComplete();
+                UpdateText();
+                CalculateOrigin();
             }
             else
             {
-                ++this.frames;
-                this.UpdateText();
-                this.CalculateOrigin();
+                ++frames;
+                UpdateText();
+                CalculateOrigin();
             }
         }
 
-        public override void Render() => Draw.SpriteBatch.DrawString(this.font, this.Text, this.RenderPosition, this.Color, this.Rotation, this.Origin, this.Scale, this.Effects, 0.0f);
+        public override void Render() => Draw.SpriteBatch.DrawString(font, Text, RenderPosition, Color, Rotation, Origin, Scale, Effects, 0.0f);
 
         public SpriteFont Font
         {
-            get => this.font;
+            get => font;
             set
             {
-                this.font = value;
-                this.CalculateOrigin();
+                font = value;
+                CalculateOrigin();
             }
         }
 
         public int Frames
         {
-            get => this.frames;
+            get => frames;
             set
             {
-                if (this.frames == value)
+                if (frames == value)
                     return;
-                this.frames = value;
-                this.UpdateText();
-                this.CalculateOrigin();
+                frames = value;
+                UpdateText();
+                CalculateOrigin();
             }
         }
 
         public Vector2 Justify
         {
-            get => this.justify;
+            get => justify;
             set
             {
-                this.justify = value;
-                this.CalculateOrigin();
+                justify = value;
+                CalculateOrigin();
             }
         }
 
-        public float Width => this.font.MeasureString(this.Text).X;
+        public float Width => font.MeasureString(Text).X;
 
-        public float Height => this.font.MeasureString(this.Text).Y;
+        public float Height => font.MeasureString(Text).Y;
 
         public enum CountModes
         {

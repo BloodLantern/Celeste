@@ -19,7 +19,7 @@ namespace Monocle
         public static void Store<T>(T instance) where T : Entity, new()
         {
             Cache.Init<T>();
-            Cache.cache[typeof (T)].Push((Entity) instance);
+            Cache.cache[typeof (T)].Push(instance);
         }
 
         public static T Create<T>() where T : Entity, new()

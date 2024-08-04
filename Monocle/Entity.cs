@@ -666,7 +666,7 @@ namespace Monocle
             for (int index = 1; index < entities.Length; ++index)
             {
                 float num2 = Vector2.DistanceSquared(Position, entities[index].Position);
-                if ((double) num2 < (double) num1)
+                if (num2 < (double) num1)
                 {
                     entity = entities[index];
                     num1 = num2;
@@ -686,7 +686,7 @@ namespace Monocle
                 for (int index = 1; index < entityList.Count; ++index)
                 {
                     float num2 = Vector2.DistanceSquared(Position, entityList[index].Position);
-                    if ((double) num2 < (double) num1)
+                    if (num2 < (double) num1)
                     {
                         entity = entityList[index];
                         num1 = num2;

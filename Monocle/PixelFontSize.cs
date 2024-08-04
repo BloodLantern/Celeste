@@ -18,85 +18,85 @@ namespace Monocle
         {
             if (string.IsNullOrEmpty(text))
                 return text;
-            this.temp.Clear();
+            temp.Clear();
             string[] strArray = Regex.Split(text, "(\\s)");
             float num1 = 0.0f;
             foreach (string text1 in strArray)
             {
-                float x = this.Measure(text1).X;
-                if ((double) x + (double) num1 > (double) width)
+                float x = Measure(text1).X;
+                if (x + (double) num1 > width)
                 {
-                    this.temp.Append('\n');
+                    temp.Append('\n');
                     num1 = 0.0f;
                     if (text1.Equals(" "))
                         continue;
                 }
-                if ((double) x > (double) width)
+                if (x > (double) width)
                 {
                     int num2 = 1;
                     int startIndex = 0;
                     for (; num2 < text1.Length; ++num2)
                     {
-                        if (num2 - startIndex > 1 && (double) this.Measure(text1.Substring(startIndex, num2 - startIndex - 1)).X > (double) width)
+                        if (num2 - startIndex > 1 && Measure(text1.Substring(startIndex, num2 - startIndex - 1)).X > (double) width)
                         {
-                            this.temp.Append(text1.Substring(startIndex, num2 - startIndex - 1));
-                            this.temp.Append('\n');
+                            temp.Append(text1.Substring(startIndex, num2 - startIndex - 1));
+                            temp.Append('\n');
                             startIndex = num2 - 1;
                         }
                     }
                     string text2 = text1.Substring(startIndex, text1.Length - startIndex);
-                    this.temp.Append(text2);
-                    num1 += this.Measure(text2).X;
+                    temp.Append(text2);
+                    num1 += Measure(text2).X;
                 }
                 else
                 {
                     num1 += x;
-                    this.temp.Append(text1);
+                    temp.Append(text1);
                 }
             }
-            return this.temp.ToString();
+            return temp.ToString();
         }
 
         public PixelFontCharacter Get(int id)
         {
-            PixelFontCharacter pixelFontCharacter = (PixelFontCharacter) null;
-            return this.Characters.TryGetValue(id, out pixelFontCharacter) ? pixelFontCharacter : (PixelFontCharacter) null;
+            PixelFontCharacter pixelFontCharacter = null;
+            return Characters.TryGetValue(id, out pixelFontCharacter) ? pixelFontCharacter : null;
         }
 
         public Vector2 Measure(char text)
         {
-            PixelFontCharacter pixelFontCharacter = (PixelFontCharacter) null;
-            return this.Characters.TryGetValue((int) text, out pixelFontCharacter) ? new Vector2((float) pixelFontCharacter.XAdvance, (float) this.LineHeight) : Vector2.Zero;
+            PixelFontCharacter pixelFontCharacter = null;
+            return Characters.TryGetValue(text, out pixelFontCharacter) ? new Vector2(pixelFontCharacter.XAdvance, LineHeight) : Vector2.Zero;
         }
 
         public Vector2 Measure(string text)
         {
             if (string.IsNullOrEmpty(text))
                 return Vector2.Zero;
-            Vector2 vector2 = new Vector2(0.0f, (float) this.LineHeight);
+            Vector2 vector2 = new Vector2(0.0f, LineHeight);
             float num1 = 0.0f;
             for (int index = 0; index < text.Length; ++index)
             {
                 if (text[index] == '\n')
                 {
-                    vector2.Y += (float) this.LineHeight;
-                    if ((double) num1 > (double) vector2.X)
+                    vector2.Y += LineHeight;
+                    if (num1 > (double) vector2.X)
                         vector2.X = num1;
                     num1 = 0.0f;
                 }
                 else
                 {
-                    PixelFontCharacter pixelFontCharacter = (PixelFontCharacter) null;
-                    if (this.Characters.TryGetValue((int) text[index], out pixelFontCharacter))
+                    PixelFontCharacter pixelFontCharacter = null;
+                    if (Characters.TryGetValue(text[index], out pixelFontCharacter))
                     {
-                        num1 += (float) pixelFontCharacter.XAdvance;
+                        num1 += pixelFontCharacter.XAdvance;
                         int num2;
-                        if (index < text.Length - 1 && pixelFontCharacter.Kerning.TryGetValue((int) text[index + 1], out num2))
-                            num1 += (float) num2;
+                        if (index < text.Length - 1 && pixelFontCharacter.Kerning.TryGetValue(text[index + 1], out num2))
+                            num1 += num2;
                     }
                 }
             }
-            if ((double) num1 > (double) vector2.X)
+            if (num1 > (double) vector2.X)
                 vector2.X = num1;
             return vector2;
         }
@@ -109,13 +109,13 @@ namespace Monocle
             int index = start;
             for (int length = text.Length; index < length && text[index] != '\n'; ++index)
             {
-                PixelFontCharacter pixelFontCharacter = (PixelFontCharacter) null;
-                if (this.Characters.TryGetValue((int) text[index], out pixelFontCharacter))
+                PixelFontCharacter pixelFontCharacter = null;
+                if (Characters.TryGetValue(text[index], out pixelFontCharacter))
                 {
-                    nextLine += (float) pixelFontCharacter.XAdvance;
+                    nextLine += pixelFontCharacter.XAdvance;
                     int num;
-                    if (index < length - 1 && pixelFontCharacter.Kerning.TryGetValue((int) text[index + 1], out num))
-                        nextLine += (float) num;
+                    if (index < length - 1 && pixelFontCharacter.Kerning.TryGetValue(text[index + 1], out num))
+                        nextLine += num;
                 }
             }
             return nextLine;
@@ -134,7 +134,7 @@ namespace Monocle
                         ++num;
                 }
             }
-            return (float) (num * this.LineHeight);
+            return num * LineHeight;
         }
 
         public void Draw(
@@ -146,12 +146,12 @@ namespace Monocle
         {
             if (char.IsWhiteSpace(character))
                 return;
-            PixelFontCharacter pixelFontCharacter = (PixelFontCharacter) null;
-            if (!this.Characters.TryGetValue((int) character, out pixelFontCharacter))
+            PixelFontCharacter pixelFontCharacter = null;
+            if (!Characters.TryGetValue(character, out pixelFontCharacter))
                 return;
-            Vector2 vector2_1 = this.Measure(character);
+            Vector2 vector2_1 = Measure(character);
             Vector2 vector2_2 = new Vector2(vector2_1.X * justify.X, vector2_1.Y * justify.Y);
-            Vector2 val = position + (new Vector2((float) pixelFontCharacter.XOffset, (float) pixelFontCharacter.YOffset) - vector2_2) * scale;
+            Vector2 val = position + (new Vector2(pixelFontCharacter.XOffset, pixelFontCharacter.YOffset) - vector2_2) * scale;
             pixelFontCharacter.Texture.Draw(val.Floor(), Vector2.Zero, color, scale);
         }
 
@@ -169,28 +169,28 @@ namespace Monocle
             if (string.IsNullOrEmpty(text))
                 return;
             Vector2 zero = Vector2.Zero;
-            Vector2 vector2 = new Vector2(((double) justify.X != 0.0 ? this.WidthToNextLine(text, 0) : 0.0f) * justify.X, this.HeightOf(text) * justify.Y);
+            Vector2 vector2 = new Vector2((justify.X != 0.0 ? WidthToNextLine(text, 0) : 0.0f) * justify.X, HeightOf(text) * justify.Y);
             for (int index = 0; index < text.Length; ++index)
             {
                 if (text[index] == '\n')
                 {
                     zero.X = 0.0f;
-                    zero.Y += (float) this.LineHeight;
-                    if ((double) justify.X != 0.0)
-                        vector2.X = this.WidthToNextLine(text, index + 1) * justify.X;
+                    zero.Y += LineHeight;
+                    if (justify.X != 0.0)
+                        vector2.X = WidthToNextLine(text, index + 1) * justify.X;
                 }
                 else
                 {
-                    PixelFontCharacter pixelFontCharacter = (PixelFontCharacter) null;
-                    if (this.Characters.TryGetValue((int) text[index], out pixelFontCharacter))
+                    PixelFontCharacter pixelFontCharacter = null;
+                    if (Characters.TryGetValue(text[index], out pixelFontCharacter))
                     {
-                        Vector2 position1 = position + (zero + new Vector2((float) pixelFontCharacter.XOffset, (float) pixelFontCharacter.YOffset) - vector2) * scale;
-                        if ((double) stroke > 0.0 && !this.Outline)
+                        Vector2 position1 = position + (zero + new Vector2(pixelFontCharacter.XOffset, pixelFontCharacter.YOffset) - vector2) * scale;
+                        if (stroke > 0.0 && !Outline)
                         {
-                            if ((double) edgeDepth > 0.0)
+                            if (edgeDepth > 0.0)
                             {
                                 pixelFontCharacter.Texture.Draw(position1 + new Vector2(0.0f, -stroke), Vector2.Zero, strokeColor, scale);
-                                for (float y = -stroke; (double) y < (double) edgeDepth + (double) stroke; y += stroke)
+                                for (float y = -stroke; y < edgeDepth + (double) stroke; y += stroke)
                                 {
                                     pixelFontCharacter.Texture.Draw(position1 + new Vector2(-stroke, y), Vector2.Zero, strokeColor, scale);
                                     pixelFontCharacter.Texture.Draw(position1 + new Vector2(stroke, y), Vector2.Zero, strokeColor, scale);
@@ -211,21 +211,21 @@ namespace Monocle
                                 pixelFontCharacter.Texture.Draw(position1 + new Vector2(1f, 1f) * stroke, Vector2.Zero, strokeColor, scale);
                             }
                         }
-                        if ((double) edgeDepth > 0.0)
+                        if (edgeDepth > 0.0)
                             pixelFontCharacter.Texture.Draw(position1 + Vector2.UnitY * edgeDepth, Vector2.Zero, edgeColor, scale);
                         pixelFontCharacter.Texture.Draw(position1, Vector2.Zero, color, scale);
-                        zero.X += (float) pixelFontCharacter.XAdvance;
+                        zero.X += pixelFontCharacter.XAdvance;
                         int num;
-                        if (index < text.Length - 1 && pixelFontCharacter.Kerning.TryGetValue((int) text[index + 1], out num))
-                            zero.X += (float) num;
+                        if (index < text.Length - 1 && pixelFontCharacter.Kerning.TryGetValue(text[index + 1], out num))
+                            zero.X += num;
                     }
                 }
             }
         }
 
-        public void Draw(string text, Vector2 position, Color color) => this.Draw(text, position, Vector2.Zero, Vector2.One, color, 0.0f, Color.Transparent, 0.0f, Color.Transparent);
+        public void Draw(string text, Vector2 position, Color color) => Draw(text, position, Vector2.Zero, Vector2.One, color, 0.0f, Color.Transparent, 0.0f, Color.Transparent);
 
-        public void Draw(string text, Vector2 position, Vector2 justify, Vector2 scale, Color color) => this.Draw(text, position, justify, scale, color, 0.0f, Color.Transparent, 0.0f, Color.Transparent);
+        public void Draw(string text, Vector2 position, Vector2 justify, Vector2 scale, Color color) => Draw(text, position, justify, scale, color, 0.0f, Color.Transparent, 0.0f, Color.Transparent);
 
         public void DrawOutline(
             string text,
@@ -236,7 +236,7 @@ namespace Monocle
             float stroke,
             Color strokeColor)
         {
-            this.Draw(text, position, justify, scale, color, 0.0f, Color.Transparent, stroke, strokeColor);
+            Draw(text, position, justify, scale, color, 0.0f, Color.Transparent, stroke, strokeColor);
         }
 
         public void DrawEdgeOutline(
@@ -250,7 +250,7 @@ namespace Monocle
             float stroke = 0.0f,
             Color strokeColor = default (Color))
         {
-            this.Draw(text, position, justify, scale, color, edgeDepth, edgeColor, stroke, strokeColor);
+            Draw(text, position, justify, scale, color, edgeDepth, edgeColor, stroke, strokeColor);
         }
     }
 }

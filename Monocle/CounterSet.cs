@@ -11,7 +11,7 @@ namespace Monocle
         public CounterSet()
             : base(true, false)
         {
-            this.counters = new Dictionary<T, float>();
+            counters = new Dictionary<T, float>();
         }
 
         public float this[T index]
@@ -19,17 +19,17 @@ namespace Monocle
             get
             {
                 float num;
-                return this.counters.TryGetValue(index, out num) ? Math.Max(num - this.timer, 0.0f) : 0.0f;
+                return counters.TryGetValue(index, out num) ? Math.Max(num - timer, 0.0f) : 0.0f;
             }
-            set => this.counters[index] = this.timer + value;
+            set => counters[index] = timer + value;
         }
 
         public bool Check(T index)
         {
             float num;
-            return this.counters.TryGetValue(index, out num) && (double) num - (double) this.timer > 0.0;
+            return counters.TryGetValue(index, out num) && num - (double) timer > 0.0;
         }
 
-        public override void Update() => this.timer += Engine.DeltaTime;
+        public override void Update() => timer += Engine.DeltaTime;
     }
 }

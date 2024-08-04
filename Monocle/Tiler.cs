@@ -10,7 +10,7 @@ namespace Monocle
             Action<int> tileOutput,
             int tileWidth,
             int tileHeight,
-            Tiler.EdgeBehavior edges)
+            EdgeBehavior edges)
         {
             int length1 = bits.GetLength(0);
             int length2 = bits.GetLength(1);
@@ -23,7 +23,7 @@ namespace Monocle
                     {
                         switch (edges)
                         {
-                            case Tiler.EdgeBehavior.True:
+                            case EdgeBehavior.True:
                                 Tiler.Left = Tiler.TileX == 0 || bits[Tiler.TileX - 1, Tiler.TileY];
                                 Tiler.Right = Tiler.TileX == length1 - 1 || bits[Tiler.TileX + 1, Tiler.TileY];
                                 Tiler.Up = Tiler.TileY == 0 || bits[Tiler.TileX, Tiler.TileY - 1];
@@ -33,7 +33,7 @@ namespace Monocle
                                 Tiler.DownLeft = Tiler.TileX == 0 || Tiler.TileY == length2 - 1 || bits[Tiler.TileX - 1, Tiler.TileY + 1];
                                 Tiler.DownRight = Tiler.TileX == length1 - 1 || Tiler.TileY == length2 - 1 || bits[Tiler.TileX + 1, Tiler.TileY + 1];
                                 break;
-                            case Tiler.EdgeBehavior.False:
+                            case EdgeBehavior.False:
                                 Tiler.Left = Tiler.TileX != 0 && bits[Tiler.TileX - 1, Tiler.TileY];
                                 Tiler.Right = Tiler.TileX != length1 - 1 && bits[Tiler.TileX + 1, Tiler.TileY];
                                 Tiler.Up = Tiler.TileY != 0 && bits[Tiler.TileX, Tiler.TileY - 1];
@@ -43,7 +43,7 @@ namespace Monocle
                                 Tiler.DownLeft = Tiler.TileX != 0 && Tiler.TileY != length2 - 1 && bits[Tiler.TileX - 1, Tiler.TileY + 1];
                                 Tiler.DownRight = Tiler.TileX != length1 - 1 && Tiler.TileY != length2 - 1 && bits[Tiler.TileX + 1, Tiler.TileY + 1];
                                 break;
-                            case Tiler.EdgeBehavior.Wrap:
+                            case EdgeBehavior.Wrap:
                                 Tiler.Left = bits[(Tiler.TileX + length1 - 1) % length1, Tiler.TileY];
                                 Tiler.Right = bits[(Tiler.TileX + 1) % length1, Tiler.TileY];
                                 Tiler.Up = bits[Tiler.TileX, (Tiler.TileY + length2 - 1) % length2];
@@ -70,7 +70,7 @@ namespace Monocle
             Action<int> tileOutput,
             int tileWidth,
             int tileHeight,
-            Tiler.EdgeBehavior edges)
+            EdgeBehavior edges)
         {
             int length1 = bits.GetLength(0);
             int length2 = bits.GetLength(1);
@@ -83,7 +83,7 @@ namespace Monocle
                     {
                         switch (edges)
                         {
-                            case Tiler.EdgeBehavior.True:
+                            case EdgeBehavior.True:
                                 Tiler.Left = Tiler.TileX == 0 || bits[Tiler.TileX - 1, Tiler.TileY] || mask[Tiler.TileX - 1, Tiler.TileY];
                                 Tiler.Right = Tiler.TileX == length1 - 1 || bits[Tiler.TileX + 1, Tiler.TileY] || mask[Tiler.TileX + 1, Tiler.TileY];
                                 Tiler.Up = Tiler.TileY == 0 || bits[Tiler.TileX, Tiler.TileY - 1] || mask[Tiler.TileX, Tiler.TileY - 1];
@@ -93,7 +93,7 @@ namespace Monocle
                                 Tiler.DownLeft = Tiler.TileX == 0 || Tiler.TileY == length2 - 1 || bits[Tiler.TileX - 1, Tiler.TileY + 1] || mask[Tiler.TileX - 1, Tiler.TileY + 1];
                                 Tiler.DownRight = Tiler.TileX == length1 - 1 || Tiler.TileY == length2 - 1 || bits[Tiler.TileX + 1, Tiler.TileY + 1] || mask[Tiler.TileX + 1, Tiler.TileY + 1];
                                 break;
-                            case Tiler.EdgeBehavior.False:
+                            case EdgeBehavior.False:
                                 Tiler.Left = Tiler.TileX != 0 && (bits[Tiler.TileX - 1, Tiler.TileY] || mask[Tiler.TileX - 1, Tiler.TileY]);
                                 Tiler.Right = Tiler.TileX != length1 - 1 && (bits[Tiler.TileX + 1, Tiler.TileY] || mask[Tiler.TileX + 1, Tiler.TileY]);
                                 Tiler.Up = Tiler.TileY != 0 && (bits[Tiler.TileX, Tiler.TileY - 1] || mask[Tiler.TileX, Tiler.TileY - 1]);
@@ -103,7 +103,7 @@ namespace Monocle
                                 Tiler.DownLeft = Tiler.TileX != 0 && Tiler.TileY != length2 - 1 && (bits[Tiler.TileX - 1, Tiler.TileY + 1] || mask[Tiler.TileX - 1, Tiler.TileY + 1]);
                                 Tiler.DownRight = Tiler.TileX != length1 - 1 && Tiler.TileY != length2 - 1 && (bits[Tiler.TileX + 1, Tiler.TileY + 1] || mask[Tiler.TileX + 1, Tiler.TileY + 1]);
                                 break;
-                            case Tiler.EdgeBehavior.Wrap:
+                            case EdgeBehavior.Wrap:
                                 Tiler.Left = bits[(Tiler.TileX + length1 - 1) % length1, Tiler.TileY] || mask[(Tiler.TileX + length1 - 1) % length1, Tiler.TileY];
                                 Tiler.Right = bits[(Tiler.TileX + 1) % length1, Tiler.TileY] || mask[(Tiler.TileX + 1) % length1, Tiler.TileY];
                                 Tiler.Up = bits[Tiler.TileX, (Tiler.TileY + length2 - 1) % length2] || mask[Tiler.TileX, (Tiler.TileY + length2 - 1) % length2];
@@ -129,9 +129,9 @@ namespace Monocle
             Action<int> tileOutput,
             int tileWidth,
             int tileHeight,
-            Tiler.EdgeBehavior edges)
+            EdgeBehavior edges)
         {
-            return Tiler.Tile(bits, new Func<int>(autotileData.TileHandler), tileOutput, tileWidth, tileHeight, edges);
+            return Tiler.Tile(bits, autotileData.TileHandler, tileOutput, tileWidth, tileHeight, edges);
         }
 
         public static int[,] Tile(
@@ -141,9 +141,9 @@ namespace Monocle
             Action<int> tileOutput,
             int tileWidth,
             int tileHeight,
-            Tiler.EdgeBehavior edges)
+            EdgeBehavior edges)
         {
-            return Tiler.Tile(bits, mask, new Func<int>(autotileData.TileHandler), tileOutput, tileWidth, tileHeight, edges);
+            return Tiler.Tile(bits, mask, autotileData.TileHandler, tileOutput, tileWidth, tileHeight, edges);
         }
 
         public static int TileX { get; private set; }

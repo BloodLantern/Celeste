@@ -56,7 +56,7 @@ namespace Monocle
             foreach (KeyValuePair<int, Dictionary<int, int>> keyValuePair1 in dictionary)
             {
                 foreach (KeyValuePair<int, int> keyValuePair2 in keyValuePair1.Value)
-                    Console.WriteLine(keyValuePair1.Key.ToString() + "x" + keyValuePair2.Key + ": " + keyValuePair2.Value);
+                    Console.WriteLine(keyValuePair1.Key + "x" + keyValuePair2.Key + ": " + keyValuePair2.Value);
             }
         }
 

@@ -14,11 +14,11 @@ namespace Monocle
 
         public PixelFontCharacter(int character, MTexture texture, XmlElement xml)
         {
-            this.Character = character;
-            this.Texture = texture.GetSubtexture(xml.AttrInt("x"), xml.AttrInt("y"), xml.AttrInt("width"), xml.AttrInt("height"));
-            this.XOffset = xml.AttrInt("xoffset");
-            this.YOffset = xml.AttrInt("yoffset");
-            this.XAdvance = xml.AttrInt("xadvance");
+            Character = character;
+            Texture = texture.GetSubtexture(xml.AttrInt("x"), xml.AttrInt("y"), xml.AttrInt("width"), xml.AttrInt("height"));
+            XOffset = xml.AttrInt("xoffset");
+            YOffset = xml.AttrInt("yoffset");
+            XAdvance = xml.AttrInt("xadvance");
         }
     }
 }

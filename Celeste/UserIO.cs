@@ -108,7 +108,7 @@ namespace Celeste
         }
 
         /// <summary>
-        /// Closes the IO stream... I suppose. For some readon this function is empty
+        /// Closes the IO stream... I suppose. For some reason this function is empty
         /// and <see cref="Open(Mode)"/> always returns <see langword="true"/>.
         /// </summary>
         public static void Close()
@@ -164,11 +164,10 @@ namespace Celeste
                         yield return null;
                 }
                 else
-                    goto label_14;
+                    break;
             }
             while (menu.TryAgain);
-            menu = null;
-label_14:
+            
             Saving = false;
             Celeste.SaveRoutine = null;
         }

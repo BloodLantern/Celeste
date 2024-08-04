@@ -16,7 +16,7 @@ namespace Monocle
         private ulong cachedFrame;
         private static readonly List<Tween> cached = new();
 
-        public Tween.TweenMode Mode { get; private set; }
+        public TweenMode Mode { get; private set; }
 
         public float Duration { get; private set; }
 
@@ -29,7 +29,7 @@ namespace Monocle
         public bool Reverse { get; private set; }
 
         public static Tween Create(
-            Tween.TweenMode mode,
+            TweenMode mode,
             Ease.Easer easer = null,
             float duration = 1f,
             bool start = false)
@@ -53,7 +53,7 @@ namespace Monocle
 
         public static Tween Set(
             Entity entity,
-            Tween.TweenMode tweenMode,
+            TweenMode tweenMode,
             float duration,
             Ease.Easer easer,
             Action<Tween> onUpdate,
@@ -71,7 +71,7 @@ namespace Monocle
             Vector2 targetPosition,
             float duration,
             Ease.Easer easer,
-            Tween.TweenMode tweenMode = Tween.TweenMode.Oneshot)
+            TweenMode tweenMode = TweenMode.Oneshot)
         {
             Vector2 startPosition = entity.Position;
             Tween tween = Tween.Create(tweenMode, easer, duration, true);
@@ -85,9 +85,9 @@ namespace Monocle
         {
         }
 
-        private void Init(Tween.TweenMode mode, Ease.Easer easer, float duration, bool start)
+        private void Init(TweenMode mode, Ease.Easer easer, float duration, bool start)
         {
-            if ((double) duration <= 0.0)
+            if (duration <= 0.0)
                 duration = 1E-06f;
             UseRawDeltaTime = false;
             Mode = mode;
@@ -117,24 +117,24 @@ namespace Monocle
             Eased = Easer == null ? Percent : Easer(Percent);
             if (OnUpdate != null)
                 OnUpdate(this);
-            if ((double) TimeLeft > 0.0)
+            if (TimeLeft > 0.0)
                 return;
             TimeLeft = 0.0f;
             if (OnComplete != null)
                 OnComplete(this);
             switch (Mode)
             {
-                case Tween.TweenMode.Persist:
+                case TweenMode.Persist:
                     Active = false;
                     break;
-                case Tween.TweenMode.Oneshot:
+                case TweenMode.Oneshot:
                     Active = false;
                     RemoveSelf();
                     break;
-                case Tween.TweenMode.Looping:
+                case TweenMode.Looping:
                     Start(Reverse);
                     break;
-                case Tween.TweenMode.YoyoOneshot:
+                case TweenMode.YoyoOneshot:
                     if (Reverse == startedReversed)
                     {
                         Start(!Reverse);
@@ -144,7 +144,7 @@ namespace Monocle
                     Active = false;
                     RemoveSelf();
                     break;
-                case Tween.TweenMode.YoyoLooping:
+                case TweenMode.YoyoLooping:
                     Start(!Reverse);
                     break;
             }

@@ -14,7 +14,7 @@ namespace Monocle
         public string Title;
         public Version Version;
         public static Action OverloadGameLoop;
-        private static int viewPadding = 0;
+        private static int viewPadding;
         private static bool resizing;
         public static float TimeRate = 1f;
         public static float TimeRateB = 1f;
@@ -84,15 +84,15 @@ namespace Monocle
             ClearColor = Color.Black;
             InactiveSleepTime = new TimeSpan(0L);
             Graphics = new GraphicsDeviceManager(this);
-            Graphics.DeviceReset += new EventHandler<EventArgs>(OnGraphicsReset);
-            Graphics.DeviceCreated += new EventHandler<EventArgs>(OnGraphicsCreate);
+            Graphics.DeviceReset += OnGraphicsReset;
+            Graphics.DeviceCreated += OnGraphicsCreate;
             Graphics.SynchronizeWithVerticalRetrace = vsync;
             Graphics.PreferMultiSampling = false;
             Graphics.GraphicsProfile = GraphicsProfile.HiDef;
             Graphics.PreferredBackBufferFormat = SurfaceFormat.Color;
             Graphics.PreferredDepthStencilFormat = DepthFormat.Depth24Stencil8;
             Window.AllowUserResizing = true;
-            Window.ClientSizeChanged += new EventHandler<EventArgs>(OnClientSizeChanged);
+            Window.ClientSizeChanged += OnClientSizeChanged;
             if (fullscreen)
             {
                 Graphics.PreferredBackBufferWidth = GraphicsAdapter.DefaultAdapter.CurrentDisplayMode.Width;
@@ -195,9 +195,9 @@ namespace Monocle
             {
                 if (DashAssistFreeze)
                 {
-                    if (Celeste.Input.Dash.Check || !DashAssistFreezePress)
+                    if (Input.Dash.Check || !DashAssistFreezePress)
                     {
-                        if (Celeste.Input.Dash.Check)
+                        if (Input.Dash.Check)
                             DashAssistFreezePress = true;
                         if (scene != null)
                         {
@@ -342,10 +342,10 @@ namespace Monocle
             ViewWidth -= ViewPadding * 2;
             ViewHeight -= (int) ((double) num * ViewPadding * 2.0);
             ScreenMatrix = Matrix.CreateScale(ViewWidth / (float) Width);
-            Viewport = new Viewport()
+            Viewport = new Viewport
             {
-                X = (int) ((double) backBufferWidth / 2.0 - ViewWidth / 2),
-                Y = (int) ((double) backBufferHeight / 2.0 - ViewHeight / 2),
+                X = (int) (backBufferWidth / 2.0 - ViewWidth / 2),
+                Y = (int) (backBufferHeight / 2.0 - ViewHeight / 2),
                 Width = ViewWidth,
                 Height = ViewHeight,
                 MinDepth = 0.0f,

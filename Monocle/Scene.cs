@@ -95,15 +95,15 @@ namespace Monocle
         {
         }
 
-        public bool OnInterval(float interval) => (int) ((TimeActive - (double) Engine.DeltaTime) / (double) interval) < (int) (TimeActive / (double) interval);
+        public bool OnInterval(float interval) => (int) ((TimeActive - (double) Engine.DeltaTime) / interval) < (int) (TimeActive / (double) interval);
 
-        public bool OnInterval(float interval, float offset) => Math.Floor((TimeActive - (double) offset - (double) Engine.DeltaTime) / (double) interval) < Math.Floor((TimeActive - (double) offset) / (double) interval);
+        public bool OnInterval(float interval, float offset) => Math.Floor((TimeActive - (double) offset - Engine.DeltaTime) / interval) < Math.Floor((TimeActive - (double) offset) / interval);
 
         public bool BetweenInterval(float interval) => Calc.BetweenInterval(TimeActive, interval);
 
-        public bool OnRawInterval(float interval) => (int) ((RawTimeActive - (double) Engine.RawDeltaTime) / (double) interval) < (int) (RawTimeActive / (double) interval);
+        public bool OnRawInterval(float interval) => (int) ((RawTimeActive - (double) Engine.RawDeltaTime) / interval) < (int) (RawTimeActive / (double) interval);
 
-        public bool OnRawInterval(float interval, float offset) => Math.Floor((RawTimeActive - (double) offset - (double) Engine.RawDeltaTime) / (double) interval) < Math.Floor((RawTimeActive - (double) offset) / (double) interval);
+        public bool OnRawInterval(float interval, float offset) => Math.Floor((RawTimeActive - (double) offset - Engine.RawDeltaTime) / interval) < Math.Floor((RawTimeActive - (double) offset) / interval);
 
         public bool BetweenRawInterval(float interval) => Calc.BetweenInterval(RawTimeActive, interval);
 
@@ -261,7 +261,7 @@ namespace Monocle
             Vector2 vector2_1 = to - from;
             vector2_1.Normalize();
             Vector2 vector2_2 = vector2_1 * precision;
-            int num = (int) Math.Floor((double) (from - to).Length() / (double) precision);
+            int num = (int) Math.Floor((from - to).Length() / (double) precision);
             Vector2 vector2_3 = from;
             Vector2 point = from + vector2_2;
             for (int index = 0; index <= num; ++index)
@@ -403,21 +403,21 @@ namespace Monocle
         public List<T> CollideAll<T>(Vector2 point) where T : Entity
         {
             List<T> hits = new();
-            CollideInto<T>(point, hits);
+            CollideInto(point, hits);
             return hits;
         }
 
         public List<T> CollideAll<T>(Vector2 from, Vector2 to) where T : Entity
         {
             List<T> hits = new();
-            CollideInto<T>(from, to, hits);
+            CollideInto(from, to, hits);
             return hits;
         }
 
         public List<T> CollideAll<T>(Rectangle rect) where T : Entity
         {
             List<T> hits = new();
-            CollideInto<T>(rect, hits);
+            CollideInto(rect, hits);
             return hits;
         }
 
@@ -456,7 +456,7 @@ namespace Monocle
             Vector2 vector2_1 = to - from;
             vector2_1.Normalize();
             Vector2 vector2_2 = vector2_1 * precision;
-            int num = (int) Math.Floor((double) (from - to).Length() / (double) precision);
+            int num = (int) Math.Floor((from - to).Length() / (double) precision);
             Vector2 vector2_3 = from;
             Vector2 point = from + vector2_2;
             for (int index = 0; index <= num; ++index)
@@ -598,21 +598,21 @@ namespace Monocle
         public List<T> CollideAllByComponent<T>(Vector2 point) where T : Component
         {
             List<T> hits = new();
-            CollideIntoByComponent<T>(point, hits);
+            CollideIntoByComponent(point, hits);
             return hits;
         }
 
         public List<T> CollideAllByComponent<T>(Vector2 from, Vector2 to) where T : Component
         {
             List<T> hits = new();
-            CollideIntoByComponent<T>(from, to, hits);
+            CollideIntoByComponent(from, to, hits);
             return hits;
         }
 
         public List<T> CollideAllByComponent<T>(Rectangle rect) where T : Component
         {
             List<T> hits = new();
-            CollideIntoByComponent<T>(rect, hits);
+            CollideIntoByComponent(rect, hits);
             return hits;
         }
 
@@ -651,7 +651,7 @@ namespace Monocle
             Vector2 vector2_1 = to - from;
             vector2_1.Normalize();
             Vector2 vector2_2 = vector2_1 * precision;
-            int num = (int) Math.Floor((double) (from - to).Length() / (double) precision);
+            int num = (int) Math.Floor((from - to).Length() / (double) precision);
             Vector2 vector2_3 = from;
             Vector2 point = from + vector2_2;
             for (int index = 0; index <= num; ++index)

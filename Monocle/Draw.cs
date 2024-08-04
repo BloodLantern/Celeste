@@ -30,7 +30,7 @@ namespace Monocle
             Particle = new MTexture(parent, 1, 1, 1, 1);
         }
 
-        public static void Point(Vector2 at, Color color) => SpriteBatch.Draw(Pixel.Texture.Texture, at, new Rectangle?(Pixel.ClipRect), color, 0.0f, Vector2.Zero, 1f, SpriteEffects.None, 0.0f);
+        public static void Point(Vector2 at, Color color) => SpriteBatch.Draw(Pixel.Texture.Texture, at, Draw.Pixel.ClipRect, color, 0.0f, Vector2.Zero, 1f, SpriteEffects.None, 0.0f);
 
         public static void Line(Vector2 start, Vector2 end, Color color) => LineAngle(start, Calc.Angle(start, end), Vector2.Distance(start, end), color);
 
@@ -49,7 +49,7 @@ namespace Monocle
             Line(new Vector2(x1, y1), new Vector2(x2, y2), color, thickness);
         }
 
-        public static void LineAngle(Vector2 start, float angle, float length, Color color) => SpriteBatch.Draw(Pixel.Texture.Texture, start, new Rectangle?(Pixel.ClipRect), color, angle, Vector2.Zero, new Vector2(length, 1f), SpriteEffects.None, 0.0f);
+        public static void LineAngle(Vector2 start, float angle, float length, Color color) => SpriteBatch.Draw(Pixel.Texture.Texture, start, Draw.Pixel.ClipRect, color, angle, Vector2.Zero, new Vector2(length, 1f), SpriteEffects.None, 0.0f);
 
         public static void LineAngle(
             Vector2 start,
@@ -58,7 +58,7 @@ namespace Monocle
             Color color,
             float thickness)
         {
-            SpriteBatch.Draw(Pixel.Texture.Texture, start, new Rectangle?(Pixel.ClipRect), color, angle, new Vector2(0.0f, 0.5f), new Vector2(length, thickness), SpriteEffects.None, 0.0f);
+            SpriteBatch.Draw(Pixel.Texture.Texture, start, Draw.Pixel.ClipRect, color, angle, new Vector2(0.0f, 0.5f), new Vector2(length, thickness), SpriteEffects.None, 0.0f);
         }
 
         public static void LineAngle(
@@ -129,7 +129,7 @@ namespace Monocle
             rect.Y = (int) y;
             rect.Width = (int) width;
             rect.Height = (int) height;
-            SpriteBatch.Draw(Pixel.Texture.Texture, rect, new Rectangle?(Pixel.ClipRect), color);
+            SpriteBatch.Draw(Pixel.Texture.Texture, rect, Draw.Pixel.ClipRect, color);
         }
 
         public static void Rect(Vector2 position, float width, float height, Color color) => Rect(position.X, position.Y, width, height, color);
@@ -137,7 +137,7 @@ namespace Monocle
         public static void Rect(Rectangle rect, Color color)
         {
             rect = rect;
-            SpriteBatch.Draw(Pixel.Texture.Texture, rect, new Rectangle?(Pixel.ClipRect), color);
+            SpriteBatch.Draw(Pixel.Texture.Texture, rect, Draw.Pixel.ClipRect, color);
         }
 
         public static void Rect(Collider collider, Color color) => Rect(collider.AbsoluteLeft, collider.AbsoluteTop, collider.Width, collider.Height, color);
@@ -148,15 +148,15 @@ namespace Monocle
             rect.Y = (int) y;
             rect.Width = (int) width;
             rect.Height = 1;
-            SpriteBatch.Draw(Pixel.Texture.Texture, rect, new Rectangle?(Pixel.ClipRect), color);
+            SpriteBatch.Draw(Pixel.Texture.Texture, rect, Draw.Pixel.ClipRect, color);
             rect.Y += (int) height - 1;
-            SpriteBatch.Draw(Pixel.Texture.Texture, rect, new Rectangle?(Pixel.ClipRect), color);
+            SpriteBatch.Draw(Pixel.Texture.Texture, rect, Draw.Pixel.ClipRect, color);
             rect.Y -= (int) height - 1;
             rect.Width = 1;
             rect.Height = (int) height;
-            SpriteBatch.Draw(Pixel.Texture.Texture, rect, new Rectangle?(Pixel.ClipRect), color);
+            SpriteBatch.Draw(Pixel.Texture.Texture, rect, Draw.Pixel.ClipRect, color);
             rect.X += (int) width - 1;
-            SpriteBatch.Draw(Pixel.Texture.Texture, rect, new Rectangle?(Pixel.ClipRect), color);
+            SpriteBatch.Draw(Pixel.Texture.Texture, rect, Draw.Pixel.ClipRect, color);
         }
 
         public static void HollowRect(Vector2 position, float width, float height, Color color) => HollowRect(position.X, position.Y, width, height, color);
@@ -351,8 +351,8 @@ namespace Monocle
             int num = 0;
             for (; clipRect.X < tex.ClipRect.X + tex.ClipRect.Width; clipRect.Width = Math.Min(sliceSize, tex.ClipRect.X + tex.ClipRect.Width - clipRect.X))
             {
-                Vector2 vector2 = new(sliceSize * num, (float) Math.Round(Math.Sin((double) sineCounter + (double) sliceAdd * num) * (double) amplitude));
-                SpriteBatch.Draw(tex.Texture.Texture, position, new Rectangle?(clipRect), color, rotation, origin - vector2, scale, effects, 0.0f);
+                Vector2 vector2 = new(sliceSize * num, (float) Math.Round(Math.Sin(sineCounter + (double) sliceAdd * num) * amplitude));
+                SpriteBatch.Draw(tex.Texture.Texture, position, clipRect, color, rotation, origin - vector2, scale, effects, 0.0f);
                 ++num;
                 clipRect.X += sliceSize;
             }
@@ -379,8 +379,8 @@ namespace Monocle
             int num = 0;
             for (; clipRect.Y < tex.ClipRect.Y + tex.ClipRect.Height; clipRect.Height = Math.Min(sliceSize, tex.ClipRect.Y + tex.ClipRect.Height - clipRect.Y))
             {
-                Vector2 vector2 = new((float) Math.Round(Math.Sin((double) sineCounter + (double) sliceAdd * num) * (double) amplitude), sliceSize * num);
-                SpriteBatch.Draw(tex.Texture.Texture, position, new Rectangle?(clipRect), color, rotation, origin - vector2, scale, effects, 0.0f);
+                Vector2 vector2 = new((float) Math.Round(Math.Sin(sineCounter + (double) sliceAdd * num) * amplitude), sliceSize * num);
+                SpriteBatch.Draw(tex.Texture.Texture, position, clipRect, color, rotation, origin - vector2, scale, effects, 0.0f);
                 ++num;
                 clipRect.Y += sliceSize;
             }
@@ -410,8 +410,8 @@ namespace Monocle
                 float amount = (clipRect.Y - tex.ClipRect.Y) / (float) tex.ClipRect.Height;
                 clipRect.Height = (int) MathHelper.Lerp(sliceSize, 1f, amount);
                 clipRect.Height = Math.Min(sliceSize, tex.ClipRect.Y + tex.ClipRect.Height - clipRect.Y);
-                Vector2 vector2 = new((float) Math.Round(Math.Sin((double) sineCounter + (double) sliceAdd * num) * (double) amplitude * (double) amount), clipRect.Y - tex.ClipRect.Y);
-                SpriteBatch.Draw(tex.Texture.Texture, position, new Rectangle?(clipRect), color, rotation, origin - vector2, scale, effects, 0.0f);
+                Vector2 vector2 = new((float) Math.Round(Math.Sin(sineCounter + (double) sliceAdd * num) * amplitude * amount), clipRect.Y - tex.ClipRect.Y);
+                SpriteBatch.Draw(tex.Texture.Texture, position, clipRect, color, rotation, origin - vector2, scale, effects, 0.0f);
                 ++num;
             }
         }

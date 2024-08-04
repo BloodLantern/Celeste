@@ -77,7 +77,7 @@ namespace Monocle
                             VirtualTexture texture2 = VirtualContent.CreateTexture(Path.Combine(Path.GetDirectoryName(path), str1 + ".png"));
                             MTexture parent2 = new(texture2);
                             atlas.Sources.Add(texture2);
-                            foreach (XmlElement xml2 in (XmlNode) current)
+                            foreach (XmlElement xml2 in current)
                             {
                                 string str2 = xml2.Attr("n");
                                 Rectangle clipRect = new(xml2.AttrInt("x"), xml2.AttrInt("y"), xml2.AttrInt("w"), xml2.AttrInt("h"));
@@ -281,7 +281,7 @@ namespace Monocle
             int num = 0;
             while (true)
             {
-                string str = Path.Combine(rootPath, filename + num.ToString() + ".xml");
+                string str = Path.Combine(rootPath, filename + num + ".xml");
                 if (File.Exists(Path.Combine(Engine.ContentDirectory, str)))
                 {
                     ReadAtlasData(atlas, str, format);

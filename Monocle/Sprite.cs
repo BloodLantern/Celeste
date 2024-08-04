@@ -124,70 +124,70 @@ namespace Monocle
             SetFrame(currentAnimation.Frames[CurrentAnimationFrame]);
         }
 
-        public void AddLoop(string id, string path, float delay) => animations[id] = new Animation()
+        public void AddLoop(string id, string path, float delay) => animations[id] = new Animation
         {
             Delay = delay,
             Frames = GetFrames(path),
             Goto = new Chooser<string>(id, 1f)
         };
 
-        public void AddLoop(string id, string path, float delay, params int[] frames) => animations[id] = new Animation()
+        public void AddLoop(string id, string path, float delay, params int[] frames) => animations[id] = new Animation
         {
             Delay = delay,
             Frames = GetFrames(path, frames),
             Goto = new Chooser<string>(id, 1f)
         };
 
-        public void AddLoop(string id, float delay, params MTexture[] frames) => animations[id] = new Animation()
+        public void AddLoop(string id, float delay, params MTexture[] frames) => animations[id] = new Animation
         {
             Delay = delay,
             Frames = frames,
             Goto = new Chooser<string>(id, 1f)
         };
 
-        public void Add(string id, string path) => animations[id] = new Animation()
+        public void Add(string id, string path) => animations[id] = new Animation
         {
             Delay = 0.0f,
             Frames = GetFrames(path),
             Goto = null
         };
 
-        public void Add(string id, string path, float delay) => animations[id] = new Animation()
+        public void Add(string id, string path, float delay) => animations[id] = new Animation
         {
             Delay = delay,
             Frames = GetFrames(path),
             Goto = null
         };
 
-        public void Add(string id, string path, float delay, params int[] frames) => animations[id] = new Animation()
+        public void Add(string id, string path, float delay, params int[] frames) => animations[id] = new Animation
         {
             Delay = delay,
             Frames = GetFrames(path, frames),
             Goto = null
         };
 
-        public void Add(string id, string path, float delay, string into) => animations[id] = new Animation()
+        public void Add(string id, string path, float delay, string into) => animations[id] = new Animation
         {
             Delay = delay,
             Frames = GetFrames(path),
             Goto = Chooser<string>.FromString<string>(into)
         };
 
-        public void Add(string id, string path, float delay, Chooser<string> into) => animations[id] = new Animation()
+        public void Add(string id, string path, float delay, Chooser<string> into) => animations[id] = new Animation
         {
             Delay = delay,
             Frames = GetFrames(path),
             Goto = into
         };
 
-        public void Add(string id, string path, float delay, string into, params int[] frames) => animations[id] = new Animation()
+        public void Add(string id, string path, float delay, string into, params int[] frames) => animations[id] = new Animation
         {
             Delay = delay,
             Frames = GetFrames(path, frames),
             Goto = Chooser<string>.FromString<string>(into)
         };
 
-        public void Add(string id, float delay, string into, params MTexture[] frames) => animations[id] = new Animation()
+        public void Add(string id, float delay, string into, params MTexture[] frames) => animations[id] = new Animation
         {
             Delay = delay,
             Frames = frames,
@@ -201,7 +201,7 @@ namespace Monocle
             Chooser<string> into,
             params int[] frames)
         {
-            animations[id] = new Animation()
+            animations[id] = new Animation
             {
                 Delay = delay,
                 Frames = GetFrames(path, frames),
@@ -360,7 +360,7 @@ namespace Monocle
                 return;
             Rectangle relativeRect = Texture.GetRelativeRect(rectangle);
             Vector2 vector2 = new(-Math.Min(rectangle.X - Texture.DrawOffset.X, 0f), -Math.Min(rectangle.Y - Texture.DrawOffset.Y, 0f));
-            Draw.SpriteBatch.Draw(Texture.Texture.Texture, RenderPosition + offset, new Rectangle?(relativeRect), Color, Rotation, Origin - vector2, Scale, Effects, 0f);
+            Draw.SpriteBatch.Draw(Texture.Texture.Texture, RenderPosition + offset, relativeRect, Color, Rotation, Origin - vector2, Scale, Effects, 0f);
         }
 
         public void LogAnimations()

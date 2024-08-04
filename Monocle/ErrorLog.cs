@@ -37,7 +37,7 @@ namespace Monocle
             stringBuilder.AppendLine(" Error Log");
             stringBuilder.AppendLine("==========================================");
             stringBuilder.AppendLine();
-            if (Engine.Instance != null && Engine.Instance.Version != (Version) null)
+            if (Engine.Instance != null && Engine.Instance.Version != null)
             {
                 stringBuilder.Append("Ver ");
                 stringBuilder.AppendLine(Engine.Instance.Version.ToString());

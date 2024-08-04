@@ -163,7 +163,7 @@ label_9:
             foreach (Buttons button in Controller)
             {
                 float num = MInput.GamePads[gamepadIndex].Axis(button, threshold);
-                if ((double) num != 0.0)
+                if (num != 0.0)
                     return num;
             }
             return 0.0f;

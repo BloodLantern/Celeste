@@ -27,7 +27,7 @@ namespace Monocle
         {
             try
             {
-                SerializeToFile<T>(obj, filepath, mode);
+                SerializeToFile(obj, filepath, mode);
                 return true;
             }
             catch
@@ -85,11 +85,8 @@ namespace Monocle
                     return default (T);
                 }
             }
-            else
-            {
-                loadError = false;
-                return default (T);
-            }
+            loadError = false;
+            return default (T);
         }
 
         public enum SerializeModes
