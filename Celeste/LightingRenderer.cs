@@ -2,6 +2,7 @@
 using Microsoft.Xna.Framework.Graphics;
 using Monocle;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace Celeste
 {
@@ -51,7 +52,7 @@ namespace Celeste
         {
             lights = new VertexLight[64];
             for (int index = 0; index < 20; ++index)
-                angles[index] = new Vector3(Calc.AngleToVector((float) (index / 20.0 * 6.2831854820251465), 1f), 0.0f);
+                angles[index] = new(Calc.AngleToVector(index / 20f * MathHelper.TwoPi, 1f), 0f);
         }
 
         public VertexLight SetSpotlight(VertexLight light)
@@ -83,37 +84,40 @@ namespace Celeste
             }
             foreach (VertexLight component in scene.Tracker.GetComponents<VertexLight>())
             {
-                if ((component.Entity == null || !component.Entity.Visible || !component.Visible || component.Alpha <= 0.0 || component.Color.A <= 0 || component.Center.X + (double) component.EndRadius <= camera.X || component.Center.Y + (double) component.EndRadius <= camera.Y || component.Center.X - (double) component.EndRadius >= camera.X + 320.0 ? 0 : (component.Center.Y - (double) component.EndRadius < camera.Y + 180.0 ? 1 : 0)) != 0)
+                if ((component.Entity is not { Visible: true } || !component.Visible || component.Alpha <= 0.0 || component.Color.A <= 0 || component.Center.X + (double) component.EndRadius <= camera.X || component.Center.Y + (double) component.EndRadius <= camera.Y || component.Center.X - (double) component.EndRadius >= camera.X + 320.0 ? 0 : (component.Center.Y - (double) component.EndRadius < camera.Y + 180.0 ? 1 : 0)) != 0)
                 {
                     if (component.Index < 0)
                     {
                         component.Dirty = true;
                         for (int index = 0; index < 64; ++index)
                         {
-                            if (lights[index] == null)
-                            {
-                                lights[index] = component;
-                                component.Index = index;
-                                break;
-                            }
+                            if (lights[index] != null)
+                                continue;
+                            
+                            lights[index] = component;
+                            component.Index = index;
+                            break;
                         }
                     }
                     if (component.LastPosition != component.Position || component.LastEntityPosition != component.Entity.Position || component.Dirty)
                     {
                         component.LastPosition = component.Position;
                         component.InSolid = false;
-                        foreach (Solid solid in scene.CollideAll<Solid>(component.Center))
+                        foreach (Solid solid in scene.CollideAll<Solid>(component.Center).Where(solid => solid.DisableLightsInside))
                         {
-                            if (solid.DisableLightsInside)
-                            {
-                                component.InSolid = true;
-                                break;
-                            }
+                            component.InSolid = true;
+                            break;
                         }
-                        if (!component.InSolid)
-                            component.LastNonSolidPosition = component.Center;
-                        if (component.InSolid && !component.Started)
-                            component.InSolidAlphaMultiplier = 0.0f;
+                        
+                        switch (component.InSolid)
+                        {
+                            case false:
+                                component.LastNonSolidPosition = component.Center;
+                                break;
+                            case true when !component.Started:
+                                component.InSolidAlphaMultiplier = 0.0f;
+                                break;
+                        }
                     }
                     if (component.Entity.Position != component.LastEntityPosition)
                     {

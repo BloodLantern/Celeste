@@ -14,4 +14,4 @@ Simply clone the project, open the Visual Studio solution file, and you should b
 
 ## How to run
 
-The only thing left to do after building is to copy the Content folder from a copy of the game to the build folder (bin/x86/(Debug|Release)). **This project doesn't aim at giving the game for free as you need the assets which aren't included here.**
+The only thing left to do after building is to copy the Content folder from a release of the game to the build folder (bin/x86/(Debug|Release)). **This project doesn't aim at giving the game for free as you need the assets which aren't included here.**
