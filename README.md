@@ -10,7 +10,11 @@ As it is coded in C#, most of it was done using DotPeek, and what's left is code
 
 ## How to build
 
-Simply clone the project, open the Visual Studio solution file, and you should be good to go!
+Install the following dependencies:
+- [.NET Framework 4.5.2](https://dotnet.microsoft.com/en-us/download/dotnet-framework/thank-you/net452-developer-pack-offline-installer)
+- [Microsoft XNA Framework Redistributable 4.0](https://www.microsoft.com/en-us/download/details.aspx?id=20914)
+
+Then clone the project, open the Visual Studio solution file, and you should be good to go!
 
 ## How to run
 
