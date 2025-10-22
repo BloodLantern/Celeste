@@ -20,10 +20,9 @@ namespace Celeste
         public override void OnStay(Player player)
         {
             Level scene = Scene as Level;
-            Session session = scene.Session;
-            float num1 = LightAddFrom + (LightAddTo - LightAddFrom) * MathHelper.Clamp(GetPositionLerp(player, PositionMode), 0.0f, 1f);
-            double num2 = num1;
-            session.LightingAlphaAdd = (float) num2;
+            Session session = scene!.Session;
+            float num1 = LightAddFrom + (LightAddTo - LightAddFrom) * MathHelper.Clamp(GetPositionLerp(player, PositionMode), 0f, 1f);
+            session.LightingAlphaAdd = num1;
             scene.Lighting.Alpha = scene.BaseLightingAlpha + num1;
         }
     }

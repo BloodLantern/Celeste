@@ -5,6 +5,7 @@ using Monocle;
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace Celeste
 {
@@ -1231,54 +1232,70 @@ namespace Celeste
             get
             {
                 Vector2 cameraTarget = new();
-                Vector2 vector2 = new(X - 160f, Y - 90f);
-                if (StateMachine.State != 18)
+                Vector2 vector2 = new(X - Celeste.GameWidth * 0.5f, Y - Celeste.GameHeight * 0.5f);
+                if (StateMachine.State != StReflectionFall)
                     vector2 += new Vector2(level.CameraOffset.X, level.CameraOffset.Y);
-                if (StateMachine.State == 19)
+                switch (StateMachine.State)
                 {
-                    vector2.X += 0.2f * Speed.X;
-                    vector2.Y += 0.2f * Speed.Y;
+                    case StRedDash:
+                        vector2.X += 48 * Math.Sign(Speed.X);
+                        vector2.Y += 48 * Math.Sign(Speed.Y);
+                        break;
+                    
+                    case StSummitLaunch:
+                        vector2.Y -= 64f;
+                        break;
+                    
+                    case StReflectionFall:
+                        vector2.Y += 32f;
+                        break;
+
+                    case StStarFly:
+                        vector2.X += 0.2f * Speed.X;
+                        vector2.Y += 0.2f * Speed.Y;
+                        break;
                 }
-                else if (StateMachine.State == 5)
+                if (CameraAnchorLerp.Length() > 0f)
                 {
-                    vector2.X += 48 * Math.Sign(Speed.X);
-                    vector2.Y += 48 * Math.Sign(Speed.Y);
-                }
-                else if (StateMachine.State == 10)
-                    vector2.Y -= 64f;
-                else if (StateMachine.State == 18)
-                    vector2.Y += 32f;
-                if (CameraAnchorLerp.Length() > 0.0)
-                {
-                    if (CameraAnchorIgnoreX && !CameraAnchorIgnoreY)
-                        vector2.Y = MathHelper.Lerp(vector2.Y, CameraAnchor.Y, CameraAnchorLerp.Y);
-                    else if (!CameraAnchorIgnoreX && CameraAnchorIgnoreY)
-                        vector2.X = MathHelper.Lerp(vector2.X, CameraAnchor.X, CameraAnchorLerp.X);
-                    else if (CameraAnchorLerp.X == (double) CameraAnchorLerp.Y)
+                    switch (CameraAnchorIgnoreX)
                     {
-                        vector2 = Vector2.Lerp(vector2, CameraAnchor, CameraAnchorLerp.X);
-                    }
-                    else
-                    {
-                        vector2.X = MathHelper.Lerp(vector2.X, CameraAnchor.X, CameraAnchorLerp.X);
-                        vector2.Y = MathHelper.Lerp(vector2.Y, CameraAnchor.Y, CameraAnchorLerp.Y);
+                        case true when !CameraAnchorIgnoreY:
+                            vector2.Y = MathHelper.Lerp(vector2.Y, CameraAnchor.Y, CameraAnchorLerp.Y);
+                            break;
+                        
+                        case false when CameraAnchorIgnoreY:
+                            vector2.X = MathHelper.Lerp(vector2.X, CameraAnchor.X, CameraAnchorLerp.X);
+                            break;
+                        
+                        default:
+                        {
+                            if (CameraAnchorLerp.X == CameraAnchorLerp.Y)
+                            {
+                                vector2 = Vector2.Lerp(vector2, CameraAnchor, CameraAnchorLerp.X);
+                            }
+                            else
+                            {
+                                vector2.X = MathHelper.Lerp(vector2.X, CameraAnchor.X, CameraAnchorLerp.X);
+                                vector2.Y = MathHelper.Lerp(vector2.Y, CameraAnchor.Y, CameraAnchorLerp.Y);
+                            }
+
+                            break;
+                        }
                     }
                 }
-                Rectangle bounds;
                 if (EnforceLevelBounds)
                 {
-                    cameraTarget.X = MathHelper.Clamp(vector2.X, level.Bounds.Left, level.Bounds.Right - 320);
-                    ref Vector2 local = ref cameraTarget;
-                    double y = vector2.Y;
-                    bounds = level.Bounds;
-                    double top = bounds.Top;
-                    bounds = level.Bounds;
-                    double max = bounds.Bottom - 180;
-                    double num = MathHelper.Clamp((float) y, (float) top, (float) max);
-                    local.Y = (float) num;
+                    cameraTarget.X = MathHelper.Clamp(vector2.X, level.Bounds.Left, level.Bounds.Right - Celeste.GameWidth);
+                    float top = level.Bounds.Top;
+                    float max = level.Bounds.Bottom - Celeste.GameHeight;
+                    float num = MathHelper.Clamp(vector2.Y, top, max);
+                    cameraTarget.Y = num;
                 }
                 else
+                {
                     cameraTarget = vector2;
+                }
+
                 if (level.CameraLockMode != Level.CameraLockModes.None)
                 {
                     CameraLocker component = Scene.Tracker.GetComponent<CameraLocker>();
@@ -1287,46 +1304,45 @@ namespace Celeste
                         cameraTarget.X = Math.Max(cameraTarget.X, level.Camera.X);
                         if (component != null)
                         {
-                            ref Vector2 local = ref cameraTarget;
-                            double x = cameraTarget.X;
-                            bounds = level.Bounds;
-                            double val2 = Math.Max(bounds.Left, component.Entity.X - component.MaxXOffset);
-                            double num = Math.Min((float) x, (float) val2);
-                            local.X = (float) num;
+                            float val2 = Math.Max(level.Bounds.Left, component.Entity.X - component.MaxXOffset);
+                            float num = Math.Min(cameraTarget.X, val2);
+                            cameraTarget.X = num;
                         }
                     }
-                    if (level.CameraLockMode == Level.CameraLockModes.FinalBoss)
+                    switch (level.CameraLockMode)
                     {
-                        cameraTarget.Y = Math.Max(cameraTarget.Y, level.Camera.Y);
-                        if (component != null)
+                        case Level.CameraLockModes.FinalBoss:
                         {
-                            ref Vector2 local = ref cameraTarget;
-                            double y = cameraTarget.Y;
-                            bounds = level.Bounds;
-                            double val2 = Math.Max(bounds.Top, component.Entity.Y - component.MaxYOffset);
-                            double num = Math.Min((float) y, (float) val2);
-                            local.Y = (float) num;
+                            cameraTarget.Y = Math.Max(cameraTarget.Y, level.Camera.Y);
+                            if (component != null)
+                            {
+                                float val2 = Math.Max(level.Bounds.Top, component.Entity.Y - component.MaxYOffset);
+                                float num = Math.Min(cameraTarget.Y, val2);
+                                cameraTarget.Y = num;
+                            }
+
+                            break;
                         }
-                    }
-                    else if (level.CameraLockMode == Level.CameraLockModes.BoostSequence)
-                    {
-                        level.CameraUpwardMaxY = Math.Min(level.Camera.Y + 180f, level.CameraUpwardMaxY);
-                        cameraTarget.Y = Math.Min(cameraTarget.Y, level.CameraUpwardMaxY);
-                        if (component != null)
+                        
+                        case Level.CameraLockModes.BoostSequence:
                         {
-                            ref Vector2 local = ref cameraTarget;
-                            double y = cameraTarget.Y;
-                            bounds = level.Bounds;
-                            double val2 = Math.Min(bounds.Bottom - 180, component.Entity.Y - component.MaxYOffset);
-                            double num = Math.Max((float) y, (float) val2);
-                            local.Y = (float) num;
+                            level.CameraUpwardMaxY = Math.Min(level.Camera.Y + Celeste.GameHeight, level.CameraUpwardMaxY);
+                            cameraTarget.Y = Math.Min(cameraTarget.Y, level.CameraUpwardMaxY);
+                            if (component != null)
+                            {
+                                float val2 = Math.Min(level.Bounds.Bottom - Celeste.GameHeight, component.Entity.Y - component.MaxYOffset);
+                                float num = Math.Max(cameraTarget.Y, val2);
+                                cameraTarget.Y = num;
+                            }
+
+                            break;
                         }
                     }
                 }
-                foreach (Entity entity in Scene.Tracker.GetEntities<Killbox>())
+                foreach (Entity entity in Scene.Tracker.GetEntities<Killbox>()
+                             .Where(entity => entity.Collidable && Top < entity.Bottom && Right > entity.Left && Left < entity.Right))
                 {
-                    if (entity.Collidable && Top < (double) entity.Bottom && Right > (double) entity.Left && Left < (double) entity.Right)
-                        cameraTarget.Y = Math.Min(cameraTarget.Y, entity.Top - 180f);
+                    cameraTarget.Y = Math.Min(cameraTarget.Y, entity.Top - Celeste.GameHeight);
                 }
                 return cameraTarget;
             }
@@ -1383,19 +1399,21 @@ namespace Celeste
             }
         }
 
-        public bool InControl
+        public bool InControl => StateMachine.State switch
         {
-            get
-            {
-                return StateMachine.State switch
-                {
-                    11 or 12 or 13 or 14 or 15 or 16 or 17 or 23 or 25 => false,
-                    _ => true,
-                };
-            }
-        }
+            StDummy
+                or StIntroWalk
+                or StIntroJump
+                or StIntroRespawn
+                or StIntroWakeUp
+                or StBirdDashTutorial
+                or StFrozen
+                or StIntroMoonJump
+                or StIntroThinkForABit => false,
+            _ => true,
+        };
 
-        public PlayerInventory Inventory => level != null && level.Session != null ? level.Session.Inventory : PlayerInventory.Default;
+        public PlayerInventory Inventory => level is { Session: not null } ? level.Session.Inventory : PlayerInventory.Default;
 
         public void OnTransition()
         {

@@ -1438,10 +1438,16 @@ namespace Celeste
             player.Position = at;
             foreach (Entity entity in Tracker.GetEntities<Trigger>())
             {
-                if (entity is CameraTargetTrigger && player.CollideCheck(entity))
-                    (entity as CameraTargetTrigger).OnStay(player);
-                else if (entity is CameraOffsetTrigger && player.CollideCheck(entity))
-                    (entity as CameraOffsetTrigger).OnEnter(player);
+                switch (entity)
+                {
+                    case CameraTargetTrigger trigger when player.CollideCheck(trigger):
+                        trigger.OnStay(player);
+                        break;
+                    
+                    case CameraOffsetTrigger offsetTrigger when player.CollideCheck(offsetTrigger):
+                        offsetTrigger.OnEnter(player);
+                        break;
+                }
             }
             Vector2 cameraTarget = player.CameraTarget;
             player.Position = position;

@@ -501,7 +501,7 @@ namespace Monocle
 
         public static float SineMap(float counter, float newMin, float newMax) => Map((float) Math.Sin(counter), -1f, 1f, newMin, newMax);
 
-        public static float ClampedMap(float val, float min, float max, float newMin = 0.0f, float newMax = 1f) => MathHelper.Clamp((float) ((val - (double) min) / (max - (double) min)), 0.0f, 1f) * (newMax - newMin) + newMin;
+        public static float ClampedMap(float val, float min, float max, float newMin = 0.0f, float newMax = 1f) => MathHelper.Clamp((val - min) / (max - min), 0f, 1f) * (newMax - newMin) + newMin;
 
         public static float LerpSnap(float value1, float value2, float amount, float snapThreshold = 0.1f)
         {

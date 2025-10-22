@@ -172,7 +172,7 @@ namespace Celeste
             for (int index = 0; index < 64; ++index)
             {
                 VertexLight light = lights[index];
-                if (light != null && light.Dirty)
+                if (light is { Dirty: true })
                     SetClear(index);
             }
             if (vertexCount <= 0)
